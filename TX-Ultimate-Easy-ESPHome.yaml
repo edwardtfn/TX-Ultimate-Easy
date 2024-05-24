@@ -1,0 +1,15 @@
+substitutions:
+  name: tx-ultimate-easy
+  friendly_name: TX Ultimate Easy
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+packages:
+  remote_package:
+    url: https://github.com/edwardtfn/TX-Ultimate-Easy
+    ref: dev
+    refresh: 30s
+    files:
+      - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml

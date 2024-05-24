@@ -1,0 +1,192 @@
+substitutions:
+  name: tx-ultimate
+  friendly_name: TX Ultimate
+
+  led_pin: GPIO13
+  status_led_pin: GPIO33
+
+  audio_sdata_pin: GPIO15
+
+api:
+
+binary_sensor:
+  - id: bs_vibrating
+    name: Vibrating
+    icon: mdi:vibrate
+    internal: false
+    platform: template
+    lambda: return sw_vibration_motor->state;
+
+# bluetooth_proxy:
+
+button:
+  - id: bt_restart
+    name: Restart
+    internal: false
+    platform: restart
+
+  - id: bt_vibrate
+    name: Vibrate
+    icon: mdi:vibrate
+    internal: false
+    platform: template
+    on_press: 
+      then:
+        - switch.turn_on: sw_vibration_motor
+        - delay: !lambda return nr_vibrating_duration->state;
+        - switch.turn_off: sw_vibration_motor
+
+captive_portal:
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+    sdkconfig_options:
+      CONFIG_BT_ALLOCATION_FROM_SPIRAM_FIRST: "y"
+      CONFIG_BT_BLE_DYNAMIC_ENV_MEMORY: "y"
+      CONFIG_ESP32_REV_MIN_3: "y"
+      CONFIG_MBEDTLS_DYNAMIC_BUFFER: "y"
+      CONFIG_MBEDTLS_DYNAMIC_FREE_CA_CERT: "y"
+      CONFIG_MBEDTLS_DYNAMIC_FREE_CONFIG_DATA: "y"
+      CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC: "y"
+      CONFIG_SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY: "y"
+      CONFIG_SPIRAM_RODATA: "y"
+      CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP: "y"
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  on_boot: 
+    - priority: 700
+      then:
+        - wait_until:
+            condition:
+              - lambda: return sl_tx_model_gang->active_index().has_value();
+        - lambda: |-
+            auto index = sl_tx_model_gang->active_index();
+            if (index.has_value()) {
+              sw_relay_1->set_internal(false);
+              sw_relay_2->set_internal(index.value() < 1);
+              sw_relay_3->set_internal(index.value() < 2);
+              sw_relay_4->set_internal(index.value() < 3);
+            }
+
+i2s_audio:
+  id: if_i2s_audio
+  i2s_lrclk_pin: GPIO4
+  i2s_bclk_pin: GPIO2
+
+logger:
+
+number:
+  - id: nr_vibrating_duration
+    name: Vibrate duration
+    icon: mdi:vibrate
+    unit_of_measurement: ms
+    mode: box
+    internal: false
+    platform: template
+    min_value: 10
+    max_value: 3000
+    step: 1
+    initial_value: 50
+    optimistic: true
+    restore_value: true
+
+ota:
+
+psram:
+
+select:
+  - id: sl_tx_model_gang
+    name: Model
+    platform: template
+    options:
+      - "1 Gang"
+      - "2 Gang"
+      - "3 Gang"
+      - "4 Gang"
+    initial_option: "1 Gang"
+    optimistic: true
+    restore_value: true
+    internal: false
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dip-switch
+
+switch:
+  - id: sw_pa_power
+    name: PA - Power
+    platform: gpio
+    pin: GPIO26
+    restore_mode: ALWAYS_ON
+    internal: true
+
+  - id: sw_relay_1
+    name: Relay 1
+    platform: gpio
+    pin: GPIO18
+    restore_mode: RESTORE_DEFAULT_OFF
+    internal: false
+
+  - id: sw_relay_2
+    name: Relay 2
+    platform: gpio
+    pin: GPIO17
+    restore_mode: RESTORE_DEFAULT_OFF
+    internal: true
+
+  - id: sw_relay_3
+    name: Relay 3
+    platform: gpio
+    pin: GPIO27
+    restore_mode: RESTORE_DEFAULT_OFF
+    internal: true
+
+  - id: sw_relay_4
+    name: Relay 4
+    platform: gpio
+    pin: GPIO23
+    restore_mode: RESTORE_DEFAULT_OFF
+    internal: true
+
+  - id: sw_touch_panel_power
+    name: Touch panel - Power
+    platform: gpio
+    pin:
+      number: GPIO5
+      inverted: true
+    restore_mode: ALWAYS_ON
+    internal: true
+
+  - id: sw_vibration_motor
+    name: Vibration motor
+    platform: gpio
+    pin: GPIO21
+    restore_mode: ALWAYS_OFF
+    internal: true
+    on_turn_on:
+      then:
+        - lambda: bs_vibrating->publish_state(true);
+    on_turn_off:
+      then:
+        - lambda: bs_vibrating->publish_state(false);
+
+uart:
+  id: if_uart_touch
+  tx_pin: GPIO19
+  rx_pin: GPIO22
+  baud_rate: 115200
+  debug:
+    direction: BOTH #RX
+    dummy_receiver: false
+    after:
+      timeout: 2s
+      bytes: 2048
+    sequence:
+      #- lambda: UARTDebug::log_string(direction, bytes);
+      - lambda: UARTDebug::log_hex(direction, bytes, ' ');
+
+wifi:
+  ap:
