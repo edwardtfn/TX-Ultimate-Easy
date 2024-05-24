@@ -1,7 +1,7 @@
 # TX-Ultimate-Easy
 ESPHome based custom firmware for Sonoff TX Ultimate. Easy to setup.
 
-![TX Ultimate Easy logo](Assets/Logo.webp)
+<img src="Assets/Logo.webp" alt="TX Ultimate Easy Logo" width="200"/>
 
 # TX Ultimate Easy
 
