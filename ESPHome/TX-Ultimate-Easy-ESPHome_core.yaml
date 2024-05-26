@@ -2,6 +2,8 @@ substitutions:
   name: tx-ultimate-easy
   friendly_name: TX Ultimate Easy
 
+  version: 0.0.1
+
 api:
 
 binary_sensor:
@@ -253,6 +255,17 @@ switch:
     on_turn_off:
       then:
         - lambda: bs_vibrating->publish_state(false);
+
+text_sensor:
+  - id: tx_fw_version
+    name: Firmware version
+    platform: template
+    entity_category: diagnostic
+    icon: mdi:tag-text-outline
+    internal: false
+    update_interval: never
+    lambda: |-
+      return {"${version}"};
 
 uart:
   id: if_uart_touch
