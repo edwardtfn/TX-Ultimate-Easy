@@ -36,7 +36,8 @@ captive_portal:
 esp32:
   board: esp32dev
   framework:
-    type: esp-idf
+    # type: esp-idf
+    type: arduino
 #    sdkconfig_options:
 #      CONFIG_BT_ALLOCATION_FROM_SPIRAM_FIRST: "y"
 #      CONFIG_BT_BLE_DYNAMIC_ENV_MEMORY: "y"
@@ -87,14 +88,14 @@ i2s_audio:
 light:
   - id: light_led
     name: Light - LED
-    # platform: neopixelbus
-    platform: esp32_rmt_led_strip
+    platform: neopixelbus
+    # platform: esp32_rmt_led_strip
     rgb_order: GRB
     pin: GPIO33
     num_leds: 28
     rmt_channel: 0
-    # chipset: ws2811
-    chipset: ws2812
+    chipset: ws2811
+    # chipset: ws2812
     effects:
       - addressable_rainbow:
       - addressable_rainbow:
