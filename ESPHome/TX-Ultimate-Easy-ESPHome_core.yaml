@@ -37,21 +37,33 @@ esp32:
   board: esp32dev
   framework:
     type: esp-idf
-    sdkconfig_options:
-      CONFIG_BT_ALLOCATION_FROM_SPIRAM_FIRST: "y"
-      CONFIG_BT_BLE_DYNAMIC_ENV_MEMORY: "y"
-      CONFIG_ESP32_REV_MIN_3: "y"
-      CONFIG_MBEDTLS_DYNAMIC_BUFFER: "y"
-      CONFIG_MBEDTLS_DYNAMIC_FREE_CA_CERT: "y"
-      CONFIG_MBEDTLS_DYNAMIC_FREE_CONFIG_DATA: "y"
-      CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC: "y"
-      CONFIG_SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY: "y"
-      CONFIG_SPIRAM_RODATA: "y"
-      CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP: "y"
+#    sdkconfig_options:
+#      CONFIG_BT_ALLOCATION_FROM_SPIRAM_FIRST: "y"
+#      CONFIG_BT_BLE_DYNAMIC_ENV_MEMORY: "y"
+#      CONFIG_ESP32_REV_MIN_3: "y"
+#      CONFIG_MBEDTLS_DYNAMIC_BUFFER: "y"
+#      CONFIG_MBEDTLS_DYNAMIC_FREE_CA_CERT: "y"
+#      CONFIG_MBEDTLS_DYNAMIC_FREE_CONFIG_DATA: "y"
+#      CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC: "y"
+#      CONFIG_SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY: "y"
+#      CONFIG_SPIRAM_RODATA: "y"
+#      CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP: "y"
 
 esphome:
   name: ${name}
   friendly_name: ${friendly_name}
+  platformio_options:
+    build_flags:
+      - -DDCONFIG_BT_ALLOCATION_FROM_SPIRAM_FIRST=true
+      - -DDCONFIG_BT_BLE_DYNAMIC_ENV_MEMORY=true
+      - -DDCONFIG_ESP32_REV_MIN_3=true
+      - -DDCONFIG_MBEDTLS_DYNAMIC_BUFFER=true
+      - -DDCONFIG_MBEDTLS_DYNAMIC_FREE_CA_CERT=true
+      - -DDCONFIG_MBEDTLS_DYNAMIC_FREE_CONFIG_DATA=true
+      - -DDCONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC=true
+      - -DDCONFIG_SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY=true
+      - -DDCONFIG_SPIRAM_RODATA=true
+      - -DDCONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP=true
   on_boot: 
     - priority: 700
       then:
@@ -75,11 +87,13 @@ i2s_audio:
 light:
   - id: light_led
     name: Light - LED
+    # platform: neopixelbus
     platform: esp32_rmt_led_strip
     rgb_order: GRB
     pin: GPIO33
     num_leds: 28
     rmt_channel: 0
+    # chipset: ws2811
     chipset: ws2812
     effects:
       - addressable_rainbow:
