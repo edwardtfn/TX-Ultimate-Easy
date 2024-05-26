@@ -89,13 +89,14 @@ light:
   - id: light_led
     name: Light - LED
     platform: neopixelbus
+    type: GRB
+    variant: WS2811
     # platform: esp32_rmt_led_strip
-    rgb_order: GRB
-    pin: GPIO33
-    num_leds: 28
-    rmt_channel: 0
-    chipset: ws2811
+    # rgb_order: GRB
+    # rmt_channel: 0
     # chipset: ws2812
+    num_leds: 28
+    pin: GPIO33
     effects:
       - addressable_rainbow:
       - addressable_rainbow:
@@ -148,6 +149,16 @@ light:
 #    chipset: ws2812
 
 logger:
+
+media_player:
+  - id: mp_audio
+    name: Audio player
+    platform: i2s_audio
+    i2s_dout_pin: GPIO15
+    i2s_audio_id: if_i2s_audio
+    i2s_comm_fmt: lsb
+    dac_type: external
+    internal: false
 
 number:
   - id: nr_vibrating_duration
