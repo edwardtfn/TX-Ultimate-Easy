@@ -2,7 +2,11 @@ substitutions:
   name: tx-ultimate-easy
   friendly_name: TX Ultimate Easy
 
-  version: 0.0.1
+  latitude: '0'
+  longitude: '0'
+  zone_home: 'zone.home'
+
+  version: '0.0.1'
 
 api:
   id: api_server
@@ -93,9 +97,20 @@ esphome:
               sw_relay_3->set_internal(index.value() < 2);
               sw_relay_4->set_internal(index.value() < 3);
             }
-    - priority: -100
+    - priority: 600  # This is where most sensors are set up.
       then:
-        - lambda: tx_fw_version->publish_state("${version}");
+        - lambda: |-
+            tx_fw_version->publish_state("${version}");
+            tx_device_name->publish_state("${name}");
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/edwardtfn/TX-Ultimate-Easy/
+      ref: dev
+      path: ESPHome/components
+    components:
+      - tx_ultimate_easy
 
 i2s_audio:
   id: if_i2s_audio
@@ -226,7 +241,7 @@ sensor:
 
   - id: zone_home_latitude
     platform: homeassistant
-    entity_id: zone.home
+    entity_id: ${zone_home}
     attribute: latitude
     internal: false
     on_value:
@@ -234,7 +249,7 @@ sensor:
 
   - id: zone_home_longitude
     platform: homeassistant
-    entity_id: zone.home
+    entity_id: ${zone_home}
     attribute: longitude
     internal: false
     on_value:
@@ -242,8 +257,8 @@ sensor:
 
 sun:
   id: sun_entity
-  latitude: 90
-  longitude: 180
+  latitude: ${latitude}
+  longitude: ${longitude}
 
 switch:
   - id: sw_speaker_aplifier
@@ -317,9 +332,36 @@ text_sensor:
     lambda: |-
       return {"${version}"};
 
+  - id: tx_device_name
+    name: Device Name
+    platform: template
+    icon: mdi:identifier
+    entity_category: diagnostic
+    internal: false
+    disabled_by_default: false
+    lambda: |-
+      return {"${name}"};
+    filters:
+      - lambda: |-
+          const std::string raw_name = x;
+          std::string result;
+          bool last_was_underscore = false;
+          for (const char& c : raw_name) {
+            if (isalnum(c)) {
+              result += tolower(c);  // Add alphanumeric characters as lowercase
+              last_was_underscore = false;
+            } else if (!last_was_underscore) {  // Replace non-alphanumeric with '_' but avoid consecutive '_'
+              result += '_';
+              last_was_underscore = true;
+            }
+          }
+          return result;
+
 time:
   - id: time_source
     platform: homeassistant
+
+tx_ultimate_easy:
 
 uart:
   id: if_uart_touch
