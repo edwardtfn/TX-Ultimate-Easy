@@ -5,6 +5,18 @@ substitutions:
   version: 0.0.1
 
 api:
+  id: api_server
+  services:
+    - service: set_float
+      variables:
+        component: string
+        val: float
+      then:
+        - lambda: |-
+            if (!isnan(val)) {
+              if (component == "latitude") sun_entity->set_latitude(val);
+              else if (component == "longitude") sun_entity->set_longitude(val);
+            }
 
 binary_sensor:
   - id: bs_vibrating
@@ -205,6 +217,34 @@ select:
     disabled_by_default: false
     icon: mdi:dip-switch
 
+sensor:
+  - id: sun_elevation
+    name: Sun Elevation
+    platform: sun
+    type: elevation
+    internal: true
+
+  - id: zone_home_latitude
+    platform: homeassistant
+    entity_id: zone.home
+    attribute: latitude
+    internal: false
+    on_value:
+      - lambda: if (!isnan(x)) sun_entity->set_latitude(x);
+
+  - id: zone_home_longitude
+    platform: homeassistant
+    entity_id: zone.home
+    attribute: longitude
+    internal: false
+    on_value:
+      - lambda: if (!isnan(x)) sun_entity->set_longitude(x);
+
+sun:
+  id: sun_entity
+  latitude: 90
+  longitude: 180
+
 switch:
   - id: sw_speaker_aplifier
     name: Speaker - Aplifier
@@ -276,6 +316,10 @@ text_sensor:
     update_interval: never
     lambda: |-
       return {"${version}"};
+
+time:
+  - id: time_source
+    platform: homeassistant
 
 uart:
   id: if_uart_touch
