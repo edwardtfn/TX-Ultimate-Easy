@@ -108,7 +108,6 @@ external_components:
       type: git
       url: https://github.com/edwardtfn/TX-Ultimate-Easy/
       ref: dev
-      path: ESPHome/components
     components:
       - tx_ultimate_easy
 
