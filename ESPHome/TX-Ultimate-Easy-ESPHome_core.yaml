@@ -30,6 +30,46 @@ binary_sensor:
     platform: template
     lambda: return sw_vibration_motor->state;
 
+  - id: bs_button_1
+    name: Button 1
+    internal: false
+    platform: template
+    on_press:
+      then:
+        - switch.toggle: sw_relay_1
+        - delay: !lambda "return (isnan(nr_button_timeout->state) ? 500 : int(nr_button_timeout->state));"
+        - lambda: bs_button_1->publish_state(false);
+
+  - id: bs_button_2
+    name: Button 2
+    internal: true
+    platform: template
+    on_press:
+      then:
+        - switch.toggle: sw_relay_2
+        - delay: !lambda "return (isnan(nr_button_timeout->state) ? 500 : int(nr_button_timeout->state));"
+        - lambda: bs_button_2->publish_state(false);
+
+  - id: bs_button_3
+    name: Button 3
+    internal: true
+    platform: template
+    on_press:
+      then:
+        - switch.toggle: sw_relay_3
+        - delay: !lambda "return (isnan(nr_button_timeout->state) ? 500 : int(nr_button_timeout->state));"
+        - lambda: bs_button_3->publish_state(false);
+
+  - id: bs_button_4
+    name: Button 4
+    internal: true
+    platform: template
+    on_press:
+      then:
+        - switch.toggle: sw_relay_4
+        - delay: !lambda "return (isnan(nr_button_timeout->state) ? 500 : int(nr_button_timeout->state));"
+        - lambda: bs_button_4->publish_state(false);
+
 # bluetooth_proxy:
 
 button:
@@ -92,10 +132,19 @@ esphome:
         - lambda: |-
             auto index = sl_tx_model_gang->active_index();
             if (index.has_value()) {
+              uint8_t idx = index.value();
               sw_relay_1->set_internal(false);
-              sw_relay_2->set_internal(index.value() < 1);
-              sw_relay_3->set_internal(index.value() < 2);
-              sw_relay_4->set_internal(index.value() < 3);
+              sw_relay_2->set_internal(idx < 1);
+              sw_relay_3->set_internal(idx < 2);
+              sw_relay_4->set_internal(idx < 3);
+              bs_button_1->set_internal(false);
+              bs_button_2->set_internal(idx < 1);
+              bs_button_3->set_internal(idx < 2);
+              bs_button_4->set_internal(idx < 3);
+              bs_button_1->publish_state(false);
+              bs_button_2->publish_state(false);
+              bs_button_3->publish_state(false);
+              bs_button_4->publish_state(false);
             }
     - priority: 600  # This is where most sensors are set up.
       then:
@@ -106,7 +155,7 @@ esphome:
 external_components:
   - source:
       type: git
-      url: https://github.com/edwardtfn/TX-Ultimate-Easy/
+      url: https://github.com/edwardtfn/TX-Ultimate-Easy
       ref: dev
     components:
       - tx_ultimate_easy
@@ -210,6 +259,20 @@ number:
     initial_value: 15
     optimistic: true
     restore_value: true
+
+  - id: nr_button_timeout
+    name: Button timeout
+    icon: mdi:timer
+    unit_of_measurement: ms
+    internal: false
+    platform: template
+    min_value: 1
+    max_value: 3000
+    step: 1
+    initial_value: 500
+    optimistic: true
+    restore_value: true
+
 ota:
 
 psram:
@@ -361,21 +424,20 @@ time:
     platform: homeassistant
 
 tx_ultimate_easy:
+  id: tx_ultimate
+  uart: uart_touch
+
+  on_touch_event:
+    - lambda: |-
+        ESP_LOGD("tx_ultimate_easy.on_touch_event", "Touch event:");
+        ESP_LOGD("tx_ultimate_easy.on_touch_event", "  State:    %i (%s)", touch.state, touch.state_str.c_str());
+        ESP_LOGD("tx_ultimate_easy.on_touch_event", "  Position: %i", touch.x);
 
 uart:
-  id: if_uart_touch
+  id: uart_touch
   tx_pin: GPIO19
   rx_pin: GPIO22
   baud_rate: 115200
-  debug:
-    direction: BOTH #RX
-    dummy_receiver: false
-    after:
-      timeout: 2s
-      bytes: 2048
-    sequence:
-      # - lambda: UARTDebug::log_string(direction, bytes);
-      - lambda: UARTDebug::log_hex(direction, bytes, ' ');
 
 web_server:
 
