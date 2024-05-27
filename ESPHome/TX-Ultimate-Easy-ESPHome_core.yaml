@@ -81,11 +81,14 @@ esphome:
               sw_relay_3->set_internal(index.value() < 2);
               sw_relay_4->set_internal(index.value() < 3);
             }
+    - priority: -100
+      then:
+        - lambda: tx_fw_version->publish_state("${version}");
 
 i2s_audio:
   id: if_i2s_audio
-  i2s_lrclk_pin: GPIO4
   i2s_bclk_pin: GPIO2
+  i2s_lrclk_pin: GPIO4
 
 light:
   - id: light_led
@@ -98,7 +101,7 @@ light:
     # rmt_channel: 0
     # chipset: ws2812
     num_leds: 28
-    pin: GPIO33
+    pin: GPIO13
     effects:
       - addressable_rainbow:
       - addressable_rainbow:
@@ -153,13 +156,18 @@ light:
 logger:
 
 media_player:
-  - id: mp_audio
-    name: Audio player
+  - id: mp_speaker
+    name: Speaker
     platform: i2s_audio
     i2s_dout_pin: GPIO15
     i2s_audio_id: if_i2s_audio
     i2s_comm_fmt: lsb
     dac_type: external
+    mode: mono
+    mute_pin:
+        number: GPIO26
+        inverted: true
+        allow_other_uses: true
     internal: false
 
 number:
@@ -167,16 +175,15 @@ number:
     name: Vibrate duration
     icon: mdi:vibrate
     unit_of_measurement: ms
-    mode: box
+    # mode: box
     internal: false
     platform: template
-    min_value: 10
-    max_value: 3000
+    min_value: 1
+    max_value: 500
     step: 1
-    initial_value: 50
+    initial_value: 15
     optimistic: true
     restore_value: true
-
 ota:
 
 psram:
@@ -199,11 +206,14 @@ select:
     icon: mdi:dip-switch
 
 switch:
-  - id: sw_pa_power
-    name: PA - Power
+  - id: sw_speaker_aplifier
+    name: Speaker - Aplifier
     platform: gpio
-    pin: GPIO26
-    restore_mode: ALWAYS_ON
+    pin:
+      number: GPIO26
+      inverted: true
+      allow_other_uses: true
+    restore_mode: RESTORE_DEFAULT_ON
     internal: true
 
   - id: sw_relay_1
@@ -279,7 +289,7 @@ uart:
       timeout: 2s
       bytes: 2048
     sequence:
-      #- lambda: UARTDebug::log_string(direction, bytes);
+      # - lambda: UARTDebug::log_string(direction, bytes);
       - lambda: UARTDebug::log_hex(direction, bytes, ' ');
 
 web_server:
