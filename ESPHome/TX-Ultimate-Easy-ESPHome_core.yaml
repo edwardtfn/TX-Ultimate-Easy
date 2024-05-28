@@ -37,8 +37,6 @@ binary_sensor:
     on_press:
       then:
         - switch.toggle: sw_relay_1
-        - delay: !lambda "return (isnan(nr_button_timeout->state) ? 500 : int(nr_button_timeout->state));"
-        - lambda: bs_button_1->publish_state(false);
 
   - id: bs_button_2
     name: Button 2
@@ -47,8 +45,6 @@ binary_sensor:
     on_press:
       then:
         - switch.toggle: sw_relay_2
-        - delay: !lambda "return (isnan(nr_button_timeout->state) ? 500 : int(nr_button_timeout->state));"
-        - lambda: bs_button_2->publish_state(false);
 
   - id: bs_button_3
     name: Button 3
@@ -57,8 +53,6 @@ binary_sensor:
     on_press:
       then:
         - switch.toggle: sw_relay_3
-        - delay: !lambda "return (isnan(nr_button_timeout->state) ? 500 : int(nr_button_timeout->state));"
-        - lambda: bs_button_3->publish_state(false);
 
   - id: bs_button_4
     name: Button 4
@@ -67,8 +61,6 @@ binary_sensor:
     on_press:
       then:
         - switch.toggle: sw_relay_4
-        - delay: !lambda "return (isnan(nr_button_timeout->state) ? 500 : int(nr_button_timeout->state));"
-        - lambda: bs_button_4->publish_state(false);
 
 # bluetooth_proxy:
 
@@ -255,19 +247,6 @@ number:
     max_value: 500
     step: 1
     initial_value: 15
-    optimistic: true
-    restore_value: true
-
-  - id: nr_button_timeout
-    name: Button timeout
-    icon: mdi:timer
-    unit_of_measurement: ms
-    internal: false
-    platform: template
-    min_value: 1
-    max_value: 3000
-    step: 1
-    initial_value: 500
     optimistic: true
     restore_value: true
 
@@ -459,11 +438,39 @@ tx_ultimate_easy:
     - lambda: |-
         if (sl_touch_vibration_feedback->state == "On press" or sl_touch_vibration_feedback->state == "Always")
           vibrate->execute();
+        auto model_index = sl_tx_model_gang->active_index();
+        if (model_index.has_value()) {
+          uint8_t model_idx = model_index.value() + 1;
+          switch (model_idx) {
+            case 1:  // 1 Gang
+              bs_button_1->publish_state(true);
+              break;
+            case 2:  // 2 Gang
+              if (touch.x <= 5) bs_button_1->publish_state(true);
+              else bs_button_2->publish_state(true);
+              break;
+            case 3:  // 3 Gang
+              if (touch.x <= 3) bs_button_1->publish_state(true);
+              else if (touch.x <= 7) bs_button_2->publish_state(true);
+              else bs_button_3->publish_state(true);
+              break;
+            case 4:  // 4 Gang
+              if (touch.x <= 2) bs_button_1->publish_state(true);
+              else if (touch.x <= 5) bs_button_2->publish_state(true);
+              else if (touch.x <= 8) bs_button_3->publish_state(true);
+              else bs_button_4->publish_state(true);
+              break;
+          }
+        }
 
   on_release:
     - lambda: |-
         if (sl_touch_vibration_feedback->state == "On release" or sl_touch_vibration_feedback->state == "Always")
           vibrate->execute();
+        if (bs_button_1->state) bs_button_1->publish_state(false);
+        if (bs_button_2->state) bs_button_2->publish_state(false);
+        if (bs_button_3->state) bs_button_3->publish_state(false);
+        if (bs_button_4->state) bs_button_4->publish_state(false);
 
 uart:
   id: uart_touch
