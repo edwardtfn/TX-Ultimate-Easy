@@ -799,7 +799,7 @@ switch:
       number: GPIO5
       inverted: true
     restore_mode: ALWAYS_ON
-    internal: true
+    internal: false
 
   - id: sw_vibration_motor
     name: Vibration motor
