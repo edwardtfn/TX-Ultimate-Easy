@@ -639,6 +639,167 @@ light:
         from: 27
         to: 27
 
+  - id: light_rl_1_1_bottom
+    name: Light - Relay 1 of 1 (bottom)
+    internal: true
+    platform: partition
+    segments:
+      - id: light_full
+        from: 9
+        to: 9
+  - id: light_rl_1_1_top
+    name: Light - Relay 1 of 1 (top)
+    internal: true
+    platform: partition
+    segments:
+      - id: light_full
+        from: 23
+        to: 23
+  - id: light_rl_1_2_bottom
+    name: Light - Relay 1 of 2 (bottom)
+    internal: true
+    platform: partition
+    segments:
+      - id: light_full
+        from: 11
+        to: 11
+  - id: light_rl_1_2_top
+    name: Light - Relay 1 of 2 (top)
+    internal: true
+    platform: partition
+    segments:
+      - id: light_full
+        from: 21
+        to: 21
+  - id: light_rl_2_2_bottom
+    name: Light - Relay 2 of 2 (bottom)
+    internal: true
+    platform: partition
+    segments:
+      - id: light_full
+        from: 7
+        to: 7
+  - id: light_rl_2_2_top
+    name: Light - Relay 2 of 2 (top)
+    internal: true
+    platform: partition
+    segments:
+      - id: light_full
+        from: 25
+        to: 25
+  - id: light_rl_1_3_bottom
+    name: Light - Relay 1 of 3 (bottom)
+    internal: true
+    platform: partition
+    segments:
+      - id: light_full
+        from: 11
+        to: 11
+  - id: light_rl_1_3_top
+    name: Light - Relay 1 of 3 (top)
+    internal: true
+    platform: partition
+    segments:
+      - id: light_full
+        from: 21
+        to: 21
+  - id: light_rl_2_3_bottom
+    name: Light - Relay 2 of 3 (bottom)
+    internal: true
+    platform: partition
+    segments:
+      - id: light_full
+        from: 9
+        to: 9
+  - id: light_rl_2_3_top
+    name: Light - Relay 2 of 3 (top)
+    internal: true
+    platform: partition
+    segments:
+      - id: light_full
+        from: 23
+        to: 23
+  - id: light_rl_3_3_bottom
+    name: Light - Relay 3 of 3 (bottom)
+    internal: true
+    platform: partition
+    segments:
+      - id: light_full
+        from: 7
+        to: 7
+  - id: light_rl_3_3_top
+    name: Light - Relay 3 of 3 (top)
+    internal: true
+    platform: partition
+    segments:
+      - id: light_full
+        from: 25
+        to: 25
+  - id: light_rl_1_4_bottom
+    name: Light - Relay 1 of 4 (bottom)
+    internal: true
+    platform: partition
+    segments:
+      - id: light_full
+        from: 12
+        to: 12
+  - id: light_rl_1_4_top
+    name: Light - Relay 1 of 4 (top)
+    internal: true
+    platform: partition
+    segments:
+      - id: light_full
+        from: 20
+        to: 20
+  - id: light_rl_2_4_bottom
+    name: Light - Relay 2 of 4 (bottom)
+    internal: true
+    platform: partition
+    segments:
+      - id: light_full
+        from: 10
+        to: 10
+  - id: light_rl_2_4_top
+    name: Light - Relay 2 of 4 (top)
+    internal: true
+    platform: partition
+    segments:
+      - id: light_full
+        from: 22
+        to: 22
+  - id: light_rl_3_4_bottom
+    name: Light - Relay 3 of 4 (bottom)
+    internal: true
+    platform: partition
+    segments:
+      - id: light_full
+        from: 8
+        to: 8
+  - id: light_rl_3_4_top
+    name: Light - Relay 3 of 4 (top)
+    internal: true
+    platform: partition
+    segments:
+      - id: light_full
+        from: 24
+        to: 24
+  - id: light_rl_4_4_bottom
+    name: Light - Relay 4 of 4 (bottom)
+    internal: true
+    platform: partition
+    segments:
+      - id: light_full
+        from: 6
+        to: 6
+  - id: light_rl_4_4_top
+    name: Light - Relay 4 of 4 (top)
+    internal: true
+    platform: partition
+    segments:
+      - id: light_full
+        from: 26
+        to: 26
+
 #  - id: light_status
 #    name: Light - Status
 #    platform: esp32_rmt_led_strip
@@ -685,6 +846,146 @@ ota:
 psram:
 
 script:
+  - id: show_relay_status
+    mode: restart
+    then:
+      - lambda: |-
+          auto model_index = sl_tx_model_gang->active_index();
+          auto light_index = sl_relay_light_mode->active_index();
+          if (model_index.has_value() and light_index.has_value() and light_index.value() > 0) {
+            uint8_t model_idx = model_index.value() + 1;
+            switch (model_idx) {
+              case 1:  // 1 Gang
+                if (light_index == 1 or light_index == 3) {
+                  if (sw_relay_1->state)
+                    light_rl_1_1_bottom->turn_on().perform();
+                  else
+                    light_rl_1_1_bottom->turn_off().perform();
+                }
+                if (light_index == 2 or light_index == 3) {
+                  if (sw_relay_1->state)
+                    light_rl_1_1_top->turn_on().perform();
+                  else
+                    light_rl_1_1_top->turn_off().perform();
+                }
+                break;
+              case 2:  // 2 Gang
+                if (light_index == 1 or light_index == 3) {
+                  if (sw_relay_1->state)
+                    light_rl_1_2_bottom->turn_on().perform();
+                  else
+                    light_rl_1_2_bottom->turn_off().perform();
+                }
+                if (light_index == 2 or light_index == 3) {
+                  if (sw_relay_1->state)
+                    light_rl_1_2_top->turn_on().perform();
+                  else
+                    light_rl_1_2_top->turn_off().perform();
+                }
+                if (light_index == 1 or light_index == 3) {
+                  if (sw_relay_2->state)
+                    light_rl_2_2_bottom->turn_on().perform();
+                  else
+                    light_rl_2_2_bottom->turn_off().perform();
+                }
+                if (light_index == 2 or light_index == 3) {
+                  if (sw_relay_2->state)
+                    light_rl_2_2_top->turn_on().perform();
+                  else
+                    light_rl_2_2_top->turn_off().perform();
+                }
+                break;
+              case 3:  // 3 Gang
+                if (light_index == 1 or light_index == 3) {
+                  if (sw_relay_1->state)
+                    light_rl_1_3_bottom->turn_on().perform();
+                  else
+                    light_rl_1_3_bottom->turn_off().perform();
+                }
+                if (light_index == 2 or light_index == 3) {
+                  if (sw_relay_1->state)
+                    light_rl_1_3_top->turn_on().perform();
+                  else
+                    light_rl_1_3_top->turn_off().perform();
+                }
+                if (light_index == 1 or light_index == 3) {
+                  if (sw_relay_2->state)
+                    light_rl_2_3_bottom->turn_on().perform();
+                  else
+                    light_rl_2_3_bottom->turn_off().perform();
+                }
+                if (light_index == 2 or light_index == 3) {
+                  if (sw_relay_2->state)
+                    light_rl_2_3_top->turn_on().perform();
+                  else
+                    light_rl_2_3_top->turn_off().perform();
+                }
+                if (light_index == 1 or light_index == 3) {
+                  if (sw_relay_3->state)
+                    light_rl_3_3_bottom->turn_on().perform();
+                  else
+                    light_rl_3_3_bottom->turn_off().perform();
+                }
+                if (light_index == 2 or light_index == 3) {
+                  if (sw_relay_3->state)
+                    light_rl_3_3_top->turn_on().perform();
+                  else
+                    light_rl_3_3_top->turn_off().perform();
+                }
+                break;
+              case 4:  // 4 Gang
+                if (light_index == 1 or light_index == 3) {
+                  if (sw_relay_1->state)
+                    light_rl_1_4_bottom->turn_on().perform();
+                  else
+                    light_rl_1_4_bottom->turn_off().perform();
+                }
+                if (light_index == 2 or light_index == 3) {
+                  if (sw_relay_1->state)
+                    light_rl_1_4_top->turn_on().perform();
+                  else
+                    light_rl_1_4_top->turn_off().perform();
+                }
+                if (light_index == 1 or light_index == 3) {
+                  if (sw_relay_2->state)
+                    light_rl_2_4_bottom->turn_on().perform();
+                  else
+                    light_rl_2_4_bottom->turn_off().perform();
+                }
+                if (light_index == 2 or light_index == 3) {
+                  if (sw_relay_2->state)
+                    light_rl_2_4_top->turn_on().perform();
+                  else
+                    light_rl_2_4_top->turn_off().perform();
+                }
+                if (light_index == 1 or light_index == 3) {
+                  if (sw_relay_3->state)
+                    light_rl_3_4_bottom->turn_on().perform();
+                  else
+                    light_rl_3_4_bottom->turn_off().perform();
+                }
+                if (light_index == 2 or light_index == 3) {
+                  if (sw_relay_3->state)
+                    light_rl_3_4_top->turn_on().perform();
+                  else
+                    light_rl_3_4_top->turn_off().perform();
+                }
+                if (light_index == 1 or light_index == 3) {
+                  if (sw_relay_4->state)
+                    light_rl_4_4_bottom->turn_on().perform();
+                  else
+                    light_rl_4_4_bottom->turn_off().perform();
+                }
+                if (light_index == 2 or light_index == 3) {
+                  if (sw_relay_4->state)
+                    light_rl_4_4_top->turn_on().perform();
+                  else
+                    light_rl_4_4_top->turn_off().perform();
+                }
+                break;
+            }
+          }
+
   - id: vibrate
     mode: restart
     then:
@@ -693,21 +994,21 @@ script:
       - switch.turn_off: sw_vibration_motor
 
 select:
-  - id: sl_tx_model_gang
-    name: Model
+  - id: sl_relay_light_mode
+    name: Relay light mode
     platform: template
     options:
-      - "1 Gang"
-      - "2 Gang"
-      - "3 Gang"
-      - "4 Gang"
-    initial_option: "1 Gang"
+      - "Disabled"
+      - "Bottom"
+      - "Top"
+      - "Both"
+    initial_option: "Bottom"
     optimistic: true
     restore_value: true
     internal: false
     entity_category: config
     disabled_by_default: false
-    icon: mdi:dip-switch
+    icon: mdi:dots-square
 
   - id: sl_touch_vibration_feedback
     name: Touch - Vibration feedback
@@ -724,6 +1025,22 @@ select:
     entity_category: config
     disabled_by_default: false
     icon: mdi:vibrate
+
+  - id: sl_tx_model_gang
+    name: Model
+    platform: template
+    options:
+      - "1 Gang"
+      - "2 Gang"
+      - "3 Gang"
+      - "4 Gang"
+    initial_option: "1 Gang"
+    optimistic: true
+    restore_value: true
+    internal: false
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dip-switch
 
 sensor:
   - id: sun_elevation
