@@ -83,11 +83,9 @@ button:
     icon: mdi:vibrate
     internal: false
     platform: template
-    on_press: 
+    on_press:
       then:
-        - switch.turn_on: sw_vibration_motor
-        - delay: !lambda return nr_vibrating_duration->state;
-        - switch.turn_off: sw_vibration_motor
+        - script.execute: vibrate
 
 captive_portal:
 
@@ -277,6 +275,14 @@ ota:
 
 psram:
 
+script:
+  - id: vibrate
+    mode: restart
+    then:
+      - switch.turn_on: sw_vibration_motor
+      - delay: !lambda return nr_vibrating_duration->state;
+      - switch.turn_off: sw_vibration_motor
+
 select:
   - id: sl_tx_model_gang
     name: Model
@@ -293,6 +299,22 @@ select:
     entity_category: config
     disabled_by_default: false
     icon: mdi:dip-switch
+
+  - id: sl_touch_vibration_feedback
+    name: Touch - Vibration feedback
+    platform: template
+    options:
+      - "Disabled"
+      - "On press"
+      - "On release"
+      - "Always"
+    initial_option: "Disabled"
+    optimistic: true
+    restore_value: true
+    internal: false
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:vibrate
 
 sensor:
   - id: sun_elevation
@@ -432,6 +454,16 @@ tx_ultimate_easy:
         ESP_LOGD("tx_ultimate_easy.on_touch_event", "Touch event:");
         ESP_LOGD("tx_ultimate_easy.on_touch_event", "  State:    %i (%s)", touch.state, touch.state_str.c_str());
         ESP_LOGD("tx_ultimate_easy.on_touch_event", "  Position: %i", touch.x);
+
+  on_press:
+    - lambda: |-
+        if (sl_touch_vibration_feedback->state == "On press" or sl_touch_vibration_feedback->state == "Always")
+          vibrate->execute();
+
+  on_release:
+    - lambda: |-
+        if (sl_touch_vibration_feedback->state == "On release" or sl_touch_vibration_feedback->state == "Always")
+          vibrate->execute();
 
 uart:
   id: uart_touch
