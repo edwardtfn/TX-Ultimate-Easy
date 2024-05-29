@@ -6,6 +6,7 @@ substitutions:
   longitude: '0'
   zone_home: 'zone.home'
   default_transition_length: 500ms
+  invalid_cooldown: 100ms
 
   version: '0.0.1'
 
@@ -39,6 +40,18 @@ binary_sensor:
     on_press:
       then:
         - switch.toggle: sw_relay_1
+    on_click:
+      then:
+        - lambda: send_event_to_ha->execute("bs_button_1", "click");
+    on_double_click:
+      then:
+        - lambda: send_event_to_ha->execute("bs_button_1", "double_click");
+    on_multi_click:
+      - timing: &long_click-timing
+          - ON for at least 0.8s
+        invalid_cooldown: ${invalid_cooldown}
+        then:
+          - lambda: send_event_to_ha->execute("bs_button_1", "long_click");
 
   - id: bs_button_2
     name: Button 2
@@ -48,6 +61,17 @@ binary_sensor:
     on_press:
       then:
         - switch.toggle: sw_relay_2
+    on_click:
+      then:
+        - lambda: send_event_to_ha->execute("bs_button_2", "click");
+    on_double_click:
+      then:
+        - lambda: send_event_to_ha->execute("bs_button_2", "double_click");
+    on_multi_click:
+      - timing: *long_click-timing
+        invalid_cooldown: ${invalid_cooldown}
+        then:
+          - lambda: send_event_to_ha->execute("bs_button_2", "long_click");
 
   - id: bs_button_3
     name: Button 3
@@ -57,6 +81,17 @@ binary_sensor:
     on_press:
       then:
         - switch.toggle: sw_relay_3
+    on_click:
+      then:
+        - lambda: send_event_to_ha->execute("bs_button_3", "click");
+    on_double_click:
+      then:
+        - lambda: send_event_to_ha->execute("bs_button_3", "double_click");
+    on_multi_click:
+      - timing: *long_click-timing
+        invalid_cooldown: ${invalid_cooldown}
+        then:
+          - lambda: send_event_to_ha->execute("bs_button_3", "long_click");
 
   - id: bs_button_4
     name: Button 4
@@ -66,30 +101,53 @@ binary_sensor:
     on_press:
       then:
         - switch.toggle: sw_relay_4
+    on_click:
+      then:
+        - lambda: send_event_to_ha->execute("bs_button_4", "click");
+    on_double_click:
+      then:
+        - lambda: send_event_to_ha->execute("bs_button_4", "double_click");
+    on_multi_click:
+      - timing: *long_click-timing
+        invalid_cooldown: ${invalid_cooldown}
+        then:
+          - lambda: send_event_to_ha->execute("bs_button_4", "long_click");
 
   - id: bs_swipe_left
     name: Swipe left
     icon: mdi:gesture-swipe-left
     internal: true
     platform: template
+    on_click:
+      then:
+        - lambda: send_event_to_ha->execute("swipe", "left");
 
   - id: bs_swipe_right
     name: Swipe right
     icon: mdi:gesture-swipe-right
     internal: true
     platform: template
+    on_click:
+      then:
+        - lambda: send_event_to_ha->execute("swipe", "right");
 
   - id: bs_swipe_up
     name: Swipe up
     icon: mdi:gesture-swipe-up
     internal: true
     platform: template
+    on_click:
+      then:
+        - lambda: send_event_to_ha->execute("swipe", "up");
 
   - id: bs_swipe_down
     name: Swipe down
     icon: mdi:gesture-swipe-down
     internal: true
     platform: template
+    on_click:
+      then:
+        - lambda: send_event_to_ha->execute("swipe", "down");
 
 button:
   - id: bt_restart
@@ -266,6 +324,9 @@ esphome:
         - lambda: |-
             tx_fw_version->publish_state("${version}");
             tx_device_name->publish_state("${name}");
+    - priority: -100  # At this priority, pretty much everything should already be initialized.
+      then:
+        - lambda: send_event_to_ha->execute("boot", "done");
 
 external_components:
   - source:
@@ -1535,6 +1596,22 @@ ota:
 psram:
 
 script:
+  - id: send_event_to_ha
+    mode: queued
+    parameters:
+      component: string
+      event: string
+    then:
+      - lambda: |-
+          esphome::api::CustomAPIDevice ha_event;
+          ha_event.fire_homeassistant_event("esphome.tx_ultimate_easy",
+            {
+              {"device_name", tx_device_name->state.c_str()},
+              {"firmware", "${version}"},
+              {"component", component},
+              {"event", event},
+            });
+
   - id: show_relay_status
     mode: restart
     then:
