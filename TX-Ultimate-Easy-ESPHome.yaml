@@ -10,6 +10,10 @@ packages:
   remote_package:
     url: https://github.com/edwardtfn/TX-Ultimate-Easy
     ref: dev
-    refresh: 30s
+    refresh: 1h
     files:
       - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
+
+### Uncomment the lines bellow if you have issues with OTA and cannot flash via serial at this moment. ###
+#esp32:
+#  flash_size: 4MB
