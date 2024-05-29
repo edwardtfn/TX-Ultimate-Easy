@@ -62,6 +62,16 @@ binary_sensor:
       then:
         - switch.toggle: sw_relay_4
 
+  - id: bs_swipe_left
+    name: Swipe left
+    internal: false
+    platform: template
+
+  - id: bs_swipe_right
+    name: Swipe right
+    internal: false
+    platform: template
+
 # bluetooth_proxy:
 
 button:
@@ -135,6 +145,8 @@ esphome:
               bs_button_2->publish_state(false);
               bs_button_3->publish_state(false);
               bs_button_4->publish_state(false);
+              bs_swipe_left->publish_state(false);
+              bs_swipe_right->publish_state(false);
             }
     - priority: 600  # This is where most sensors are set up.
       then:
@@ -1175,12 +1187,6 @@ tx_ultimate_easy:
   id: tx_ultimate
   uart: uart_touch
 
-  on_touch_event:
-    - lambda: |-
-        ESP_LOGD("tx_ultimate_easy.on_touch_event", "Touch event:");
-        ESP_LOGD("tx_ultimate_easy.on_touch_event", "  State:    %i (%s)", touch.state, touch.state_str.c_str());
-        ESP_LOGD("tx_ultimate_easy.on_touch_event", "  Position: %i", touch.x);
-
   on_press:
     - lambda: |-
         if (sl_touch_vibration_feedback->state == "On press" or sl_touch_vibration_feedback->state == "Always")
@@ -1218,6 +1224,24 @@ tx_ultimate_easy:
         if (bs_button_2->state) bs_button_2->publish_state(false);
         if (bs_button_3->state) bs_button_3->publish_state(false);
         if (bs_button_4->state) bs_button_4->publish_state(false);
+        if (bs_swipe_left->state) bs_swipe_left->publish_state(false);
+        if (bs_swipe_right->state) bs_swipe_right->publish_state(false);
+
+  on_swipe_left:
+    - binary_sensor.template.publish:
+        id: bs_swipe_left
+        state: ON
+
+  on_swipe_right:
+    - binary_sensor.template.publish:
+        id: bs_swipe_right
+        state: ON
+
+  on_touch_event:
+    - lambda: |-
+        ESP_LOGD("tx_ultimate_easy.on_touch_event", "Touch event:");
+        ESP_LOGD("tx_ultimate_easy.on_touch_event", "  State:    %i (%s)", touch.state, touch.state_str.c_str());
+        ESP_LOGD("tx_ultimate_easy.on_touch_event", "  Position: %i", touch.x);
 
 uart:
   id: uart_touch
