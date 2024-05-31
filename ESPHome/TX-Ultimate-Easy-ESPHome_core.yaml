@@ -173,7 +173,9 @@ esp32:
 esphome:
   name: ${name}
   friendly_name: ${friendly_name}
-
+  platformio_options:
+    build_flags:
+      - -D TX_ULTIMATE_EASY_CORE
   on_boot:
     - priority: 701
       then:

@@ -15,6 +15,13 @@ esp32:
       CONFIG_SPIRAM_RODATA: "y"
       CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP: "y"
 
+esphome:
+  platformio_options:
+    build_flags:
+      - -D TX_ULTIMATE_EASY_ADDON_BLE_PROXY
+
+i2s_audio: !remove
+
 light:
   - id: !extend light_full
     platform: esp32_rmt_led_strip
@@ -37,5 +44,3 @@ switch:
       number: GPIO26
       inverted: true
       allow_other_uses: false
-
-i2s_audio: !remove
