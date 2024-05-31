@@ -169,50 +169,10 @@ captive_portal:
 esp32:
   board: esp32dev
   flash_size: 8MB
-  framework:
-    # type: esp-idf
-    type: arduino
-#    sdkconfig_options:
-#      CONFIG_BT_ALLOCATION_FROM_SPIRAM_FIRST: "y"
-#      CONFIG_BT_BLE_DYNAMIC_ENV_MEMORY: "y"
-#      CONFIG_ESP32_REV_MIN_3: "y"
-#      CONFIG_MBEDTLS_DYNAMIC_BUFFER: "y"
-#      CONFIG_MBEDTLS_DYNAMIC_FREE_CA_CERT: "y"
-#      CONFIG_MBEDTLS_DYNAMIC_FREE_CONFIG_DATA: "y"
-#      CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC: "y"
-#      CONFIG_SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY: "y"
-#      CONFIG_SPIRAM_RODATA: "y"
-#      CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP: "y"
 
 esphome:
   name: ${name}
   friendly_name: ${friendly_name}
-#  platformio_options:
-#    build_flags:
-#      - -DCONFIG_BT_ALLOCATION_FROM_SPIRAM_FIRST
-#      - -DCONFIG_BT_BLE_DYNAMIC_ENV_MEMORY
-#      - -DCONFIG_ESP32_REV_MIN_3
-#      - -DCONFIG_MBEDTLS_DYNAMIC_BUFFER
-#      - -DCONFIG_MBEDTLS_DYNAMIC_FREE_CA_CERT
-#      - -DCONFIG_MBEDTLS_DYNAMIC_FREE_CONFIG_DATA
-#      - -DCONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC
-#      - -DCONFIG_SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY
-#      - -DCONFIG_SPIRAM_RODATA
-#      - -DCONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP
-#      - -DCONFIG_SPIRAM_USE
-#      - -DCONFIG_SPIRAM_ALLOW_NOINIT_SEG_EXTERNAL_MEMORY
-#      - -DCONFIG_SPIRAM_CACHE_LIBCHAR_IN_IRAM
-#      - -DCONFIG_SPIRAM_CACHE_LIBENV_IN_IRAM
-#      - -DCONFIG_SPIRAM_CACHE_LIBFILE_IN_IRAM
-#      - -DCONFIG_SPIRAM_CACHE_LIBIO_IN_IRAM
-#      - -DCONFIG_SPIRAM_CACHE_LIBJMP_IN_IRAM
-#      - -DCONFIG_SPIRAM_CACHE_LIBMATH_IN_IRAM
-#      - -DCONFIG_SPIRAM_CACHE_LIBMEM_IN_IRAM
-#      - -DCONFIG_SPIRAM_CACHE_LIBMISC_IN_IRAM
-#      - -DCONFIG_SPIRAM_CACHE_LIBNUMPARSER_IN_IRAM
-#      - -DCONFIG_SPIRAM_CACHE_LIBRAND_IN_IRAM
-#      - -DCONFIG_SPIRAM_CACHE_LIBSTR_IN_IRAM
-#      - -DCONFIG_SPIRAM_CACHE_LIBTIME_IN_IRAM
 
   on_boot:
     - priority: 701
@@ -232,10 +192,12 @@ esphome:
               light_29->set_internal(idx == 0);
               light_30->set_internal(idx == 0);
               light_31->set_internal(idx == 0);
+              light_eu->set_internal(idx == 1);
               light_eu_bottom->set_internal(idx == 1);
               light_eu_left->set_internal(idx == 1);
               light_eu_right->set_internal(idx == 1);
               light_eu_top->set_internal(idx == 1);
+              light_us->set_internal(idx == 0);
               light_us_bottom->set_internal(idx == 0);
               light_us_left->set_internal(idx == 0);
               light_us_right->set_internal(idx == 0);
@@ -354,10 +316,6 @@ light:
     platform: neopixelbus
     type: GRB
     variant: WS2811
-    # platform: esp32_rmt_led_strip
-    # rgb_order: GRB
-    # rmt_channel: 0
-    # chipset: ws2812
     num_leds: 32
     pin: GPIO13
 

@@ -1,0 +1,41 @@
+bluetooth_proxy:
+
+esp32:
+  framework: 
+    type: esp-idf
+    sdkconfig_options:
+      CONFIG_BT_ALLOCATION_FROM_SPIRAM_FIRST: "y"
+      CONFIG_BT_BLE_DYNAMIC_ENV_MEMORY: "y"
+      CONFIG_ESP32_REV_MIN_3: "y"
+      CONFIG_MBEDTLS_DYNAMIC_BUFFER: "y"
+      CONFIG_MBEDTLS_DYNAMIC_FREE_CA_CERT: "y"
+      CONFIG_MBEDTLS_DYNAMIC_FREE_CONFIG_DATA: "y"
+      CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC: "y"
+      CONFIG_SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY: "y"
+      CONFIG_SPIRAM_RODATA: "y"
+      CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP: "y"
+
+light:
+  - id: !extend light_full
+    platform: esp32_rmt_led_strip
+    rgb_order: GRB
+    rmt_channel: 0
+    chipset: ws2812
+    type: !remove
+    variant: !remove
+    max_refresh_rate: 33ms
+    #bit0_high: 0.0004ms  # High time for bit 0
+    #bit0_low: 0.00085ms  # Low time for bit 0
+    #bit1_high: 0.0008ms  # High time for bit 1
+    #bit1_low: 0.00045ms  # Low time for bit 1
+
+media_player: !remove
+
+switch:
+  - id: !extend sw_speaker_amplifier
+    pin:
+      number: GPIO26
+      inverted: true
+      allow_other_uses: false
+
+i2s_audio: !remove
