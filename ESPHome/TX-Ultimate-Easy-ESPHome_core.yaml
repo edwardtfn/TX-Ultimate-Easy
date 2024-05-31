@@ -165,6 +165,7 @@ button:
         - script.execute: vibrate
 
 captive_portal:
+  id: ap_captive_portal
 
 esp32:
   board: esp32dev
@@ -291,10 +292,7 @@ esphome:
         - lambda: send_event_to_ha->execute("boot", "done");
 
 external_components:
-  - source:
-      type: git
-      url: https://github.com/edwardtfn/TX-Ultimate-Easy
-      ref: dev
+  - source: github://edwardtfn/TX-Ultimate-Easy@dev  # Change this before releasing
     components:
       - tx_ultimate_easy
 
@@ -310,6 +308,9 @@ i2s_audio:
   id: if_i2s_audio
   i2s_bclk_pin: GPIO2
   i2s_lrclk_pin: GPIO4
+
+improv_serial:
+  id: serial_improv
 
 light:
   - id: light_full
