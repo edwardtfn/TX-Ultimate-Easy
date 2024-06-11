@@ -113,6 +113,15 @@ binary_sensor:
         then:
           - lambda: send_event_to_ha->execute("bs_button_4", "long_click");
 
+  - id: bs_multi_touch
+    name: Multi-touch
+    icon: mdi:gesture-two-tap
+    internal: false
+    platform: template
+    on_click:
+      then:
+        - lambda: send_event_to_ha->execute("multi_touch", "multi_touch");
+
   - id: bs_swipe_left
     name: Swipe left
     icon: mdi:gesture-swipe-left
@@ -225,6 +234,7 @@ esphome:
               bs_button_2->publish_state(false);
               bs_button_3->publish_state(false);
               bs_button_4->publish_state(false);
+              bs_multi_touch->publish_state(false);
               bs_swipe_left->publish_state(false);
               bs_swipe_right->publish_state(false);
               sl_button_1_action->set_internal(false);
@@ -1554,11 +1564,35 @@ number:
     optimistic: true
     restore_value: true
 
+  - id: nr_touch_duration
+    name: Touch duration
+    icon: mdi:timer-cog-outline
+    unit_of_measurement: ms
+    # mode: box
+    internal: false
+    entity_category: config
+    platform: template
+    min_value: 10
+    max_value: 1500
+    step: 1
+    initial_value: 250
+    optimistic: true
+    restore_value: true
+
 ota:
 
 psram:
 
 script:
+  - id: release_buttons
+    mode: restart
+    then:
+      - lambda: |-
+          if (bs_button_1->state) bs_button_1->publish_state(false);
+          if (bs_button_2->state) bs_button_2->publish_state(false);
+          if (bs_button_3->state) bs_button_3->publish_state(false);
+          if (bs_button_4->state) bs_button_4->publish_state(false);
+
   - id: send_event_to_ha
     mode: queued
     parameters:
@@ -1901,6 +1935,15 @@ tx_ultimate_easy:
   id: tx_ultimate
   uart: uart_touch
 
+  on_multi_touch_release:
+    - lambda: |-
+        if (sl_touch_vibration_feedback->state == "On press" or sl_touch_vibration_feedback->state == "Always")
+          vibrate->execute();
+        bs_multi_touch->publish_state(true);
+        release_buttons->execute();
+    - delay: !lambda return nr_touch_duration->state;
+    - lambda: bs_multi_touch->publish_state(false);
+
   on_press:
     - lambda: |-
         if (sl_touch_vibration_feedback->state == "On press" or sl_touch_vibration_feedback->state == "Always")
@@ -1934,22 +1977,23 @@ tx_ultimate_easy:
     - lambda: |-
         if (sl_touch_vibration_feedback->state == "On release" or sl_touch_vibration_feedback->state == "Always")
           vibrate->execute();
-        if (bs_button_1->state) bs_button_1->publish_state(false);
-        if (bs_button_2->state) bs_button_2->publish_state(false);
-        if (bs_button_3->state) bs_button_3->publish_state(false);
-        if (bs_button_4->state) bs_button_4->publish_state(false);
+        release_buttons->execute();
         if (bs_swipe_left->state) bs_swipe_left->publish_state(false);
         if (bs_swipe_right->state) bs_swipe_right->publish_state(false);
 
   on_swipe_left:
-    - binary_sensor.template.publish:
-        id: bs_swipe_left
-        state: ON
+    - lambda: |-
+        bs_swipe_left->publish_state(true);
+        release_buttons->execute();
+    - delay: !lambda return nr_touch_duration->state;
+    - lambda: bs_swipe_left->publish_state(false);
 
   on_swipe_right:
-    - binary_sensor.template.publish:
-        id: bs_swipe_right
-        state: ON
+    - lambda: |-
+        bs_swipe_right->publish_state(true);
+        release_buttons->execute();
+    - delay: !lambda return nr_touch_duration->state;
+    - lambda: bs_swipe_right->publish_state(false);
 
   on_touch_event:
     - lambda: |-
