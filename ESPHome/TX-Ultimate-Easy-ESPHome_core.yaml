@@ -241,10 +241,30 @@ esphome:
               sl_button_2_action->set_internal(idx < 1);
               sl_button_3_action->set_internal(idx < 2);
               sl_button_4_action->set_internal(idx < 3);
-              sw_relay_1->set_internal(false);
-              sw_relay_2->set_internal(idx < 1);
-              sw_relay_3->set_internal(idx < 2);
-              sw_relay_4->set_internal(idx < 3);
+              sl_relay_1_mode->set_internal(false);
+              sl_relay_2_mode->set_internal(idx < 1);
+              sl_relay_3_mode->set_internal(idx < 2);
+              sl_relay_4_mode->set_internal(idx < 3);
+              auto relay_mode_index = sl_relay_1_mode->active_index();
+              if (relay_mode_index.has_value()) {
+                ligth_output_1->set_internal(false or relay_mode_index.value() != 1);
+                sw_relay_1->set_internal(false or relay_mode_index.value() != 0);
+              }
+              relay_mode_index = sl_relay_2_mode->active_index();
+              if (relay_mode_index.has_value()) {
+                ligth_output_2->set_internal(idx < 1 or relay_mode_index.value() != 1);
+                sw_relay_2->set_internal(idx < 1 or relay_mode_index.value() != 0);
+              }
+              relay_mode_index = sl_relay_3_mode->active_index();
+              if (relay_mode_index.has_value()) {
+                ligth_output_3->set_internal(idx < 2 or relay_mode_index.value() != 1);
+                sw_relay_3->set_internal(idx < 2 or relay_mode_index.value() != 0);
+              }
+              relay_mode_index = sl_relay_4_mode->active_index();
+              if (relay_mode_index.has_value()) {
+                ligth_output_4->set_internal(idx < 3 or relay_mode_index.value() != 1);
+                sw_relay_4->set_internal(idx < 3 or relay_mode_index.value() != 0);
+              }
             }
     - priority: 699
       then:
@@ -327,6 +347,30 @@ improv_serial:
   id: serial_improv
 
 light:
+  - id: ligth_output_1
+    name: Light output 1
+    internal: true
+    platform: binary
+    output: output_relay_1
+
+  - id: ligth_output_2
+    name: Light output 2
+    internal: true
+    platform: binary
+    output: output_relay_2
+
+  - id: ligth_output_3
+    name: Light output 3
+    internal: true
+    platform: binary
+    output: output_relay_3
+
+  - id: ligth_output_4
+    name: Light output 4
+    internal: true
+    platform: binary
+    output: output_relay_4
+
   - id: light_full
     name: Light - All
     internal: true
@@ -1581,6 +1625,23 @@ number:
 
 ota:
 
+output:
+  - id: output_relay_1
+    platform: gpio
+    pin: GPIO18
+
+  - id: output_relay_2
+    platform: gpio
+    pin: GPIO17
+
+  - id: output_relay_3
+    platform: gpio
+    pin: GPIO27
+
+  - id: output_relay_4
+    platform: gpio
+    pin: GPIO23
+
 psram:
 
 script:
@@ -1714,6 +1775,62 @@ select:
     disabled_by_default: false
     icon: mdi:dots-square
 
+  - id: sl_relay_1_mode
+    name: Relay 1 mode
+    platform: template
+    options:
+      - "Relay"
+      - "Light"
+      - "Not in use"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dip-switch
+
+  - id: sl_relay_2_mode
+    name: Relay 2 mode
+    platform: template
+    options:
+      - "Relay"
+      - "Light"
+      - "Not in use"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dip-switch
+
+  - id: sl_relay_3_mode
+    name: Relay 3 mode
+    platform: template
+    options:
+      - "Relay"
+      - "Light"
+      - "Not in use"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dip-switch
+
+  - id: sl_relay_4_mode
+    name: Relay 4 mode
+    platform: template
+    options:
+      - "Relay"
+      - "Light"
+      - "Not in use"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dip-switch
+
   - id: sl_relay_light_mode_us
     name: Relay light mode
     platform: template
@@ -1818,10 +1935,10 @@ switch:
 
   - id: sw_relay_1
     name: Relay 1
-    platform: gpio
-    pin: GPIO18
+    platform: output
+    output: output_relay_1
     restore_mode: RESTORE_DEFAULT_OFF
-    internal: false
+    internal: true
     on_turn_on:
       then:
         - script.execute: show_relay_status
@@ -1831,8 +1948,8 @@ switch:
 
   - id: sw_relay_2
     name: Relay 2
-    platform: gpio
-    pin: GPIO17
+    platform: output
+    output: output_relay_2
     restore_mode: RESTORE_DEFAULT_OFF
     internal: true
     on_turn_on:
@@ -1844,8 +1961,8 @@ switch:
 
   - id: sw_relay_3
     name: Relay 3
-    platform: gpio
-    pin: GPIO27
+    platform: output
+    output: output_relay_3
     restore_mode: RESTORE_DEFAULT_OFF
     internal: true
     on_turn_on:
@@ -1857,8 +1974,8 @@ switch:
 
   - id: sw_relay_4
     name: Relay 4
-    platform: gpio
-    pin: GPIO23
+    platform: output
+    output: output_relay_4
     restore_mode: RESTORE_DEFAULT_OFF
     internal: true
     on_turn_on:
