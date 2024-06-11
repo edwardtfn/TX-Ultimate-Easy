@@ -1,7 +1,7 @@
 bluetooth_proxy:
 
 esp32:
-  framework: 
+  framework:
     type: esp-idf
     sdkconfig_options:
       CONFIG_BT_ALLOCATION_FROM_SPIRAM_FIRST: "y"
