@@ -879,8 +879,8 @@ light:
     default_transition_length: ${default_transition_length}
     segments:
       - id: light_full
-        from: 11
-        to: 11
+        from: 12
+        to: 12
   - id: light_eu_rl_1_3_top
     name: Light - Relay 1 of 3 (top)
     internal: true
@@ -888,8 +888,8 @@ light:
     default_transition_length: ${default_transition_length}
     segments:
       - id: light_full
-        from: 21
-        to: 21
+        from: 20
+        to: 20
   - id: light_eu_rl_2_3_bottom
     name: Light - Relay 2 of 3 (bottom)
     internal: true
@@ -915,8 +915,8 @@ light:
     default_transition_length: ${default_transition_length}
     segments:
       - id: light_full
-        from: 7
-        to: 7
+        from: 6
+        to: 6
   - id: light_eu_rl_3_3_top
     name: Light - Relay 3 of 3 (top)
     internal: true
@@ -924,8 +924,8 @@ light:
     default_transition_length: ${default_transition_length}
     segments:
       - id: light_full
-        from: 25
-        to: 25
+        from: 26
+        to: 26
   - id: light_eu_rl_1_4_bottom
     name: Light - Relay 1 of 4 (bottom)
     internal: true
