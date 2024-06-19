@@ -1,3 +1,5 @@
+// tx_ultimate_easy.h
+
 #pragma once
 
 #include "esphome/core/automation.h"
@@ -7,15 +9,27 @@
 #include "esphome/components/binary_sensor/binary_sensor.h"
 #include "esphome/components/switch/switch.h"
 #include "esphome/components/light/addressable_light.h"
+#include <array>
 
 namespace esphome {
     namespace tx_ultimate_easy {
-        const static uint8_t TOUCH_STATE_RELEASE = 1;
-        const static uint8_t TOUCH_STATE_PRESS = 2;
-        const static uint8_t TOUCH_STATE_SWIPE = 3;
-        const static uint8_t TOUCH_STATE_MULTI_TOUCH = 11;
-        const static uint8_t TOUCH_STATE_SWIPE_RIGHT = 12;
-        const static uint8_t TOUCH_STATE_SWIPE_LEFT = 13;
+        // Touch State Constants
+        constexpr uint8_t TOUCH_STATE_RELEASE = 0x01;
+        constexpr uint8_t TOUCH_STATE_PRESS = 0x02;
+        constexpr uint8_t TOUCH_STATE_SWIPE = 0x03;
+        constexpr uint8_t TOUCH_STATE_MULTI_TOUCH = 0x0B;
+        constexpr uint8_t TOUCH_STATE_SWIPE_RIGHT = 0x0C;
+        constexpr uint8_t TOUCH_STATE_SWIPE_LEFT = 0x0D;
+
+        // UART Constants
+        constexpr int UART_RECEIVED_BYTES_SIZE = 15;
+        constexpr int HEADER_BYTE_1 = 0xAA;
+        constexpr int HEADER_BYTE_2 = 0x55;
+        constexpr int VALID_DATA_BYTE_2 = 0x01;
+        constexpr int VALID_DATA_BYTE_3 = 0x02;
+
+        // Log tag
+        static const char *TAG = "tx_ultimate_easy";
 
         struct TouchPoint {
             int8_t x = -1;
@@ -41,12 +55,12 @@ namespace esphome {
 
         protected:
             void send_touch_(TouchPoint tp);
-            void handle_touch(int bytes[]);
+            void handle_touch(const std::array<int, UART_RECEIVED_BYTES_SIZE> &bytes);
 
-            TouchPoint get_touch_point(int bytes[]);
-            bool is_valid_data(int bytes[]);
-            int get_touch_position_x(int bytes[]);
-            int get_touch_state(int bytes[]);
+            TouchPoint get_touch_point(const std::array<int, UART_RECEIVED_BYTES_SIZE> &bytes);
+            bool is_valid_data(const std::array<int, UART_RECEIVED_BYTES_SIZE> &bytes);
+            int get_touch_position_x(const std::array<int, UART_RECEIVED_BYTES_SIZE> &bytes);
+            int get_touch_state(const std::array<int, UART_RECEIVED_BYTES_SIZE> &bytes);
 
             Trigger<TouchPoint> trigger_touch_event_;
             Trigger<TouchPoint> trigger_touch_;

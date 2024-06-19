@@ -14,5 +14,5 @@ packages:
     refresh: 30s
     files:
       - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
-      #- ESPHome/TX-Ultimate-Easy-ESPHome_addon_ble_proxy.yaml  # Adds experimental BLE proxy support (limited)
+      # - ESPHome/TX-Ultimate-Easy-ESPHome_addon_ble_proxy.yaml  # Adds experimental BLE proxy support (limited)
 ...
