@@ -1,3 +1,4 @@
+---
 substitutions:
   name: tx-ultimate-easy
   friendly_name: TX Ultimate Easy
@@ -234,11 +235,17 @@ esphome:
             light_us_right->set_internal(!us_model);
             light_us_top->set_internal(!us_model);
             sl_relay_1_mode->set_internal(num_gangs < 1);
+            sl_relay_1_light_mode_eu->set_internal(us_model or num_gangs < 1);
+            sl_relay_1_light_mode_us->set_internal(!us_model or num_gangs < 1);
             sl_relay_2_mode->set_internal(num_gangs < 2);
+            sl_relay_2_light_mode_eu->set_internal(us_model or num_gangs < 2);
+            sl_relay_2_light_mode_us->set_internal(!us_model or num_gangs < 2);
             sl_relay_3_mode->set_internal(num_gangs < 3);
+            sl_relay_3_light_mode_eu->set_internal(us_model or num_gangs < 3);
+            sl_relay_3_light_mode_us->set_internal(!us_model or num_gangs < 3);
             sl_relay_4_mode->set_internal(num_gangs < 4);
-            sl_relay_light_mode_eu->set_internal(us_model);
-            sl_relay_light_mode_us->set_internal(!us_model);
+            sl_relay_4_light_mode_eu->set_internal(us_model or num_gangs < 4);
+            sl_relay_4_light_mode_us->set_internal(!us_model or num_gangs < 4);
             auto relay_mode_index = sl_relay_1_mode->active_index();
             if (relay_mode_index.has_value()) {
               ligth_output_1->set_internal(false or relay_mode_index.value() != 1);
@@ -1185,15 +1192,6 @@ light:
         from: 7
         to: 7
 
-#  - id: light_status
-#    name: Light - Status
-#    platform: esp32_rmt_led_strip
-#    rgb_order: GRB
-#    pin: GPIO13
-#    num_leds: 1
-#    rmt_channel: 0
-#    chipset: ws2812
-
 logger:
 
 media_player:
@@ -1205,10 +1203,6 @@ media_player:
     i2s_comm_fmt: lsb
     dac_type: external
     mode: mono
-    mute_pin:
-        number: GPIO26
-        inverted: true
-        allow_other_uses: true
     internal: false
 
 number:
@@ -1243,6 +1237,7 @@ number:
     restore_value: true
 
 ota:
+  platform: esphome
 
 output:
   - id: output_relay_1
@@ -1293,24 +1288,31 @@ script:
     mode: restart
     then:
       - lambda: |-
+          return;
+          show_relay_status->stop();
           auto model_format = sl_tx_model_format->active_index();
-          auto light_index = ((model_format.has_value() and model_format.value() == 0)
-                              ? sl_relay_light_mode_eu->active_index()
-                              : sl_relay_light_mode_us->active_index());
-          if (model_format.has_value() and light_index.has_value() and light_index.value() > 0) {
-            std::vector<switch_::Switch*> switches = {sw_relay_1, sw_relay_2, sw_relay_3, sw_relay_4};
-            uint8_t light_idx = light_index.value();
-            if (light_idx == 1 or light_idx == 3) {
-              for (int i = 0; i < id(gb_lights_1).size(); ++i) {
-                if (switches[i]->state)
+          std::vector<esphome::select::Select*> relay_modes;
+
+          if (model_format.has_value() and model_format.value() == 0) {
+            relay_modes = {sl_relay_1_light_mode_eu, sl_relay_2_light_mode_eu, sl_relay_3_light_mode_eu, sl_relay_4_light_mode_eu};
+          } else {
+            relay_modes = {sl_relay_1_light_mode_us, sl_relay_2_light_mode_us, sl_relay_3_light_mode_us, sl_relay_4_light_mode_us};
+          }
+
+          std::vector<switch_::Switch*> switches = {sw_relay_1, sw_relay_2, sw_relay_3, sw_relay_4};
+          for (int i = 0; i < relay_modes.size(); ++i) {
+            auto light_index = relay_modes[i]->active_index();
+            if (light_index.has_value()) {
+              uint8_t light_idx = light_index.value();
+              bool switch_state = switches[i]->state;
+              if (light_idx == 1 || light_idx == 3) {
+                if (switch_state)
                   id(gb_lights_1)[i]->turn_on().perform();
                 else
                   id(gb_lights_1)[i]->turn_off().perform();
               }
-            }
-            if (light_idx == 2 or light_idx == 3) {
-              for (int i = 0; i < id(gb_lights_2).size(); ++i) {
-                if (switches[i]->state)
+              if (light_idx == 2 || light_idx == 3) {
+                if (switch_state)
                   id(gb_lights_2)[i]->turn_on().perform();
                 else
                   id(gb_lights_2)[i]->turn_off().perform();
@@ -1378,22 +1380,6 @@ select:
     disabled_by_default: false
     icon: mdi:dip-switch
 
-  - id: sl_relay_light_mode_eu
-    name: Relay light mode
-    platform: template
-    options:
-      - "Disabled"
-      - "Bottom"
-      - "Top"
-      - "Both"
-    initial_option: "Bottom"
-    optimistic: true
-    restore_value: true
-    internal: true
-    entity_category: config
-    disabled_by_default: false
-    icon: mdi:dots-square
-
   - id: sl_relay_1_mode
     name: Relay 1 mode
     platform: template
@@ -1450,8 +1436,120 @@ select:
     disabled_by_default: false
     icon: mdi:dip-switch
 
-  - id: sl_relay_light_mode_us
-    name: Relay light mode
+  - id: sl_relay_1_light_mode_eu
+    name: Relay 1 light mode
+    platform: template
+    options:
+      - "Disabled"
+      - "Bottom"
+      - "Top"
+      - "Both"
+    initial_option: "Bottom"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dots-square
+
+  - id: sl_relay_2_light_mode_eu
+    name: Relay 2 light mode
+    platform: template
+    options:
+      - "Disabled"
+      - "Bottom"
+      - "Top"
+      - "Both"
+    initial_option: "Bottom"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dots-square
+
+  - id: sl_relay_3_light_mode_eu
+    name: Relay 3 light mode
+    platform: template
+    options:
+      - "Disabled"
+      - "Bottom"
+      - "Top"
+      - "Both"
+    initial_option: "Bottom"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dots-square
+
+  - id: sl_relay_4_light_mode_eu
+    name: Relay 4 light mode
+    platform: template
+    options:
+      - "Disabled"
+      - "Bottom"
+      - "Top"
+      - "Both"
+    initial_option: "Bottom"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dots-square
+
+  - id: sl_relay_1_light_mode_us
+    name: Relay 1 light mode
+    platform: template
+    options:
+      - "Disabled"
+      - "Left"
+      - "Right"
+      - "Both"
+    initial_option: "Right"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dots-square
+
+  - id: sl_relay_2_light_mode_us
+    name: Relay 2 light mode
+    platform: template
+    options:
+      - "Disabled"
+      - "Left"
+      - "Right"
+      - "Both"
+    initial_option: "Right"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dots-square
+
+  - id: sl_relay_3_light_mode_us
+    name: Relay 3 light mode
+    platform: template
+    options:
+      - "Disabled"
+      - "Left"
+      - "Right"
+      - "Both"
+    initial_option: "Right"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dots-square
+
+  - id: sl_relay_4_light_mode_us
+    name: Relay 4 light mode
     platform: template
     options:
       - "Disabled"
@@ -1541,17 +1639,6 @@ sun:
   longitude: ${longitude}
 
 switch:
-  - id: sw_speaker_amplifier
-    name: Speaker - Amplifier
-    platform: gpio
-    pin:
-      number: GPIO26
-      inverted: true
-      allow_other_uses: true
-    restore_mode: RESTORE_DEFAULT_ON
-    internal: true
-    entity_category: config
-
   - id: sw_relay_1
     name: Relay 1
     platform: output
@@ -1747,3 +1834,4 @@ web_server:
 
 wifi:
   ap:
+...

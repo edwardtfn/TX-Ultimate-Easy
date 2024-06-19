@@ -1,3 +1,4 @@
+---
 bluetooth_proxy:
 
 esp32:
@@ -31,9 +32,6 @@ light:
     type: !remove
     variant: !remove
     max_refresh_rate: 33ms
-    #bit0_high: 0.0004ms  # High time for bit 0
-    #bit0_low: 0.00085ms  # Low time for bit 0
-    #bit1_high: 0.0008ms  # High time for bit 1
-    #bit1_low: 0.00045ms  # Low time for bit 1
 
 media_player: !remove
+...
