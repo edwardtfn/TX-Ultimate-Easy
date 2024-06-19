@@ -1,0 +1,30 @@
+---
+name: Validate Python (flake8)
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+    paths:
+      - '*.py'
+  pull_request:
+    paths:
+      - '*.py'
+  workflow_dispatch:
+
+jobs:
+  flake8-lint:
+    runs-on: ubuntu-latest
+    name: Lint
+    steps:
+      - name: Check out source repository
+        uses: actions/checkout@main
+      - name: Set up Python environment
+        uses: actions/setup-python@main
+        with:
+          python-version: "3.11"
+      - name: flake8 Lint
+        uses: py-actions/flake8@v2
+        with:
+          max-line-length: "200"
+          path: "components/tx_ultimate_easy"
+...

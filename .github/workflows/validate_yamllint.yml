@@ -1,0 +1,47 @@
+---
+name: Validate YAML (secondary files)
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+    paths:
+      - '**/*.yml'
+      - '**/*.yaml'
+  pull_request:
+    paths:
+      - '**/*.yml'
+      - '**/*.yaml'
+  workflow_dispatch:
+
+jobs:
+  code_scan:
+    name: Validate YAML
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@main
+        with:
+          fetch-depth: '0'
+
+      - name: Identify changed files
+        uses: tj-actions/changed-files@v41
+        id: changed-files
+        with:
+          files: '**/*.y*ml'
+          separator: ","
+
+      - name: Validate YAML
+        if: steps.changed-files.outputs.any_changed == 'true'
+        run: |
+          IFS=',' read -ra FILES <<< "${{ steps.changed-files.outputs.all_changed_files }}"
+          for file in "${FILES[@]}"; do
+            if [[ "$file" =~ ^*\.yaml$ ]] || \
+              [[ "$file" =~ ^ESPHome/*\.yaml$ ]]; then
+              echo "Skipping $file"
+              continue
+            fi
+            echo "::group::Validating $file"
+            yamllint -c "./.rules/yamllint.yml" "$file"
+            echo "::endgroup::"
+          done
+...

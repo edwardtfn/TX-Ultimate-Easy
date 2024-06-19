@@ -1,0 +1,5 @@
+---
+packages:
+  basic_package: !include ../TX-Ultimate-Easy-ESPHome.yaml  # Core package
+  addon_bluetooth_proxy: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_addon_ble_proxy.yaml
+...
