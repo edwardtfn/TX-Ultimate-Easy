@@ -37,10 +37,3 @@ light:
     #bit1_low: 0.00045ms  # Low time for bit 1
 
 media_player: !remove
-
-switch:
-  - id: !extend sw_speaker_amplifier
-    pin:
-      number: GPIO26
-      inverted: true
-      allow_other_uses: false
