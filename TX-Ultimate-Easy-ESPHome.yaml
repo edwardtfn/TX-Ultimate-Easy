@@ -1,3 +1,4 @@
+---
 substitutions:
   name: tx-ultimate-easy
   friendly_name: TX Ultimate Easy
@@ -10,10 +11,8 @@ packages:
   remote_package:
     url: https://github.com/edwardtfn/TX-Ultimate-Easy
     ref: dev
-    refresh: 1h
+    refresh: 30s
     files:
       - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
-
-### Uncomment the lines bellow if you have issues with OTA and cannot flash via serial at this moment. ###
-#esp32:
-#  flash_size: 4MB
+      # - ESPHome/TX-Ultimate-Easy-ESPHome_addon_ble_proxy.yaml  # Adds experimental BLE proxy support (limited)
+...
