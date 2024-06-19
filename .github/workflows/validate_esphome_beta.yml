@@ -1,101 +1,100 @@
 ---
-  name: Validate ESPHome (Beta)
-  
-  # yamllint disable-line rule:truthy
-  on:
-    workflow_dispatch:
-  
-  concurrency:
-    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-    cancel-in-progress: true
-  
-  jobs:
-    setup_dependencies:
-      name: Setup & Cache Dependencies
-      runs-on: ubuntu-latest
-      outputs:
-        cache-hit-arduino: ${{ steps.cache-arduino.outputs.cache-hit }}
-  
-      steps:
-        - name: Checkout repository
-          uses: actions/checkout@main
-  
-        - name: Cache Arduino Dependencies
-          id: cache-arduino
-          uses: actions/cache@main
-          with:
-            path: |
-              ~/.esphome/cache
-              ~/.platformio/packages
-              ~/.platformio/platforms
-            key: ${{ runner.os }}-arduino-${{ hashFiles('**/esphome_ard_basic.yaml') }}
-            restore-keys: |
-              ${{ runner.os }}-arduino-
-  
-    code_scan:
-      name: Code scan (YAML)
-      runs-on: "ubuntu-latest"
-      needs: setup_dependencies
-      steps:
-        - name: Checkout Code
-          uses: actions/checkout@main
-  
-        - name: Setup Python
-          uses: actions/setup-python@main
-          with:
-            python-version: '3.8'
-  
-        - name: Install Yamllint
-          run: pip install yamllint
-  
-        - name: Validate YAML files
-          run: find . -name "*.yaml" -exec yamllint -c ./.rules/yamllint.yml {} +
-  
-    build_basic:
-      name: Basic
-      needs: [code_scan, setup_dependencies]
-      runs-on: ubuntu-latest
-      strategy:
-        fail-fast: false
-        matrix:
-          include:
-            - id: ard
-              yaml_file: ".test/esphome_ard_basic.yaml"
-              cache-hit: ${{ needs.setup_dependencies.outputs.cache-hit-arduino }}
-  
-      steps:
-        - name: Checkout repository
-          uses: actions/checkout@main
-  
-        - name: Firmware
-          if: steps.matrix.outputs.cache-hit != 'true'
-          uses: barndawgie/build-action@v1.9.0
-          with:
-            yaml_file: ${{ matrix.yaml_file }}
-            version: beta
-  
-    build_bluetooth_proxy:
-      name: Bluetooth Proxy
-      needs: build_basic
-      runs-on: ubuntu-latest
-      strategy:
-        matrix:
-          include:
-            - id: idf_v4
-              base: idf_v4
-              yaml_file: ".test/esphome_idf_bluetooth_proxy.yaml"
-            - id: idf_v5
-              base: idf_v5
-              yaml_file: ".test/esphome_idf5_bluetooth_proxy.yaml"
-  
-      steps:
-        - name: Checkout repository
-          uses: actions/checkout@main
-  
-        - name: Build Bluetooth Proxy Firmware
-          uses: barndawgie/build-action@v1.9.0
-          with:
-            yaml_file: ${{ matrix.yaml_file }}
-            version: beta
+name: Validate ESPHome (Beta)
+
+# yamllint disable-line rule:truthy
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  setup_dependencies:
+    name: Setup & Cache Dependencies
+    runs-on: ubuntu-latest
+    outputs:
+      cache-hit-arduino: ${{ steps.cache-arduino.outputs.cache-hit }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@main
+
+      - name: Cache Arduino Dependencies
+        id: cache-arduino
+        uses: actions/cache@main
+        with:
+          path: |
+            ~/.esphome/cache
+            ~/.platformio/packages
+            ~/.platformio/platforms
+          key: ${{ runner.os }}-arduino-${{ hashFiles('**/esphome_ard_basic.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-arduino-
+
+  code_scan:
+    name: Code scan (YAML)
+    runs-on: "ubuntu-latest"
+    needs: setup_dependencies
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@main
+
+      - name: Setup Python
+        uses: actions/setup-python@main
+        with:
+          python-version: '3.8'
+
+      - name: Install Yamllint
+        run: pip install yamllint
+
+      - name: Validate YAML files
+        run: find . -name "*.yaml" -exec yamllint -c ./.rules/yamllint.yml {} +
+
+  build_basic:
+    name: Basic
+    needs: [code_scan, setup_dependencies]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: ard
+            yaml_file: ".test/esphome_ard_basic.yaml"
+            cache-hit: ${{ needs.setup_dependencies.outputs.cache-hit-arduino }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@main
+
+      - name: Firmware
+        if: steps.matrix.outputs.cache-hit != 'true'
+        uses: barndawgie/build-action@v1.9.0
+        with:
+          yaml_file: ${{ matrix.yaml_file }}
+          version: beta
+
+  build_bluetooth_proxy:
+    name: Bluetooth Proxy
+    needs: build_basic
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - id: idf_v4
+            base: idf_v4
+            yaml_file: ".test/esphome_idf_bluetooth_proxy.yaml"
+          - id: idf_v5
+            base: idf_v5
+            yaml_file: ".test/esphome_idf5_bluetooth_proxy.yaml"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@main
+
+      - name: Build Bluetooth Proxy Firmware
+        uses: barndawgie/build-action@v1.9.0
+        with:
+          yaml_file: ${{ matrix.yaml_file }}
+          version: beta
 ...
-  
