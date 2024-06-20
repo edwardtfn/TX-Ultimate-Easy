@@ -28,32 +28,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  setup_dependencies:
-    name: Setup & Cache Dependencies
-    runs-on: ubuntu-latest
-    outputs:
-      cache-hit-arduino: ${{ steps.cache-arduino.outputs.cache-hit }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@main
-
-      - name: Cache Arduino Dependencies
-        id: cache-arduino
-        uses: actions/cache@main
-        with:
-          path: |
-            ~/.esphome/cache
-            ~/.platformio/packages
-            ~/.platformio/platforms
-          key: ${{ runner.os }}-arduino-${{ hashFiles('**/esphome_ard_basic.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-arduino-
-
   code_scan:
     name: Code scan (YAML)
     runs-on: "ubuntu-latest"
-    needs: setup_dependencies
     steps:
       - name: Checkout Code
         uses: actions/checkout@main
