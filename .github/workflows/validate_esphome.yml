@@ -1,5 +1,5 @@
 ---
-name: Validate and Build ESPHome
+name: Validate ESPHome
 
 # yamllint disable-line rule:truthy
 on:
