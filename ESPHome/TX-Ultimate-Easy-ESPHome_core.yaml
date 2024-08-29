@@ -204,6 +204,7 @@ esp32:
 esphome:
   name: ${name}
   friendly_name: ${friendly_name}
+  comment: TX Ultimate Easy
   platformio_options:
     build_flags:
       - -D TX_ULTIMATE_EASY_CORE
@@ -394,7 +395,7 @@ light:
     segments:
       - id: light_full
         from: 0
-        to: 28
+        to: 27
     effects: &light_effects_full
       - addressable_rainbow:
       - addressable_rainbow:
@@ -507,8 +508,8 @@ light:
     default_transition_length: ${default_transition_length}
     segments:
       - id: light_full
-        from: 10
-        to: 15
+        from: 9
+        to: 14
         reversed: true
     effects: *light_effects_full
   - id: light_us_left
