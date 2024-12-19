@@ -28,32 +28,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  setup_dependencies:
-    name: Setup & Cache Dependencies
-    runs-on: ubuntu-latest
-    outputs:
-      cache-hit-arduino: ${{ steps.cache-arduino.outputs.cache-hit }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@main
-
-      - name: Cache Arduino Dependencies
-        id: cache-arduino
-        uses: actions/cache@main
-        with:
-          path: |
-            ~/.esphome/cache
-            ~/.platformio/packages
-            ~/.platformio/platforms
-          key: ${{ runner.os }}-arduino-${{ hashFiles('**/esphome_ard_basic.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-arduino-
-
   code_scan:
     name: Code scan (YAML)
     runs-on: "ubuntu-latest"
-    needs: setup_dependencies
     steps:
       - name: Checkout Code
         uses: actions/checkout@main
@@ -71,48 +48,38 @@ jobs:
 
   build_basic:
     name: Basic
-    needs: [code_scan, setup_dependencies]
+    needs:
+      - code_scan
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - id: ard
-            yaml_file: ".test/esphome_ard_basic.yaml"
-            cache-hit: ${{ needs.setup_dependencies.outputs.cache-hit-arduino }}
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@main
-
-      - name: Firmware
-        if: steps.matrix.outputs.cache-hit != 'true'
+      - uses: actions/checkout@main
+      - name: Build core
         uses: esphome/build-action@main
         with:
-          yaml_file: ${{ matrix.yaml_file }}
+          yaml_file: ".test/esphome_ard_basic.yaml"
           version: beta
 
-  build_bluetooth_proxy:
-    name: Bluetooth Proxy
+  build_bluetooth_proxy_4:
+    name: Bluetooth Proxy (IDF v4)
     needs: build_basic
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - id: idf_v4
-            base: idf_v4
-            yaml_file: ".test/esphome_idf_bluetooth_proxy.yaml"
-          - id: idf_v5
-            base: idf_v5
-            yaml_file: ".test/esphome_idf53_bluetooth_proxy.yaml"
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@main
-
-      - name: Build Bluetooth Proxy Firmware
+      - uses: actions/checkout@main
+      - name: Build core
         uses: esphome/build-action@main
         with:
-          yaml_file: ${{ matrix.yaml_file }}
+          yaml_file: ".test/esphome_idf_bluetooth_proxy.yaml"
+          version: beta
+
+  build_bluetooth_proxy_53:
+    name: Bluetooth Proxy (IDF v5.3)
+    needs: build_basic
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build core
+        uses: esphome/build-action@main
+        with:
+          yaml_file: ".test/esphome_idf53_bluetooth_proxy.yaml"
           version: beta
 ...
