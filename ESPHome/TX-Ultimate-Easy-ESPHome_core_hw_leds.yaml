@@ -749,7 +749,9 @@ light:
         to: 7
 
 select:
-  - id: sl_relay_1_light_mode_eu
+  # EU relay light mode template
+  - &relay_light_mode_eu
+    id: sl_relay_1_light_mode_eu
     name: Relay 1 light mode
     platform: template
     options:
@@ -765,55 +767,21 @@ select:
     disabled_by_default: false
     icon: mdi:dots-square
 
-  - id: sl_relay_2_light_mode_eu
+  - <<: *relay_light_mode_eu
+    id: sl_relay_2_light_mode_eu
     name: Relay 2 light mode
-    platform: template
-    options:
-      - "Disabled"
-      - "Bottom"
-      - "Top"
-      - "Both"
-    initial_option: "Bottom"
-    optimistic: true
-    restore_value: true
-    internal: true
-    entity_category: config
-    disabled_by_default: false
-    icon: mdi:dots-square
 
-  - id: sl_relay_3_light_mode_eu
+  - <<: *relay_light_mode_eu
+    id: sl_relay_3_light_mode_eu
     name: Relay 3 light mode
-    platform: template
-    options:
-      - "Disabled"
-      - "Bottom"
-      - "Top"
-      - "Both"
-    initial_option: "Bottom"
-    optimistic: true
-    restore_value: true
-    internal: true
-    entity_category: config
-    disabled_by_default: false
-    icon: mdi:dots-square
 
-  - id: sl_relay_4_light_mode_eu
+  - <<: *relay_light_mode_eu
+    id: sl_relay_4_light_mode_eu
     name: Relay 4 light mode
-    platform: template
-    options:
-      - "Disabled"
-      - "Bottom"
-      - "Top"
-      - "Both"
-    initial_option: "Bottom"
-    optimistic: true
-    restore_value: true
-    internal: true
-    entity_category: config
-    disabled_by_default: false
-    icon: mdi:dots-square
 
-  - id: sl_relay_1_light_mode_us
+  # US relay light mode template
+  - &relay_light_mode_us
+    id: sl_relay_1_light_mode_us
     name: Relay 1 light mode
     platform: template
     options:
@@ -829,51 +797,15 @@ select:
     disabled_by_default: false
     icon: mdi:dots-square
 
-  - id: sl_relay_2_light_mode_us
+  - <<: *relay_light_mode_us
+    id: sl_relay_2_light_mode_us
     name: Relay 2 light mode
-    platform: template
-    options:
-      - "Disabled"
-      - "Left"
-      - "Right"
-      - "Both"
-    initial_option: "Right"
-    optimistic: true
-    restore_value: true
-    internal: true
-    entity_category: config
-    disabled_by_default: false
-    icon: mdi:dots-square
 
-  - id: sl_relay_3_light_mode_us
+  - <<: *relay_light_mode_us
+    id: sl_relay_3_light_mode_us
     name: Relay 3 light mode
-    platform: template
-    options:
-      - "Disabled"
-      - "Left"
-      - "Right"
-      - "Both"
-    initial_option: "Right"
-    optimistic: true
-    restore_value: true
-    internal: true
-    entity_category: config
-    disabled_by_default: false
-    icon: mdi:dots-square
 
-  - id: sl_relay_4_light_mode_us
+  - <<: *relay_light_mode_us
+    id: sl_relay_4_light_mode_us
     name: Relay 4 light mode
-    platform: template
-    options:
-      - "Disabled"
-      - "Left"
-      - "Right"
-      - "Both"
-    initial_option: "Right"
-    optimistic: true
-    restore_value: true
-    internal: true
-    entity_category: config
-    disabled_by_default: false
-    icon: mdi:dots-square
 ...
