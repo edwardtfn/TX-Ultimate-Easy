@@ -78,6 +78,55 @@ output:
     pin: GPIO23
 
 script:
+  - id: !extend boot_initialize
+    then:
+      - script.execute: boot_initialize_relays
+
+  - id: boot_initialize_relays
+    mode: restart
+    then:
+      - wait_until:
+          condition:
+            - lambda: return sl_tx_model_format->active_index().has_value();
+            - lambda: return sl_tx_model_gang->active_index().has_value();
+      - lambda: |-
+          const bool is_model_us = sl_tx_model_format->active_index().has_value() and
+                                    sl_tx_model_format->active_index().value() == 1;
+          const uint8_t num_gangs = (sl_tx_model_gang->active_index().has_value()) ?
+                                    (sl_tx_model_gang->active_index().value() + 1) : 0;
+          sl_relay_1_mode->set_internal(num_gangs < 1);
+          sl_relay_1_light_mode_eu->set_internal(is_model_us or num_gangs < 1);
+          sl_relay_1_light_mode_us->set_internal(!is_model_us or num_gangs < 1);
+          sl_relay_2_mode->set_internal(num_gangs < 2);
+          sl_relay_2_light_mode_eu->set_internal(is_model_us or num_gangs < 2);
+          sl_relay_2_light_mode_us->set_internal(!is_model_us or num_gangs < 2);
+          sl_relay_3_mode->set_internal(num_gangs < 3);
+          sl_relay_3_light_mode_eu->set_internal(is_model_us or num_gangs < 3);
+          sl_relay_3_light_mode_us->set_internal(!is_model_us or num_gangs < 3);
+          sl_relay_4_mode->set_internal(num_gangs < 4);
+          sl_relay_4_light_mode_eu->set_internal(is_model_us or num_gangs < 4);
+          sl_relay_4_light_mode_us->set_internal(!is_model_us or num_gangs < 4);
+          auto relay_mode_index = sl_relay_1_mode->active_index();
+          if (relay_mode_index.has_value()) {
+            light_output_1->set_internal(false or relay_mode_index.value() != 1);
+            sw_relay_1->set_internal(false or relay_mode_index.value() != 0);
+          }
+          relay_mode_index = sl_relay_2_mode->active_index();
+          if (relay_mode_index.has_value()) {
+            light_output_2->set_internal(num_gangs < 2 or relay_mode_index.value() != 1);
+            sw_relay_2->set_internal(num_gangs < 2 or relay_mode_index.value() != 0);
+          }
+          relay_mode_index = sl_relay_3_mode->active_index();
+          if (relay_mode_index.has_value()) {
+            light_output_3->set_internal(num_gangs < 3 or relay_mode_index.value() != 1);
+            sw_relay_3->set_internal(num_gangs < 3 or relay_mode_index.value() != 0);
+          }
+          relay_mode_index = sl_relay_4_mode->active_index();
+          if (relay_mode_index.has_value()) {
+            light_output_4->set_internal(num_gangs < 4 or relay_mode_index.value() != 1);
+            sw_relay_4->set_internal(num_gangs < 4 or relay_mode_index.value() != 0);
+          }
+
   - id: show_relay_status
     mode: restart
     then:

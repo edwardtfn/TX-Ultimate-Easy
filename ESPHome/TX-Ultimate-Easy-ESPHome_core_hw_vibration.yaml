@@ -11,6 +11,9 @@
 ##### - For normal system use, modifications to this file are NOT required.                    #####
 ####################################################################################################
 ---
+substitutions:
+  vibration_max_duration: 5s
+
 binary_sensor:
   - id: bs_vibrating
     name: Vibrating
@@ -44,6 +47,11 @@ number:
     initial_value: 15
     optimistic: true
     restore_value: true
+
+ota:
+  on_state_change:
+    then:
+      - switch.turn_off: sw_vibration_motor
 
 script:
   - id: !extend touch_on_multi_touch_release
@@ -112,9 +120,19 @@ switch:
     internal: true
     on_turn_on:
       then:
-        - lambda: bs_vibrating->publish_state(true);
+        - binary_sensor.template.publish:
+            id: bs_vibrating
+            state: ON  # yamllint disable-line rule:truthy
+        - delay: ${vibration_max_duration}
+        - if:
+            condition:
+              switch.is_on: sw_vibration_motor
+            then:
+              - switch.turn_off: sw_vibration_motor
     on_turn_off:
       then:
-        - lambda: bs_vibrating->publish_state(false);
+        - binary_sensor.template.publish:
+            id: bs_vibrating
+            state: OFF  # yamllint disable-line rule:truthy
 
 ...

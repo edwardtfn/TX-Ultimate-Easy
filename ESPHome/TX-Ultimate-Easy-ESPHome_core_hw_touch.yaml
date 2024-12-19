@@ -58,7 +58,7 @@ binary_sensor:
         - lambda: send_event_to_ha->execute("swipe", "down");
 
 external_components:
-  - source: github://edwardtfn/TX-Ultimate-Easy@dev  # Change this before releasing
+  - source: github://edwardtfn/TX-Ultimate-Easy@main
     components:
       - tx_ultimate_easy
 
@@ -79,6 +79,29 @@ number:
     restore_value: true
 
 script:
+  - id: !extend boot_initialize
+    then:
+      - script.execute: boot_initialize_touch
+
+  - id: boot_initialize_touch
+    mode: restart
+    then:
+      - wait_until:
+          condition:
+            - lambda: return sl_tx_model_format->active_index().has_value();
+      - lambda: |-
+          const bool is_model_us = sl_tx_model_format->active_index().has_value() and
+                                    sl_tx_model_format->active_index().value() == 1;
+          bs_multi_touch->publish_state(false);
+          bs_swipe_down->publish_state(false);
+          bs_swipe_down->set_internal(!is_model_us);
+          bs_swipe_left->publish_state(false);
+          bs_swipe_left->set_internal(is_model_us);
+          bs_swipe_right->publish_state(false);
+          bs_swipe_right->set_internal(is_model_us);
+          bs_swipe_up->publish_state(false);
+          bs_swipe_up->set_internal(!is_model_us);
+
   - id: touch_on_multi_touch_release
     mode: restart
     then:

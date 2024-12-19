@@ -21,8 +21,11 @@ api:
       then:
         - lambda: |-
             if (!isnan(val)) {
-              if (component == "latitude") sun_entity->set_latitude(val);
-              else if (component == "longitude") sun_entity->set_longitude(val);
+              if (component == "latitude" && val >= -90 && val <= 90) {
+                sun_entity->set_latitude(val);
+              } else if (component == "longitude" && val >= -180 && val <= 180) {
+                sun_entity->set_longitude(val);
+              }
             }
 
 script:

@@ -23,22 +23,22 @@ globals:
     restore_value: false
 
 light:
-  - id: ligth_output_1
+  - id: light_output_1
     name: Light output 1
     internal: true
     platform: binary
     output: output_relay_1
-  - id: ligth_output_2
+  - id: light_output_2
     name: Light output 2
     internal: true
     platform: binary
     output: output_relay_2
-  - id: ligth_output_3
+  - id: light_output_3
     name: Light output 3
     internal: true
     platform: binary
     output: output_relay_3
-  - id: ligth_output_4
+  - id: light_output_4
     name: Light output 4
     internal: true
     platform: binary
@@ -747,6 +747,71 @@ light:
       - id: light_full
         from: 7
         to: 7
+
+script:
+  - id: !extend boot_initialize
+    then:
+      - wait_until:
+          condition:
+            - lambda: return sl_tx_model_format->active_index().has_value();
+            - lambda: return sl_tx_model_gang->active_index().has_value();
+      - lambda: |-
+          const bool is_model_us = sl_tx_model_format->active_index().has_value() and
+                                    sl_tx_model_format->active_index().value() == 1;
+          const uint8_t num_gangs = (sl_tx_model_gang->active_index().has_value()) ?
+                                    (sl_tx_model_gang->active_index().value() + 1) : 0;
+          light_28->set_internal(!is_model_us);
+          light_29->set_internal(!is_model_us);
+          light_30->set_internal(!is_model_us);
+          light_31->set_internal(!is_model_us);
+          light_eu->set_internal(is_model_us);
+          light_eu_bottom->set_internal(is_model_us);
+          light_eu_left->set_internal(is_model_us);
+          light_eu_right->set_internal(is_model_us);
+          light_eu_top->set_internal(is_model_us);
+          light_us->set_internal(!is_model_us);
+          light_us_bottom->set_internal(!is_model_us);
+          light_us_left->set_internal(!is_model_us);
+          light_us_right->set_internal(!is_model_us);
+          light_us_top->set_internal(!is_model_us);
+          switch (num_gangs) {
+            case 1:  // 1 Gang
+              if (is_model_us) {
+                id(gb_lights_1) = { light_us_rl_1_1_left };
+                id(gb_lights_2) = { light_us_rl_1_1_right };
+              } else {
+                id(gb_lights_1) = { light_eu_rl_1_1_bottom };
+                id(gb_lights_2) = { light_eu_rl_1_1_top };
+              }
+              break;
+            case 2:  // 2 Gang
+              if (is_model_us) {
+                id(gb_lights_1) = { light_us_rl_1_2_left, light_us_rl_2_2_left };
+                id(gb_lights_2) = { light_us_rl_1_2_right, light_us_rl_2_2_right };
+              } else {
+                id(gb_lights_1) = { light_eu_rl_1_2_bottom, light_eu_rl_2_2_bottom };
+                id(gb_lights_2) = { light_eu_rl_1_2_top, light_eu_rl_2_2_top };
+              }
+              break;
+            case 3:  // 3 Gang
+              if (is_model_us) {
+                id(gb_lights_1) = { light_us_rl_1_3_left, light_us_rl_2_3_left, light_us_rl_3_3_left };
+                id(gb_lights_2) = { light_us_rl_1_3_right, light_us_rl_2_3_right, light_us_rl_3_3_right };
+              } else {
+                id(gb_lights_1) = { light_eu_rl_1_3_bottom, light_eu_rl_2_3_bottom, light_eu_rl_3_3_bottom };
+                id(gb_lights_2) = { light_eu_rl_1_3_top, light_eu_rl_2_3_top, light_eu_rl_3_3_top };
+              }
+              break;
+            case 4:  // 3 Gang
+              if (is_model_us) {
+                id(gb_lights_1) = { light_us_rl_1_4_left, light_us_rl_2_4_left, light_us_rl_3_4_left, light_us_rl_4_4_left };
+                id(gb_lights_2) = { light_us_rl_1_4_right, light_us_rl_2_4_right, light_us_rl_3_4_right, light_us_rl_4_4_right };
+              } else {
+                id(gb_lights_1) = { light_eu_rl_1_4_bottom, light_eu_rl_2_4_bottom, light_eu_rl_3_4_bottom, light_eu_rl_4_4_bottom };
+                id(gb_lights_2) = { light_eu_rl_1_4_top, light_eu_rl_2_4_top, light_eu_rl_3_4_top, light_eu_rl_4_4_top };
+              }
+              break;
+          }
 
 select:
   # EU relay light mode template
