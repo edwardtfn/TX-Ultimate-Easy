@@ -41,7 +41,7 @@ jobs:
           yaml-file: ".test/esphome_ard_basic.yaml"
 
   build_bluetooth_proxy_4:
-    name: Bluetooth Proxy (IDF v4)
+    name: Bluetooth Proxy (IDF)
     needs: build_basic
     runs-on: ubuntu-latest
     steps:
