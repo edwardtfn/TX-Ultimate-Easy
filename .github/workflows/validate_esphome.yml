@@ -38,7 +38,7 @@ jobs:
       - name: Build core
         uses: esphome/build-action@main
         with:
-          yaml_file: ".test/esphome_ard_basic.yaml"
+          yaml-file: ".test/esphome_ard_basic.yaml"
 
   build_bluetooth_proxy_4:
     name: Bluetooth Proxy (IDF v4)
@@ -49,7 +49,7 @@ jobs:
       - name: Build core
         uses: esphome/build-action@main
         with:
-          yaml_file: ".test/esphome_idf_bluetooth_proxy.yaml"
+          yaml-file: ".test/esphome_idf_bluetooth_proxy.yaml"
 
   build_bluetooth_proxy_53:
     name: Bluetooth Proxy (IDF v5.3)
@@ -60,5 +60,5 @@ jobs:
       - name: Build core
         uses: esphome/build-action@main
         with:
-          yaml_file: ".test/esphome_idf53_bluetooth_proxy.yaml"
+          yaml-file: ".test/esphome_idf53_bluetooth_proxy.yaml"
 ...

@@ -56,7 +56,7 @@ jobs:
       - name: Build core
         uses: esphome/build-action@main
         with:
-          yaml_file: ".test/esphome_ard_basic.yaml"
+          yaml-file: ".test/esphome_ard_basic.yaml"
           version: beta
 
   build_bluetooth_proxy_4:
@@ -68,7 +68,7 @@ jobs:
       - name: Build core
         uses: esphome/build-action@main
         with:
-          yaml_file: ".test/esphome_idf_bluetooth_proxy.yaml"
+          yaml-file: ".test/esphome_idf_bluetooth_proxy.yaml"
           version: beta
 
   build_bluetooth_proxy_53:
@@ -80,6 +80,6 @@ jobs:
       - name: Build core
         uses: esphome/build-action@main
         with:
-          yaml_file: ".test/esphome_idf53_bluetooth_proxy.yaml"
+          yaml-file: ".test/esphome_idf53_bluetooth_proxy.yaml"
           version: beta
 ...
