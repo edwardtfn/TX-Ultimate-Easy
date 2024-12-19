@@ -74,6 +74,7 @@ light:
         from: 0
         to: 31
 
+  # Those lights are available based on the model selections
   - id: light_eu_bottom
     name: Light - Bottom
     <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml

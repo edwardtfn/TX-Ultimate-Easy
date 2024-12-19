@@ -1,41 +1,38 @@
-effects: &light_effects_full
+effects:
   - addressable_rainbow:
+      name: "Rainbow"
   - addressable_rainbow:
       name: "Rainbow - Fast"
       speed: 50
   - pulse:
-  - pulse:
-      name: "Pulse - Fast"
-      transition_length: 0.5s
-      update_interval: 0.5s
+      name: "Pulse"
+      transition_length: 1s
+      update_interval: 1s
   - pulse:
       name: "Pulse - Slow"
+      transition_length: 2s
       update_interval: 2s
   - addressable_scan:
-  - addressable_scan:
-      name: Scan Effect With Custom Values
+      name: "Scan"
       move_interval: 100ms
       scan_width: 3
   - addressable_twinkle:
-  - addressable_twinkle:
-      name: Twinkle Effect With Custom Values
+      name: "Twinkle"
       twinkle_probability: 5%
       progress_interval: 4ms
   - addressable_random_twinkle:
-  - addressable_random_twinkle:
-      name: Random Twinkle Effect With Custom Values
+      name: "Random Twinkle"
       twinkle_probability: 20%
       progress_interval: 32ms
   - addressable_fireworks:
-  - addressable_fireworks:
-      name: Fireworks Effect With Custom Values
+      name: "Fireworks"
       update_interval: 32ms
       spark_probability: 10%
       use_random_color: false
       fade_out_rate: 120
   - addressable_flicker:
-  - addressable_flicker:
-      name: Flicker Effect With Custom Values
+      name: "Flicker"
       update_interval: 16ms
       intensity: 5%
   - random:
+      name: "Random"
