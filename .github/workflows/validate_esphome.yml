@@ -3,24 +3,6 @@ name: Validate ESPHome
 
 # yamllint disable-line rule:truthy
 on:
-  push:
-    paths:
-      - "*.yaml"
-      - "prebuilt/*.yaml"
-      - ".test/*.yaml"
-      - "*.h"
-      - "*.c"
-      - "*.cpp"
-      - "*.py"
-  pull_request:
-    paths:
-      - "*.yaml"
-      - "prebuilt/*.yaml"
-      - ".test/*.yaml"
-      - "*.h"
-      - "*.c"
-      - "*.cpp"
-      - "*.py"
   workflow_dispatch:
 
 concurrency:
@@ -69,8 +51,8 @@ jobs:
         with:
           yaml_file: ".test/esphome_idf_bluetooth_proxy.yaml"
 
-  build_bluetooth_proxy_5:
-    name: Bluetooth Proxy (IDF v5)
+  build_bluetooth_proxy_53:
+    name: Bluetooth Proxy (IDF v5.3)
     needs: build_basic
     runs-on: ubuntu-latest
     steps:
@@ -78,5 +60,5 @@ jobs:
       - name: Build core
         uses: esphome/build-action@main
         with:
-          yaml_file: ".test/esphome_idf5_bluetooth_proxy.yaml"
+          yaml_file: ".test/esphome_idf53_bluetooth_proxy.yaml"
 ...

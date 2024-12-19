@@ -1,4 +1,4 @@
-# yamllint disable rule:document-start rule:document-end
+---
 effects:
   - addressable_rainbow:
       name: "Rainbow"
@@ -37,4 +37,4 @@ effects:
       intensity: 5%
   - random:
       name: "Random"
-# yamllint enable rule:document-start rule:document-end
+...
