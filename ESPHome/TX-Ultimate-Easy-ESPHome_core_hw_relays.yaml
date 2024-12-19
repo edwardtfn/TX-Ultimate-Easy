@@ -82,40 +82,52 @@ script:
     mode: restart
     then:
       - lambda: |-
-          return;
-          show_relay_status->stop();
           auto model_format = sl_tx_model_format->active_index();
-          std::vector<esphome::select::Select*> relay_modes;
+          if (!model_format.has_value()) return;  // Early return if no model format
 
-          if (model_format.has_value() and model_format.value() == 0) {
-            relay_modes = {sl_relay_1_light_mode_eu, sl_relay_2_light_mode_eu, sl_relay_3_light_mode_eu, sl_relay_4_light_mode_eu};
+          std::vector<esphome::select::Select*> relay_modes;
+          const bool is_eu_model = model_format.value() == 0;
+
+          // Select appropriate light mode selectors based on model
+          if (is_eu_model) {
+            relay_modes = {sl_relay_1_light_mode_eu, sl_relay_2_light_mode_eu,
+                          sl_relay_3_light_mode_eu, sl_relay_4_light_mode_eu};
           } else {
-            relay_modes = {sl_relay_1_light_mode_us, sl_relay_2_light_mode_us, sl_relay_3_light_mode_us, sl_relay_4_light_mode_us};
+            relay_modes = {sl_relay_1_light_mode_us, sl_relay_2_light_mode_us,
+                          sl_relay_3_light_mode_us, sl_relay_4_light_mode_us};
           }
 
-          std::vector<switch_::Switch*> switches = {sw_relay_1, sw_relay_2, sw_relay_3, sw_relay_4};
-          for (int i = 0; i < relay_modes.size(); ++i) {
+          // Get switch states
+          const std::vector<switch_::Switch*> switches = {sw_relay_1, sw_relay_2, sw_relay_3, sw_relay_4};
+
+          // Update lights based on relay states
+          for (size_t i = 0; i < relay_modes.size(); ++i) {
             auto light_index = relay_modes[i]->active_index();
-            if (light_index.has_value()) {
-              uint8_t light_idx = light_index.value();
-              bool switch_state = switches[i]->state;
-              if (light_idx == 1 || light_idx == 3) {
-                if (switch_state)
-                  id(gb_lights_1)[i]->turn_on().perform();
-                else
-                  id(gb_lights_1)[i]->turn_off().perform();
-              }
-              if (light_idx == 2 || light_idx == 3) {
-                if (switch_state)
-                  id(gb_lights_2)[i]->turn_on().perform();
-                else
-                  id(gb_lights_2)[i]->turn_off().perform();
-              }
+            if (!light_index.has_value()) continue;
+
+            const uint8_t light_idx = light_index.value();
+            const bool switch_state = switches[i]->state;
+
+            // Update first light group (bottom/left)
+            if (light_idx == 1 || light_idx == 3) {
+              if (switch_state)
+                id(gb_lights_1)[i]->turn_on();
+              else
+                id(gb_lights_1)[i]->turn_off();
+            }
+
+            // Update second light group (top/right)
+            if (light_idx == 2 || light_idx == 3) {
+              if (switch_state)
+                id(gb_lights_2)[i]->turn_on();
+              else
+                id(gb_lights_2)[i]->turn_off();
             }
           }
 
 select:
-  - id: sl_relay_1_mode
+  - &relay_mode_base
+    id: sl_relay_1_mode
     name: Relay 1 mode
     platform: template
     options:
@@ -131,45 +143,15 @@ select:
 
   - id: sl_relay_2_mode
     name: Relay 2 mode
-    platform: template
-    options:
-      - "Relay"
-      - "Light"
-      - "Not in use"
-    optimistic: true
-    restore_value: true
-    internal: true
-    entity_category: config
-    disabled_by_default: false
-    icon: mdi:dip-switch
+    <<: *relay_mode_base
 
   - id: sl_relay_3_mode
     name: Relay 3 mode
-    platform: template
-    options:
-      - "Relay"
-      - "Light"
-      - "Not in use"
-    optimistic: true
-    restore_value: true
-    internal: true
-    entity_category: config
-    disabled_by_default: false
-    icon: mdi:dip-switch
+    <<: *relay_mode_base
 
   - id: sl_relay_4_mode
     name: Relay 4 mode
-    platform: template
-    options:
-      - "Relay"
-      - "Light"
-      - "Not in use"
-    optimistic: true
-    restore_value: true
-    internal: true
-    entity_category: config
-    disabled_by_default: false
-    icon: mdi:dip-switch
+    <<: *relay_mode_base
 
 switch:
   - &relay_switch_base

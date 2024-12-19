@@ -244,5 +244,4 @@ select:
     entity_category: config
     disabled_by_default: false
     icon: mdi:dip-switch
-
 ...
