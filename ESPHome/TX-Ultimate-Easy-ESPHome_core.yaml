@@ -25,7 +25,7 @@ packages:
   # yamllint disable rule:colons
   core_api:          !include TX-Ultimate-Easy-ESPHome_core_api.yaml
   core_hw_buttons:   !include TX-Ultimate-Easy-ESPHome_core_hw_buttons.yaml
-  core_hw_led:       !include TX-Ultimate-Easy-ESPHome_core_hw_led.yaml
+  core_hw_leds:      !include TX-Ultimate-Easy-ESPHome_core_hw_leds.yaml
   core_hw_relays:    !include TX-Ultimate-Easy-ESPHome_core_hw_relays.yaml
   core_hw_speaker:   !include TX-Ultimate-Easy-ESPHome_core_hw_speaker.yaml
   core_hw_touch:     !include TX-Ultimate-Easy-ESPHome_core_hw_touch.yaml

@@ -183,7 +183,7 @@ tx_ultimate_easy:
   on_press:
     - lambda: ESP_LOGI("tx_ultimate_easy", "Pressed");
     - script.execute:
-        id: touch_on_multi_touch_press
+        id: touch_on_press
         touch_x: !lambda return static_cast<uint8_t>(touch.x);
 
   on_release:

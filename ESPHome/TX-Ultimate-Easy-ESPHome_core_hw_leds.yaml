@@ -2,7 +2,7 @@
 #####                              TX Ultimate Easy for ESPHome                                #####
 #####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
 ####################################################################################################
-##### Purpose: ESPHome Core - Hardware - LED                                                   #####
+##### Purpose: ESPHome Core - Hardware - LEDs                                                  #####
 ####################################################################################################
 ##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
 ####################################################################################################
@@ -57,94 +57,48 @@ light:
   - id: light_eu
     name: Light
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_effects.yaml
     segments:
       - id: light_full
         from: 0
         to: 27
-    effects: &light_effects_full
-      - addressable_rainbow:
-      - addressable_rainbow:
-          name: "Rainbow - Fast"
-          speed: 50
-      - pulse:
-      - pulse:
-          name: "Pulse - Fast"
-          transition_length: 0.5s
-          update_interval: 0.5s
-      - pulse:
-          name: "Pulse - Slow"
-          update_interval: 2s
-      - addressable_scan:
-      - addressable_scan:
-          name: Scan Effect With Custom Values
-          move_interval: 100ms
-          scan_width: 3
-      - addressable_twinkle:
-      - addressable_twinkle:
-          name: Twinkle Effect With Custom Values
-          twinkle_probability: 5%
-          progress_interval: 4ms
-      - addressable_random_twinkle:
-      - addressable_random_twinkle:
-          name: Random Twinkle Effect With Custom Values
-          twinkle_probability: 20%
-          progress_interval: 32ms
-      - addressable_fireworks:
-      - addressable_fireworks:
-          name: Fireworks Effect With Custom Values
-          update_interval: 32ms
-          spark_probability: 10%
-          use_random_color: false
-          fade_out_rate: 120
-      - addressable_flicker:
-      - addressable_flicker:
-          name: Flicker Effect With Custom Values
-          update_interval: 16ms
-          intensity: 5%
-      - random:
+
   - id: light_us
     name: Light
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_effects.yaml
     segments:
       - id: light_full
         from: 0
         to: 31
-    effects: *light_effects_full
 
   - id: light_eu_bottom
     name: Light - Bottom
-    internal: true
-    disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_effects.yaml
     segments:
       - id: light_full
         from: 6
         to: 12
         reversed: true
-    effects: *light_effects_full
   - id: light_eu_left
     name: Light - Left
-    internal: true
-    disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_effects.yaml
     segments:
       - id: light_full
         from: 13
         to: 19
         reversed: true
-    effects: *light_effects_full
   - id: light_eu_right
     name: Light - Right
-    internal: true
-    disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_effects.yaml
     segments:
       - id: light_full
         from: 27
@@ -154,49 +108,41 @@ light:
         from: 0
         to: 5
         reversed: false
-    effects: *light_effects_full
   - id: light_eu_top
     name: Light - Top
-    internal: true
-    disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_effects.yaml
     segments:
       - id: light_full
         from: 20
         to: 26
         reversed: false
-    effects: *light_effects_full
   - id: light_us_bottom
     name: Light - Bottom
-    internal: true
-    disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_effects.yaml
     segments:
       - id: light_full
         from: 9
         to: 14
         reversed: true
-    effects: *light_effects_full
   - id: light_us_left
     name: Light - Left
-    internal: true
-    disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_effects.yaml
     segments:
       - id: light_full
         from: 15
         to: 24
         reversed: true
-    effects: *light_effects_full
   - id: light_us_right
     name: Light - Right
-    internal: true
-    disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_effects.yaml
     segments:
       - id: light_full
         from: 31
@@ -206,25 +152,21 @@ light:
         from: 0
         to: 8
         reversed: false
-    effects: *light_effects_full
   - id: light_us_top
     name: Light - Top
-    internal: true
-    disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_effects.yaml
     segments:
       - id: light_full
         from: 25
         to: 30
         reversed: false
-    effects: *light_effects_full
 
   - id: light_00
     name: Light - LED 00
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 0
@@ -232,8 +174,7 @@ light:
   - id: light_01
     name: Light - LED 01
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 1
@@ -241,8 +182,7 @@ light:
   - id: light_02
     name: Light - LED 02
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 2
@@ -250,8 +190,7 @@ light:
   - id: light_03
     name: Light - LED 03
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 3
@@ -259,8 +198,7 @@ light:
   - id: light_04
     name: Light - LED 04
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 4
@@ -268,8 +206,7 @@ light:
   - id: light_05
     name: Light - LED 05
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 5
@@ -277,8 +214,7 @@ light:
   - id: light_06
     name: Light - LED 06
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 6
@@ -286,8 +222,7 @@ light:
   - id: light_07
     name: Light - LED 07
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 7
@@ -295,8 +230,7 @@ light:
   - id: light_08
     name: Light - LED 08
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 8
@@ -304,8 +238,7 @@ light:
   - id: light_09
     name: Light - LED 09
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 9
@@ -313,8 +246,7 @@ light:
   - id: light_10
     name: Light - LED 10
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 10
@@ -322,8 +254,7 @@ light:
   - id: light_11
     name: Light - LED 11
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 11
@@ -331,8 +262,7 @@ light:
   - id: light_12
     name: Light - LED 12
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 12
@@ -340,8 +270,7 @@ light:
   - id: light_13
     name: Light - LED 13
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 13
@@ -349,8 +278,7 @@ light:
   - id: light_14
     name: Light - LED 14
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 14
@@ -358,8 +286,7 @@ light:
   - id: light_15
     name: Light - LED 15
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 15
@@ -367,8 +294,7 @@ light:
   - id: light_16
     name: Light - LED 16
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 16
@@ -376,8 +302,7 @@ light:
   - id: light_17
     name: Light - LED 17
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 17
@@ -385,8 +310,7 @@ light:
   - id: light_18
     name: Light - LED 18
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 18
@@ -394,8 +318,7 @@ light:
   - id: light_19
     name: Light - LED 19
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 19
@@ -403,8 +326,7 @@ light:
   - id: light_20
     name: Light - LED 20
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 20
@@ -412,8 +334,7 @@ light:
   - id: light_21
     name: Light - LED 21
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 21
@@ -421,8 +342,7 @@ light:
   - id: light_22
     name: Light - LED 22
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 22
@@ -430,8 +350,7 @@ light:
   - id: light_23
     name: Light - LED 23
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 23
@@ -439,8 +358,7 @@ light:
   - id: light_24
     name: Light - LED 24
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 24
@@ -448,8 +366,7 @@ light:
   - id: light_25
     name: Light - LED 25
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 25
@@ -457,8 +374,7 @@ light:
   - id: light_26
     name: Light - LED 26
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 26
@@ -466,48 +382,39 @@ light:
   - id: light_27
     name: Light - LED 27
     disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 27
         to: 27
   - id: light_28
     name: Light - LED 28
-    internal: true
-    disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 28
         to: 28
   - id: light_29
     name: Light - LED 29
-    internal: true
-    disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 29
         to: 29
   - id: light_30
     name: Light - LED 30
-    internal: true
-    disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 30
         to: 30
   - id: light_31
     name: Light - LED 31
-    internal: true
-    disabled_by_default: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 31
@@ -516,8 +423,7 @@ light:
   - id: light_eu_rl_1_1_bottom
     name: Light - Relay 1 of 1 (bottom)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 9
@@ -525,8 +431,7 @@ light:
   - id: light_eu_rl_1_1_top
     name: Light - Relay 1 of 1 (top)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 23
@@ -534,8 +439,7 @@ light:
   - id: light_eu_rl_1_2_bottom
     name: Light - Relay 1 of 2 (bottom)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 11
@@ -543,8 +447,7 @@ light:
   - id: light_eu_rl_1_2_top
     name: Light - Relay 1 of 2 (top)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 21
@@ -552,8 +455,7 @@ light:
   - id: light_eu_rl_2_2_bottom
     name: Light - Relay 2 of 2 (bottom)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 7
@@ -561,8 +463,7 @@ light:
   - id: light_eu_rl_2_2_top
     name: Light - Relay 2 of 2 (top)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 25
@@ -570,8 +471,7 @@ light:
   - id: light_eu_rl_1_3_bottom
     name: Light - Relay 1 of 3 (bottom)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 12
@@ -579,8 +479,7 @@ light:
   - id: light_eu_rl_1_3_top
     name: Light - Relay 1 of 3 (top)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 20
@@ -588,8 +487,7 @@ light:
   - id: light_eu_rl_2_3_bottom
     name: Light - Relay 2 of 3 (bottom)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 9
@@ -597,8 +495,7 @@ light:
   - id: light_eu_rl_2_3_top
     name: Light - Relay 2 of 3 (top)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 23
@@ -606,8 +503,7 @@ light:
   - id: light_eu_rl_3_3_bottom
     name: Light - Relay 3 of 3 (bottom)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 6
@@ -615,8 +511,7 @@ light:
   - id: light_eu_rl_3_3_top
     name: Light - Relay 3 of 3 (top)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 26
@@ -624,8 +519,7 @@ light:
   - id: light_eu_rl_1_4_bottom
     name: Light - Relay 1 of 4 (bottom)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 12
@@ -633,8 +527,7 @@ light:
   - id: light_eu_rl_1_4_top
     name: Light - Relay 1 of 4 (top)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 20
@@ -642,8 +535,7 @@ light:
   - id: light_eu_rl_2_4_bottom
     name: Light - Relay 2 of 4 (bottom)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 10
@@ -651,8 +543,7 @@ light:
   - id: light_eu_rl_2_4_top
     name: Light - Relay 2 of 4 (top)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 22
@@ -660,8 +551,7 @@ light:
   - id: light_eu_rl_3_4_bottom
     name: Light - Relay 3 of 4 (bottom)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 8
@@ -669,8 +559,7 @@ light:
   - id: light_eu_rl_3_4_top
     name: Light - Relay 3 of 4 (top)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 24
@@ -678,8 +567,7 @@ light:
   - id: light_eu_rl_4_4_bottom
     name: Light - Relay 4 of 4 (bottom)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 6
@@ -687,8 +575,7 @@ light:
   - id: light_eu_rl_4_4_top
     name: Light - Relay 4 of 4 (top)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 26
@@ -696,8 +583,7 @@ light:
   - id: light_us_rl_1_1_left
     name: Light - Relay 1 of 1 (left)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 15
@@ -705,8 +591,7 @@ light:
   - id: light_us_rl_1_1_right
     name: Light - Relay 1 of 1 (right)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 31
@@ -717,8 +602,7 @@ light:
   - id: light_us_rl_1_2_left
     name: Light - Relay 1 of 2 (left)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 20
@@ -726,8 +610,7 @@ light:
   - id: light_us_rl_1_2_right
     name: Light - Relay 1 of 2 (right)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 31
@@ -738,8 +621,7 @@ light:
   - id: light_us_rl_2_2_left
     name: Light - Relay 2 of 2 (left)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 15
@@ -747,8 +629,7 @@ light:
   - id: light_us_rl_2_2_right
     name: Light - Relay 2 of 2 (right)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 4
@@ -756,8 +637,7 @@ light:
   - id: light_us_rl_1_3_left
     name: Light - Relay 1 of 3 (left)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 22
@@ -765,8 +645,7 @@ light:
   - id: light_us_rl_1_3_right
     name: Light - Relay 1 of 3 (right)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 0
@@ -774,8 +653,7 @@ light:
   - id: light_us_rl_2_3_left
     name: Light - Relay 2 of 3 (left)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 19
@@ -783,8 +661,7 @@ light:
   - id: light_us_rl_2_3_right
     name: Light - Relay 2 of 3 (right)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 3
@@ -792,8 +669,7 @@ light:
   - id: light_us_rl_3_3_left
     name: Light - Relay 3 of 3 (left)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 17
@@ -801,8 +677,7 @@ light:
   - id: light_us_rl_3_3_right
     name: Light - Relay 3 of 3 (right)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 6
@@ -810,8 +685,7 @@ light:
   - id: light_us_rl_1_4_left
     name: Light - Relay 1 of 4 (left)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 12
@@ -819,8 +693,7 @@ light:
   - id: light_us_rl_1_4_right
     name: Light - Relay 1 of 4 (right)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 31
@@ -828,8 +701,7 @@ light:
   - id: light_us_rl_2_4_left
     name: Light - Relay 2 of 4 (left)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 24
@@ -837,8 +709,7 @@ light:
   - id: light_us_rl_2_4_right
     name: Light - Relay 2 of 4 (right)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 2
@@ -846,8 +717,7 @@ light:
   - id: light_us_rl_3_4_left
     name: Light - Relay 3 of 4 (left)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 21
@@ -855,8 +725,7 @@ light:
   - id: light_us_rl_3_4_right
     name: Light - Relay 3 of 4 (right)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 4
@@ -864,8 +733,7 @@ light:
   - id: light_us_rl_4_4_left
     name: Light - Relay 4 of 4 (left)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 19
@@ -873,8 +741,7 @@ light:
   - id: light_us_rl_4_4_right
     name: Light - Relay 4 of 4 (right)
     internal: true
-    platform: partition
-    default_transition_length: ${default_transition_length}
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
     segments:
       - id: light_full
         from: 7
@@ -1008,5 +875,4 @@ select:
     entity_category: config
     disabled_by_default: false
     icon: mdi:dots-square
-
 ...
