@@ -1,2 +1,4 @@
+# yamllint disable rule:document-start rule:document-end rule:new-line-at-end-of-file
 internal: true
 disabled_by_default: true
+# yamllint enable rule:document-start rule:document-end rule:new-line-at-end-of-file
