@@ -172,7 +172,8 @@ select:
     icon: mdi:dip-switch
 
 switch:
-  - id: sw_relay_1
+  - &relay_switch_base
+    id: sw_relay_1
     name: Relay 1
     platform: output
     output: output_relay_1
@@ -187,40 +188,16 @@ switch:
 
   - id: sw_relay_2
     name: Relay 2
-    platform: output
     output: output_relay_2
-    restore_mode: RESTORE_DEFAULT_OFF
-    internal: true
-    on_turn_on:
-      then:
-        - script.execute: show_relay_status
-    on_turn_off:
-      then:
-        - script.execute: show_relay_status
+    <<: *relay_switch_base
 
   - id: sw_relay_3
     name: Relay 3
-    platform: output
     output: output_relay_3
-    restore_mode: RESTORE_DEFAULT_OFF
-    internal: true
-    on_turn_on:
-      then:
-        - script.execute: show_relay_status
-    on_turn_off:
-      then:
-        - script.execute: show_relay_status
+    <<: *relay_switch_base
 
   - id: sw_relay_4
     name: Relay 4
-    platform: output
     output: output_relay_4
-    restore_mode: RESTORE_DEFAULT_OFF
-    internal: true
-    on_turn_on:
-      then:
-        - script.execute: show_relay_status
-    on_turn_off:
-      then:
-        - script.execute: show_relay_status
+    <<: *relay_switch_base
 ...

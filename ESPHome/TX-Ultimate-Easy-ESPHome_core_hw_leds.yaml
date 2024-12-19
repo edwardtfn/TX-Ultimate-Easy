@@ -767,17 +767,17 @@ select:
     disabled_by_default: false
     icon: mdi:dots-square
 
-  - <<: *relay_light_mode_eu
-    id: sl_relay_2_light_mode_eu
+  - id: sl_relay_2_light_mode_eu
     name: Relay 2 light mode
+    <<: *relay_light_mode_eu
 
-  - <<: *relay_light_mode_eu
-    id: sl_relay_3_light_mode_eu
+  - id: sl_relay_3_light_mode_eu
     name: Relay 3 light mode
+    <<: *relay_light_mode_eu
 
-  - <<: *relay_light_mode_eu
-    id: sl_relay_4_light_mode_eu
+  - id: sl_relay_4_light_mode_eu
     name: Relay 4 light mode
+    <<: *relay_light_mode_eu
 
   # US relay light mode template
   - &relay_light_mode_us
@@ -797,15 +797,15 @@ select:
     disabled_by_default: false
     icon: mdi:dots-square
 
-  - <<: *relay_light_mode_us
-    id: sl_relay_2_light_mode_us
+  - id: sl_relay_2_light_mode_us
     name: Relay 2 light mode
+    <<: *relay_light_mode_us
 
-  - <<: *relay_light_mode_us
-    id: sl_relay_3_light_mode_us
+  - id: sl_relay_3_light_mode_us
     name: Relay 3 light mode
+    <<: *relay_light_mode_us
 
-  - <<: *relay_light_mode_us
-    id: sl_relay_4_light_mode_us
+  - id: sl_relay_4_light_mode_us
     name: Relay 4 light mode
+    <<: *relay_light_mode_us
 ...
