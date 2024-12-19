@@ -20,6 +20,9 @@ api:
         val: float
       then:
         - lambda: |-
+            ESP_LOGD("core_api", "Set float:");
+            ESP_LOGD("core_api", "  Component: %s", component.c_str());
+            ESP_LOGD("core_api", "  Value:     %f", val);
             if (!isnan(val)) {
               if (component == "latitude" && val >= -90 && val <= 90) {
                 sun_entity->set_latitude(val);

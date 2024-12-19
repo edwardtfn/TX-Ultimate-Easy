@@ -70,6 +70,7 @@ improv_serial:
   id: serial_improv
 
 logger:
+  level: INFO
 
 ota:
   platform: esphome
