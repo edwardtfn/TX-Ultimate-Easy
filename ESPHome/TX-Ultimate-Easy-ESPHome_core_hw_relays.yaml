@@ -1,0 +1,226 @@
+####################################################################################################
+#####                              TX Ultimate Easy for ESPHome                                #####
+#####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
+####################################################################################################
+##### Purpose: ESPHome Core - Hardware - Relays                                                #####
+####################################################################################################
+##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
+####################################################################################################
+##### NOTE:                                                                                    #####
+##### - Make changes ONLY if absolutely necessary and you have the required knowledge.         #####
+##### - For normal system use, modifications to this file are NOT required.                    #####
+####################################################################################################
+---
+binary_sensor:
+  - id: !extend bs_button_1
+    on_click:
+      then:
+        - lambda: |-
+            if (sl_button_1_action->active_index().has_value() and
+                sl_button_1_action->active_index().value() == 1 and
+                !bs_multi_touch->state and
+                !bs_swipe_left->state and
+                !bs_swipe_down->state and
+                !bs_swipe_right->state)
+              sw_relay_1->toggle();
+
+  - id: !extend bs_button_2
+    on_click:
+      then:
+        - lambda: |-
+            if (sl_button_2_action->active_index().has_value() and
+                sl_button_2_action->active_index().value() == 1 and
+                !bs_multi_touch->state and
+                !bs_swipe_left->state and
+                !bs_swipe_down->state and
+                !bs_swipe_right->state)
+              sw_relay_2->toggle();
+
+  - id: !extend bs_button_3
+    on_click:
+      then:
+        - lambda: |-
+            if (sl_button_3_action->active_index().has_value() and
+                sl_button_3_action->active_index().value() == 1 and
+                !bs_multi_touch->state and
+                !bs_swipe_left->state and
+                !bs_swipe_down->state and
+                !bs_swipe_right->state)
+              sw_relay_3->toggle();
+
+  - id: !extend bs_button_4
+    on_click:
+      then:
+        - lambda: |-
+            if (sl_button_4_action->active_index().has_value() and
+                sl_button_4_action->active_index().value() == 1 and
+                !bs_multi_touch->state and
+                !bs_swipe_left->state and
+                !bs_swipe_down->state and
+                !bs_swipe_right->state)
+              sw_relay_4->toggle();
+
+output:
+  - id: output_relay_1
+    platform: gpio
+    pin: GPIO18
+
+  - id: output_relay_2
+    platform: gpio
+    pin: GPIO17
+
+  - id: output_relay_3
+    platform: gpio
+    pin: GPIO27
+
+  - id: output_relay_4
+    platform: gpio
+    pin: GPIO23
+
+script:
+  - id: show_relay_status
+    mode: restart
+    then:
+      - lambda: |-
+          return;
+          show_relay_status->stop();
+          auto model_format = sl_tx_model_format->active_index();
+          std::vector<esphome::select::Select*> relay_modes;
+
+          if (model_format.has_value() and model_format.value() == 0) {
+            relay_modes = {sl_relay_1_light_mode_eu, sl_relay_2_light_mode_eu, sl_relay_3_light_mode_eu, sl_relay_4_light_mode_eu};
+          } else {
+            relay_modes = {sl_relay_1_light_mode_us, sl_relay_2_light_mode_us, sl_relay_3_light_mode_us, sl_relay_4_light_mode_us};
+          }
+
+          std::vector<switch_::Switch*> switches = {sw_relay_1, sw_relay_2, sw_relay_3, sw_relay_4};
+          for (int i = 0; i < relay_modes.size(); ++i) {
+            auto light_index = relay_modes[i]->active_index();
+            if (light_index.has_value()) {
+              uint8_t light_idx = light_index.value();
+              bool switch_state = switches[i]->state;
+              if (light_idx == 1 || light_idx == 3) {
+                if (switch_state)
+                  id(gb_lights_1)[i]->turn_on().perform();
+                else
+                  id(gb_lights_1)[i]->turn_off().perform();
+              }
+              if (light_idx == 2 || light_idx == 3) {
+                if (switch_state)
+                  id(gb_lights_2)[i]->turn_on().perform();
+                else
+                  id(gb_lights_2)[i]->turn_off().perform();
+              }
+            }
+          }
+
+select:
+  - id: sl_relay_1_mode
+    name: Relay 1 mode
+    platform: template
+    options:
+      - "Relay"
+      - "Light"
+      - "Not in use"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dip-switch
+
+  - id: sl_relay_2_mode
+    name: Relay 2 mode
+    platform: template
+    options:
+      - "Relay"
+      - "Light"
+      - "Not in use"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dip-switch
+
+  - id: sl_relay_3_mode
+    name: Relay 3 mode
+    platform: template
+    options:
+      - "Relay"
+      - "Light"
+      - "Not in use"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dip-switch
+
+  - id: sl_relay_4_mode
+    name: Relay 4 mode
+    platform: template
+    options:
+      - "Relay"
+      - "Light"
+      - "Not in use"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dip-switch
+
+switch:
+  - id: sw_relay_1
+    name: Relay 1
+    platform: output
+    output: output_relay_1
+    restore_mode: RESTORE_DEFAULT_OFF
+    internal: true
+    on_turn_on:
+      then:
+        - script.execute: show_relay_status
+    on_turn_off:
+      then:
+        - script.execute: show_relay_status
+
+  - id: sw_relay_2
+    name: Relay 2
+    platform: output
+    output: output_relay_2
+    restore_mode: RESTORE_DEFAULT_OFF
+    internal: true
+    on_turn_on:
+      then:
+        - script.execute: show_relay_status
+    on_turn_off:
+      then:
+        - script.execute: show_relay_status
+
+  - id: sw_relay_3
+    name: Relay 3
+    platform: output
+    output: output_relay_3
+    restore_mode: RESTORE_DEFAULT_OFF
+    internal: true
+    on_turn_on:
+      then:
+        - script.execute: show_relay_status
+    on_turn_off:
+      then:
+        - script.execute: show_relay_status
+
+  - id: sw_relay_4
+    name: Relay 4
+    platform: output
+    output: output_relay_4
+    restore_mode: RESTORE_DEFAULT_OFF
+    internal: true
+    on_turn_on:
+      then:
+        - script.execute: show_relay_status
+    on_turn_off:
+      then:
+        - script.execute: show_relay_status
+...
