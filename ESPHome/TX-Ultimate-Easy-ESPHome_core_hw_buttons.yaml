@@ -133,11 +133,34 @@ script:
   - id: buttons_release
     mode: restart
     then:
-      - lambda: |-
-          if (bs_button_1->state) bs_button_1->publish_state(false);
-          if (bs_button_2->state) bs_button_2->publish_state(false);
-          if (bs_button_3->state) bs_button_3->publish_state(false);
-          if (bs_button_4->state) bs_button_4->publish_state(false);
+      - if:
+          condition:
+            binary_sensor.is_on: bs_button_1
+          then:
+            - binary_sensor.template.publish:
+                id: bs_button_1
+                state: OFF  # yamllint disable-line rule:truthy
+      - if:
+          condition:
+            binary_sensor.is_on: bs_button_2
+          then:
+            - binary_sensor.template.publish:
+                id: bs_button_2
+                state: OFF  # yamllint disable-line rule:truthy
+      - if:
+          condition:
+            binary_sensor.is_on: bs_button_3
+          then:
+            - binary_sensor.template.publish:
+                id: bs_button_3
+                state: OFF  # yamllint disable-line rule:truthy
+      - if:
+          condition:
+            binary_sensor.is_on: bs_button_4
+          then:
+            - binary_sensor.template.publish:
+                id: bs_button_4
+                state: OFF  # yamllint disable-line rule:truthy
 
   - id: !extend touch_on_multi_touch_release
     then:
@@ -193,7 +216,8 @@ script:
       - script.execute: buttons_release
 
 select:
-  - id: sl_button_1_action
+  - &button_select_action_base
+    id: sl_button_1_action
     name: Button 1 action
     platform: template
     options:
@@ -212,12 +236,7 @@ select:
     options:
       - "None"
       - "Relay 2 (toggle)"
-    optimistic: true
-    restore_value: true
-    internal: true
-    entity_category: config
-    disabled_by_default: false
-    icon: mdi:dip-switch
+    <<: *button_select_action_base
 
   - id: sl_button_3_action
     name: Button 3 action
@@ -225,12 +244,7 @@ select:
     options:
       - "None"
       - "Relay 3 (toggle)"
-    optimistic: true
-    restore_value: true
-    internal: true
-    entity_category: config
-    disabled_by_default: false
-    icon: mdi:dip-switch
+    <<: *button_select_action_base
 
   - id: sl_button_4_action
     name: Button 4 action
@@ -238,10 +252,5 @@ select:
     options:
       - "None"
       - "Relay 4 (toggle)"
-    optimistic: true
-    restore_value: true
-    internal: true
-    entity_category: config
-    disabled_by_default: false
-    icon: mdi:dip-switch
+    <<: *button_select_action_base
 ...

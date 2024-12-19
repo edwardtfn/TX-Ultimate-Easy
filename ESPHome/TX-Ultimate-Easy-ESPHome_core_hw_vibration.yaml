@@ -49,7 +49,7 @@ script:
   - id: !extend touch_on_multi_touch_release
     then:
       - script.execute: touch_on_multi_touch_release_vibration
-  
+
   - id: touch_on_multi_touch_release_vibration
     mode: restart
     then:
@@ -60,7 +60,7 @@ script:
   - id: !extend touch_on_press
     then:
       - script.execute: touch_on_press_vibration
-  
+
   - id: touch_on_press_vibration
     mode: restart
     then:
@@ -71,7 +71,7 @@ script:
   - id: !extend touch_on_release
     then:
       - script.execute: touch_on_release_vibration
-  
+
   - id: touch_on_release_vibration
     mode: restart
     then:

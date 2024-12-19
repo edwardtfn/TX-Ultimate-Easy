@@ -126,7 +126,7 @@ script:
           }
 
 select:
-  - &relay_mode_base
+  - &relay_select_mode_base
     id: sl_relay_1_mode
     name: Relay 1 mode
     platform: template
@@ -143,15 +143,15 @@ select:
 
   - id: sl_relay_2_mode
     name: Relay 2 mode
-    <<: *relay_mode_base
+    <<: *relay_select_mode_base
 
   - id: sl_relay_3_mode
     name: Relay 3 mode
-    <<: *relay_mode_base
+    <<: *relay_select_mode_base
 
   - id: sl_relay_4_mode
     name: Relay 4 mode
-    <<: *relay_mode_base
+    <<: *relay_select_mode_base
 
 switch:
   - &relay_switch_base

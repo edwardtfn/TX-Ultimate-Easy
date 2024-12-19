@@ -123,7 +123,7 @@ script:
     then:
       - binary_sensor.template.publish:
           id: bs_swipe_left
-          state: ON
+          state: ON  # yamllint disable-line rule:truthy
       - delay: !lambda return nr_touch_duration->state;
       - script.execute: touch_swipe_turn_off_binary_sensor
 
@@ -139,7 +139,7 @@ script:
     then:
       - binary_sensor.template.publish:
           id: bs_swipe_right
-          state: ON
+          state: ON  # yamllint disable-line rule:truthy
       - delay: !lambda return nr_touch_duration->state;
       - script.execute: touch_swipe_turn_off_binary_sensor
 
@@ -152,14 +152,14 @@ script:
           then:
             - binary_sensor.template.publish:
                 id: bs_swipe_left
-                state: OFF
+                state: OFF  # yamllint disable-line rule:truthy
       - if:
           condition:
             binary_sensor.is_on: bs_swipe_right
           then:
             - binary_sensor.template.publish:
                 id: bs_swipe_right
-                state: OFF
+                state: OFF  # yamllint disable-line rule:truthy
 
 switch:
   - id: sw_touch_panel_power
