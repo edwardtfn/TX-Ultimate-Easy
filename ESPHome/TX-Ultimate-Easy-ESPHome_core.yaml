@@ -19,7 +19,7 @@ substitutions:
   longitude: '0'
   zone_home: 'zone.home'
 
-  version: '0.0.3'
+  version: '0.0.4'
 
 packages:
   # yamllint disable rule:colons
