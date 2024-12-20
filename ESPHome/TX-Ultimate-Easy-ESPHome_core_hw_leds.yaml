@@ -819,11 +819,15 @@ script:
               break;
             case 4:  // 3 Gang
               if (is_model_us) {
-                id(gb_lights_1) = { light_us_rl_1_4_left, light_us_rl_2_4_left, light_us_rl_3_4_left, light_us_rl_4_4_left };
-                id(gb_lights_2) = { light_us_rl_1_4_right, light_us_rl_2_4_right, light_us_rl_3_4_right, light_us_rl_4_4_right };
+                id(gb_lights_1) = { light_us_rl_1_4_left, light_us_rl_2_4_left,
+                                    light_us_rl_3_4_left, light_us_rl_4_4_left };
+                id(gb_lights_2) = { light_us_rl_1_4_right, light_us_rl_2_4_right,
+                                    light_us_rl_3_4_right, light_us_rl_4_4_right };
               } else {
-                id(gb_lights_1) = { light_eu_rl_1_4_bottom, light_eu_rl_2_4_bottom, light_eu_rl_3_4_bottom, light_eu_rl_4_4_bottom };
-                id(gb_lights_2) = { light_eu_rl_1_4_top, light_eu_rl_2_4_top, light_eu_rl_3_4_top, light_eu_rl_4_4_top };
+                id(gb_lights_1) = { light_eu_rl_1_4_bottom, light_eu_rl_2_4_bottom,
+                                    light_eu_rl_3_4_bottom, light_eu_rl_4_4_bottom };
+                id(gb_lights_2) = { light_eu_rl_1_4_top, light_eu_rl_2_4_top,
+                                    light_eu_rl_3_4_top, light_eu_rl_4_4_top };
               }
               break;
           }
@@ -840,7 +844,7 @@ script:
           static const uint32_t LIGHT_TRANSITION_TURN_OFF = ${LIGHT_TRANSITION_TURN_OFF};
           static const uint8_t LIGHT_BRIGHTNESS_TURN_ON = ${LIGHT_BRIGHTNESS_TURN_ON};
 
-          ESP_LOGI("core_hw_leds.light_set_state", "Setting light group %d, index %d to state %s", 
+          ESP_LOGI("core_hw_leds.light_set_state", "Setting light group %d, index %d to state %s",
                     light_group, light_index, state ? "ON" : "OFF");
 
           switch (light_group) {

@@ -148,8 +148,9 @@ script:
       - lambda: |-
           const bool is_model_us = sl_tx_model_format->active_index().has_value() and
                                     sl_tx_model_format->active_index().value() == 1;
-          const uint8_t num_gangs = (sl_tx_model_gang->active_index().has_value()) ?
-                                    (sl_tx_model_gang->active_index().value() + 1) : 0;
+          const uint8_t num_gangs = (sl_tx_model_gang->active_index().has_value())
+                                      ? (sl_tx_model_gang->active_index().value() + 1)
+                                      : 0;
 
           if (num_gangs < 1 || num_gangs > 4) {
             ESP_LOGE("core_hw_relays", "Invalid number of gangs: %" PRIu8, num_gangs);
@@ -171,25 +172,25 @@ script:
               case 0:
                 relay_state = id(sw_relay_1).state;
                 light_mode = is_model_us 
-                              ? id(sl_relay_1_light_mode_us)->state 
+                              ? id(sl_relay_1_light_mode_us)->state
                               : id(sl_relay_1_light_mode_eu)->state;
                 break;
               case 1:
                 relay_state = id(sw_relay_2).state;
                 light_mode = is_model_us 
-                              ? id(sl_relay_2_light_mode_us)->state 
+                              ? id(sl_relay_2_light_mode_us)->state
                               : id(sl_relay_2_light_mode_eu)->state;
                 break;
               case 2:
                 relay_state = id(sw_relay_3).state;
                 light_mode = is_model_us 
-                              ? id(sl_relay_3_light_mode_us)->state 
+                              ? id(sl_relay_3_light_mode_us)->state
                               : id(sl_relay_3_light_mode_eu)->state;
                 break;
               case 3:
                 relay_state = id(sw_relay_4).state;
                 light_mode = is_model_us 
-                              ? id(sl_relay_4_light_mode_us)->state 
+                              ? id(sl_relay_4_light_mode_us)->state
                               : id(sl_relay_4_light_mode_eu)->state;
                 break;
             }
