@@ -1,11 +1,13 @@
 # TX Ultimate Easy
 
-[![GitHub Activity][commits-shield]][commits]
-[![License][license-shield]][license]
-[![GitHub Last Commit][last-commit-shield]][commits]
-[![ESPHome][esphome-shield]][esphome]
-[![Discord][discord-shield]][discord]
-[![Buy me an ice-cream][buymeacoffee-shield]][buymeacoffee]
+<!-- markdownlint-disable MD033 -->
+<a href="https://github.com/edwardtfn/TX-Ultimate-Easy/commits/main" target="_blank">![GitHub Activity][commits-shield]</a>
+<a href="LICENSE" target="_blank">![License][license-shield]</a>
+<a href="https://github.com/edwardtfn/TX-Ultimate-Easy/commits/main" target="_blank">![GitHub Last Commit][last-commit-shield]</a>
+<a href="https://esphome.io/" target="_blank">![ESPHome][esphome-shield]</a>
+<a href="https://discord.gg/Db6WJWzWuf" target="_blank">![Discord][discord-shield]</a>
+<a href="https://www.buymeacoffee.com/edwardfirmo" target="_blank">![Buy me an ice-cream][buymeacoffee-shield]</a>
+<!-- markdownlint-enable MD033 -->
 
 <!-- markdownlint-disable MD013 -->
 | &nbsp;![TX Ultimate Easy Logo](Assets/Logo.webp) | TX Ultimate Easy provides custom ESPHome firmware for Sonoff TX Ultimate devices. Our project focuses on user-friendly configuration through the Home Assistant UI, eliminating the need for manual YAML editing. Whether you're new to home automation or an experienced user, TX Ultimate Easy makes it simple to manage your device. |
