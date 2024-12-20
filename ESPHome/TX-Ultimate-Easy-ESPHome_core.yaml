@@ -21,6 +21,14 @@ substitutions:
 
   version: '0.0.4'
 
+  TX_MODEL_FORMAT_EU_TEXT: "EU (Square, T5-xC-86)"
+  TX_MODEL_FORMAT_US_TEXT: "US (Rectangle, T5-xC-120)"
+
+  TX_MODEL_1_GANG_TEXT: "1 Gang"
+  TX_MODEL_2_GANG_TEXT: "2 Gang"
+  TX_MODEL_3_GANG_TEXT: "3 Gang"
+  TX_MODEL_4_GANG_TEXT: "4 Gang"
+
 packages:
   # yamllint disable rule:colons
   core_api:          !include TX-Ultimate-Easy-ESPHome_core_api.yaml
@@ -103,9 +111,9 @@ select:
     name: Model (Format)
     platform: template
     options:
-      - "EU (Square, T5-xC-86)"
-      - "US (Rectangle, T5-xC-120)"
-    initial_option: "EU (Square, T5-xC-86)"
+      - "${TX_MODEL_FORMAT_EU_TEXT}"
+      - "${TX_MODEL_FORMAT_US_TEXT}"
+    initial_option: "${TX_MODEL_FORMAT_EU_TEXT}"
     optimistic: true
     restore_value: true
     internal: false
@@ -117,11 +125,11 @@ select:
     name: Model (Gang)
     platform: template
     options:
-      - "1 Gang"
-      - "2 Gang"
-      - "3 Gang"
-      - "4 Gang"
-    initial_option: "1 Gang"
+      - "${TX_MODEL_1_GANG_TEXT}"
+      - "${TX_MODEL_2_GANG_TEXT}"
+      - "${TX_MODEL_3_GANG_TEXT}"
+      - "${TX_MODEL_4_GANG_TEXT}"
+    initial_option: "${TX_MODEL_1_GANG_TEXT}"
     optimistic: true
     restore_value: true
     internal: false

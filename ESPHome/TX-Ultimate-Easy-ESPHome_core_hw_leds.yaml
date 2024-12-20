@@ -14,6 +14,17 @@
 substitutions:
   default_transition_length: 500ms
 
+  LIGHT_MODE_BOTH_TEXT: "Both"
+  LIGHT_MODE_DISABLED_TEXT: "Disabled"
+  LIGHT_MODE_LEFT_TEXT: "Left"
+  LIGHT_MODE_RIGHT_TEXT: "Right"
+  LIGHT_MODE_BOTTOM_TEXT: "Bottom"  
+  LIGHT_MODE_TOP_TEXT: "Top"
+
+  LIGHT_TRANSITION_TURN_ON: '0'    # Transition time in msec
+  LIGHT_TRANSITION_TURN_OFF: '0'   # Transition time in msec
+  LIGHT_BRIGHTNESS_TURN_ON: '0'    # Brightness (1 to 100%, 0 to not set it)
+
 globals:
   - id: gb_lights_1
     type: std::vector<light::LightState*>
@@ -817,6 +828,62 @@ script:
               break;
           }
 
+  - id: light_set_state
+    mode: parallel
+    parameters:
+      light_group: uint8_t
+      light_index: uint8_t
+      state: bool
+    then:
+      - lambda: |-
+          static const uint32_t LIGHT_TRANSITION_TURN_ON = ${LIGHT_TRANSITION_TURN_ON};
+          static const uint32_t LIGHT_TRANSITION_TURN_OFF = ${LIGHT_TRANSITION_TURN_OFF};
+          static const uint8_t LIGHT_BRIGHTNESS_TURN_ON = ${LIGHT_BRIGHTNESS_TURN_ON};
+
+          ESP_LOGI("core_hw_leds.light_set_state", "Setting light group %d, index %d to state %s", 
+                    light_group, light_index, state ? "ON" : "OFF");
+
+          switch (light_group) {
+            case 1:
+              if (light_index >= id(gb_lights_1).size()) {
+                ESP_LOGE("light_set_state", "Invalid light_index %d for group 1", light_index);
+                return;
+              }
+              if (state and !id(gb_lights_1)[light_index]->current_values.is_on()) {
+                auto call = id(gb_lights_1)[light_index]->turn_on();
+                if (LIGHT_TRANSITION_TURN_ON > 0)
+                  call.set_transition_length(LIGHT_TRANSITION_TURN_ON);  // in ms
+                if (LIGHT_BRIGHTNESS_TURN_ON > 0 and LIGHT_BRIGHTNESS_TURN_ON <= 100)
+                  call.set_brightness(LIGHT_TRANSITION_TURN_ON / 100.0f);
+                call.perform();
+              } else if (!state and id(gb_lights_1)[light_index]->current_values.is_on()) {
+                auto call = id(gb_lights_1)[light_index]->turn_off();
+                if (LIGHT_TRANSITION_TURN_OFF > 0)
+                  call.set_transition_length(LIGHT_TRANSITION_TURN_OFF);  // in ms
+                call.perform();
+              }
+              break;
+            case 2:
+              if (light_index >= id(gb_lights_2).size()) {
+                ESP_LOGE("light_set_state", "Invalid light_index %d for group 2", light_index);
+                return;
+              }
+              if (state and !id(gb_lights_2)[light_index]->current_values.is_on()) {
+                auto call = id(gb_lights_2)[light_index]->turn_on();
+                if (LIGHT_TRANSITION_TURN_ON > 0)
+                  call.set_transition_length(LIGHT_TRANSITION_TURN_ON);  // in ms
+                if (LIGHT_BRIGHTNESS_TURN_ON > 0 and LIGHT_BRIGHTNESS_TURN_ON <= 100)
+                  call.set_brightness(LIGHT_TRANSITION_TURN_ON / 100.0f);
+                call.perform();
+              } else if (!state and id(gb_lights_2)[light_index]->current_values.is_on()) {
+                auto call = id(gb_lights_2)[light_index]->turn_off();
+                if (LIGHT_TRANSITION_TURN_OFF > 0)
+                  call.set_transition_length(LIGHT_TRANSITION_TURN_OFF);  // in ms
+                call.perform();
+              }
+              break;
+          }
+
 select:
   # EU relay light mode template
   - &relay_light_mode_eu
@@ -824,11 +891,11 @@ select:
     name: Relay 1 light mode
     platform: template
     options:
-      - "Disabled"
-      - "Bottom"
-      - "Top"
-      - "Both"
-    initial_option: "Bottom"
+      - "${LIGHT_MODE_DISABLED_TEXT}"
+      - "${LIGHT_MODE_BOTTOM_TEXT}"
+      - "${LIGHT_MODE_TOP_TEXT}"
+      - "${LIGHT_MODE_BOTH_TEXT}"
+    initial_option: "${LIGHT_MODE_BOTTOM_TEXT}"
     optimistic: true
     restore_value: true
     internal: true
@@ -854,11 +921,11 @@ select:
     name: Relay 1 light mode
     platform: template
     options:
-      - "Disabled"
-      - "Left"
-      - "Right"
-      - "Both"
-    initial_option: "Right"
+      - "${LIGHT_MODE_DISABLED_TEXT}"
+      - "${LIGHT_MODE_LEFT_TEXT}"
+      - "${LIGHT_MODE_RIGHT_TEXT}"
+      - "${LIGHT_MODE_BOTH_TEXT}"
+    initial_option: "${LIGHT_MODE_RIGHT_TEXT}"
     optimistic: true
     restore_value: true
     internal: true
