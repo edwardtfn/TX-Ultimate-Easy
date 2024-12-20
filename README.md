@@ -1,7 +1,9 @@
 # TX Ultimate Easy
 
+<!-- markdownlint-disable MD013 -->
 | &nbsp;![TX Ultimate Easy Logo](Assets/Logo.webp) | Welcome to TX Ultimate Easy! This project aims to provide custom firmware for Sonoff TX Ultimate devices based on ESPHome, making it easy for even the least tech-savvy users to configure and use. Our goal is to have all the configurations manageable directly through the Home Assistant UI, eliminating the need to edit YAML files manually. |
 | --- | :-- |
+<!-- markdownlint-enable MD013 -->
 
 ## Features
 
@@ -52,5 +54,6 @@ If you find this project helpful, consider supporting us through Buy Me a Coffee
 
 [![Buy Me a Coffee](https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png)](https://www.buymeacoffee.com/edwardfirmo)
 
-
+<!-- markdownlint-disable MD033 -->
 <img src="Assets/Logo.webp" alt="TX Ultimate Easy Logo" width="100"/>
+<!-- markdownlint-enable MD033 -->
