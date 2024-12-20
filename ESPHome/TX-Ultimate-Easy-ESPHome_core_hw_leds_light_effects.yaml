@@ -1,0 +1,40 @@
+---
+effects:
+  - addressable_rainbow:
+      name: "Rainbow"
+  - addressable_rainbow:
+      name: "Rainbow - Fast"
+      speed: 50
+  - pulse:
+      name: "Pulse"
+      transition_length: 1s
+      update_interval: 1s
+  - pulse:
+      name: "Pulse - Slow"
+      transition_length: 2s
+      update_interval: 2s
+  - addressable_scan:
+      name: "Scan"
+      move_interval: 100ms
+      scan_width: 3
+  - addressable_twinkle:
+      name: "Twinkle"
+      twinkle_probability: 5%
+      progress_interval: 4ms
+  - addressable_random_twinkle:
+      name: "Random Twinkle"
+      twinkle_probability: 20%
+      progress_interval: 32ms
+  - addressable_fireworks:
+      name: "Fireworks"
+      update_interval: 32ms
+      spark_probability: 10%
+      use_random_color: false
+      fade_out_rate: 120
+  - addressable_flicker:
+      name: "Flicker"
+      update_interval: 16ms
+      intensity: 5%
+  - random:
+      name: "Random"
+...

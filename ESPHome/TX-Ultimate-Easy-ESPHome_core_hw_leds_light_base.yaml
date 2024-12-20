@@ -1,0 +1,4 @@
+---
+platform: partition
+default_transition_length: ${default_transition_length}
+...

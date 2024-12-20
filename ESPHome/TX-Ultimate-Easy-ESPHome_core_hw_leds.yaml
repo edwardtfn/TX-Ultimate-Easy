@@ -1,0 +1,963 @@
+####################################################################################################
+#####                              TX Ultimate Easy for ESPHome                                #####
+#####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
+####################################################################################################
+##### Purpose: ESPHome Core - Hardware - LEDs                                                  #####
+####################################################################################################
+##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
+####################################################################################################
+##### NOTE:                                                                                    #####
+##### - Make changes ONLY if absolutely necessary and you have the required knowledge.         #####
+##### - For normal system use, modifications to this file are NOT required.                    #####
+####################################################################################################
+---
+substitutions:
+  default_transition_length: 500ms
+
+  LIGHT_MODE_BOTH_TEXT: "Both"
+  LIGHT_MODE_DISABLED_TEXT: "Disabled"
+  LIGHT_MODE_LEFT_TEXT: "Left"
+  LIGHT_MODE_RIGHT_TEXT: "Right"
+  LIGHT_MODE_BOTTOM_TEXT: "Bottom"
+  LIGHT_MODE_TOP_TEXT: "Top"
+
+  LIGHT_TRANSITION_TURN_ON: '0'    # Transition time in msec
+  LIGHT_TRANSITION_TURN_OFF: '0'   # Transition time in msec
+  LIGHT_BRIGHTNESS_TURN_ON: '0'    # Brightness (1 to 100%, 0 to not set it)
+
+globals:
+  - id: gb_lights_1
+    type: std::vector<light::LightState*>
+    restore_value: false
+  - id: gb_lights_2
+    type: std::vector<light::LightState*>
+    restore_value: false
+
+light:
+  - id: light_output_1
+    name: Light output 1
+    internal: true
+    platform: binary
+    output: output_relay_1
+  - id: light_output_2
+    name: Light output 2
+    internal: true
+    platform: binary
+    output: output_relay_2
+  - id: light_output_3
+    name: Light output 3
+    internal: true
+    platform: binary
+    output: output_relay_3
+  - id: light_output_4
+    name: Light output 4
+    internal: true
+    platform: binary
+    output: output_relay_4
+
+  - id: light_full
+    name: Light - All
+    internal: true
+    platform: neopixelbus
+    type: GRB
+    variant: WS2811
+    # method: esp32_rmt
+    num_leds: 32
+    pin: GPIO13
+
+  - id: light_eu
+    name: Light
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_effects.yaml
+    segments:
+      - id: light_full
+        from: 0
+        to: 27
+
+  - id: light_us
+    name: Light
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_effects.yaml
+    segments:
+      - id: light_full
+        from: 0
+        to: 31
+
+  # Those lights are available based on the model selections
+  - id: light_eu_bottom
+    name: Light - Bottom
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_effects.yaml
+    segments:
+      - id: light_full
+        from: 6
+        to: 12
+        reversed: true
+  - id: light_eu_left
+    name: Light - Left
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_effects.yaml
+    segments:
+      - id: light_full
+        from: 13
+        to: 19
+        reversed: true
+  - id: light_eu_right
+    name: Light - Right
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_effects.yaml
+    segments:
+      - id: light_full
+        from: 27
+        to: 27
+        reversed: false
+      - id: light_full
+        from: 0
+        to: 5
+        reversed: false
+  - id: light_eu_top
+    name: Light - Top
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_effects.yaml
+    segments:
+      - id: light_full
+        from: 20
+        to: 26
+        reversed: false
+  - id: light_us_bottom
+    name: Light - Bottom
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_effects.yaml
+    segments:
+      - id: light_full
+        from: 9
+        to: 14
+        reversed: true
+  - id: light_us_left
+    name: Light - Left
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_effects.yaml
+    segments:
+      - id: light_full
+        from: 15
+        to: 24
+        reversed: true
+  - id: light_us_right
+    name: Light - Right
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_effects.yaml
+    segments:
+      - id: light_full
+        from: 31
+        to: 31
+        reversed: false
+      - id: light_full
+        from: 0
+        to: 8
+        reversed: false
+  - id: light_us_top
+    name: Light - Top
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_effects.yaml
+    segments:
+      - id: light_full
+        from: 25
+        to: 30
+        reversed: false
+
+  - id: light_00
+    name: Light - LED 00
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 0
+        to: 0
+  - id: light_01
+    name: Light - LED 01
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 1
+        to: 1
+  - id: light_02
+    name: Light - LED 02
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 2
+        to: 2
+  - id: light_03
+    name: Light - LED 03
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 3
+        to: 3
+  - id: light_04
+    name: Light - LED 04
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 4
+        to: 4
+  - id: light_05
+    name: Light - LED 05
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 5
+        to: 5
+  - id: light_06
+    name: Light - LED 06
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 6
+        to: 6
+  - id: light_07
+    name: Light - LED 07
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 7
+        to: 7
+  - id: light_08
+    name: Light - LED 08
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 8
+        to: 8
+  - id: light_09
+    name: Light - LED 09
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 9
+        to: 9
+  - id: light_10
+    name: Light - LED 10
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 10
+        to: 10
+  - id: light_11
+    name: Light - LED 11
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 11
+        to: 11
+  - id: light_12
+    name: Light - LED 12
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 12
+        to: 12
+  - id: light_13
+    name: Light - LED 13
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 13
+        to: 13
+  - id: light_14
+    name: Light - LED 14
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 14
+        to: 14
+  - id: light_15
+    name: Light - LED 15
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 15
+        to: 15
+  - id: light_16
+    name: Light - LED 16
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 16
+        to: 16
+  - id: light_17
+    name: Light - LED 17
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 17
+        to: 17
+  - id: light_18
+    name: Light - LED 18
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 18
+        to: 18
+  - id: light_19
+    name: Light - LED 19
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 19
+        to: 19
+  - id: light_20
+    name: Light - LED 20
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 20
+        to: 20
+  - id: light_21
+    name: Light - LED 21
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 21
+        to: 21
+  - id: light_22
+    name: Light - LED 22
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 22
+        to: 22
+  - id: light_23
+    name: Light - LED 23
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 23
+        to: 23
+  - id: light_24
+    name: Light - LED 24
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 24
+        to: 24
+  - id: light_25
+    name: Light - LED 25
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 25
+        to: 25
+  - id: light_26
+    name: Light - LED 26
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 26
+        to: 26
+  - id: light_27
+    name: Light - LED 27
+    disabled_by_default: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 27
+        to: 27
+  - id: light_28
+    name: Light - LED 28
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 28
+        to: 28
+  - id: light_29
+    name: Light - LED 29
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 29
+        to: 29
+  - id: light_30
+    name: Light - LED 30
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 30
+        to: 30
+  - id: light_31
+    name: Light - LED 31
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_internal.yaml
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 31
+        to: 31
+
+  - id: light_eu_rl_1_1_bottom
+    name: Light - Relay 1 of 1 (bottom)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 9
+        to: 9
+  - id: light_eu_rl_1_1_top
+    name: Light - Relay 1 of 1 (top)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 23
+        to: 23
+  - id: light_eu_rl_1_2_bottom
+    name: Light - Relay 1 of 2 (bottom)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 11
+        to: 11
+  - id: light_eu_rl_1_2_top
+    name: Light - Relay 1 of 2 (top)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 21
+        to: 21
+  - id: light_eu_rl_2_2_bottom
+    name: Light - Relay 2 of 2 (bottom)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 7
+        to: 7
+  - id: light_eu_rl_2_2_top
+    name: Light - Relay 2 of 2 (top)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 25
+        to: 25
+  - id: light_eu_rl_1_3_bottom
+    name: Light - Relay 1 of 3 (bottom)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 12
+        to: 12
+  - id: light_eu_rl_1_3_top
+    name: Light - Relay 1 of 3 (top)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 20
+        to: 20
+  - id: light_eu_rl_2_3_bottom
+    name: Light - Relay 2 of 3 (bottom)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 9
+        to: 9
+  - id: light_eu_rl_2_3_top
+    name: Light - Relay 2 of 3 (top)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 23
+        to: 23
+  - id: light_eu_rl_3_3_bottom
+    name: Light - Relay 3 of 3 (bottom)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 6
+        to: 6
+  - id: light_eu_rl_3_3_top
+    name: Light - Relay 3 of 3 (top)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 26
+        to: 26
+  - id: light_eu_rl_1_4_bottom
+    name: Light - Relay 1 of 4 (bottom)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 12
+        to: 12
+  - id: light_eu_rl_1_4_top
+    name: Light - Relay 1 of 4 (top)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 20
+        to: 20
+  - id: light_eu_rl_2_4_bottom
+    name: Light - Relay 2 of 4 (bottom)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 10
+        to: 10
+  - id: light_eu_rl_2_4_top
+    name: Light - Relay 2 of 4 (top)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 22
+        to: 22
+  - id: light_eu_rl_3_4_bottom
+    name: Light - Relay 3 of 4 (bottom)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 8
+        to: 8
+  - id: light_eu_rl_3_4_top
+    name: Light - Relay 3 of 4 (top)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 24
+        to: 24
+  - id: light_eu_rl_4_4_bottom
+    name: Light - Relay 4 of 4 (bottom)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 6
+        to: 6
+  - id: light_eu_rl_4_4_top
+    name: Light - Relay 4 of 4 (top)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 26
+        to: 26
+  - id: light_us_rl_1_1_left
+    name: Light - Relay 1 of 1 (left)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 15
+        to: 24
+  - id: light_us_rl_1_1_right
+    name: Light - Relay 1 of 1 (right)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 31
+        to: 31
+      - id: light_full
+        from: 0
+        to: 8
+  - id: light_us_rl_1_2_left
+    name: Light - Relay 1 of 2 (left)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 20
+        to: 24
+  - id: light_us_rl_1_2_right
+    name: Light - Relay 1 of 2 (right)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 31
+        to: 31
+      - id: light_full
+        from: 0
+        to: 3
+  - id: light_us_rl_2_2_left
+    name: Light - Relay 2 of 2 (left)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 15
+        to: 19
+  - id: light_us_rl_2_2_right
+    name: Light - Relay 2 of 2 (right)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 4
+        to: 8
+  - id: light_us_rl_1_3_left
+    name: Light - Relay 1 of 3 (left)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 22
+        to: 23
+  - id: light_us_rl_1_3_right
+    name: Light - Relay 1 of 3 (right)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 0
+        to: 1
+  - id: light_us_rl_2_3_left
+    name: Light - Relay 2 of 3 (left)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 19
+        to: 20
+  - id: light_us_rl_2_3_right
+    name: Light - Relay 2 of 3 (right)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 3
+        to: 4
+  - id: light_us_rl_3_3_left
+    name: Light - Relay 3 of 3 (left)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 17
+        to: 18
+  - id: light_us_rl_3_3_right
+    name: Light - Relay 3 of 3 (right)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 6
+        to: 7
+  - id: light_us_rl_1_4_left
+    name: Light - Relay 1 of 4 (left)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 12
+        to: 12
+  - id: light_us_rl_1_4_right
+    name: Light - Relay 1 of 4 (right)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 31
+        to: 31
+  - id: light_us_rl_2_4_left
+    name: Light - Relay 2 of 4 (left)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 24
+        to: 24
+  - id: light_us_rl_2_4_right
+    name: Light - Relay 2 of 4 (right)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 2
+        to: 2
+  - id: light_us_rl_3_4_left
+    name: Light - Relay 3 of 4 (left)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 21
+        to: 21
+  - id: light_us_rl_3_4_right
+    name: Light - Relay 3 of 4 (right)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 4
+        to: 4
+  - id: light_us_rl_4_4_left
+    name: Light - Relay 4 of 4 (left)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 19
+        to: 19
+  - id: light_us_rl_4_4_right
+    name: Light - Relay 4 of 4 (right)
+    internal: true
+    <<: !include TX-Ultimate-Easy-ESPHome_core_hw_leds_light_base.yaml
+    segments:
+      - id: light_full
+        from: 7
+        to: 7
+
+script:
+  - id: !extend boot_initialize
+    then:
+      - wait_until:
+          condition:
+            - lambda: return sl_tx_model_format->active_index().has_value();
+            - lambda: return sl_tx_model_gang->active_index().has_value();
+      - lambda: |-
+          const bool is_model_us = sl_tx_model_format->active_index().has_value() and
+                                    sl_tx_model_format->active_index().value() == 1;
+          const uint8_t num_gangs = (sl_tx_model_gang->active_index().has_value()) ?
+                                    (sl_tx_model_gang->active_index().value() + 1) : 0;
+          if (num_gangs < 1 || num_gangs > 4) {
+            ESP_LOGE("core_hw_leds", "Invalid number of gangs: %" PRIu8, num_gangs);
+            return;
+          }
+          light_28->set_internal(!is_model_us);
+          light_29->set_internal(!is_model_us);
+          light_30->set_internal(!is_model_us);
+          light_31->set_internal(!is_model_us);
+          light_eu->set_internal(is_model_us);
+          light_eu_bottom->set_internal(is_model_us);
+          light_eu_left->set_internal(is_model_us);
+          light_eu_right->set_internal(is_model_us);
+          light_eu_top->set_internal(is_model_us);
+          light_us->set_internal(!is_model_us);
+          light_us_bottom->set_internal(!is_model_us);
+          light_us_left->set_internal(!is_model_us);
+          light_us_right->set_internal(!is_model_us);
+          light_us_top->set_internal(!is_model_us);
+          switch (num_gangs) {
+            case 1:  // 1 Gang
+              if (is_model_us) {
+                id(gb_lights_1) = { light_us_rl_1_1_left };
+                id(gb_lights_2) = { light_us_rl_1_1_right };
+              } else {
+                id(gb_lights_1) = { light_eu_rl_1_1_bottom };
+                id(gb_lights_2) = { light_eu_rl_1_1_top };
+              }
+              break;
+            case 2:  // 2 Gang
+              if (is_model_us) {
+                id(gb_lights_1) = { light_us_rl_1_2_left, light_us_rl_2_2_left };
+                id(gb_lights_2) = { light_us_rl_1_2_right, light_us_rl_2_2_right };
+              } else {
+                id(gb_lights_1) = { light_eu_rl_1_2_bottom, light_eu_rl_2_2_bottom };
+                id(gb_lights_2) = { light_eu_rl_1_2_top, light_eu_rl_2_2_top };
+              }
+              break;
+            case 3:  // 3 Gang
+              if (is_model_us) {
+                id(gb_lights_1) = { light_us_rl_1_3_left, light_us_rl_2_3_left, light_us_rl_3_3_left };
+                id(gb_lights_2) = { light_us_rl_1_3_right, light_us_rl_2_3_right, light_us_rl_3_3_right };
+              } else {
+                id(gb_lights_1) = { light_eu_rl_1_3_bottom, light_eu_rl_2_3_bottom, light_eu_rl_3_3_bottom };
+                id(gb_lights_2) = { light_eu_rl_1_3_top, light_eu_rl_2_3_top, light_eu_rl_3_3_top };
+              }
+              break;
+            case 4:  // 3 Gang
+              if (is_model_us) {
+                id(gb_lights_1) = { light_us_rl_1_4_left, light_us_rl_2_4_left,
+                                    light_us_rl_3_4_left, light_us_rl_4_4_left };
+                id(gb_lights_2) = { light_us_rl_1_4_right, light_us_rl_2_4_right,
+                                    light_us_rl_3_4_right, light_us_rl_4_4_right };
+              } else {
+                id(gb_lights_1) = { light_eu_rl_1_4_bottom, light_eu_rl_2_4_bottom,
+                                    light_eu_rl_3_4_bottom, light_eu_rl_4_4_bottom };
+                id(gb_lights_2) = { light_eu_rl_1_4_top, light_eu_rl_2_4_top,
+                                    light_eu_rl_3_4_top, light_eu_rl_4_4_top };
+              }
+              break;
+          }
+
+  - id: light_set_state
+    mode: parallel
+    parameters:
+      light_group: uint8_t
+      light_index: uint8_t
+      state: bool
+    then:
+      - lambda: |-
+          static const uint32_t LIGHT_TRANSITION_TURN_ON = ${LIGHT_TRANSITION_TURN_ON};
+          static const uint32_t LIGHT_TRANSITION_TURN_OFF = ${LIGHT_TRANSITION_TURN_OFF};
+          static const uint8_t LIGHT_BRIGHTNESS_TURN_ON = ${LIGHT_BRIGHTNESS_TURN_ON};
+
+          const bool is_model_us = sl_tx_model_format->active_index().has_value() and
+                                    sl_tx_model_format->active_index().value() == 1;
+          const std::string light_mode_group_1 = is_model_us ? "${LIGHT_MODE_LEFT_TEXT}" : "${LIGHT_MODE_BOTTOM_TEXT}";
+          const std::string light_mode_group_2 = is_model_us ? "${LIGHT_MODE_RIGHT_TEXT}" : "${LIGHT_MODE_TOP_TEXT}";
+
+          switch (light_group) {
+            case 1:
+              if (light_index >= id(gb_lights_1).size()) {
+                ESP_LOGE("core_hw_leds", "Invalid set with %s light for Relay %" PRIu8,
+                                          light_mode_group_1.c_str(), light_index);
+                return;
+              }
+              if (state and !id(gb_lights_1)[light_index]->current_values.is_on()) {
+                ESP_LOGI("core_hw_leds", "Turn-on %s light for Relay %" PRIu8,
+                                          light_mode_group_1.c_str(), light_index);
+                auto call = id(gb_lights_1)[light_index]->turn_on();
+                if (LIGHT_TRANSITION_TURN_ON > 0)
+                  call.set_transition_length(LIGHT_TRANSITION_TURN_ON);  // in ms
+                if (LIGHT_BRIGHTNESS_TURN_ON > 0 and LIGHT_BRIGHTNESS_TURN_ON <= 100)
+                  call.set_brightness(LIGHT_BRIGHTNESS_TURN_ON / 100.0f);
+                call.perform();
+              } else if (!state and id(gb_lights_1)[light_index]->current_values.is_on()) {
+                ESP_LOGI("core_hw_leds", "Turn-off %s light for Relay %" PRIu8,
+                                          light_mode_group_1.c_str(), light_index);
+                auto call = id(gb_lights_1)[light_index]->turn_off();
+                if (LIGHT_TRANSITION_TURN_OFF > 0)
+                  call.set_transition_length(LIGHT_TRANSITION_TURN_OFF);  // in ms
+                call.perform();
+              }
+              break;
+            case 2:
+              if (light_index >= id(gb_lights_2).size()) {
+                ESP_LOGE("core_hw_leds", "Invalid set with %s light for Relay %" PRIu8,
+                                          light_mode_group_2.c_str(), light_index);
+                return;
+              }
+              if (state and !id(gb_lights_2)[light_index]->current_values.is_on()) {
+                ESP_LOGI("core_hw_leds", "Turn-on %s light for Relay %" PRIu8,
+                                          light_mode_group_2.c_str(), light_index);
+                auto call = id(gb_lights_2)[light_index]->turn_on();
+                if (LIGHT_TRANSITION_TURN_ON > 0)
+                  call.set_transition_length(LIGHT_TRANSITION_TURN_ON);  // in ms
+                if (LIGHT_BRIGHTNESS_TURN_ON > 0 and LIGHT_BRIGHTNESS_TURN_ON <= 100)
+                  call.set_brightness(LIGHT_BRIGHTNESS_TURN_ON / 100.0f);
+                call.perform();
+              } else if (!state and id(gb_lights_2)[light_index]->current_values.is_on()) {
+                ESP_LOGI("core_hw_leds", "Turn-off %s light for Relay %" PRIu8,
+                                          light_mode_group_2.c_str(), light_index);
+                auto call = id(gb_lights_2)[light_index]->turn_off();
+                if (LIGHT_TRANSITION_TURN_OFF > 0)
+                  call.set_transition_length(LIGHT_TRANSITION_TURN_OFF);  // in ms
+                call.perform();
+              }
+              break;
+          }
+
+select:
+  # EU relay light mode template
+  - &relay_light_mode_eu
+    id: sl_relay_1_light_mode_eu
+    name: Relay 1 light mode
+    platform: template
+    options:
+      - "${LIGHT_MODE_DISABLED_TEXT}"
+      - "${LIGHT_MODE_BOTTOM_TEXT}"
+      - "${LIGHT_MODE_TOP_TEXT}"
+      - "${LIGHT_MODE_BOTH_TEXT}"
+    initial_option: "${LIGHT_MODE_BOTTOM_TEXT}"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dots-square
+
+  - id: sl_relay_2_light_mode_eu
+    name: Relay 2 light mode
+    <<: *relay_light_mode_eu
+
+  - id: sl_relay_3_light_mode_eu
+    name: Relay 3 light mode
+    <<: *relay_light_mode_eu
+
+  - id: sl_relay_4_light_mode_eu
+    name: Relay 4 light mode
+    <<: *relay_light_mode_eu
+
+  # US relay light mode template
+  - &relay_light_mode_us
+    id: sl_relay_1_light_mode_us
+    name: Relay 1 light mode
+    platform: template
+    options:
+      - "${LIGHT_MODE_DISABLED_TEXT}"
+      - "${LIGHT_MODE_LEFT_TEXT}"
+      - "${LIGHT_MODE_RIGHT_TEXT}"
+      - "${LIGHT_MODE_BOTH_TEXT}"
+    initial_option: "${LIGHT_MODE_RIGHT_TEXT}"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dots-square
+
+  - id: sl_relay_2_light_mode_us
+    name: Relay 2 light mode
+    <<: *relay_light_mode_us
+
+  - id: sl_relay_3_light_mode_us
+    name: Relay 3 light mode
+    <<: *relay_light_mode_us
+
+  - id: sl_relay_4_light_mode_us
+    name: Relay 4 light mode
+    <<: *relay_light_mode_us
+...

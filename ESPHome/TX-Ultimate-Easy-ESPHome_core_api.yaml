@@ -2,7 +2,7 @@
 #####                              TX Ultimate Easy for ESPHome                                #####
 #####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
 ####################################################################################################
-##### Purpose: ESPHome Core - Add-on - BLE Proxy                                               #####
+##### Purpose: ESPHome Core - API                                                              #####
 ####################################################################################################
 ##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
 ####################################################################################################
@@ -11,39 +11,31 @@
 ##### - For normal system use, modifications to this file are NOT required.                    #####
 ####################################################################################################
 ---
-bluetooth_proxy:
+api:
+  id: api_server
+  on_client_connected:
+    then:
+      - script.execute: publish_device_info
 
-esp32:
-  framework:
-    type: esp-idf
-    sdkconfig_options:
-      CONFIG_BT_ALLOCATION_FROM_SPIRAM_FIRST: "y"
-      CONFIG_BT_BLE_DYNAMIC_ENV_MEMORY: "y"
-      CONFIG_ESP32_REV_MIN_3: "y"
-      CONFIG_MBEDTLS_DYNAMIC_BUFFER: "y"
-      CONFIG_MBEDTLS_DYNAMIC_FREE_CA_CERT: "y"
-      CONFIG_MBEDTLS_DYNAMIC_FREE_CONFIG_DATA: "y"
-      CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC: "y"
-      CONFIG_SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY: "y"
-      CONFIG_SPIRAM_RODATA: "y"
-      CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP: "y"
+script:
+  - id: !extend button_action
+    then:
+      - script.execute:
+          id: send_event_to_ha
+          component: !lambda return component.c_str();
+          event: !lambda return event.c_str();
 
-esphome:
-  platformio_options:
-    build_flags:
-      - -D TX_ULTIMATE_EASY_ADDON_BLE_PROXY
-
-i2s_audio: !remove
-
-light:
-  - id: !extend light_full
-    platform: esp32_rmt_led_strip
-    rgb_order: GRB
-    rmt_channel: 0
-    chipset: ws2812
-    type: !remove
-    variant: !remove
-    max_refresh_rate: 33ms
-
-media_player: !remove
+  - id: send_event_to_ha
+    mode: queued
+    parameters:
+      component: string
+      event: string
+    then:
+      - homeassistant.event:
+          event: esphome.tx_ultimate_easy
+          data:
+            device_name: !lambda return tx_device_name->state.c_str();
+            firmware: ${version}
+            component: !lambda return component.c_str();
+            event: !lambda return event.c_str();
 ...

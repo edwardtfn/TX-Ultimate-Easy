@@ -1,0 +1,277 @@
+####################################################################################################
+#####                              TX Ultimate Easy for ESPHome                                #####
+#####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
+####################################################################################################
+##### Purpose: ESPHome Core - Hardware - Buttons                                               #####
+####################################################################################################
+##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
+####################################################################################################
+##### NOTE:                                                                                    #####
+##### - Make changes ONLY if absolutely necessary and you have the required knowledge.         #####
+##### - For normal system use, modifications to this file are NOT required.                    #####
+####################################################################################################
+---
+substitutions:
+  invalid_cooldown: 100ms
+
+  BUTTON_ACTION_NONE_TEXT: "None"
+  BUTTON_1_ACTION_TEXT: "Relay 1 (toggle)"
+  BUTTON_2_ACTION_TEXT: "Relay 2 (toggle)"
+  BUTTON_3_ACTION_TEXT: "Relay 3 (toggle)"
+  BUTTON_4_ACTION_TEXT: "Relay 4 (toggle)"
+
+binary_sensor:
+  - id: bs_button_1
+    name: Button 1
+    icon: mdi:gesture-tap-box
+    internal: false
+    platform: template
+    on_click:
+      then:
+        - script.execute:
+            id: button_action
+            component: bs_button_1
+            event: click
+    on_double_click:
+      then:
+        - script.execute:
+            id: button_action
+            component: bs_button_1
+            event: double_click
+    on_multi_click:
+      - timing: &long_click-timing
+          - ON for at least 0.8s
+        invalid_cooldown: ${invalid_cooldown}
+        then:
+          - script.execute:
+              id: button_action
+              component: bs_button_1
+              event: long_click
+
+  - id: bs_button_2
+    name: Button 2
+    icon: mdi:gesture-tap-box
+    internal: true
+    platform: template
+    on_click:
+      then:
+        - script.execute:
+            id: button_action
+            component: bs_button_2
+            event: click
+    on_double_click:
+      then:
+        - script.execute:
+            id: button_action
+            component: bs_button_2
+            event: double_click
+    on_multi_click:
+      - timing: *long_click-timing
+        invalid_cooldown: ${invalid_cooldown}
+        then:
+          - script.execute:
+              id: button_action
+              component: bs_button_2
+              event: long_click
+
+  - id: bs_button_3
+    name: Button 3
+    icon: mdi:gesture-tap-box
+    internal: true
+    platform: template
+    on_click:
+      then:
+        - script.execute:
+            id: button_action
+            component: bs_button_3
+            event: click
+    on_double_click:
+      then:
+        - script.execute:
+            id: button_action
+            component: bs_button_3
+            event: double_click
+    on_multi_click:
+      - timing: *long_click-timing
+        invalid_cooldown: ${invalid_cooldown}
+        then:
+          - script.execute:
+              id: button_action
+              component: bs_button_3
+              event: long_click
+
+  - id: bs_button_4
+    name: Button 4
+    icon: mdi:gesture-tap-box
+    internal: true
+    platform: template
+    on_click:
+      then:
+        - script.execute:
+            id: button_action
+            component: bs_button_4
+            event: click
+    on_double_click:
+      then:
+        - script.execute:
+            id: button_action
+            component: bs_button_4
+            event: double_click
+    on_multi_click:
+      - timing: *long_click-timing
+        invalid_cooldown: ${invalid_cooldown}
+        then:
+          - script.execute:
+              id: button_action
+              component: bs_button_4
+              event: long_click
+
+script:
+  - id: !extend boot_initialize
+    then:
+      - script.execute: boot_initialize_buttons
+
+  - id: boot_initialize_buttons
+    mode: restart
+    then:
+      - wait_until:
+          condition:
+            - lambda: return sl_tx_model_gang->active_index().has_value();
+      - lambda: |-
+          const uint8_t num_gangs = (sl_tx_model_gang->active_index().has_value()) ?
+                                    (sl_tx_model_gang->active_index().value() + 1) : 0;
+          if (num_gangs < 1 || num_gangs > 4) {
+            ESP_LOGE("core_hw_buttons", "Invalid number of gangs: %" PRIu8, num_gangs);
+            return;
+          }
+          bs_button_1->publish_state(false);
+          bs_button_1->set_internal(num_gangs < 1);
+          sl_button_1_action->set_internal(num_gangs < 1);
+          bs_button_2->publish_state(false);
+          bs_button_2->set_internal(num_gangs < 2);
+          sl_button_2_action->set_internal(num_gangs < 2);
+          bs_button_3->publish_state(false);
+          bs_button_3->set_internal(num_gangs < 3);
+          sl_button_3_action->set_internal(num_gangs < 3);
+          bs_button_4->publish_state(false);
+          bs_button_4->set_internal(num_gangs < 4);
+          sl_button_4_action->set_internal(num_gangs < 4);
+
+  - id: button_action
+    mode: parallel
+    parameters:
+      component: string
+      event: string
+    then:  # There's nothing here so far
+    # Extended by:
+    #   - core_api
+
+  - id: buttons_release
+    mode: restart
+    then:
+      - lambda: |-
+          std::vector<binary_sensor::BinarySensor*> buttons = {
+            bs_button_1, bs_button_2, bs_button_3, bs_button_4
+          };
+          for (auto* button : buttons) {
+            if (button->state) {
+              button->publish_state(false);
+            }
+          }
+
+  - id: !extend touch_on_multi_touch_release
+    then:
+      - script.execute: buttons_release
+
+  - id: !extend touch_on_press
+    then:
+      - script.execute:
+          id: touch_on_press_buttons
+          touch_x: !lambda return touch_x;
+
+  - id: touch_on_press_buttons
+    mode: restart
+    parameters:
+      touch_x: uint8_t
+    then:
+      - lambda: |-
+          auto model_index = sl_tx_model_gang->active_index();
+          if (model_index.has_value()) {
+            uint8_t model_idx = model_index.value() + 1;
+            switch (model_idx) {
+              case 1:  // 1 Gang
+                bs_button_1->publish_state(true);
+                break;
+              case 2:  // 2 Gang
+                if (touch_x <= 5) bs_button_1->publish_state(true);
+                else bs_button_2->publish_state(true);
+                break;
+              case 3:  // 3 Gang
+                if (touch_x <= 3) bs_button_1->publish_state(true);
+                else if (touch_x <= 7) bs_button_2->publish_state(true);
+                else bs_button_3->publish_state(true);
+                break;
+              case 4:  // 4 Gang
+                if (touch_x <= 2) bs_button_1->publish_state(true);
+                else if (touch_x <= 5) bs_button_2->publish_state(true);
+                else if (touch_x <= 8) bs_button_3->publish_state(true);
+                else bs_button_4->publish_state(true);
+                break;
+            }
+          }
+
+  - id: !extend touch_on_release
+    then:
+      - script.execute: buttons_release
+
+  - id: !extend touch_swipe_left
+    then:
+      - script.execute: buttons_release
+
+  - id: !extend touch_swipe_right
+    then:
+      - script.execute: buttons_release
+
+select:
+  - &button_select_action_base
+    id: sl_button_1_action
+    name: Button 1 action
+    platform: template
+    options:
+      - "${BUTTON_ACTION_NONE_TEXT}"
+      - "${BUTTON_1_ACTION_TEXT}"
+    initial_option: "${BUTTON_1_ACTION_TEXT}"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dip-switch
+
+  - id: sl_button_2_action
+    name: Button 2 action
+    platform: template
+    options:
+      - "${BUTTON_ACTION_NONE_TEXT}"
+      - "${BUTTON_2_ACTION_TEXT}"
+    initial_option: "${BUTTON_2_ACTION_TEXT}"
+    <<: *button_select_action_base
+
+  - id: sl_button_3_action
+    name: Button 3 action
+    platform: template
+    options:
+      - "${BUTTON_ACTION_NONE_TEXT}"
+      - "${BUTTON_3_ACTION_TEXT}"
+    initial_option: "${BUTTON_3_ACTION_TEXT}"
+    <<: *button_select_action_base
+
+  - id: sl_button_4_action
+    name: Button 4 action
+    platform: template
+    options:
+      - "${BUTTON_ACTION_NONE_TEXT}"
+      - "${BUTTON_4_ACTION_TEXT}"
+    initial_option: "${BUTTON_4_ACTION_TEXT}"
+    <<: *button_select_action_base
+...
