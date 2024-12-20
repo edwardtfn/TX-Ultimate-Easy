@@ -31,13 +31,11 @@ script:
       component: string
       event: string
     then:
-      - lambda: |-
-          esphome::api::CustomAPIDevice ha_event;
-          ha_event.fire_homeassistant_event("esphome.tx_ultimate_easy",
-            {
-              {"device_name", tx_device_name->state.c_str()},
-              {"firmware", "${version}"},
-              {"component", component},
-              {"event", event},
-            });
+      - homeassistant.event:
+          event: esphome.tx_ultimate_easy
+          data:
+            device_name: !lambda return tx_device_name->state.c_str();
+            firmware: ${version}
+            component: !lambda return component.c_str();
+            event: !lambda return event.c_str();
 ...

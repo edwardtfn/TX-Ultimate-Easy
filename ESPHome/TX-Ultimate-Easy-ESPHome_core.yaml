@@ -89,11 +89,18 @@ script:
   - id: boot_done
     mode: restart
     then:
-      - lambda: send_event_to_ha->execute("boot", "done");
+      - script.execute:
+          id: send_event_to_ha
+          component: boot
+          event: done
 
   - id: boot_initialize
     mode: restart
-    then:  # There's nothing here so far
+    then:
+      - script.execute:
+          id: send_event_to_ha
+          component: boot
+          event: start
     # Extended by:
     #   - HW Buttons
     #   - HW Relays
@@ -109,7 +116,7 @@ script:
     then:
       - lambda: |-
           tx_fw_version->publish_state("${version}");
-          tx_device_name->publish_state("${name}");
+          tx_device_name->publish_state(App.get_name().c_str());
 
 select:
   - id: sl_tx_model_format
