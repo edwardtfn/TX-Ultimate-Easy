@@ -78,7 +78,7 @@ improv_serial:
   id: serial_improv
 
 logger:
-  level: DEBUG
+  level: INFO
 
 ota:
   platform: esphome
@@ -89,22 +89,34 @@ script:
   - id: boot_done
     mode: restart
     then:
-      - lambda: send_event_to_ha->execute("boot", "done");
+      - script.execute:
+          id: send_event_to_ha
+          component: boot
+          event: done
 
   - id: boot_initialize
     mode: restart
-    then:  # There's nothing here so far
-    # Extended by:
-    #   - HW Buttons
-    #   - HW Relays
-    #   - HW Touch
+    then:
+      # Extended by:
+      #   - HW Buttons
+      #   - HW Relays
+      #   - HW Touch
+      - script.execute:
+          id: send_event_to_ha
+          component: boot
+          event: start
 
   - id: boot_sequence
     mode: restart
     then:
+      - script.execute: publish_device_info
+
+  - id: publish_device_info
+    mode: restart
+    then:
       - lambda: |-
           tx_fw_version->publish_state("${version}");
-          tx_device_name->publish_state("${name}");
+          tx_device_name->publish_state(App.get_name().c_str());
 
 select:
   - id: sl_tx_model_format
@@ -137,34 +149,6 @@ select:
     disabled_by_default: false
     icon: mdi:dip-switch
 
-sensor:
-  - id: sun_elevation
-    name: Sun Elevation
-    platform: sun
-    type: elevation
-    internal: true
-
-  - id: zone_home_latitude
-    platform: homeassistant
-    entity_id: ${zone_home}
-    attribute: latitude
-    internal: false
-    on_value:
-      - lambda: if (!isnan(x)) sun_entity->set_latitude(x);
-
-  - id: zone_home_longitude
-    platform: homeassistant
-    entity_id: ${zone_home}
-    attribute: longitude
-    internal: false
-    on_value:
-      - lambda: if (!isnan(x)) sun_entity->set_longitude(x);
-
-sun:
-  id: sun_entity
-  latitude: ${latitude}
-  longitude: ${longitude}
-
 text_sensor:
   - id: tx_fw_version
     name: Firmware version
@@ -183,6 +167,7 @@ text_sensor:
     entity_category: diagnostic
     internal: false
     disabled_by_default: false
+    update_interval: never
     lambda: |-
       return {"${name}"};
     filters:

@@ -13,23 +13,9 @@
 ---
 api:
   id: api_server
-  actions:
-    - action: set_float
-      variables:
-        component: string
-        val: float
-      then:
-        - lambda: |-
-            ESP_LOGD("core_api", "Set float:");
-            ESP_LOGD("core_api", "  Component: %s", component.c_str());
-            ESP_LOGD("core_api", "  Value:     %f", val);
-            if (!isnan(val)) {
-              if (component == "latitude" && val >= -90 && val <= 90) {
-                sun_entity->set_latitude(val);
-              } else if (component == "longitude" && val >= -180 && val <= 180) {
-                sun_entity->set_longitude(val);
-              }
-            }
+  on_client_connected:
+    then:
+      - script.execute: publish_device_info
 
 script:
   - id: !extend button_action
@@ -45,14 +31,11 @@ script:
       component: string
       event: string
     then:
-      - lambda: |-
-          esphome::api::CustomAPIDevice ha_event;
-          ha_event.fire_homeassistant_event("esphome.tx_ultimate_easy",
-            {
-              {"device_name", tx_device_name->state.c_str()},
-              {"firmware", "${version}"},
-              {"component", component},
-              {"event", event},
-            });
-
+      - homeassistant.event:
+          event: esphome.tx_ultimate_easy
+          data:
+            device_name: !lambda return tx_device_name->state.c_str();
+            firmware: ${version}
+            component: !lambda return component.c_str();
+            event: !lambda return event.c_str();
 ...
