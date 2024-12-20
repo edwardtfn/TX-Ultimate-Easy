@@ -863,7 +863,7 @@ script:
                 if (LIGHT_TRANSITION_TURN_ON > 0)
                   call.set_transition_length(LIGHT_TRANSITION_TURN_ON);  // in ms
                 if (LIGHT_BRIGHTNESS_TURN_ON > 0 and LIGHT_BRIGHTNESS_TURN_ON <= 100)
-                  call.set_brightness(LIGHT_TRANSITION_TURN_ON / 100.0f);
+                  call.set_brightness(LIGHT_BRIGHTNESS_TURN_ON / 100.0f);
                 call.perform();
               } else if (!state and id(gb_lights_1)[light_index]->current_values.is_on()) {
                 ESP_LOGI("core_hw_leds", "Turn-off %s light for Relay %" PRIu8,
@@ -887,7 +887,7 @@ script:
                 if (LIGHT_TRANSITION_TURN_ON > 0)
                   call.set_transition_length(LIGHT_TRANSITION_TURN_ON);  // in ms
                 if (LIGHT_BRIGHTNESS_TURN_ON > 0 and LIGHT_BRIGHTNESS_TURN_ON <= 100)
-                  call.set_brightness(LIGHT_TRANSITION_TURN_ON / 100.0f);
+                  call.set_brightness(LIGHT_BRIGHTNESS_TURN_ON / 100.0f);
                 call.perform();
               } else if (!state and id(gb_lights_2)[light_index]->current_values.is_on()) {
                 ESP_LOGI("core_hw_leds", "Turn-off %s light for Relay %" PRIu8,
