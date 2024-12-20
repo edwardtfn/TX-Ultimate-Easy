@@ -1,6 +1,6 @@
 # TX Ultimate Easy
 
-| &nbsp;![TX Ultimate Easy Logo](Assets/Logo.webp) | Welcome to TX Ultimate Easy! This project aims to provide custom firmware for Sonoff TX Ultimate devices based on ESPHome, making it easy for even the least tech-savvy users to configure and use. Our goal is to have all the configurations manageable directly through the Home Assistant UI or via blueprints, eliminating the need to edit YAML files manually. |
+| &nbsp;![TX Ultimate Easy Logo](Assets/Logo.webp) | Welcome to TX Ultimate Easy! This project aims to provide custom firmware for Sonoff TX Ultimate devices based on ESPHome, making it easy for even the least tech-savvy users to configure and use. Our goal is to have all the configurations manageable directly through the Home Assistant UI, eliminating the need to edit YAML files manually. |
 | --- | :-- |
 
 ## Features
@@ -26,9 +26,6 @@ To be written.
 
 - **Via Home Assistant UI:**
   All device settings can be managed through the Home Assistant interface. No need to edit YAML files directly.
-
-- **Using Blueprints:**
-  Import and use blueprints to quickly configure your device for common use cases.
 
 ## Documentation
 To be written.
