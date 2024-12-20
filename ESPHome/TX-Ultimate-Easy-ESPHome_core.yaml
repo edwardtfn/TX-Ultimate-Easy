@@ -97,14 +97,14 @@ script:
   - id: boot_initialize
     mode: restart
     then:
+      # Extended by:
+      #   - HW Buttons
+      #   - HW Relays
+      #   - HW Touch
       - script.execute:
           id: send_event_to_ha
           component: boot
           event: start
-    # Extended by:
-    #   - HW Buttons
-    #   - HW Relays
-    #   - HW Touch
 
   - id: boot_sequence
     mode: restart
