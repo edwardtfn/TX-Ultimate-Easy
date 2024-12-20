@@ -12,7 +12,7 @@
 ####################################################################################################
 ---
 substitutions:
-  vibration_max_duration: 5s
+  vibration_max_duration: 2s
 
 binary_sensor:
   - id: bs_vibrating
@@ -37,7 +37,6 @@ number:
     name: Vibrate duration
     icon: mdi:vibrate
     unit_of_measurement: ms
-    # mode: box
     internal: false
     entity_category: config
     platform: template
