@@ -78,7 +78,7 @@ improv_serial:
   id: serial_improv
 
 logger:
-  level: DEBUG
+  level: INFO
 
 ota:
   platform: esphome
