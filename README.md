@@ -21,7 +21,7 @@
 [last-commit-shield]: https://img.shields.io/github/last-commit/edwardtfn/TX-Ultimate-Easy
 [esphome-shield]: https://img.shields.io/badge/powered%20by-ESPHome-blue
 [esphome]: https://esphome.io/
-[discord-shield]: https://img.shields.io/discord/1195037138681913374?logo=discord
+[discord-shield]: https://img.shields.io/badge/Discord-chat-blue?logo=discord
 [discord]: https://discord.gg/Db6WJWzWuf
 [buymeacoffee-shield]: https://img.shields.io/static/v1?label=Buy%20me%20an%20ice%20cream&message=❄&color=blue
 [buymeacoffee]: https://www.buymeacoffee.com/edwardfirmo
