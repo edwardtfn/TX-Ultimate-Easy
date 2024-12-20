@@ -60,6 +60,12 @@ binary_sensor:
                 !bs_swipe_right->state)
               sw_relay_4->toggle();
 
+globals:
+  - id: boot_initialization_relays
+    type: bool
+    restore_value: false
+    initial_value: 'false'
+
 output:
   - id: output_relay_1
     platform: gpio
@@ -95,7 +101,7 @@ script:
           const uint8_t num_gangs = (sl_tx_model_gang->active_index().has_value()) ?
                                     (sl_tx_model_gang->active_index().value() + 1) : 0;
           if (num_gangs < 1 || num_gangs > 4) {
-            ESP_LOGE("hw_relays", "Invalid number of gangs: %" PRIu8, num_gangs);
+            ESP_LOGE("core_hw_relays", "Invalid number of gangs: %" PRIu8, num_gangs);
             return;
           }
           sl_relay_1_mode->set_internal(num_gangs < 1);
@@ -130,13 +136,22 @@ script:
             light_output_4->set_internal(num_gangs < 4 or relay_mode_index.value() != 1);
             sw_relay_4->set_internal(num_gangs < 4 or relay_mode_index.value() != 0);
           }
+          id(boot_initialization_relays) = true;
 
   - id: show_relay_status
     mode: restart
     then:
+      - script.wait: boot_initialize_relays
+      - wait_until:
+          condition:
+            - lambda: return sl_tx_model_format->active_index().has_value();
+            - lambda: return id(boot_initialization_relays);
       - lambda: |-
           auto model_format = sl_tx_model_format->active_index();
-          if (!model_format.has_value()) return;  // Early return if no model format
+          if (!model_format.has_value()) {
+            ESP_LOGE("core_hw_relays", "Model (Format) not defined");
+            return;
+          }
 
           std::vector<esphome::select::Select*> relay_modes;
           const bool is_eu_model = model_format.value() == 0;
@@ -153,8 +168,16 @@ script:
           // Get switch states
           const std::vector<switch_::Switch*> switches = {sw_relay_1, sw_relay_2, sw_relay_3, sw_relay_4};
 
+          // Check if light vectors are initialized
+          if (id(gb_lights_1).empty() || id(gb_lights_2).empty()) {
+            ESP_LOGE("core_hw_relays", "Light vector not initialized");
+            return;
+          }
+
           // Update lights based on relay states
-          for (size_t i = 0; i < relay_modes.size(); ++i) {
+          for (size_t i = 0; i < relay_modes.size() && i < id(gb_lights_1).size(); ++i) {
+            if (!relay_modes[i] || !switches[i]) continue;
+            
             auto light_index = relay_modes[i]->active_index();
             if (!light_index.has_value()) continue;
 
@@ -162,7 +185,7 @@ script:
             const bool switch_state = switches[i]->state;
 
             // Update first light group (bottom/left)
-            if (light_idx == 1 || light_idx == 3) {
+            if ((light_idx == 1 || light_idx == 3) && i < id(gb_lights_1).size() && id(gb_lights_1)[i]) {
               if (switch_state)
                 id(gb_lights_1)[i]->turn_on();
               else
@@ -170,7 +193,7 @@ script:
             }
 
             // Update second light group (top/right)
-            if (light_idx == 2 || light_idx == 3) {
+            if ((light_idx == 2 || light_idx == 3) && i < id(gb_lights_2).size() && id(gb_lights_2)[i]) {
               if (switch_state)
                 id(gb_lights_2)[i]->turn_on();
               else
