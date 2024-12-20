@@ -137,34 +137,6 @@ select:
     disabled_by_default: false
     icon: mdi:dip-switch
 
-sensor:
-  - id: sun_elevation
-    name: Sun Elevation
-    platform: sun
-    type: elevation
-    internal: true
-
-  - id: zone_home_latitude
-    platform: homeassistant
-    entity_id: ${zone_home}
-    attribute: latitude
-    internal: false
-    on_value:
-      - lambda: if (!isnan(x)) sun_entity->set_latitude(x);
-
-  - id: zone_home_longitude
-    platform: homeassistant
-    entity_id: ${zone_home}
-    attribute: longitude
-    internal: false
-    on_value:
-      - lambda: if (!isnan(x)) sun_entity->set_longitude(x);
-
-sun:
-  id: sun_entity
-  latitude: ${latitude}
-  longitude: ${longitude}
-
 text_sensor:
   - id: tx_fw_version
     name: Firmware version

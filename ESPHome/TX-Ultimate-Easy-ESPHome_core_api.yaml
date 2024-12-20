@@ -13,23 +13,6 @@
 ---
 api:
   id: api_server
-  actions:
-    - action: set_float
-      variables:
-        component: string
-        val: float
-      then:
-        - lambda: |-
-            ESP_LOGD("core_api", "Set float:");
-            ESP_LOGD("core_api", "  Component: %s", component.c_str());
-            ESP_LOGD("core_api", "  Value:     %f", val);
-            if (!isnan(val)) {
-              if (component == "latitude" && val >= -90 && val <= 90) {
-                sun_entity->set_latitude(val);
-              } else if (component == "longitude" && val >= -180 && val <= 180) {
-                sun_entity->set_longitude(val);
-              }
-            }
 
 script:
   - id: !extend button_action
@@ -54,5 +37,4 @@ script:
               {"component", component},
               {"event", event},
             });
-
 ...
