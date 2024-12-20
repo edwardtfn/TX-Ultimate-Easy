@@ -1,8 +1,7 @@
 # TX Ultimate Easy
 
-[![GitHub Release][releases-shield]][releases]
 [![GitHub Activity][commits-shield]][commits]
-[![License][license-shield]](LICENSE)
+[![License][license-shield]][license]
 [![GitHub Last Commit][last-commit-shield]][commits]
 [![ESPHome][esphome-shield]][esphome]
 [![Discord][discord-shield]][discord]
@@ -13,15 +12,14 @@
 | --- | :-- |
 <!-- markdownlint-enable MD013 -->
 
-[releases-shield]: https://img.shields.io/github/v/release/edwardtfn/TX-Ultimate-Easy
-[releases]: https://github.com/edwardtfn/TX-Ultimate-Easy/releases
 [commits-shield]: https://img.shields.io/github/commit-activity/y/edwardtfn/TX-Ultimate-Easy
 [commits]: https://github.com/edwardtfn/TX-Ultimate-Easy/commits/main
 [license-shield]: https://img.shields.io/github/license/edwardtfn/TX-Ultimate-Easy
+[license]: LICENSE
 [last-commit-shield]: https://img.shields.io/github/last-commit/edwardtfn/TX-Ultimate-Easy
 [esphome-shield]: https://img.shields.io/badge/powered%20by-ESPHome-blue
 [esphome]: https://esphome.io/
-[discord-shield]: https://img.shields.io/badge/Discord-chat-blue?logo=discord
+[discord-shield]: https://img.shields.io/discord/1243652421692031016?logo=discord
 [discord]: https://discord.gg/Db6WJWzWuf
 [buymeacoffee-shield]: https://img.shields.io/static/v1?label=Buy%20me%20an%20ice%20cream&message=❄&color=blue
 [buymeacoffee]: https://www.buymeacoffee.com/edwardfirmo
