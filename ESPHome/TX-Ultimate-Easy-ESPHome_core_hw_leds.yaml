@@ -817,7 +817,7 @@ script:
                 id(gb_lights_2) = { light_eu_rl_1_3_top, light_eu_rl_2_3_top, light_eu_rl_3_3_top };
               }
               break;
-            case 4:  // 3 Gang
+            case 4:  // 4 Gang
               if (is_model_us) {
                 id(gb_lights_1) = { light_us_rl_1_4_left, light_us_rl_2_4_left,
                                     light_us_rl_3_4_left, light_us_rl_4_4_left };
