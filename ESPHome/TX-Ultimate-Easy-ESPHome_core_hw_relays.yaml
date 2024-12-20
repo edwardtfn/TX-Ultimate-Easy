@@ -177,7 +177,7 @@ script:
           // Update lights based on relay states
           for (size_t i = 0; i < relay_modes.size() && i < id(gb_lights_1).size(); ++i) {
             if (!relay_modes[i] || !switches[i]) continue;
-            
+
             auto light_index = relay_modes[i]->active_index();
             if (!light_index.has_value()) continue;
 
