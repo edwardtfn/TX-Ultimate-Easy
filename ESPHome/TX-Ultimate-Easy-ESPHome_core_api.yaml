@@ -13,6 +13,9 @@
 ---
 api:
   id: api_server
+  on_client_connected:
+    then:
+      - script.execute: publish_device_info
 
 script:
   - id: !extend button_action

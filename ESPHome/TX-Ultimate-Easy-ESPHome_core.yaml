@@ -102,6 +102,11 @@ script:
   - id: boot_sequence
     mode: restart
     then:
+      - script.execute: publish_device_info
+
+  - id: publish_device_info
+    mode: restart
+    then:
       - lambda: |-
           tx_fw_version->publish_state("${version}");
           tx_device_name->publish_state("${name}");
@@ -155,6 +160,7 @@ text_sensor:
     entity_category: diagnostic
     internal: false
     disabled_by_default: false
+    update_interval: never
     lambda: |-
       return {"${name}"};
     filters:
