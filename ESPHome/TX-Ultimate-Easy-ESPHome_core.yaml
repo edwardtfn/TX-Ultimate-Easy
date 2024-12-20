@@ -129,7 +129,6 @@ select:
     disabled_by_default: false
     icon: mdi:dip-switch
 
-
 sensor:
   - id: sun_elevation
     name: Sun Elevation
