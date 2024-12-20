@@ -171,25 +171,25 @@ script:
             switch (i) {
               case 0:
                 relay_state = id(sw_relay_1).state;
-                light_mode = is_model_us 
+                light_mode = is_model_us
                               ? id(sl_relay_1_light_mode_us)->state
                               : id(sl_relay_1_light_mode_eu)->state;
                 break;
               case 1:
                 relay_state = id(sw_relay_2).state;
-                light_mode = is_model_us 
+                light_mode = is_model_us
                               ? id(sl_relay_2_light_mode_us)->state
                               : id(sl_relay_2_light_mode_eu)->state;
                 break;
               case 2:
                 relay_state = id(sw_relay_3).state;
-                light_mode = is_model_us 
+                light_mode = is_model_us
                               ? id(sl_relay_3_light_mode_us)->state
                               : id(sl_relay_3_light_mode_eu)->state;
                 break;
               case 3:
                 relay_state = id(sw_relay_4).state;
-                light_mode = is_model_us 
+                light_mode = is_model_us
                               ? id(sl_relay_4_light_mode_us)->state
                               : id(sl_relay_4_light_mode_eu)->state;
                 break;
