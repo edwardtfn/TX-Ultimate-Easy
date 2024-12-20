@@ -14,6 +14,12 @@
 substitutions:
   invalid_cooldown: 100ms
 
+  BUTTON_ACTION_NONE_TEXT: "None"
+  BUTTON_1_ACTION_TEXT: "Relay 1 (toggle)"
+  BUTTON_2_ACTION_TEXT: "Relay 2 (toggle)"
+  BUTTON_3_ACTION_TEXT: "Relay 3 (toggle)"
+  BUTTON_4_ACTION_TEXT: "Relay 4 (toggle)"
+
 binary_sensor:
   - id: bs_button_1
     name: Button 1
@@ -232,8 +238,9 @@ select:
     name: Button 1 action
     platform: template
     options:
-      - "None"
-      - "Relay 1 (toggle)"
+      - "${BUTTON_ACTION_NONE_TEXT}"
+      - "${BUTTON_1_ACTION_TEXT}"
+    initial_option: "${BUTTON_1_ACTION_TEXT}"
     optimistic: true
     restore_value: true
     internal: true
@@ -245,23 +252,26 @@ select:
     name: Button 2 action
     platform: template
     options:
-      - "None"
-      - "Relay 2 (toggle)"
+      - "${BUTTON_ACTION_NONE_TEXT}"
+      - "${BUTTON_2_ACTION_TEXT}"
+    initial_option: "${BUTTON_2_ACTION_TEXT}"
     <<: *button_select_action_base
 
   - id: sl_button_3_action
     name: Button 3 action
     platform: template
     options:
-      - "None"
-      - "Relay 3 (toggle)"
+      - "${BUTTON_ACTION_NONE_TEXT}"
+      - "${BUTTON_3_ACTION_TEXT}"
+    initial_option: "${BUTTON_3_ACTION_TEXT}"
     <<: *button_select_action_base
 
   - id: sl_button_4_action
     name: Button 4 action
     platform: template
     options:
-      - "None"
-      - "Relay 4 (toggle)"
+      - "${BUTTON_ACTION_NONE_TEXT}"
+      - "${BUTTON_4_ACTION_TEXT}"
+    initial_option: "${BUTTON_4_ACTION_TEXT}"
     <<: *button_select_action_base
 ...
