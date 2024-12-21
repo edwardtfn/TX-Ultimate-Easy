@@ -23,7 +23,7 @@ substitutions:
   BUTTON_CLICK_MIN_LENGTH: '50'    # The minimum duration the click should last, in msec
   BUTTON_CLICK_MAX_LENGTH: '350'   # The maximum duration the click should last, in msec
   BUTTON_MULTI_CLICK_DELAY: '500'  # The time to wait for another click, in msec
-  BUTTON_PRESS_TIMEOUT: '10000'    # Ignore if buttor is pressed for longer than this time, in msec
+  BUTTON_PRESS_TIMEOUT: '10000'    # Ignore if button is pressed for longer than this time, in msec
   BUTTON_LONG_PRESS_DELAY: '800'   # The time to wait to consider a long press, in msec
 
 binary_sensor:
@@ -120,12 +120,12 @@ script:
       - delay:
           milliseconds: ${BUTTON_MULTI_CLICK_DELAY}
       - lambda: |-
-          button_action->execute(
-            ("bs_button_" + std::to_string(id(button_press_button))).c_str(),
-            (id(click_counter) == 1 ? "click" :
-            (id(click_counter) == 2 ? "double_click" :
-            (std::to_string(id(click_counter)) + "_click").c_str()))
-          );
+          const std::string button_name = "bs_button_" + std::to_string(id(button_press_button));
+          std::string event_name;
+          if (id(click_counter) == 1) event_name = "click";
+          else if (id(click_counter) == 2) event_name = "double_click";
+          else event_name = std::to_string(id(click_counter)) + "_click";
+          button_action->execute(button_name.c_str(), event_name.c_str());
 
   - id: buttons_release
     mode: restart
@@ -165,7 +165,7 @@ script:
               if (model_idx == 1) {
                   button = 1; // Single button, always 1
               } else {
-                  const uint8_t step = 10 / model_idx; // Calculate step size for regions
+                  const uint8_t step = ${TOUCH_POSITION_MAX_VALUE} / model_idx; // Width of each button region
                   button = (touch_x / step) + 1; // Determine button region
                   if (button > model_idx)
                     button = model_idx; // Clamp to max button count

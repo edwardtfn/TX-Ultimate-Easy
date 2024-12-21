@@ -11,6 +11,9 @@
 ##### - For normal system use, modifications to this file are NOT required.                    #####
 ####################################################################################################
 ---
+substitutions:
+  TOUCH_POSITION_MAX_VALUE: '10'  # Maximum touch position value
+
 binary_sensor:
   - id: bs_multi_touch
     name: Multi-touch
