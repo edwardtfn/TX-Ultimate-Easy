@@ -43,6 +43,15 @@ echo "$NEW_VERSION" > "$VERSION_FILE"
 echo "version: $NEW_VERSION" > "$VERSION_YAML_FILE"
 
 # Commit and tag
-git add "$VERSION_FILE" "$VERSION_YAML_FILE"
-git commit -m "Bump version to $NEW_VERSION"
-git tag "v$NEW_VERSION"
+if ! git add "$VERSION_FILE" "$VERSION_YAML_FILE"; then
+  echo "Error: Failed to stage version files"
+  exit 1
+fi
+if ! git commit -m "Bump version to $NEW_VERSION"; then
+  echo "Error: Failed to commit version bump"
+  exit 1
+fi
+if ! git tag "v$NEW_VERSION"; then
+  echo "Error: Failed to create version tag"
+  exit 1
+fi
