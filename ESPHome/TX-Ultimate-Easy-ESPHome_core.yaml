@@ -15,11 +15,7 @@ substitutions:
   name: tx-ultimate-easy
   friendly_name: TX Ultimate Easy
 
-  latitude: '0'
-  longitude: '0'
-  zone_home: 'zone.home'
-
-  version: '0.0.4'
+  <<: !include ../versioning/VERSION_YAML
 
   TX_MODEL_FORMAT_EU_TEXT: "EU (Square, T5-xC-86)"
   TX_MODEL_FORMAT_US_TEXT: "US (Rectangle, T5-xC-120)"
