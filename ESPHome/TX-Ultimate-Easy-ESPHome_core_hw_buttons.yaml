@@ -114,6 +114,19 @@ script:
           id(button_press_start_time) = 0;
           buttons_release->execute();
 
+  - id: button_click_event
+    mode: restart
+    then:
+      - delay:
+          milliseconds: ${BUTTON_MULTI_CLICK_DELAY}
+      - lambda: |-
+          button_action->execute(
+            ("bs_button_" + std::to_string(id(button_press_button))).c_str(),
+            (id(click_counter) == 1 ? "click" :
+            (id(click_counter) == 2 ? "double_click" :
+            (std::to_string(id(click_counter)) + "_click").c_str()))
+          );
+
   - id: buttons_release
     mode: restart
     then:
@@ -205,19 +218,6 @@ script:
             ESP_LOGW("core_hw_buttons", "Press event timestamp not recorded yet");
           }
           id(button_press_start_time) = 0;
-
-  - id: button_click_event
-    mode: restart
-    then:
-      - delay:
-          milliseconds: ${BUTTON_MULTI_CLICK_DELAY}
-      - lambda: |-
-          button_action->execute(
-            ("bs_button_" + std::to_string(id(button_press_button))).c_str(),
-            (id(click_counter) == 1 ? "click" :
-            (id(click_counter) == 2 ? "double_click" :
-            (std::to_string(id(click_counter)) + "_click").c_str()))
-          );
 
   - id: !extend touch_swipe_left
     then:
