@@ -61,7 +61,7 @@ external_components:
   - source:
       type: git
       url: https://github.com/edwardtfn/TX-Ultimate-Easy
-      ref: ${version}
+      ref: v${version}
     refresh: 1h
     components:
       - tx_ultimate_easy
