@@ -6,8 +6,9 @@ on:  # yamllint disable-line rule:truthy
   push:
     branches:
       - main
-    commit-message:
-      excludes: "[skip-versioning]"
+    paths-ignore:
+      - '**/VERSION'
+      - '**/VERSION_YAML'
   workflow_dispatch:
     inputs:
       update_stable:
