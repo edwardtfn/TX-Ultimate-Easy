@@ -14,17 +14,6 @@ This scheme makes it easy to identify when a version was released and provides a
 - **`bump_version.sh`**: A script to increment the version based on the current date and release sequence.
 - **`README.md`**: Documentation for the versioning process.
 
-## Version Validation
-
-The versioning system enforces strict format validation:
-- Year must be a 4-digit number (YYYY)
-- Month must be a number from 1 to 12 without leading zeros
-- Sequence must be a positive number with no leading zeros (1, 2, ...).
-
-The `bump_version.sh` script includes validation checks and will fail if:
-- The version format is invalid.
-- Other format-related issues are detected.
-
 ## Usage
 
 ### Automatically Managed
@@ -56,12 +45,12 @@ This ensures the correct version is used directly in the ESPHome setup without r
 
 The versioning system enforces strict format validation:
 - Year must be a 4-digit number (YYYY)
-- Month must be a 2-digit number (01-12)
-- Sequence must be a 2-digit number (01-99)
+- Month must be a number from 1 to 12 without leading zeros
+- Sequence must be a positive number with no leading zeros (1, 2, ...).
 
 The `bump_version.sh` script includes validation checks and will fail if:
-- The version format is invalid
-- The sequence number would exceed 99 in a month
+- The version format is invalid.
+- Other format-related issues are detected.
 
 ### GitHub Actions Workflow Adjustment
 The GitHub Actions workflow for versioning runs only when changes are merged into the `main` branch, ensuring no premature version updates during PR creation.
