@@ -66,6 +66,27 @@ globals:
     restore_value: false
     initial_value: 'false'
 
+light:
+  # These lights are used for the physical relays to be shown as lights
+  - &light_binary_base
+    id: light_output_1
+    name: Light output 1
+    output: output_relay_1
+    platform: binary
+    internal: true
+  - id: light_output_2
+    name: Light output 2
+    output: output_relay_2
+    <<: *light_binary_base
+  - id: light_output_3
+    name: Light output 3
+    output: output_relay_3
+    <<: *light_binary_base
+  - id: light_output_4
+    name: Light output 4
+    output: output_relay_4
+    <<: *light_binary_base
+
 output:
   - id: output_relay_1
     platform: gpio
