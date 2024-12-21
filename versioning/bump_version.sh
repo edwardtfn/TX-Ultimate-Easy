@@ -10,13 +10,15 @@ else
   CURRENT_VERSION="0.0.0" # Default if file doesn't exist
 fi
 
-# Extract components
-CURRENT_YEAR=$(date +%Y)
-CURRENT_MONTH=$(date +%m)
-if ! [[ "$CURRENT_VERSION" =~ ^[0-9]{4}\.[0-9]{2}\.[0-9]{2}$ ]]; then
+# Validate the current version format
+if ! [[ "$CURRENT_VERSION" =~ ^[0-9]{4}\.[0-9]{1,2}\.[0-9]+$ ]]; then
   echo "Error: Invalid version format in $VERSION_FILE"
   exit 1
 fi
+
+# Extract components
+CURRENT_YEAR=$(date +%Y)
+CURRENT_MONTH=$(date +%-m) # Avoid leading zero for the month
 CURRENT_SEQ=$(echo "$CURRENT_VERSION" | awk -F. '{print $3}')
 
 VERSION_YEAR=$(echo "$CURRENT_VERSION" | awk -F. '{print $1}')
@@ -24,17 +26,12 @@ VERSION_MONTH=$(echo "$CURRENT_VERSION" | awk -F. '{print $2}')
 
 # Determine new version
 if [[ "$CURRENT_YEAR" == "$VERSION_YEAR" && "$CURRENT_MONTH" == "$VERSION_MONTH" ]]; then
-  NEXT_SEQ=$((10#$CURRENT_SEQ + 1))
-  if [ $NEXT_SEQ -gt 99 ]; then
-    echo "Error: Sequence number would exceed 99"
-    exit 1
-  fi
-  NEW_SEQ=$(printf "%02d" $NEXT_SEQ)
+  NEXT_SEQ=$((CURRENT_SEQ + 1))
 else
-  NEW_SEQ="01" # Reset sequence for a new month
+  NEXT_SEQ=1 # Reset sequence for a new month
 fi
 
-NEW_VERSION="${CURRENT_YEAR}.${CURRENT_MONTH}.${NEW_SEQ}"
+NEW_VERSION="${CURRENT_YEAR}.${CURRENT_MONTH}.${NEXT_SEQ}"
 
 # Update the plain text VERSION file
 echo "$NEW_VERSION" > "$VERSION_FILE"
@@ -47,7 +44,7 @@ if ! git add "$VERSION_FILE" "$VERSION_YAML_FILE"; then
   echo "Error: Failed to stage version files"
   exit 1
 fi
-if ! git commit -m "Bump version to $NEW_VERSION"; then
+if ! git commit -m "Bump version to $NEW_VERSION [skip-versioning]"; then
   echo "Error: Failed to commit version bump"
   exit 1
 fi
