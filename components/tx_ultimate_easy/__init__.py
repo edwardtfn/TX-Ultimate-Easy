@@ -98,6 +98,7 @@ async def register_tx_ultimate_easy(var, config):
             config[CONF_ON_LONG_TOUCH_RELEASE],
         )
 
+
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
