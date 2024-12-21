@@ -50,6 +50,17 @@ This ensures the correct version is used directly in the ESPHome setup without r
 - Enhance the `bump_version.sh` script to support different versioning schemes if needed.
 - Integrate versioning information into your deployment pipelines to label builds with their corresponding version.
 
+## Version Validation
+
+The versioning system enforces strict format validation:
+- Year must be a 4-digit number (YYYY)
+- Month must be a 2-digit number (01-12)
+- Sequence must be a 2-digit number (01-99)
+
+The `bump_version.sh` script includes validation checks and will fail if:
+- The version format is invalid
+- The sequence number would exceed 99 in a month
+
 ### GitHub Actions Workflow Adjustment
 The GitHub Actions workflow for versioning runs only when changes are merged into the `main` branch, ensuring no premature version updates during PR creation.
 This behavior is automatically handled by the integrated workflow.
