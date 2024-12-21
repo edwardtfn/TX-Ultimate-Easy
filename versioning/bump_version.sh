@@ -13,6 +13,10 @@ fi
 # Extract components
 CURRENT_YEAR=$(date +%Y)
 CURRENT_MONTH=$(date +%m)
+if ! [[ "$CURRENT_VERSION" =~ ^[0-9]{4}\.[0-9]{2}\.[0-9]{2}$ ]]; then
+  echo "Error: Invalid version format in $VERSION_FILE"
+  exit 1
+fi
 CURRENT_SEQ=$(echo "$CURRENT_VERSION" | awk -F. '{print $3}')
 
 VERSION_YEAR=$(echo "$CURRENT_VERSION" | awk -F. '{print $1}')
