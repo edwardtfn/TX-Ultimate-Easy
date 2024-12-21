@@ -127,7 +127,7 @@ script:
   - id: touch_on_press
     mode: restart
     parameters:
-      touch_x: uint8_t
+      touch_position: uint8_t
     then:
     # Extended by:
     #   - HW Buttons
@@ -212,10 +212,13 @@ tx_ultimate_easy:
 
   on_press:
     - lambda: |-
-        ESP_LOGI("tx_ultimate_easy", "Pressed at position %" PRIu8, static_cast<uint8_t>(touch.x));
-    - script.execute:
-        id: touch_on_press
-        touch_x: !lambda return static_cast<uint8_t>(touch.x);
+        const uint8_t touch_position = static_cast<uint8_t>(touch.x);
+        if (touch_position > ${TOUCH_POSITION_MAX_VALUE}) {  // Check for valid range
+          ESP_LOGE("core_hw_buttons", "Invalid touch position: %" PRIu8, touch_position);
+        } else {
+          ESP_LOGI("tx_ultimate_easy", "Pressed at position %" PRIu8, touch_position);
+          touch_on_press->execute(touch_position);
+        }
 
   on_release:
     - lambda: ESP_LOGI("tx_ultimate_easy", "Released");

@@ -148,16 +148,16 @@ script:
     then:
       - script.execute:
           id: touch_on_press_buttons
-          touch_x: !lambda return touch_x;
+          touch_position: !lambda return touch_position;
 
   - id: touch_on_press_buttons
     mode: restart
     parameters:
-      touch_x: uint8_t
+      touch_position: uint8_t
     then:
       - lambda: |-
           id(button_press_start_time) = millis();
-          id(button_press_position) = touch_x;
+          id(button_press_position) = touch_position;
           uint8_t button = 0;
           auto model_index = sl_tx_model_gang->active_index();
           if (model_index.has_value()) {
@@ -166,7 +166,7 @@ script:
                   button = 1; // Single button, always 1
               } else {
                   const uint8_t step = ${TOUCH_POSITION_MAX_VALUE} / model_idx; // Width of each button region
-                  button = (touch_x / step) + 1; // Determine button region
+                  button = (touch_position / step) + 1; // Determine button region
                   if (button > model_idx)
                     button = model_idx; // Clamp to max button count
               }
