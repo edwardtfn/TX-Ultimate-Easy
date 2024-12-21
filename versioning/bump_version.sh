@@ -20,7 +20,12 @@ VERSION_MONTH=$(echo "$CURRENT_VERSION" | awk -F. '{print $2}')
 
 # Determine new version
 if [[ "$CURRENT_YEAR" == "$VERSION_YEAR" && "$CURRENT_MONTH" == "$VERSION_MONTH" ]]; then
-  NEW_SEQ=$(printf "%02d" $((10#$CURRENT_SEQ + 1))) # Increment sequence
+  NEXT_SEQ=$((10#$CURRENT_SEQ + 1))
+  if [ $NEXT_SEQ -gt 99 ]; then
+    echo "Error: Sequence number would exceed 99"
+    exit 1
+  fi
+  NEW_SEQ=$(printf "%02d" $NEXT_SEQ)
 else
   NEW_SEQ="01" # Reset sequence for a new month
 fi
