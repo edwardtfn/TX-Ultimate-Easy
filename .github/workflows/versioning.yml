@@ -1,11 +1,14 @@
-# Workflow for managing versioning, tagging, and conditional updates
+# Workflow for managing versioning, tagging, and temporary branches
 ---
-name: Bump Version and Tag
+name: Version Bump and Tag
 
 on:  # yamllint disable-line rule:truthy
   push:
     branches:
       - main
+    paths-ignore:
+      - '**/VERSION'
+      - '**/VERSION_YAML'
   workflow_dispatch:
     inputs:
       update_stable:
@@ -25,21 +28,35 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
+      - name: Create Temporary Branch
+        run: |
+          TEMP_BRANCH="temp/version-bump-$(uuidgen)"
+          echo "TEMP_BRANCH=${TEMP_BRANCH}" >> "${GITHUB_ENV}"
+          git checkout -b "${TEMP_BRANCH}"
+
       - name: Bump Version
         run: |
           chmod +x ./versioning/bump_version.sh
           ./versioning/bump_version.sh
 
-      - name: Push Changes and Tags
+      - name: Push Changes to Temporary Branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/edwardtfn/TX-Ultimate-Easy.git main
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/edwardtfn/TX-Ultimate-Easy.git --tags
-
-      - name: Conditionally Update Stable Tag
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.update_stable == 'true' }}
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git" HEAD
+      - name: Merge Changes into Main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git tag -f stable
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/edwardtfn/TX-Ultimate-Easy.git stable --force
+          git checkout main
+          git pull "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git" main
+          git merge --no-ff "$TEMP_BRANCH" -m "Automated Version Bump [skip-versioning]"
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git" main
+
+      - name: Delete Temporary Branch
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git" --delete "$TEMP_BRANCH"
 ...
