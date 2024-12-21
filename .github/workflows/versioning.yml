@@ -28,18 +28,12 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
-      - name: Create Temporary Branch
-        run: |
-          TEMP_BRANCH="temp/version-bump-$(uuidgen)"
-          echo "TEMP_BRANCH=${TEMP_BRANCH}" >> "${GITHUB_ENV}"
-          git checkout -b "${TEMP_BRANCH}"
-
       - name: Bump Version
         run: |
           chmod +x "./versioning/bump_version.sh"
           "./versioning/bump_version.sh"
 
-      - name: Push Changes to Temporary Branch
+      - name: Push Changes and Tags
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         run: |
