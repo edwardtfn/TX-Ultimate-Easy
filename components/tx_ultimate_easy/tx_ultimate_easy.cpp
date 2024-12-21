@@ -59,18 +59,22 @@ namespace esphome {
         }
 
         uint8_t TxUltimateEasy::get_button_from_position(const uint8_t position) {
-            if (position > TOUCH_MAX_POSITION)  // Invalid position
+            // Validate position bounds
+            if (position > TOUCH_MAX_POSITION)
                 return 0;
-            if (this->gang_count_ == 1)  // For 1 Gang model, any position is button 1
+
+            // Special case for single gang (only one button exists)
+            if (this->gang_count_ == 1)
                 return 1;
-            if (this->gang_count_ < 1 or this->gang_count_ > 4)  // Invalid gang count
-                return 0;
-            const uint8_t width = TOUCH_MAX_POSITION / this->gang_count_; // Width of each button region
+
+            // Calculate button number
+            const uint8_t width = (TOUCH_MAX_POSITION + 1) / this->gang_count_;  // Width of each button region
             if (width < 1 or width > this->gang_count_)  // Invalid width - and prevents division by zero
                 return 0;
-            uint8_t button = (position / width) + 1; // Determine button region
-            if (button > this->gang_count_)
-              button = this->gang_count_; // Clamp to max button count
+            const uint8_t button = std::min(
+                static_cast<uint8_t>((position / width) + 1), // Convert position to button index
+                this->gang_count_ // Clamp to max gang count
+            );
             return button;
         }
 
