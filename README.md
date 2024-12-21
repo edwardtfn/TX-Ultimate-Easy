@@ -98,16 +98,14 @@ TX Ultimate Easy offers extensive configuration options:
 We welcome contributions from the community! Here's how you can help:
 
 1. Fork the repository
-2. Create a feature branch from `dev`
+2. Create a feature branch from `main`
 3. Make your changes
-4. Submit a pull request targeting the `dev` branch
+4. Submit a pull request targeting the `main` branch
 
 Please ensure your code follows our standards:
 - Passes all lint checks (YAML, C++, Markdown)
 - Includes appropriate documentation
 - Follows existing code style
-
-All pull requests should be made against the `dev` branch. We don't accept pull requests directly to `main` as it's reserved for stable releases.
 
 ## Support and Community
 
