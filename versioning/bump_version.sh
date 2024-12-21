@@ -5,7 +5,7 @@ VERSION_YAML_FILE="./versioning/VERSION_YAML"
 
 # Read the current version
 if [ -f "$VERSION_FILE" ]; then
-  CURRENT_VERSION=$(cat $VERSION_FILE)
+  CURRENT_VERSION=$(cat "$VERSION_FILE")
 else
   CURRENT_VERSION="0.0.0" # Default if file doesn't exist
 fi
