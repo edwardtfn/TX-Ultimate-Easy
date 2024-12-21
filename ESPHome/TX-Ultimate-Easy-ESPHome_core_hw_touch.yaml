@@ -233,8 +233,8 @@ tx_ultimate_easy:
         ESP_LOGD("tx_ultimate_easy", "  Position: %i", touch.x);
 
 uart:
-  id: uart_touch
-  tx_pin: GPIO19
-  rx_pin: GPIO22
-  baud_rate: 115200
+  - id: uart_touch
+    tx_pin: GPIO19
+    rx_pin: GPIO22
+    baud_rate: 115200
 ...
