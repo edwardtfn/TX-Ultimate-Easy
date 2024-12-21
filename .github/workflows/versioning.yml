@@ -31,8 +31,8 @@ jobs:
       - name: Create Temporary Branch
         run: |
           TEMP_BRANCH="temp/version-bump-$(uuidgen)"
-          echo "TEMP_BRANCH=$TEMP_BRANCH" >> $GITHUB_ENV
-          git checkout -b "$TEMP_BRANCH"
+          echo "TEMP_BRANCH=${TEMP_BRANCH}" >> "${GITHUB_ENV}"
+          git checkout -b "${TEMP_BRANCH}"
 
       - name: Bump Version
         run: |
