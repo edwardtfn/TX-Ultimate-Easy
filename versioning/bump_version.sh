@@ -12,8 +12,8 @@ fi
 
 # Extract components
 CURRENT_YEAR=$(date +%Y)
-CURRENT_MONTH=$(date +%-m) # Use %-m to avoid leading zero for the month
-if ! [[ "$CURRENT_VERSION" =~ ^[0-9]{4}\.[0-9]+\.[0-9]+$ ]]; then
+CURRENT_MONTH=$(date +%m)
+if ! [[ "$CURRENT_VERSION" =~ ^[0-9]{4}\.[0-9]{2}\.[0-9]{2}$ ]]; then
   echo "Error: Invalid version format in $VERSION_FILE"
   exit 1
 fi
@@ -24,12 +24,17 @@ VERSION_MONTH=$(echo "$CURRENT_VERSION" | awk -F. '{print $2}')
 
 # Determine new version
 if [[ "$CURRENT_YEAR" == "$VERSION_YEAR" && "$CURRENT_MONTH" == "$VERSION_MONTH" ]]; then
-  NEXT_SEQ=$((CURRENT_SEQ + 1))
+  NEXT_SEQ=$((10#$CURRENT_SEQ + 1))
+  if [ $NEXT_SEQ -gt 99 ]; then
+    echo "Error: Sequence number would exceed 99"
+    exit 1
+  fi
+  NEW_SEQ=$(printf "%02d" $NEXT_SEQ)
 else
-  NEXT_SEQ=1 # Reset sequence for a new month
+  NEW_SEQ="01" # Reset sequence for a new month
 fi
 
-NEW_VERSION="${CURRENT_YEAR}.${CURRENT_MONTH}.${NEXT_SEQ}"
+NEW_VERSION="${CURRENT_YEAR}.${CURRENT_MONTH}.${NEW_SEQ}"
 
 # Update the plain text VERSION file
 echo "$NEW_VERSION" > "$VERSION_FILE"
