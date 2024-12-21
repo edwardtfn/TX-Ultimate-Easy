@@ -48,6 +48,30 @@ namespace esphome {
 
         void TxUltimateEasy::dump_config() {
             ESP_LOGCONFIG(TAG, "TX Ultimate Easy");
+            ESP_LOGCONFIG(TAG, "  Gang count: %" PRIu8, this->gang_count_);
+        }
+
+        bool TxUltimateEasy::set_gang_count(const uint8_t gang_count) {
+            if (gang_count < 1 or gang_count > 4)
+                return false;
+            this->gang_count_ = gang_count;
+            return true;
+        }
+
+        uint8_t TxUltimateEasy::get_button_from_position(const uint8_t position) {
+            if (position > TOUCH_MAX_POSITION)  // Invalid position
+                return 0;
+            if (this->gang_count_ == 1)  // For 1 Gang model, any position is button 1
+                return 1;
+            if (this->gang_count_ < 1 or this->gang_count_ > 4)  // Invalid gang count
+                return 0;
+            const uint8_t width = TOUCH_MAX_POSITION / this->gang_count_; // Width of each button region
+            if (width < 1 or width > this->gang_count_)  // Invalid width - and prevents division by zero
+                return 0;
+            uint8_t button = (position / width) + 1; // Determine button region
+            if (button > this->gang_count_)
+              button = this->gang_count_; // Clamp to max button count
+            return button;
         }
 
         void TxUltimateEasy::send_touch_(TouchPoint tp) {
@@ -103,7 +127,7 @@ namespace esphome {
                     state == TOUCH_STATE_SWIPE_LEFT ||
                     state == TOUCH_STATE_SWIPE_RIGHT ||
                     state == TOUCH_STATE_MULTI_TOUCH) &&
-                   (uart_received_bytes[6] >= 0 || state == TOUCH_STATE_MULTI_TOUCH);
+                    (uart_received_bytes[6] >= 0 || state == TOUCH_STATE_MULTI_TOUCH);
         }
 
         int TxUltimateEasy::get_touch_position_x(const std::array<int, UART_RECEIVED_BYTES_SIZE> &uart_received_bytes) {
@@ -133,6 +157,8 @@ namespace esphome {
         TouchPoint TxUltimateEasy::get_touch_point(const std::array<int, UART_RECEIVED_BYTES_SIZE> &uart_received_bytes) {
             TouchPoint tp;
             tp.x = this->get_touch_position_x(uart_received_bytes);
+            if (tp.x >= 0)
+                tp.button = this->get_button_from_position(static_cast<uint8_t>(tp.x));
             tp.state = this->get_touch_state(uart_received_bytes);
             switch (tp.state) {
                 case TOUCH_STATE_RELEASE:
