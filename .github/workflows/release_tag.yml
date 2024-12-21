@@ -1,3 +1,11 @@
+# This GitHub Actions workflow updates the "stable" and "latest" Git tags
+# to point to the tag associated with a newly published release. It performs
+# the following steps:
+# 1. Checks out the repository code with full history.
+# 2. Configures Git with a generic user for the action.
+# 3. Moves and forcibly pushes the "stable" and "latest" tags to align with
+#    the tag of the newly published release.
+# This ensures that "stable" and "latest" always point to the most recent release.
 ---
 name: Update Tags
 
