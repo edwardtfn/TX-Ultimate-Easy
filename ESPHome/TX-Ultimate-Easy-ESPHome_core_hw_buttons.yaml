@@ -165,8 +165,10 @@ script:
               if (model_idx == 1) {
                   button = 1; // Single button, always 1
               } else {
-                  const uint8_t step = ${TOUCH_POSITION_MAX_VALUE} / model_idx; // Width of each button region
-                  button = (touch_position / step) + 1; // Determine button region
+                  const uint8_t width = ${TOUCH_POSITION_MAX_VALUE} / model_idx; // Width of each button region
+                  ESP_LOGV("core_hw_buttons", "Button regions: width=%" PRIu8 ", touch_position=%" PRIu8,
+                                              width, touch_position);
+                  button = (touch_position / width) + 1; // Determine button region
                   if (button > model_idx)
                     button = model_idx; // Clamp to max button count
               }

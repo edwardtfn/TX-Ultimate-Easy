@@ -12,7 +12,7 @@
 ####################################################################################################
 ---
 substitutions:
-  TOUCH_POSITION_MAX_VALUE: '10'  # Maximum touch position value
+  TOUCH_POSITION_MAX_VALUE: '10'  # Maximum touch position value returned by the touch pad via uart
 
 binary_sensor:
   - id: bs_multi_touch
@@ -206,6 +206,15 @@ tx_ultimate_easy:
   id: tx_ultimate
   uart: uart_touch
 
+  on_long_touch_release:
+    - lambda: |-
+        const uint8_t touch_position = static_cast<uint8_t>(touch.x);
+        if (touch_position > ${TOUCH_POSITION_MAX_VALUE}) {  // Check for valid range
+          ESP_LOGE("tx_ultimate_easy", "Invalid long-touch position: %" PRIu8, touch_position);
+        } else {
+          ESP_LOGI("tx_ultimate_easy", "Long-touch released at position %" PRIu8, touch_position);
+        }
+
   on_multi_touch_release:
     - lambda: ESP_LOGI("tx_ultimate_easy", "Multi-touch released");
     - script.execute: touch_on_multi_touch_release
@@ -214,7 +223,7 @@ tx_ultimate_easy:
     - lambda: |-
         const uint8_t touch_position = static_cast<uint8_t>(touch.x);
         if (touch_position > ${TOUCH_POSITION_MAX_VALUE}) {  // Check for valid range
-          ESP_LOGE("core_hw_buttons", "Invalid touch position: %" PRIu8, touch_position);
+          ESP_LOGE("tx_ultimate_easy", "Invalid touch position: %" PRIu8, touch_position);
         } else {
           ESP_LOGI("tx_ultimate_easy", "Pressed at position %" PRIu8, touch_position);
           touch_on_press->execute(touch_position);
