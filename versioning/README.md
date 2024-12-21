@@ -5,23 +5,25 @@ This project uses a time-based versioning scheme: `year.month.sequential_number`
 This scheme makes it easy to identify when a version was released and provides a clear order for releases within a given month.
 
 ### Examples
-- `2024.12.01` – First release of December 2024.
-- `2024.12.02` – Second release of December 2024.
-- `2025.01.01` – First release of January 2025.
+- `2024.1.1` – First release of January 2024.
+- `2024.12.2` – Second release of December 2024.
+- `2025.3.1` – First release of March 2025.
 
 ## Files
 - **`VERSION`**: Contains the current version of the project as plain text.
 - **`bump_version.sh`**: A script to increment the version based on the current date and release sequence.
 - **`README.md`**: Documentation for the versioning process.
 
-## Versioning Rules
-1. The version format is `YYYY.MM.NN`, where:
-   - `YYYY` is the current year.
-   - `MM` is the current month (two digits).
-   - `NN` is the sequential release number within the month (starting at `01`).
-2. On each new merge to the `main` branch:
-   - If the month hasn’t changed, the sequential number (`NN`) is incremented.
-   - If the month has changed, the sequential number resets to `01`.
+## Version Validation
+
+The versioning system enforces strict format validation:
+- Year must be a 4-digit number (YYYY)
+- Month must be a number from 1 to 12 without leading zeros
+- Sequence must be a positive number with no leading zeros (1, 2, ...).
+
+The `bump_version.sh` script includes validation checks and will fail if:
+- The version format is invalid.
+- Other format-related issues are detected.
 
 ## Usage
 
