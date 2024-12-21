@@ -49,14 +49,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git checkout main
-          git pull https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git main
-          git merge --no-ff $TEMP_BRANCH -m "Automated Version Bump [skip-versioning]"
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git main
+          git pull "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git" main
+          git merge --no-ff "$TEMP_BRANCH" -m "Automated Version Bump [skip-versioning]"
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git" main
 
       - name: Delete Temporary Branch
         if: always()
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git --delete $TEMP_BRANCH
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git" --delete "$TEMP_BRANCH"
 ...
