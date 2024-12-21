@@ -34,12 +34,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/<your-username>/<repository-name>.git main
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/<your-username>/<repository-name>.git --tags
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/edwardtfn/TX-Ultimate-Easy.git main
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/edwardtfn/TX-Ultimate-Easy.git --tags
 
       - name: Conditionally Update Stable Tag
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.update_stable == 'true' }}
         run: |
           git tag -f stable
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/<your-username>/<repository-name>.git stable --force
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/edwardtfn/TX-Ultimate-Easy.git stable --force
 ...
