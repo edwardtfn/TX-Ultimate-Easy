@@ -42,7 +42,7 @@ if ! git add "$VERSION_FILE" "$VERSION_YAML_FILE"; then
   echo "Error: Failed to stage version files"
   exit 1
 fi
-if ! git commit -m "Bump version to $NEW_VERSION"; then
+if ! git commit -m "Bump version to $NEW_VERSION [skip-versioning]"; then
   echo "Error: Failed to commit version bump"
   exit 1
 fi
