@@ -34,18 +34,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if ! git push origin main; then
-            echo "Failed to push to main branch"
-            exit 1
-          fi
-          if ! git push origin --tags --force; then
-            echo "Failed to push tags"
-            exit 1
-          fi
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/<your-username>/<repository-name>.git main
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/<your-username>/<repository-name>.git --tags
 
       - name: Conditionally Update Stable Tag
         if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.update_stable == 'true' }}
         run: |
           git tag -f stable
-          git push origin stable --force
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/<your-username>/<repository-name>.git stable --force
 ...
