@@ -40,51 +40,28 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
-      - name: Bump version and push tag
-        id: version
-        uses: mathieudutour/github-tag-action@v6.1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          release_branches: main
-          default_bump: patch
-          tag_prefix: ""
-          dry_run: true
-
-      - name: Update version in files
-        if: steps.version.outputs.new_tag
+      - name: Bump version
         run: |
           chmod +x ./bump_version.sh
-          ./bump_version.sh ${{ steps.version.outputs.new_tag }}
-          git add .
-          git commit -m "chore: bump version to ${{ steps.version.outputs.new_tag }}"
-          git push
-
-      - name: Create version tag
-        if: steps.version.outputs.new_tag
-        run: |
-          echo "Creating version tag ${{ steps.version.outputs.new_tag }}"
-          git tag -fa ${{ steps.version.outputs.new_tag }} -m "Version ${{ steps.version.outputs.new_tag }}"
-          git push origin ${{ steps.version.outputs.new_tag }} --force
+          ./bump_version.sh
 
       - name: Update stable tag
         if: |
-          steps.version.outputs.new_tag && (
+          success() && (
             github.event_name == 'workflow_dispatch' && inputs.update_stable ||
             github.event_name == 'push'
           )
         run: |
-          echo "Updating stable tag to point to ${{ steps.version.outputs.new_tag }}"
-          git tag -fa stable -m "Update stable tag to ${{ steps.version.outputs.new_tag }}"
+          git tag -fa stable -m "Update stable tag"
           git push origin stable --force
 
       - name: Update latest tag
         if: |
-          steps.version.outputs.new_tag && (
+          success() && (
             github.event_name == 'workflow_dispatch' && inputs.update_latest ||
             github.event_name == 'push'
           )
         run: |
-          echo "Updating latest tag to point to ${{ steps.version.outputs.new_tag }}"
-          git tag -fa latest -m "Update latest tag to ${{ steps.version.outputs.new_tag }}"
+          git tag -fa latest -m "Update latest tag"
           git push origin latest --force
 ...
