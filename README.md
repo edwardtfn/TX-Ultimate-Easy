@@ -1,19 +1,23 @@
 # TX Ultimate Easy
 
-<!-- markdownlint-disable MD033 -->
-<a href="https://github.com/edwardtfn/TX-Ultimate-Easy/commits/main" target="_blank">![GitHub Activity][commits-shield]</a>
-<a href="LICENSE" target="_blank">![License][license-shield]</a>
-<a href="https://github.com/edwardtfn/TX-Ultimate-Easy/commits/main" target="_blank">![GitHub Last Commit][last-commit-shield]</a>
-<a href="https://esphome.io/" target="_blank">![ESPHome][esphome-shield]</a>
-<a href="https://discord.gg/Db6WJWzWuf" target="_blank">![Discord][discord-shield]</a>
-<a href="https://www.buymeacoffee.com/edwardfirmo" target="_blank">![Buy me an ice-cream][buymeacoffee-shield]</a>
-<!-- markdownlint-enable MD033 -->
+[![Version][version-shield]](https://github.com/edwardtfn/TX-Ultimate-Easy/tags)
+[![GitHub Activity][commits-shield]](https://github.com/edwardtfn/TX-Ultimate-Easy/commits/main)
+[![License][license-shield]](LICENSE)
+[![GitHub Last Commit][last-commit-shield]](https://github.com/edwardtfn/TX-Ultimate-Easy/commits/main)
+[![ESPHome][esphome-shield]](https://esphome.io/)
+[![Discord][discord-shield]](https://discord.gg/Db6WJWzWuf)
+[![Buy me an ice-cream][buymeacoffee-shield]](https://www.buymeacoffee.com/edwardfirmo)
+
+[version-shield]: https://img.shields.io/github/v/tag/edwardtfn/TX-Ultimate-Easy?label=version
+[version]: https://github.com/edwardtfn/TX-Ultimate-Easy/tags
 
 <!-- markdownlint-disable MD013 -->
 | &nbsp;![TX Ultimate Easy Logo](Assets/Logo.webp) | TX Ultimate Easy provides custom ESPHome firmware for Sonoff TX Ultimate devices. Our project focuses on user-friendly configuration through the Home Assistant UI, eliminating the need for manual YAML editing. Whether you're new to home automation or an experienced user, TX Ultimate Easy makes it simple to manage your device. |
 | --- | :-- |
 <!-- markdownlint-enable MD013 -->
 
+[version-shield]: https://img.shields.io/github/v/tag/edwardtfn/TX-Ultimate-Easy?label=version
+[version]: https://github.com/edwardtfn/TX-Ultimate-Easy/tags
 [commits-shield]: https://img.shields.io/github/commit-activity/y/edwardtfn/TX-Ultimate-Easy
 [commits]: https://github.com/edwardtfn/TX-Ultimate-Easy/commits/main
 [license-shield]: https://img.shields.io/github/license/edwardtfn/TX-Ultimate-Easy
