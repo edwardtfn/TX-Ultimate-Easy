@@ -1,6 +1,9 @@
-# Workflow for managing versioning and tagging
+# This GitHub Actions workflow handles version bumping and tag updates.
+# It can be triggered either by:
+# 1. Pushing to main branch - automatically bumps version and updates tags
+# 2. Manual dispatch - allows independent control over stable and latest tags
 ---
-name: Version Bump and Tag
+name: Version and Tags
 
 on:  # yamllint disable-line rule:truthy
   push:
@@ -9,34 +12,56 @@ on:  # yamllint disable-line rule:truthy
     paths-ignore:
       - '**/VERSION'
       - '**/VERSION_YAML'
+
   workflow_dispatch:
     inputs:
       update_stable:
         description: "Update stable tag?"
         required: true
-        default: "false"
+        default: false
+        type: boolean
+      update_latest:
+        description: "Update latest tag?"
+        required: true
+        default: false
+        type: boolean
 
 jobs:
-  versioning:
+  version-and-tag:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: "actions/checkout@v4"
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Git
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
-      - name: Bump Version
+      - name: Bump version
         run: |
-          chmod +x "./versioning/bump_version.sh"
-          "./versioning/bump_version.sh"
+          chmod +x ./versioning/bump_version.sh
+          ./versioning/bump_version.sh
 
-      - name: Push Changes and Tags
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Update stable tag
+        if: |
+          success() && (
+            github.event_name == 'workflow_dispatch' && inputs.update_stable ||
+            github.event_name == 'push'
+          )
         run: |
-          git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" main
-          git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" --tags
+          git tag -fa stable -m "Update stable tag"
+          git push origin stable --force
+
+      - name: Update latest tag
+        if: |
+          success() && (
+            github.event_name == 'workflow_dispatch' && inputs.update_latest ||
+            github.event_name == 'push'
+          )
+        run: |
+          git tag -fa latest -m "Update latest tag"
+          git push origin latest --force
 ...
