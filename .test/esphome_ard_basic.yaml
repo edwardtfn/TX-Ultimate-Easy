@@ -1,6 +1,6 @@
 ---
 packages:
-  basic_package: !include ../TX-Ultimate-Easy-ESPHome.yaml  # Basic package
+  basic_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml  # Basic package
 
 esp32:
   framework:

@@ -11,6 +11,9 @@
 ##### - For normal system use, modifications to this file are NOT required.                    #####
 ####################################################################################################
 ---
+substitutions:
+  TOUCH_POSITION_MAX_VALUE: '10'  # Maximum touch position value returned by the touch pad via uart
+
 binary_sensor:
   - id: bs_multi_touch
     name: Multi-touch
@@ -61,7 +64,7 @@ external_components:
   - source:
       type: git
       url: https://github.com/edwardtfn/TX-Ultimate-Easy
-      ref: ${version}
+      ref: v${version}
     refresh: 1h
     components:
       - tx_ultimate_easy
@@ -124,7 +127,7 @@ script:
   - id: touch_on_press
     mode: restart
     parameters:
-      touch_x: uint8_t
+      touch_position: uint8_t
     then:
     # Extended by:
     #   - HW Buttons
@@ -203,16 +206,28 @@ tx_ultimate_easy:
   id: tx_ultimate
   uart: uart_touch
 
+  on_long_touch_release:
+    - lambda: |-
+        const uint8_t touch_position = static_cast<uint8_t>(touch.x);
+        if (touch_position > ${TOUCH_POSITION_MAX_VALUE}) {  // Check for valid range
+          ESP_LOGE("tx_ultimate_easy", "Invalid long-touch position: %" PRIu8, touch_position);
+        } else {
+          ESP_LOGI("tx_ultimate_easy", "Long-touch released at position %" PRIu8, touch_position);
+        }
+
   on_multi_touch_release:
     - lambda: ESP_LOGI("tx_ultimate_easy", "Multi-touch released");
     - script.execute: touch_on_multi_touch_release
 
   on_press:
     - lambda: |-
-        ESP_LOGI("tx_ultimate_easy", "Pressed at position %" PRIu8, static_cast<uint8_t>(touch.x));
-    - script.execute:
-        id: touch_on_press
-        touch_x: !lambda return static_cast<uint8_t>(touch.x);
+        const uint8_t touch_position = static_cast<uint8_t>(touch.x);
+        if (touch_position > ${TOUCH_POSITION_MAX_VALUE}) {  // Check for valid range
+          ESP_LOGE("tx_ultimate_easy", "Invalid touch position: %" PRIu8, touch_position);
+        } else {
+          ESP_LOGI("tx_ultimate_easy", "Pressed at position %" PRIu8, touch_position);
+          touch_on_press->execute(touch_position);
+        }
 
   on_release:
     - lambda: ESP_LOGI("tx_ultimate_easy", "Released");
@@ -233,8 +248,8 @@ tx_ultimate_easy:
         ESP_LOGD("tx_ultimate_easy", "  Position: %i", touch.x);
 
 uart:
-  id: uart_touch
-  tx_pin: GPIO19
-  rx_pin: GPIO22
-  baud_rate: 115200
+  - id: uart_touch
+    tx_pin: GPIO19
+    rx_pin: GPIO22
+    baud_rate: 115200
 ...

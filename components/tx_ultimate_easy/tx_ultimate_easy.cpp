@@ -48,6 +48,35 @@ namespace esphome {
 
         void TxUltimateEasy::dump_config() {
             ESP_LOGCONFIG(TAG, "TX Ultimate Easy");
+            ESP_LOGCONFIG(TAG, "  Gang count: %" PRIu8, this->gang_count_);
+        }
+
+        bool TxUltimateEasy::set_gang_count(const uint8_t gang_count) {
+            // Hardware supports maximum of 4 touch-sensitive buttons
+            if (gang_count < 1 or gang_count > 4)
+                return false;
+            this->gang_count_ = gang_count;
+            return true;
+        }
+
+        uint8_t TxUltimateEasy::get_button_from_position(const uint8_t position) {
+            // Validate position bounds
+            if (position > TOUCH_MAX_POSITION)
+                return 0;
+
+            // Special case for single gang (only one button exists)
+            if (this->gang_count_ == 1)
+                return 1;
+
+            // Calculate button number
+            const uint8_t width = (TOUCH_MAX_POSITION + 1) / this->gang_count_;  // Width of each button region
+            if (width < 1 or width > this->gang_count_)  // Invalid width - and prevents division by zero
+                return 0;
+            const uint8_t button = std::min(
+                static_cast<uint8_t>((position / width) + 1), // Convert position to button index
+                this->gang_count_ // Clamp to max gang count
+            );
+            return button;
         }
 
         void TxUltimateEasy::send_touch_(TouchPoint tp) {
@@ -103,7 +132,8 @@ namespace esphome {
                     state == TOUCH_STATE_SWIPE_LEFT ||
                     state == TOUCH_STATE_SWIPE_RIGHT ||
                     state == TOUCH_STATE_MULTI_TOUCH) &&
-                   (uart_received_bytes[6] >= 0 || state == TOUCH_STATE_MULTI_TOUCH);
+                    // Multi-touch events may have x < 0, all other events require valid x position
+                    (uart_received_bytes[6] >= 0 || state == TOUCH_STATE_MULTI_TOUCH);
         }
 
         int TxUltimateEasy::get_touch_position_x(const std::array<int, UART_RECEIVED_BYTES_SIZE> &uart_received_bytes) {
@@ -133,6 +163,8 @@ namespace esphome {
         TouchPoint TxUltimateEasy::get_touch_point(const std::array<int, UART_RECEIVED_BYTES_SIZE> &uart_received_bytes) {
             TouchPoint tp;
             tp.x = this->get_touch_position_x(uart_received_bytes);
+            if (tp.x >= 0)
+                tp.button = this->get_button_from_position(static_cast<uint8_t>(tp.x));
             tp.state = this->get_touch_state(uart_received_bytes);
             switch (tp.state) {
                 case TOUCH_STATE_RELEASE:
