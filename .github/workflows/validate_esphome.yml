@@ -30,8 +30,6 @@ jobs:
 
   build_basic:
     name: Basic
-    needs:
-      - code_scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -42,7 +40,6 @@ jobs:
 
   build_bluetooth_proxy_4:
     name: Bluetooth Proxy (IDF)
-    needs: build_basic
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -53,7 +50,6 @@ jobs:
 
   build_bluetooth_proxy_53:
     name: Bluetooth Proxy (IDF v5.3)
-    needs: build_basic
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
