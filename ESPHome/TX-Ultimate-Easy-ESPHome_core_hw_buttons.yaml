@@ -20,111 +20,53 @@ substitutions:
   BUTTON_3_ACTION_TEXT: "Relay 3 (toggle)"
   BUTTON_4_ACTION_TEXT: "Relay 4 (toggle)"
 
-binary_sensor:
-  - id: bs_button_1
-    name: Button 1
-    icon: mdi:gesture-tap-box
-    internal: false
-    platform: template
-    on_click:
-      then:
-        - script.execute:
-            id: button_action
-            component: bs_button_1
-            event: click
-    on_double_click:
-      then:
-        - script.execute:
-            id: button_action
-            component: bs_button_1
-            event: double_click
-    on_multi_click:
-      - timing: &long_click-timing
-          - ON for at least 0.8s
-        invalid_cooldown: ${invalid_cooldown}
-        then:
-          - script.execute:
-              id: button_action
-              component: bs_button_1
-              event: long_click
+  BUTTON_CLICK_MIN_LENGTH: '50'    # The minimum duration the click should last, in msec
+  BUTTON_CLICK_MAX_LENGTH: '350'   # The maximum duration the click should last, in msec
+  BUTTON_MULTI_CLICK_DELAY: '250'  # The time to wait for another click, in msec
+  BUTTON_PRESS_TIMEOUT: '10000'    # Ignore if button is pressed for longer than this time, in msec
+  BUTTON_LONG_PRESS_DELAY: '800'   # The time to wait to consider a long press, in msec
 
-  - id: bs_button_2
+binary_sensor:
+  - &binary_sensor_button_base
+    id: bs_button_2
     name: Button 2
     icon: mdi:gesture-tap-box
-    internal: true
     platform: template
-    on_click:
-      then:
-        - script.execute:
-            id: button_action
-            component: bs_button_2
-            event: click
-    on_double_click:
-      then:
-        - script.execute:
-            id: button_action
-            component: bs_button_2
-            event: double_click
-    on_multi_click:
-      - timing: *long_click-timing
-        invalid_cooldown: ${invalid_cooldown}
-        then:
-          - script.execute:
-              id: button_action
-              component: bs_button_2
-              event: long_click
+    internal: true
 
   - id: bs_button_3
     name: Button 3
-    icon: mdi:gesture-tap-box
-    internal: true
-    platform: template
-    on_click:
-      then:
-        - script.execute:
-            id: button_action
-            component: bs_button_3
-            event: click
-    on_double_click:
-      then:
-        - script.execute:
-            id: button_action
-            component: bs_button_3
-            event: double_click
-    on_multi_click:
-      - timing: *long_click-timing
-        invalid_cooldown: ${invalid_cooldown}
-        then:
-          - script.execute:
-              id: button_action
-              component: bs_button_3
-              event: long_click
+    <<: *binary_sensor_button_base
 
   - id: bs_button_4
     name: Button 4
-    icon: mdi:gesture-tap-box
-    internal: true
-    platform: template
-    on_click:
-      then:
-        - script.execute:
-            id: button_action
-            component: bs_button_4
-            event: click
-    on_double_click:
-      then:
-        - script.execute:
-            id: button_action
-            component: bs_button_4
-            event: double_click
-    on_multi_click:
-      - timing: *long_click-timing
-        invalid_cooldown: ${invalid_cooldown}
-        then:
-          - script.execute:
-              id: button_action
-              component: bs_button_4
-              event: long_click
+    <<: *binary_sensor_button_base
+
+  - id: bs_button_1
+    name: Button 1
+    internal: false
+    <<: *binary_sensor_button_base
+
+globals:
+  - id: button_press_button
+    type: uint8_t
+    restore_value: false
+    initial_value: '0'
+
+  - id: button_press_position
+    type: uint8_t
+    restore_value: false
+    initial_value: '0'
+
+  - id: button_press_start_time
+    type: uint32_t
+    restore_value: false
+    initial_value: '0'
+
+  - id: click_counter
+    type: uint8_t
+    restore_value: false
+    initial_value: '0'
 
 script:
   - id: !extend boot_initialize
@@ -162,9 +104,31 @@ script:
     parameters:
       component: string
       event: string
-    then:  # There's nothing here so far
-    # Extended by:
-    #   - core_api
+    then:
+      # Extended by:
+      #   - core_api
+      - lambda: |-
+          ESP_LOGI("core_hw_buttons", "Button '%s' action: '%s'", component.c_str(), event.c_str());
+          id(button_press_button) = 0;
+          id(click_counter) = 0;
+          id(button_press_start_time) = 0;
+          buttons_release->execute();
+
+  - id: button_click_event
+    mode: restart
+    parameters:
+      button_id: uint8_t
+      click_count: uint8_t
+    then:
+      - delay:
+          milliseconds: ${BUTTON_MULTI_CLICK_DELAY}
+      - lambda: |-
+          const std::string button_name = "bs_button_" + std::to_string(button_id);
+          std::string event_name;
+          if (click_count == 1) event_name = "click";
+          else if (click_count == 2) event_name = "double_click";
+          else event_name = std::to_string(click_count) + "_click";
+          button_action->execute(button_name.c_str(), event_name.c_str());
 
   - id: buttons_release
     mode: restart
@@ -187,42 +151,78 @@ script:
     then:
       - script.execute:
           id: touch_on_press_buttons
-          touch_x: !lambda return touch_x;
+          touch_position: !lambda return touch_position;
 
   - id: touch_on_press_buttons
     mode: restart
     parameters:
-      touch_x: uint8_t
+      touch_position: uint8_t
     then:
       - lambda: |-
+          id(button_press_start_time) = millis();
+          id(button_press_position) = touch_position;
+          uint8_t button = 0;
           auto model_index = sl_tx_model_gang->active_index();
           if (model_index.has_value()) {
-            uint8_t model_idx = model_index.value() + 1;
-            switch (model_idx) {
-              case 1:  // 1 Gang
-                bs_button_1->publish_state(true);
-                break;
-              case 2:  // 2 Gang
-                if (touch_x <= 5) bs_button_1->publish_state(true);
-                else bs_button_2->publish_state(true);
-                break;
-              case 3:  // 3 Gang
-                if (touch_x <= 3) bs_button_1->publish_state(true);
-                else if (touch_x <= 7) bs_button_2->publish_state(true);
-                else bs_button_3->publish_state(true);
-                break;
-              case 4:  // 4 Gang
-                if (touch_x <= 2) bs_button_1->publish_state(true);
-                else if (touch_x <= 5) bs_button_2->publish_state(true);
-                else if (touch_x <= 8) bs_button_3->publish_state(true);
-                else bs_button_4->publish_state(true);
-                break;
-            }
+              const uint8_t model_idx = model_index.value() + 1; // Increment for 1-based indexing
+              if (model_idx == 1) {
+                  button = 1; // Single button, always 1
+              } else {
+                  const uint8_t width = ${TOUCH_POSITION_MAX_VALUE} / model_idx; // Width of each button region
+                  ESP_LOGV("core_hw_buttons", "Button regions: width=%" PRIu8 ", touch_position=%" PRIu8,
+                                              width, touch_position);
+                  button = (touch_position / width) + 1; // Determine button region
+                  if (button > model_idx)
+                    button = model_idx; // Clamp to max button count
+              }
+          }
+          // Update binary sensor
+          switch (button) {
+            case 1:
+              bs_button_1->publish_state(true);
+              break;
+            case 2:
+              bs_button_2->publish_state(true);
+              break;
+            case 3:
+              bs_button_3->publish_state(true);
+              break;
+            case 4:
+              bs_button_4->publish_state(true);
+              break;
+          }
+          // Update counters
+          if (id(button_press_button) == button) {
+            id(click_counter)++;
+          } else {
+            id(click_counter) = 1;
+            id(button_press_button) = button;
           }
 
   - id: !extend touch_on_release
     then:
-      - script.execute: buttons_release
+      - lambda: |-
+          uint32_t current_time = millis();
+          buttons_release->execute();
+          if (id(button_press_start_time) > 0 and
+              id(button_press_start_time) < current_time) {
+            uint32_t press_duration  = current_time - id(button_press_start_time);
+            // Handle overflow (optional, since it's unlikely to happen here)
+            ESP_LOGI("core_hw_buttons", "Button press duration: %" PRIu32 " ms", press_duration);
+            if (press_duration < ${BUTTON_CLICK_MIN_LENGTH}) {
+              ESP_LOGW("core_hw_buttons", "Ignoring button press (too short)");
+            } else if (press_duration >= ${BUTTON_CLICK_MIN_LENGTH} and
+                        press_duration <= ${BUTTON_CLICK_MAX_LENGTH}) { // Short/normal click
+              button_click_event->execute(id(button_press_button), id(click_counter));
+            } else if (press_duration >= ${BUTTON_LONG_PRESS_DELAY} and press_duration <= ${BUTTON_PRESS_TIMEOUT}) {
+              button_action->execute(("bs_button_" + std::to_string(id(button_press_button))).c_str(), "long_click");
+            } else if (press_duration > ${BUTTON_PRESS_TIMEOUT}) { // Timeout or invalid
+              ESP_LOGW("core_hw_buttons", "Button press cancelled or timed out after ${BUTTON_PRESS_TIMEOUT} ms");
+            }
+          } else {
+            ESP_LOGW("core_hw_buttons", "Press event timestamp not recorded yet");
+          }
+          id(button_press_start_time) = 0;
 
   - id: !extend touch_swipe_left
     then:

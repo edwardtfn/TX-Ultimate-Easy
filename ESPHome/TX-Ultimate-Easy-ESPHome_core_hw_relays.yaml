@@ -11,55 +11,6 @@
 ##### - For normal system use, modifications to this file are NOT required.                    #####
 ####################################################################################################
 ---
-binary_sensor:
-  - id: !extend bs_button_1
-    on_click:
-      then:
-        - if:
-            condition:
-              - lambda: return sl_button_1_action->active_index().has_value();
-              - lambda: return sl_button_1_action->active_index().value() == 1;
-              - and: &button_click_no_other_click
-                  - lambda: return not bs_multi_touch->state;
-                  - lambda: return not bs_swipe_left->state;
-                  - lambda: return not bs_swipe_down->state;
-                  - lambda: return not bs_swipe_right->state;
-            then:
-              - switch.toggle: sw_relay_1
-
-  - id: !extend bs_button_2
-    on_click:
-      then:
-        - if:
-            condition:
-              - lambda: return sl_button_2_action->active_index().has_value();
-              - lambda: return sl_button_2_action->active_index().value() == 1;
-              - and: *button_click_no_other_click
-            then:
-              - switch.toggle: sw_relay_2
-
-  - id: !extend bs_button_3
-    on_click:
-      then:
-        - if:
-            condition:
-              - lambda: return sl_button_3_action->active_index().has_value();
-              - lambda: return sl_button_3_action->active_index().value() == 1;
-              - and: *button_click_no_other_click
-            then:
-              - switch.toggle: sw_relay_3
-
-  - id: !extend bs_button_4
-    on_click:
-      then:
-        - if:
-            condition:
-              - lambda: return sl_button_4_action->active_index().has_value();
-              - lambda: return sl_button_4_action->active_index().value() == 1;
-              - and: *button_click_no_other_click
-            then:
-              - switch.toggle: sw_relay_4
-
 globals:
   - id: boot_initialization_relays
     type: bool
@@ -158,6 +109,45 @@ script:
             sw_relay_4->set_internal(num_gangs < 4 or relay_mode_index.value() != 0);
           }
           id(boot_initialization_relays) = true;
+
+  - id: !extend button_click_event
+    then:
+      - lambda: |-
+          // Handle only single clicks
+          if (click_count != 1)
+            return;
+
+          // Ignore if other touch events are active
+          if (bs_multi_touch->state ||
+              bs_swipe_left->state ||
+              bs_swipe_down->state ||
+              bs_swipe_right->state) {
+            return;
+          }
+
+          // Toggle relay if corresponding button action is enabled
+          switch (button_id) {
+            case 1:
+              if (sl_button_1_action->active_index().has_value() and
+                  sl_button_1_action->active_index().value() == 1)
+                sw_relay_1->toggle();
+              break;
+            case 2:
+              if (sl_button_2_action->active_index().has_value() and
+                  sl_button_2_action->active_index().value() == 1)
+                sw_relay_2->toggle();
+              break;
+            case 3:
+              if (sl_button_3_action->active_index().has_value() and
+                  sl_button_3_action->active_index().value() == 1)
+                sw_relay_3->toggle();
+              break;
+            case 4:
+              if (sl_button_4_action->active_index().has_value() and
+                  sl_button_4_action->active_index().value() == 1)
+                sw_relay_4->toggle();
+              break;
+          }
 
   - id: show_relay_status
     mode: restart
