@@ -1,19 +1,20 @@
 # TX Ultimate Easy
 
-<!-- markdownlint-disable MD033 -->
-<a href="https://github.com/edwardtfn/TX-Ultimate-Easy/commits/main" target="_blank">![GitHub Activity][commits-shield]</a>
-<a href="LICENSE" target="_blank">![License][license-shield]</a>
-<a href="https://github.com/edwardtfn/TX-Ultimate-Easy/commits/main" target="_blank">![GitHub Last Commit][last-commit-shield]</a>
-<a href="https://esphome.io/" target="_blank">![ESPHome][esphome-shield]</a>
-<a href="https://discord.gg/Db6WJWzWuf" target="_blank">![Discord][discord-shield]</a>
-<a href="https://www.buymeacoffee.com/edwardfirmo" target="_blank">![Buy me an ice-cream][buymeacoffee-shield]</a>
-<!-- markdownlint-enable MD033 -->
+[![Version][version-shield]](https://github.com/edwardtfn/TX-Ultimate-Easy/tags)
+[![GitHub Activity][commits-shield]](https://github.com/edwardtfn/TX-Ultimate-Easy/commits/main)
+[![License][license-shield]](LICENSE)
+[![GitHub Last Commit][last-commit-shield]](https://github.com/edwardtfn/TX-Ultimate-Easy/commits/main)
+[![ESPHome][esphome-shield]](https://esphome.io/)
+[![Discord][discord-shield]](https://discord.gg/Db6WJWzWuf)
+[![Buy me an ice-cream][buymeacoffee-shield]](https://www.buymeacoffee.com/edwardfirmo)
 
 <!-- markdownlint-disable MD013 -->
 | &nbsp;![TX Ultimate Easy Logo](Assets/Logo.webp) | TX Ultimate Easy provides custom ESPHome firmware for Sonoff TX Ultimate devices. Our project focuses on user-friendly configuration through the Home Assistant UI, eliminating the need for manual YAML editing. Whether you're new to home automation or an experienced user, TX Ultimate Easy makes it simple to manage your device. |
 | --- | :-- |
 <!-- markdownlint-enable MD013 -->
 
+[version-shield]: https://img.shields.io/github/v/tag/edwardtfn/TX-Ultimate-Easy?label=version
+[version]: https://github.com/edwardtfn/TX-Ultimate-Easy/tags
 [commits-shield]: https://img.shields.io/github/commit-activity/y/edwardtfn/TX-Ultimate-Easy
 [commits]: https://github.com/edwardtfn/TX-Ultimate-Easy/commits/main
 [license-shield]: https://img.shields.io/github/license/edwardtfn/TX-Ultimate-Easy
@@ -35,7 +36,60 @@ TX Ultimate Easy exposes your device's components (sensors, touch panel, relays,
 - Use device triggers and states in your Home Assistant automations and scripts
 - Configure device behavior through Home Assistant's service calls
 
-All automation capabilities are handled through Home Assistant's native automation system - this project focuses on providing reliable device integration rather than implementing its own automation tools.
+All automation capabilities are handled through Home Assistant's native automation system - this project focuses on providing reliable
+device integration rather than implementing its own automation tools.
+
+### Event-Based Automation
+
+TX Ultimate Easy uses Home Assistant's native Events system for reliable automation triggers.
+While sensors show the current state (e.g., button pressed/not pressed), events capture-specific actions like clicks, swipes, and long presses.
+
+To view available events:
+
+1. Go to Developer Tools in Home Assistant
+2. Select the "Events" tab
+3. Enter `esphome.tx_ultimate_easy` in the "Event to subscribe to" field
+4. Click "Start listening"
+5. Interact with your device to see events in real-time
+
+Example event trigger in automation (YAML):
+
+```yaml
+triggers:
+  - platform: event
+    event_type: esphome.tx_ultimate_easy
+    event_data:
+      device_name: your_device_name  # Replace with your specific device name
+      component: bs_button_1         # Button identifier (e.g., bs_button_1, bs_button_2, bs_button_3 or bs_button_4)
+      event: click
+actions:
+  - action: light.toggle
+    target:
+      entity_id: light.living_room
+```
+
+**Common event types**:
+- `click`: Single press and release
+- `double_click`: Two quick presses
+- `long_press`: Press and hold
+- `swipe_left`: Left swipe gesture
+- `swipe_right`: Right swipe gesture
+
+You can also create event-based automations through the Home Assistant UI by selecting "Event" as the trigger type and filtering by your device.
+
+### Device Configuration
+#### Relay Modes
+- **Light Mode**: Exposes the relay as a light entity with brightness controls (if supported)
+- **Switch Mode**: Exposes the relay as a simple on/off switch entity
+
+#### Button Actions
+- **None**: Allows using button events for custom automations
+  Example: Trigger scenes or complex automations through Home Assistant
+- **Relay Toggle**: Direct control of the associated relay
+  Example: Toggle relay state with each press, independent of Home Assistant
+
+#### Automation
+All device behaviors can be customized through Home Assistant automations without relying on local device triggers.
 
 ## Key Features
 
@@ -103,6 +157,7 @@ We welcome contributions from the community! Here's how you can help:
 4. Submit a pull request targeting the `main` branch
 
 Please ensure your code follows our standards:
+
 - Passes all lint checks (YAML, C++, Markdown)
 - Includes appropriate documentation
 - Follows existing code style
@@ -115,7 +170,9 @@ Need help? Here are your options:
 - **Community Chat**: Join our [Discord Server](https://discord.gg/Db6WJWzWuf) for discussions and community interaction
 - **Support the Project**: Consider supporting through Buy Me a Coffee
 
-Note: For proper tracking and resolution, all bug reports and feature requests must be submitted through GitHub Issues, not Discord. The Issues page can be found at: [Issues · edwardtfn/TX-Ultimate-Easy](https://github.com/edwardtfn/TX-Ultimate-Easy/issues)
+Note: For proper tracking and resolution:
+- All bug reports and feature requests must be submitted through GitHub Issues, not Discord
+- Submit issues here: [Issues · edwardtfn/TX-Ultimate-Easy](https://github.com/edwardtfn/TX-Ultimate-Easy/issues)
 
 [![Buy Me a Coffee](https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png)](https://www.buymeacoffee.com/edwardfirmo)
 

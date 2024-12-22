@@ -13,6 +13,9 @@
 
 namespace esphome {
     namespace tx_ultimate_easy {
+        // Touch Max Position
+        constexpr uint8_t TOUCH_MAX_POSITION = 10;
+
         // Touch State Constants
         constexpr uint8_t TOUCH_STATE_RELEASE = 0x01;
         constexpr uint8_t TOUCH_STATE_PRESS = 0x02;
@@ -32,6 +35,7 @@ namespace esphome {
         static const char *TAG = "tx_ultimate_easy";
 
         struct TouchPoint {
+            uint8_t button = 0;
             int8_t x = -1;
             int8_t state = -1;
             std::string state_str = "Unknown";
@@ -53,6 +57,10 @@ namespace esphome {
             void loop() override;
             void dump_config() override;
 
+            uint8_t get_gang_count() { return this->gang_count_; }
+            bool set_gang_count(const uint8_t gang_count);
+            uint8_t get_button_from_position(const uint8_t position);
+
         protected:
             void send_touch_(TouchPoint tp);
             void handle_touch(const std::array<int, UART_RECEIVED_BYTES_SIZE> &bytes);
@@ -69,6 +77,8 @@ namespace esphome {
             Trigger<TouchPoint> trigger_swipe_right_;
             Trigger<TouchPoint> trigger_multi_touch_release_;
             Trigger<TouchPoint> trigger_long_touch_release_;
+
+            uint8_t gang_count_ = 1;
 
         }; // class TxUltimateEasy
 
