@@ -2,7 +2,9 @@
 # It can be triggered either by:
 # 1. Pushing to main branch - automatically bumps version and updates tags
 # 2. Manual dispatch - allows independent control over stable and latest tags
+
 ---
+
 name: Version and Tags
 
 on:  # yamllint disable-line rule:truthy
@@ -45,6 +47,13 @@ jobs:
           chmod +x ./versioning/bump_version.sh
           ./versioning/bump_version.sh
 
+      - name: Push Changes and Tags
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git push origin main
+          git push origin --tags --force
+
       - name: Update stable tag
         if: |
           success() && (
@@ -52,6 +61,21 @@ jobs:
             github.event_name == 'push'
           )
         run: |
+          # Verify version bump was successful
+          if [ ! -f "./versioning/VERSION" ]; then
+            echo "Error: VERSION file not found. Version bump may have failed."
+            exit 1
+          fi
+
+          # Backup existing tag
+          if git rev-parse --verify stable >/dev/null 2>&1; then
+            OLD_STABLE=$(git rev-parse stable)
+            echo "Backing up current stable tag ($OLD_STABLE)"
+          fi
+
+          # Update tag
+          NEW_VERSION=$(cat ./versioning/VERSION)
+          echo "Updating stable tag to $NEW_VERSION"
           git tag -fa stable -m "Update stable tag"
           git push origin stable --force
 
@@ -62,6 +86,21 @@ jobs:
             github.event_name == 'push'
           )
         run: |
+          # Verify version bump was successful
+          if [ ! -f "./versioning/VERSION" ]; then
+            echo "Error: VERSION file not found. Version bump may have failed."
+            exit 1
+          fi
+
+          # Backup existing tag
+          if git rev-parse --verify latest >/dev/null 2>&1; then
+            OLD_LATEST=$(git rev-parse latest)
+            echo "Backing up current latest tag ($OLD_LATEST)"
+          fi
+
+          # Update tag
+          NEW_VERSION=$(cat ./versioning/VERSION)
+          echo "Updating latest tag to $NEW_VERSION"
           git tag -fa latest -m "Update latest tag"
           git push origin latest --force
 ...
