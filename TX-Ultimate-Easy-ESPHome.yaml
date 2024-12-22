@@ -16,7 +16,7 @@ wifi:
 packages:
   remote_package:
     url: https://github.com/edwardtfn/TX-Ultimate-Easy
-    ref: dev
+    ref: latest  # Or you can specify a version, like `ref: v2024.12.6`
     refresh: 30s
     files:
       - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
