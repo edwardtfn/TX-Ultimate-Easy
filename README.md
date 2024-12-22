@@ -59,8 +59,8 @@ triggers:
   - platform: event
     event_type: esphome.tx_ultimate_easy
     event_data:
-      device_name: your_device_name
-      component: bs_button_1
+      device_name: your_device_name  # Replace with your specific device name
+      component: bs_button_1         # Button identifier (e.g., bs_button_1, bs_button_2, bs_button_3 or bs_button_4)
       event: click
 actions:
   - action: light.toggle
