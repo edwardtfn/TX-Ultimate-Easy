@@ -52,6 +52,7 @@ namespace esphome {
         }
 
         bool TxUltimateEasy::set_gang_count(const uint8_t gang_count) {
+            // Hardware supports maximum of 4 touch-sensitive buttons
             if (gang_count < 1 or gang_count > 4)
                 return false;
             this->gang_count_ = gang_count;

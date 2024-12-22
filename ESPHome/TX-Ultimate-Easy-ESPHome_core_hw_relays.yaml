@@ -113,9 +113,6 @@ script:
   - id: !extend button_click_event
     then:
       - lambda: |-
-          ESP_LOGW("DEBUG", "button_click_event");
-          ESP_LOGW("DEBUG", "  button_id:   %" PRIu8, button_id);
-          ESP_LOGW("DEBUG", "  click_count: %" PRIu8, click_count);
           if (click_count == 1) {  // Single click
             if (!bs_multi_touch->state and
                 !bs_swipe_left->state and
