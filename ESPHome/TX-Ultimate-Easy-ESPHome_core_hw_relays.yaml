@@ -11,54 +11,10 @@
 ##### - For normal system use, modifications to this file are NOT required.                    #####
 ####################################################################################################
 ---
-binary_sensor:
-  - id: !extend bs_button_1
-    on_click:
-      then:
-        - if:
-            condition:
-              - lambda: return sl_button_1_action->active_index().has_value();
-              - lambda: return sl_button_1_action->active_index().value() == 1;
-              - and: &button_click_no_other_click
-                  - lambda: return not bs_multi_touch->state;
-                  - lambda: return not bs_swipe_left->state;
-                  - lambda: return not bs_swipe_down->state;
-                  - lambda: return not bs_swipe_right->state;
-            then:
-              - switch.toggle: sw_relay_1
-
-  - id: !extend bs_button_2
-    on_click:
-      then:
-        - if:
-            condition:
-              - lambda: return sl_button_2_action->active_index().has_value();
-              - lambda: return sl_button_2_action->active_index().value() == 1;
-              - and: *button_click_no_other_click
-            then:
-              - switch.toggle: sw_relay_2
-
-  - id: !extend bs_button_3
-    on_click:
-      then:
-        - if:
-            condition:
-              - lambda: return sl_button_3_action->active_index().has_value();
-              - lambda: return sl_button_3_action->active_index().value() == 1;
-              - and: *button_click_no_other_click
-            then:
-              - switch.toggle: sw_relay_3
-
-  - id: !extend bs_button_4
-    on_click:
-      then:
-        - if:
-            condition:
-              - lambda: return sl_button_4_action->active_index().has_value();
-              - lambda: return sl_button_4_action->active_index().value() == 1;
-              - and: *button_click_no_other_click
-            then:
-              - switch.toggle: sw_relay_4
+substitutions:
+  RELAY_MODE_TEXT_SWITCH: "Switch"
+  RELAY_MODE_TEXT_LIGHT: "Light"
+  RELAY_MODE_TEXT_NOT_USED: "Not in use"
 
 globals:
   - id: boot_initialization_relays
@@ -68,24 +24,82 @@ globals:
 
 light:
   # These lights are used for the physical relays to be shown as lights
-  - &light_binary_base
-    id: light_output_1
+  - id: light_output_1
     name: Light output 1
     output: output_relay_1
     platform: binary
     internal: true
+    on_turn_on:
+      then:
+        - if:
+            condition:
+              - switch.is_off: sw_relay_1
+            then:
+              - switch.turn_on: sw_relay_1
+    on_turn_off:
+      then:
+        - if:
+            condition:
+              - switch.is_on: sw_relay_1
+            then:
+              - switch.turn_off: sw_relay_1
   - id: light_output_2
     name: Light output 2
     output: output_relay_2
-    <<: *light_binary_base
+    platform: binary
+    internal: true
+    on_turn_on:
+      then:
+        - if:
+            condition:
+              - switch.is_off: sw_relay_2
+            then:
+              - switch.turn_on: sw_relay_2
+    on_turn_off:
+      then:
+        - if:
+            condition:
+              - switch.is_on: sw_relay_2
+            then:
+              - switch.turn_off: sw_relay_2
   - id: light_output_3
     name: Light output 3
     output: output_relay_3
-    <<: *light_binary_base
+    platform: binary
+    internal: true
+    on_turn_on:
+      then:
+        - if:
+            condition:
+              - switch.is_off: sw_relay_3
+            then:
+              - switch.turn_on: sw_relay_3
+    on_turn_off:
+      then:
+        - if:
+            condition:
+              - switch.is_on: sw_relay_3
+            then:
+              - switch.turn_off: sw_relay_3
   - id: light_output_4
     name: Light output 4
     output: output_relay_4
-    <<: *light_binary_base
+    platform: binary
+    internal: true
+    on_turn_on:
+      then:
+        - if:
+            condition:
+              - switch.is_off: sw_relay_4
+            then:
+              - switch.turn_on: sw_relay_4
+    on_turn_off:
+      then:
+        - if:
+            condition:
+              - switch.is_on: sw_relay_4
+            then:
+              - switch.turn_off: sw_relay_4
 
 output:
   - id: output_relay_1
@@ -158,6 +172,41 @@ script:
             sw_relay_4->set_internal(num_gangs < 4 or relay_mode_index.value() != 0);
           }
           id(boot_initialization_relays) = true;
+
+  - id: !extend button_click_event
+    then:
+      - lambda: |-
+          // Handle only single clicks
+          if (click_count != 1)
+            return;
+
+          // Ignore if other touch events are active
+          if (bs_multi_touch->state ||
+              bs_swipe_left->state ||
+              bs_swipe_down->state ||
+              bs_swipe_right->state) {
+            return;
+          }
+
+          // Toggle relay if corresponding button action is enabled
+          switch (button_id) {
+            case ${BUTTON_1_ID}:
+              if (sl_button_1_action->state != "${RELAY_MODE_TEXT_NOT_USED}")
+                sw_relay_1->toggle();
+              break;
+            case ${BUTTON_2_ID}:
+              if (sl_button_2_action->state != "${RELAY_MODE_TEXT_NOT_USED}")
+                sw_relay_2->toggle();
+              break;
+            case ${BUTTON_3_ID}:
+              if (sl_button_3_action->state != "${RELAY_MODE_TEXT_NOT_USED}")
+                sw_relay_3->toggle();
+              break;
+            case ${BUTTON_4_ID}:
+              if (sl_button_4_action->state != "${RELAY_MODE_TEXT_NOT_USED}")
+                sw_relay_4->toggle();
+              break;
+          }
 
   - id: show_relay_status
     mode: restart
@@ -236,12 +285,13 @@ script:
 select:
   - &relay_select_mode_base
     id: sl_relay_1_mode
-    name: Relay 1 mode
+    name: Relay 1 display mode
     platform: template
     options:
-      - "Relay"
-      - "Light"
-      - "Not in use"
+      - "${RELAY_MODE_TEXT_SWITCH}"
+      - "${RELAY_MODE_TEXT_LIGHT}"
+      - "${RELAY_MODE_TEXT_NOT_USED}"
+    initial_option: "${RELAY_MODE_TEXT_SWITCH}"
     optimistic: true
     restore_value: true
     internal: true
@@ -250,44 +300,107 @@ select:
     icon: mdi:dip-switch
 
   - id: sl_relay_2_mode
-    name: Relay 2 mode
+    name: Relay 2 display mode
     <<: *relay_select_mode_base
 
   - id: sl_relay_3_mode
-    name: Relay 3 mode
+    name: Relay 3 display mode
     <<: *relay_select_mode_base
 
   - id: sl_relay_4_mode
-    name: Relay 4 mode
+    name: Relay 4 display mode
     <<: *relay_select_mode_base
 
 switch:
-  - &relay_switch_base
-    id: sw_relay_1
+  - id: sw_relay_1
     name: Relay 1
-    platform: output
     output: output_relay_1
+    platform: output
     restore_mode: RESTORE_DEFAULT_OFF
     internal: true
     on_turn_on:
       then:
         - script.execute: show_relay_status
+        - if:
+            condition:
+              - light.is_off: light_output_1
+            then:
+              light.turn_on: light_output_1
     on_turn_off:
       then:
         - script.execute: show_relay_status
+        - if:
+            condition:
+              - light.is_on: light_output_1
+            then:
+              - light.turn_off: light_output_1
 
   - id: sw_relay_2
     name: Relay 2
     output: output_relay_2
-    <<: *relay_switch_base
+    platform: output
+    restore_mode: RESTORE_DEFAULT_OFF
+    internal: true
+    on_turn_on:
+      then:
+        - script.execute: show_relay_status
+        - if:
+            condition:
+              - light.is_off: light_output_2
+            then:
+              light.turn_on: light_output_2
+    on_turn_off:
+      then:
+        - script.execute: show_relay_status
+        - if:
+            condition:
+              - light.is_on: light_output_2
+            then:
+              - light.turn_off: light_output_2
 
   - id: sw_relay_3
     name: Relay 3
     output: output_relay_3
-    <<: *relay_switch_base
+    platform: output
+    restore_mode: RESTORE_DEFAULT_OFF
+    internal: true
+    on_turn_on:
+      then:
+        - script.execute: show_relay_status
+        - if:
+            condition:
+              - light.is_off: light_output_3
+            then:
+              - light.turn_on: light_output_3
+    on_turn_off:
+      then:
+        - script.execute: show_relay_status
+        - if:
+            condition:
+              - light.is_on: light_output_3
+            then:
+              - light.turn_off: light_output_3
 
   - id: sw_relay_4
     name: Relay 4
     output: output_relay_4
-    <<: *relay_switch_base
+    platform: output
+    restore_mode: RESTORE_DEFAULT_OFF
+    internal: true
+    on_turn_on:
+      then:
+        - script.execute: show_relay_status
+        - if:
+            condition:
+              - light.is_off: light_output_4
+            then:
+              - light.turn_on: light_output_4
+    on_turn_off:
+      then:
+        - script.execute: show_relay_status
+        - if:
+            condition:
+              - light.is_on: light_output_4
+            then:
+              - light.turn_off: light_output_4
 ...
