@@ -42,8 +42,8 @@ jobs:
 
       - name: Bump version
         run: |
-          chmod +x ./bump_version.sh
-          ./bump_version.sh
+          chmod +x ./versioning/bump_version.sh
+          ./versioning/bump_version.sh
 
       - name: Update stable tag
         if: |
