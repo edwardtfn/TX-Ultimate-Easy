@@ -42,7 +42,7 @@ device integration rather than implementing its own automation tools.
 ### Event-Based Automation
 
 TX Ultimate Easy uses Home Assistant's native Events system for reliable automation triggers.
-While sensors show the current state (e.g., button pressed/not pressed), events capture specific actions like clicks, swipes, and long presses.
+While sensors show the current state (e.g., button pressed/not pressed), events capture-specific actions like clicks, swipes, and long presses.
 
 To view available events:
 
@@ -55,23 +55,35 @@ To view available events:
 Example event trigger in automation (YAML):
 
 ```yaml
-trigger:
-  platform: event
-  event_type: esphome.tx_ultimate_easy
-  event_data:
-    device_name: your_device_name
-    component: bs_button_1
-    event: click
+triggers:
+  - platform: event
+    event_type: esphome.tx_ultimate_easy
+    event_data:
+      device_name: your_device_name
+      component: bs_button_1
+      event: click
+actions:
+  - action: light.toggle
+    target:
+      entity_id: light.living_room
+
+# Additional common event types:
+# event: double_click
+# event: long_press
+# event: swipe_left
+# event: swipe_right
 ```
 
 You can also create event-based automations through the Home Assistant UI by selecting "Event" as the trigger type and filtering by your device.
 
 ### Device Configuration
 
-- **Relay Modes**: Choose between "Light" and "Switch" modes to control how the relay appears in Home Assistant
+- **Relay Modes**: 
+  - "Light": Appears as a light entity with brightness controls (if supported)
+  - "Switch": Appears as a simple on/off switch entity
 - **Button Actions**: 
-  - "None": Button presses only generate events, allowing full automation control
-  - "Relay Toggle": Button directly controls the relay, independent of Home Assistant
+  - "None": Example: Use button events to trigger scenes or complex automations
+  - "Relay Toggle": Example: Press to turn on, press again to turn off, regardless of Home Assistant state
 - **Automation Flexibility**: All automations can be managed through Home Assistant without relying on local device triggers
 
 ## Key Features
