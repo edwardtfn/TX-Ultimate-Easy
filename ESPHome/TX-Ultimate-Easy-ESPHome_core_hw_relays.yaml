@@ -113,34 +113,40 @@ script:
   - id: !extend button_click_event
     then:
       - lambda: |-
-          if (click_count == 1) {  // Single click
-            if (!bs_multi_touch->state and
-                !bs_swipe_left->state and
-                !bs_swipe_down->state and
-                !bs_swipe_right->state) {  // Ignore if other events are active
-              switch (button_id) {
-                case 1:
-                  if (sl_button_1_action->active_index().has_value() and
-                      sl_button_1_action->active_index().value() == 1)
-                    sw_relay_1->toggle();
-                  break;
-                case 2:
-                  if (sl_button_2_action->active_index().has_value() and
-                      sl_button_2_action->active_index().value() == 1)
-                    sw_relay_2->toggle();
-                  break;
-                case 3:
-                  if (sl_button_3_action->active_index().has_value() and
-                      sl_button_3_action->active_index().value() == 1)
-                    sw_relay_3->toggle();
-                  break;
-                case 4:
-                  if (sl_button_4_action->active_index().has_value() and
-                      sl_button_4_action->active_index().value() == 1)
-                    sw_relay_4->toggle();
-                  break;
-              }
-            }
+          // Handle only single clicks
+          if (click_count != 1)
+            return;
+
+          // Ignore if other touch events are active
+          if (bs_multi_touch->state ||
+              bs_swipe_left->state ||
+              bs_swipe_down->state ||
+              bs_swipe_right->state) {
+            return;
+          }
+
+          // Toggle relay if corresponding button action is enabled
+          switch (button_id) {
+            case 1:
+              if (sl_button_1_action->active_index().has_value() and
+                  sl_button_1_action->active_index().value() == 1)
+                sw_relay_1->toggle();
+              break;
+            case 2:
+              if (sl_button_2_action->active_index().has_value() and
+                  sl_button_2_action->active_index().value() == 1)
+                sw_relay_2->toggle();
+              break;
+            case 3:
+              if (sl_button_3_action->active_index().has_value() and
+                  sl_button_3_action->active_index().value() == 1)
+                sw_relay_3->toggle();
+              break;
+            case 4:
+              if (sl_button_4_action->active_index().has_value() and
+                  sl_button_4_action->active_index().value() == 1)
+                sw_relay_4->toggle();
+              break;
           }
 
   - id: show_relay_status
