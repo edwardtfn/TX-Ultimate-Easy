@@ -38,6 +38,40 @@ TX Ultimate Easy exposes your device's components (sensors, touch panel, relays,
 
 All automation capabilities are handled through Home Assistant's native automation system - this project focuses on providing reliable device integration rather than implementing its own automation tools.
 
+### Event-Based Automation
+
+TX Ultimate Easy uses Home Assistant's native Events system for reliable automation triggers. While sensors show the current state (e.g., button pressed/not pressed), events capture specific actions like clicks, swipes, and long presses.
+
+To view available events:
+
+1. Go to Developer Tools in Home Assistant
+2. Select the "Events" tab
+3. Enter `esphome.tx_ultimate_easy` in the "Event to subscribe to" field
+4. Click "Start listening"
+5. Interact with your device to see events in real-time
+
+Example event trigger in automation (YAML):
+
+```yaml
+trigger:
+  platform: event
+  event_type: esphome.tx_ultimate_easy
+  event_data:
+    device_name: your_device_name
+    component: bs_button_1
+    event: click
+```
+
+You can also create event-based automations through the Home Assistant UI by selecting "Event" as the trigger type and filtering by your device.
+
+### Device Configuration
+
+- **Relay Modes**: Choose between "Light" and "Switch" modes to control how the relay appears in Home Assistant
+- **Button Actions**: 
+  - "None": Button presses only generate events, allowing full automation control
+  - "Relay Toggle": Button directly controls the relay, independent of Home Assistant
+- **Automation Flexibility**: All automations can be managed through Home Assistant without relying on local device triggers
+
 ## Key Features
 
 - **Home Assistant UI Configuration**: Manage all device settings directly through the Home Assistant interface
@@ -104,6 +138,7 @@ We welcome contributions from the community! Here's how you can help:
 4. Submit a pull request targeting the `main` branch
 
 Please ensure your code follows our standards:
+
 - Passes all lint checks (YAML, C++, Markdown)
 - Includes appropriate documentation
 - Follows existing code style
