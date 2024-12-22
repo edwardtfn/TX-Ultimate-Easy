@@ -66,25 +66,30 @@ actions:
   - action: light.toggle
     target:
       entity_id: light.living_room
-
-# Additional common event types:
-# event: double_click
-# event: long_press
-# event: swipe_left
-# event: swipe_right
 ```
+
+**Common event types**:
+- `click`: Single press and release
+- `double_click`: Two quick presses
+- `long_press`: Press and hold
+- `swipe_left`: Left swipe gesture
+- `swipe_right`: Right swipe gesture
 
 You can also create event-based automations through the Home Assistant UI by selecting "Event" as the trigger type and filtering by your device.
 
 ### Device Configuration
+#### Relay Modes
+- **Light Mode**: Exposes the relay as a light entity with brightness controls (if supported)
+- **Switch Mode**: Exposes the relay as a simple on/off switch entity
 
-- **Relay Modes**: 
-  - "Light": Appears as a light entity with brightness controls (if supported)
-  - "Switch": Appears as a simple on/off switch entity
-- **Button Actions**: 
-  - "None": Example: Use button events to trigger scenes or complex automations
-  - "Relay Toggle": Example: Press to turn on, press again to turn off, regardless of Home Assistant state
-- **Automation Flexibility**: All automations can be managed through Home Assistant without relying on local device triggers
+#### Button Actions
+- **None**: Allows using button events for custom automations
+  Example: Trigger scenes or complex automations through Home Assistant
+- **Relay Toggle**: Direct control of the associated relay
+  Example: Toggle relay state with each press, independent of Home Assistant
+
+#### Automation
+All device behaviors can be customized through Home Assistant automations without relying on local device triggers.
 
 ## Key Features
 
@@ -165,8 +170,9 @@ Need help? Here are your options:
 - **Community Chat**: Join our [Discord Server](https://discord.gg/Db6WJWzWuf) for discussions and community interaction
 - **Support the Project**: Consider supporting through Buy Me a Coffee
 
-Note: For proper tracking and resolution, all bug reports and feature requests must be submitted through GitHub Issues, not Discord.
-The Issues page can be found at: [Issues · edwardtfn/TX-Ultimate-Easy](https://github.com/edwardtfn/TX-Ultimate-Easy/issues)
+Note: For proper tracking and resolution:
+- All bug reports and feature requests must be submitted through GitHub Issues, not Discord
+- Submit issues here: [Issues · edwardtfn/TX-Ultimate-Easy](https://github.com/edwardtfn/TX-Ultimate-Easy/issues)
 
 [![Buy Me a Coffee](https://www.buymeacoffee.com/assets/img/custom_images/yellow_img.png)](https://www.buymeacoffee.com/edwardfirmo)
 
