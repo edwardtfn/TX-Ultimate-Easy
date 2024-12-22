@@ -131,6 +131,7 @@ namespace esphome {
                     state == TOUCH_STATE_SWIPE_LEFT ||
                     state == TOUCH_STATE_SWIPE_RIGHT ||
                     state == TOUCH_STATE_MULTI_TOUCH) &&
+                    // Multi-touch events may have x < 0, all other events require valid x position
                     (uart_received_bytes[6] >= 0 || state == TOUCH_STATE_MULTI_TOUCH);
         }
 

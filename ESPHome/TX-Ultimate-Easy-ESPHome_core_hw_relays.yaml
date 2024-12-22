@@ -113,12 +113,15 @@ script:
   - id: !extend button_click_event
     then:
       - lambda: |-
-          if (id(click_counter) == 1) {  // Single click
+          ESP_LOGW("DEBUG", "button_click_event");
+          ESP_LOGW("DEBUG", "  button_id:   %" PRIu8, button_id);
+          ESP_LOGW("DEBUG", "  click_count: %" PRIu8, click_count);
+          if (click_count == 1) {  // Single click
             if (!bs_multi_touch->state and
                 !bs_swipe_left->state and
                 !bs_swipe_down->state and
                 !bs_swipe_right->state) {  // Ignore if other events are active
-              switch (id(button_press_button)) {
+              switch (button_id) {
                 case 1:
                   if (sl_button_1_action->active_index().has_value() and
                       sl_button_1_action->active_index().value() == 1)

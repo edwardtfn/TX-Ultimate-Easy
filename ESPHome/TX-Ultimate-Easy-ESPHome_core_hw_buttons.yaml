@@ -116,15 +116,18 @@ script:
 
   - id: button_click_event
     mode: restart
+    parameters:
+      button_id: uint8_t
+      click_count: uint8_t
     then:
       - delay:
           milliseconds: ${BUTTON_MULTI_CLICK_DELAY}
       - lambda: |-
-          const std::string button_name = "bs_button_" + std::to_string(id(button_press_button));
+          const std::string button_name = "bs_button_" + std::to_string(button_id);
           std::string event_name;
-          if (id(click_counter) == 1) event_name = "click";
-          else if (id(click_counter) == 2) event_name = "double_click";
-          else event_name = std::to_string(id(click_counter)) + "_click";
+          if (click_count == 1) event_name = "click";
+          else if (click_count == 2) event_name = "double_click";
+          else event_name = std::to_string(click_count) + "_click";
           button_action->execute(button_name.c_str(), event_name.c_str());
 
   - id: buttons_release
@@ -210,7 +213,7 @@ script:
               ESP_LOGW("core_hw_buttons", "Ignoring button press (too short)");
             } else if (press_duration >= ${BUTTON_CLICK_MIN_LENGTH} and
                         press_duration <= ${BUTTON_CLICK_MAX_LENGTH}) { // Short/normal click
-              button_click_event->execute();
+              button_click_event->execute(id(button_press_button), id(click_counter));
             } else if (press_duration >= ${BUTTON_LONG_PRESS_DELAY} and press_duration <= ${BUTTON_PRESS_TIMEOUT}) {
               button_action->execute(("bs_button_" + std::to_string(id(button_press_button))).c_str(), "long_click");
             } else if (press_duration > ${BUTTON_PRESS_TIMEOUT}) { // Timeout or invalid
