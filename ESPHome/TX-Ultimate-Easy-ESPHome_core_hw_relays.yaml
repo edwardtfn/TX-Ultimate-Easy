@@ -15,6 +15,7 @@ substitutions:
   RELAY_MODE_TEXT_SWITCH: "Switch"
   RELAY_MODE_TEXT_LIGHT: "Light"
   RELAY_MODE_TEXT_NOT_USED: "Not in use"
+  RELAY_RESTORE_MODE: RESTORE_DEFAULT_OFF
 
 globals:
   - id: boot_initialization_relays
@@ -29,6 +30,7 @@ light:
     output: output_relay_1
     platform: binary
     internal: true
+    restore_mode: ${RELAY_RESTORE_MODE}
     on_turn_on:
       then:
         - if:
@@ -349,7 +351,7 @@ switch:
     name: Relay 1
     output: output_relay_1
     platform: output
-    restore_mode: RESTORE_DEFAULT_OFF
+    restore_mode: ${RELAY_RESTORE_MODE}
     internal: true
     on_turn_on:
       then:
@@ -372,7 +374,7 @@ switch:
     name: Relay 2
     output: output_relay_2
     platform: output
-    restore_mode: RESTORE_DEFAULT_OFF
+    restore_mode: ${RELAY_RESTORE_MODE}
     internal: true
     on_turn_on:
       then:
@@ -395,7 +397,7 @@ switch:
     name: Relay 3
     output: output_relay_3
     platform: output
-    restore_mode: RESTORE_DEFAULT_OFF
+    restore_mode: ${RELAY_RESTORE_MODE}
     internal: true
     on_turn_on:
       then:
@@ -418,7 +420,7 @@ switch:
     name: Relay 4
     output: output_relay_4
     platform: output
-    restore_mode: RESTORE_DEFAULT_OFF
+    restore_mode: ${RELAY_RESTORE_MODE}
     internal: true
     on_turn_on:
       then:

@@ -25,6 +25,11 @@ substitutions:
   LIGHT_TRANSITION_TURN_OFF: '0'  # Transition time in msec
   LIGHT_BRIGHTNESS_TURN_ON: '0'   # Brightness (1 to 100%, 0 to not set it)
 
+  LIGHT_FULL_RESTORE_MODE: RESTORE_DEFAULT_OFF
+  LIGHT_SIDES_RESTORE_MODE: RESTORE_DEFAULT_OFF
+  LIGHT_INDIVIDUAL_RESTORE_MODE: RESTORE_DEFAULT_OFF
+  LIGHT_RELAYS_RESTORE_MODE: RESTORE_DEFAULT_OFF
+
 globals:
   - id: gb_lights_1
     type: std::vector<light::LightState*>
@@ -44,6 +49,7 @@ light:
     # method: esp32_rmt
     num_leds: 32
     pin: GPIO13
+    restore_mode: ${LIGHT_FULL_RESTORE_MODE}
 
   # Those lights are available based on the model selections
   - &light_partition_with_effects
@@ -52,6 +58,7 @@ light:
     platform: partition
     default_transition_length: ${default_transition_length}
     internal: true
+    restore_mode: ${LIGHT_SIDES_RESTORE_MODE}
     effects:
       - addressable_rainbow:
           name: "Rainbow"
@@ -184,6 +191,7 @@ light:
     platform: partition
     disabled_by_default: true
     default_transition_length: ${default_transition_length}
+    restore_mode: ${LIGHT_INDIVIDUAL_RESTORE_MODE}
     segments:
       - id: light_full
         from: 0
@@ -417,6 +425,7 @@ light:
     platform: partition
     internal: true
     default_transition_length: ${default_transition_length}
+    restore_mode: ${LIGHT_RELAYS_RESTORE_MODE}
     segments:
       - id: light_full
         from: 9
