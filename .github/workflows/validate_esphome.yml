@@ -1,8 +1,7 @@
 ---
-name: Validate ESPHome
+name: Validate ESPHome (Latest)
 
-# yamllint disable-line rule:truthy
-on:
+on:  # yamllint disable-line rule:truthy
   workflow_dispatch:
 
 concurrency:
@@ -37,6 +36,7 @@ jobs:
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_ard_basic.yaml"
+          version: latest
 
   build_bluetooth_proxy_4:
     name: Bluetooth Proxy (IDF)
@@ -47,6 +47,7 @@ jobs:
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_idf_bluetooth_proxy.yaml"
+          version: latest
 
   build_bluetooth_proxy_53:
     name: Bluetooth Proxy (IDF v5.3)
@@ -57,4 +58,5 @@ jobs:
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_idf53_bluetooth_proxy.yaml"
+          version: latest
 ...
