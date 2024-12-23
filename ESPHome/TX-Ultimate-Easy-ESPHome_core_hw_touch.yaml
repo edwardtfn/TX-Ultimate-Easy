@@ -311,9 +311,9 @@ script:
   - id: touch_on_release
     mode: restart
     then:
-      # Extended by:
-      #   - HW Buttons
-      #   - HW Vibration
+    # Extended by:
+    #   - HW Buttons
+    #   - HW Vibration
 
   - id: touch_swipe_left
     mode: restart
