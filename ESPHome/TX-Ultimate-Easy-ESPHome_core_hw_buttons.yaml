@@ -26,6 +26,12 @@ substitutions:
   BUTTON_PRESS_TIMEOUT: '10000'    # Ignore if button is pressed for longer than this time, in msec
   BUTTON_LONG_PRESS_DELAY: '800'   # The time to wait to consider a long press, in msec
 
+  # Button numbers constants
+  BUTTON_1_ID: '1'
+  BUTTON_2_ID: '2'
+  BUTTON_3_ID: '3'
+  BUTTON_4_ID: '4'
+
 binary_sensor:
   - &binary_sensor_button_base
     id: bs_button_2
