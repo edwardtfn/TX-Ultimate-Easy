@@ -262,6 +262,7 @@ script:
       - lambda: |-
           const uint8_t num_gangs = (sl_tx_model_gang->active_index().has_value()) ?
                                     (sl_tx_model_gang->active_index().value() + 1) : 0;
+          set_gang_count(num_gangs);
           bs_button_1_click_event->publish_state(false);
           bs_button_2_click_event->publish_state(false);
           bs_button_3_click_event->publish_state(false);
