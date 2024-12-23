@@ -44,6 +44,7 @@ light:
     # method: esp32_rmt
     num_leds: 32
     pin: GPIO13
+    restore_mode: RESTORE_DEFAULT_OFF
 
   # Those lights are available based on the model selections
   - &light_partition_with_effects
@@ -52,6 +53,7 @@ light:
     platform: partition
     default_transition_length: ${default_transition_length}
     internal: true
+    restore_mode: RESTORE_DEFAULT_OFF
     effects:
       - addressable_rainbow:
           name: "Rainbow"
@@ -184,6 +186,8 @@ light:
     platform: partition
     disabled_by_default: true
     default_transition_length: ${default_transition_length}
+    restore_mode: RESTORE_DEFAULT_OFF
+
     segments:
       - id: light_full
         from: 0
@@ -417,6 +421,7 @@ light:
     platform: partition
     internal: true
     default_transition_length: ${default_transition_length}
+    restore_mode: RESTORE_DEFAULT_OFF
     segments:
       - id: light_full
         from: 9
