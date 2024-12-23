@@ -11,6 +11,11 @@ on:  # yamllint disable-line rule:truthy
       - "*.c"
       - "*.cpp"
       - "*.py"
+    branches:
+      - main
+    paths-ignore:
+      - '**/VERSION'
+      - '**/VERSION_YAML'
   pull_request:
     paths:
       - "*.yaml"
