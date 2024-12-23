@@ -85,6 +85,8 @@ ota:
   platform: esphome
 
 psram:
+  mode: octal
+  speed: 40MHz
 
 script:
   - id: api_send_ha_event_boot
