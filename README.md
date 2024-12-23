@@ -47,7 +47,7 @@ TX Ultimate Easy uses Home Assistant's native Events system for reliable automat
 While sensors show the current state (e.g., button pressed/not pressed),
 events capture-specific actions like clicks, swipes, and long presses.
 
-For more details, please refeer to our **[Events docs](docs/events.md)**.
+For more details, please refer to our **[Events docs](docs/events.md)**.
 
 ### Device Configuration
 #### Relay Modes
