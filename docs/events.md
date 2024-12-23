@@ -2,11 +2,17 @@
 
 ## Overview of the Event System
 
-The TX Ultimate Easy firmware introduces a powerful and flexible event system designed to handle various types of interactions, such as touch gestures and device states. This system leverages Home Assistant's native event structure, ensuring seamless integration and enabling users to create advanced automations.
+The TX Ultimate Easy firmware introduces a powerful
+and flexible event system designed to handle various types of interactions,
+such as touch gestures and device states.
+This system leverages Home Assistant's native event structure,
+ensuring seamless integration and enabling users to create advanced automations.
 
 ### Event Structure
 
-All events emitted by the device are categorized under the `esphome.tx_ultimate_easy` event type in Home Assistant. The `data` field within the event payload provides details about the specific interaction. Below is a detailed description of the keys used:
+All events emitted by the device are categorized under the `esphome.tx_ultimate_easy` event type in Home Assistant.
+The `data` field within the event payload provides details about the specific interaction.
+Below is a detailed description of the keys used:
 
 #### Example Event Payload
 
@@ -226,4 +232,5 @@ action:
       entity_id: scene.relax_mode
 ```
 
-This event engine provides a robust and extensible framework for handling device interactions, allowing users to implement highly customized automations with ease.
+This event engine provides a robust and extensible framework for handling device interactions,
+allowing users to implement highly customized automations with ease.
