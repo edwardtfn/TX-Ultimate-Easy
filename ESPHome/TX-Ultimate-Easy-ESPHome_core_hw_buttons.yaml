@@ -108,33 +108,89 @@ script:
   - id: button_action
     mode: parallel
     parameters:
-      component: string
-      event: string
+      button: uint8_t
+      action: string
+      count: uint8_t
     then:
-      # Extended by:
-      #   - core_api
+      - homeassistant.event:
+          event: esphome.tx_ultimate_easy
+          data:
+            device_name: !lambda return tx_device_name->state.c_str();
+            firmware: ${version}
+            domain: touch
+            type: button
+            action: !lambda return action.c_str();
+            button_id: !lambda return button;
+            count: !lambda return count;
+            position: !lambda return id(button_press_position);
       - lambda: |-
-          ESP_LOGI("core_hw_buttons", "Button '%s' action: '%s'", component.c_str(), event.c_str());
+          ESP_LOGI("core_hw_buttons", "Button %" PRIu8 " action: '%s'", button, action.c_str());
+          if (action == "click") {
+            switch (button) {
+              case ${BUTTON_1_ID}:
+                bs_button_1_click_event->publish_state(true);
+                break;
+              case ${BUTTON_2_ID}:
+                bs_button_2_click_event->publish_state(true);
+                break;
+              case ${BUTTON_3_ID}:
+                bs_button_3_click_event->publish_state(true);
+                break;
+              case ${BUTTON_4_ID}:
+                bs_button_4_click_event->publish_state(true);
+                break;
+            }
+          } else if (action == "double_click") {
+            switch (button) {
+              case ${BUTTON_1_ID}:
+                bs_button_1_double_click_event->publish_state(true);
+                break;
+              case ${BUTTON_2_ID}:
+                bs_button_2_double_click_event->publish_state(true);
+                break;
+              case ${BUTTON_3_ID}:
+                bs_button_3_double_click_event->publish_state(true);
+                break;
+              case ${BUTTON_4_ID}:
+                bs_button_4_double_click_event->publish_state(true);
+                break;
+            }
+          } else if (action == "long_press") {
+            switch (button) {
+              case ${BUTTON_1_ID}:
+                bs_button_1_long_press_event->publish_state(true);
+                break;
+              case ${BUTTON_2_ID}:
+                bs_button_2_long_press_event->publish_state(true);
+                break;
+              case ${BUTTON_3_ID}:
+                bs_button_3_long_press_event->publish_state(true);
+                break;
+              case ${BUTTON_4_ID}:
+                bs_button_4_long_press_event->publish_state(true);
+                break;
+            }
+          }
           id(button_press_button) = 0;
-          id(click_counter) = 0;
+          id(button_press_position) = 0;
           id(button_press_start_time) = 0;
+          id(click_counter) = 0;
           buttons_release->execute();
 
   - id: button_click_event
     mode: restart
     parameters:
-      button_id: uint8_t
+      button: uint8_t
       click_count: uint8_t
     then:
       - delay:
           milliseconds: ${BUTTON_MULTI_CLICK_DELAY}
       - lambda: |-
-          const std::string button_name = "bs_button_" + std::to_string(button_id);
           std::string event_name;
           if (click_count == 1) event_name = "click";
           else if (click_count == 2) event_name = "double_click";
-          else event_name = std::to_string(click_count) + "_click";
-          button_action->execute(button_name.c_str(), event_name.c_str());
+          else event_name = "multiple_click";
+          button_action->execute(button, event_name.c_str(), click_count);
 
   - id: buttons_release
     mode: restart
@@ -157,30 +213,24 @@ script:
     then:
       - script.execute:
           id: touch_on_press_buttons
-          touch_position: !lambda return touch_position;
+          button: !lambda return button;
+          position: !lambda return position;
 
   - id: touch_on_press_buttons
     mode: restart
     parameters:
-      touch_position: uint8_t
+      button: uint8_t
+      position: uint8_t
     then:
       - lambda: |-
           id(button_press_start_time) = millis();
-          id(button_press_position) = touch_position;
-          uint8_t button = 0;
-          auto model_index = sl_tx_model_gang->active_index();
-          if (model_index.has_value()) {
-              const uint8_t model_idx = model_index.value() + 1; // Increment for 1-based indexing
-              if (model_idx == 1) {
-                  button = 1; // Single button, always 1
-              } else {
-                  const uint8_t width = ${TOUCH_POSITION_MAX_VALUE} / model_idx; // Width of each button region
-                  ESP_LOGV("core_hw_buttons", "Button regions: width=%" PRIu8 ", touch_position=%" PRIu8,
-                                              width, touch_position);
-                  button = (touch_position / width) + 1; // Determine button region
-                  if (button > model_idx)
-                    button = model_idx; // Clamp to max button count
-              }
+          id(button_press_button) = button;
+          // Update counters
+          if (id(button_press_position) == position) {
+            id(click_counter)++;
+          } else {
+            id(click_counter) = 1;
+            id(button_press_position) = position;
           }
           // Update binary sensor
           switch (button) {
@@ -196,13 +246,6 @@ script:
             case 4:
               bs_button_4->publish_state(true);
               break;
-          }
-          // Update counters
-          if (id(button_press_button) == button) {
-            id(click_counter)++;
-          } else {
-            id(click_counter) = 1;
-            id(button_press_button) = button;
           }
 
   - id: !extend touch_on_release
@@ -221,7 +264,7 @@ script:
                         press_duration <= ${BUTTON_CLICK_MAX_LENGTH}) { // Short/normal click
               button_click_event->execute(id(button_press_button), id(click_counter));
             } else if (press_duration >= ${BUTTON_LONG_PRESS_DELAY} and press_duration <= ${BUTTON_PRESS_TIMEOUT}) {
-              button_action->execute(("bs_button_" + std::to_string(id(button_press_button))).c_str(), "long_click");
+              button_action->execute(id(button_press_button), "long_click", 1);
             } else if (press_duration > ${BUTTON_PRESS_TIMEOUT}) { // Timeout or invalid
               ESP_LOGW("core_hw_buttons", "Button press cancelled or timed out after ${BUTTON_PRESS_TIMEOUT} ms");
             }

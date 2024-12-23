@@ -15,50 +15,188 @@ substitutions:
   TOUCH_POSITION_MAX_VALUE: '10'  # Maximum touch position value returned by the touch pad via uart
 
 binary_sensor:
+  - &bs_button_event_template
+    id: bs_button_event_template
+    icon: mdi:gesture-tap-box
+    internal: true
+    disabled_by_default: true
+    platform: template
+
+  - id: bs_button_1_click_event
+    name: Button 1 - Click event
+    internal: false
+    <<: *bs_button_event_template
+    on_press:
+      then:
+        - delay: !lambda return nr_touch_duration->state;
+        - binary_sensor.template.publish:
+            id: bs_button_1_click_event
+            state: OFF  # yamllint disable-line rule:truthy
+  - id: bs_button_2_click_event
+    name: Button 2 - Click event
+    internal: false
+    <<: *bs_button_event_template
+    on_press:
+      then:
+        - delay: !lambda return nr_touch_duration->state;
+        - binary_sensor.template.publish:
+            id: bs_button_2_click_event
+            state: OFF  # yamllint disable-line rule:truthy
+  - id: bs_button_3_click_event
+    name: Button 3 - Click event
+    internal: false
+    <<: *bs_button_event_template
+    on_press:
+      then:
+        - delay: !lambda return nr_touch_duration->state;
+        - binary_sensor.template.publish:
+            id: bs_button_3_click_event
+            state: OFF  # yamllint disable-line rule:truthy
+  - id: bs_button_4_click_event
+    name: Button 4 - Click event
+    internal: false
+    <<: *bs_button_event_template
+    on_press:
+      then:
+        - delay: !lambda return nr_touch_duration->state;
+        - binary_sensor.template.publish:
+            id: bs_button_4_click_event
+            state: OFF  # yamllint disable-line rule:truthy
+
+  - id: bs_button_1_double_click_event
+    name: Button 1 - Double-click event
+    internal: false
+    <<: *bs_button_event_template
+    on_press:
+      then:
+        - delay: !lambda return nr_touch_duration->state;
+        - binary_sensor.template.publish:
+            id: bs_button_1_double_click_event
+            state: OFF  # yamllint disable-line rule:truthy
+  - id: bs_button_2_double_click_event
+    name: Button 2 - Double-click event
+    internal: false
+    <<: *bs_button_event_template
+    on_press:
+      then:
+        - delay: !lambda return nr_touch_duration->state;
+        - binary_sensor.template.publish:
+            id: bs_button_2_double_click_event
+            state: OFF  # yamllint disable-line rule:truthy
+  - id: bs_button_3_double_click_event
+    name: Button 3 - Double-click event
+    internal: false
+    <<: *bs_button_event_template
+    on_press:
+      then:
+        - delay: !lambda return nr_touch_duration->state;
+        - binary_sensor.template.publish:
+            id: bs_button_3_double_click_event
+            state: OFF  # yamllint disable-line rule:truthy
+  - id: bs_button_4_double_click_event
+    name: Button 4 - Double-click event
+    internal: false
+    <<: *bs_button_event_template
+    on_press:
+      then:
+        - delay: !lambda return nr_touch_duration->state;
+        - binary_sensor.template.publish:
+            id: bs_button_4_double_click_event
+            state: OFF  # yamllint disable-line rule:truthy
+
+  - id: bs_button_1_long_press_event
+    name: Button 1 - Long-press event
+    internal: false
+    <<: *bs_button_event_template
+    on_press:
+      then:
+        - delay: !lambda return nr_touch_duration->state;
+        - binary_sensor.template.publish:
+            id: bs_button_1_long_press_event
+            state: OFF  # yamllint disable-line rule:truthy
+  - id: bs_button_2_long_press_event
+    name: Button 2 - Long-press event
+    internal: false
+    <<: *bs_button_event_template
+    on_press:
+      then:
+        - delay: !lambda return nr_touch_duration->state;
+        - binary_sensor.template.publish:
+            id: bs_button_2_long_press_event
+            state: OFF  # yamllint disable-line rule:truthy
+  - id: bs_button_3_long_press_event
+    name: Button 3 - Long-press event
+    internal: false
+    <<: *bs_button_event_template
+    on_press:
+      then:
+        - delay: !lambda return nr_touch_duration->state;
+        - binary_sensor.template.publish:
+            id: bs_button_3_long_press_event
+            state: OFF  # yamllint disable-line rule:truthy
+  - id: bs_button_4_long_press_event
+    name: Button 4 - Long-press event
+    internal: false
+    <<: *bs_button_event_template
+    on_press:
+      then:
+        - delay: !lambda return nr_touch_duration->state;
+        - binary_sensor.template.publish:
+            id: bs_button_4_long_press_event
+            state: OFF  # yamllint disable-line rule:truthy
+
   - id: bs_multi_touch
-    name: Multi-touch
+    name: Multi-touch event
     icon: mdi:gesture-two-tap
     internal: false
-    platform: template
-    on_click:
+    <<: *bs_button_event_template
+    on_press:
       then:
-        - lambda: send_event_to_ha->execute("multi_touch", "multi_touch");
+        - delay: !lambda return nr_touch_duration->state;
+        - binary_sensor.template.publish:
+            id: bs_multi_touch
+            state: OFF  # yamllint disable-line rule:truthy
 
   - id: bs_swipe_left
-    name: Swipe left
+    name: Swipe left event
     icon: mdi:gesture-swipe-left
-    internal: true
-    platform: template
-    on_click:
+    <<: *bs_button_event_template
+    on_press:
       then:
-        - lambda: send_event_to_ha->execute("swipe", "left");
-
+        - delay: !lambda return nr_touch_duration->state;
+        - binary_sensor.template.publish:
+            id: bs_swipe_left
+            state: OFF  # yamllint disable-line rule:truthy
   - id: bs_swipe_right
-    name: Swipe right
+    name: Swipe right event
     icon: mdi:gesture-swipe-right
-    internal: true
-    platform: template
-    on_click:
+    <<: *bs_button_event_template
+    on_press:
       then:
-        - lambda: send_event_to_ha->execute("swipe", "right");
-
+        - delay: !lambda return nr_touch_duration->state;
+        - binary_sensor.template.publish:
+            id: bs_swipe_right
+            state: OFF  # yamllint disable-line rule:truthy
   - id: bs_swipe_up
-    name: Swipe up
+    name: Swipe up event
     icon: mdi:gesture-swipe-up
-    internal: true
-    platform: template
-    on_click:
+    <<: *bs_button_event_template
+    on_press:
       then:
-        - lambda: send_event_to_ha->execute("swipe", "up");
-
+        - delay: !lambda return nr_touch_duration->state;
+        - binary_sensor.template.publish:
+            id: bs_swipe_up
+            state: OFF  # yamllint disable-line rule:truthy
   - id: bs_swipe_down
-    name: Swipe down
+    name: Swipe down event
     icon: mdi:gesture-swipe-down
-    internal: true
-    platform: template
-    on_click:
+    <<: *bs_button_event_template
+    on_press:
       then:
-        - lambda: send_event_to_ha->execute("swipe", "down");
+        - delay: !lambda return nr_touch_duration->state;
+        - binary_sensor.template.publish:
+            id: bs_swipe_down
+            state: OFF  # yamllint disable-line rule:truthy
 
 external_components:
   - source:
@@ -71,7 +209,7 @@ external_components:
 
 number:
   - id: nr_touch_duration
-    name: Touch duration
+    name: Touch event duration
     icon: mdi:timer-cog-outline
     unit_of_measurement: ms
     # mode: box
@@ -93,6 +231,12 @@ script:
   - id: boot_initialize_touch
     mode: restart
     then:
+      - script.execute: boot_initialize_touch_format
+      - script.execute: boot_initialize_touch_gang
+
+  - id: boot_initialize_touch_format
+    mode: restart
+    then:
       - wait_until:
           condition:
             - lambda: return sl_tx_model_format->active_index().has_value();
@@ -109,25 +253,55 @@ script:
           bs_swipe_up->publish_state(false);
           bs_swipe_up->set_internal(!is_model_us);
 
+  - id: boot_initialize_touch_gang
+    mode: restart
+    then:
+      - wait_until:
+          condition:
+            - lambda: return sl_tx_model_gang->active_index().has_value();
+      - lambda: |-
+          const uint8_t num_gangs = (sl_tx_model_gang->active_index().has_value()) ?
+                                    (sl_tx_model_gang->active_index().value() + 1) : 0;
+          bs_button_1_click_event->publish_state(false);
+          bs_button_2_click_event->publish_state(false);
+          bs_button_3_click_event->publish_state(false);
+          bs_button_4_click_event->publish_state(false);
+          bs_button_1_double_click_event->publish_state(false);
+          bs_button_2_double_click_event->publish_state(false);
+          bs_button_3_double_click_event->publish_state(false);
+          bs_button_4_double_click_event->publish_state(false);
+          bs_button_1_long_press_event->publish_state(false);
+          bs_button_2_long_press_event->publish_state(false);
+          bs_button_3_long_press_event->publish_state(false);
+          bs_button_4_long_press_event->publish_state(false);
+          bs_button_1_click_event->set_internal(num_gangs < 1);
+          bs_button_2_click_event->set_internal(num_gangs < 2);
+          bs_button_3_click_event->set_internal(num_gangs < 3);
+          bs_button_4_click_event->set_internal(num_gangs < 4);
+          bs_button_1_double_click_event->set_internal(num_gangs < 1);
+          bs_button_2_double_click_event->set_internal(num_gangs < 2);
+          bs_button_3_double_click_event->set_internal(num_gangs < 3);
+          bs_button_4_double_click_event->set_internal(num_gangs < 4);
+          bs_button_1_long_press_event->set_internal(num_gangs < 1);
+          bs_button_2_long_press_event->set_internal(num_gangs < 2);
+          bs_button_3_long_press_event->set_internal(num_gangs < 3);
+          bs_button_4_long_press_event->set_internal(num_gangs < 4);
+
   - id: touch_on_multi_touch_release
     mode: restart
     then:
       # Extended by:
       #   - HW Buttons
       #   - HW Vibration
-      - script.execute: touch_on_multi_touch_release_touch
-
-  - id: touch_on_multi_touch_release_touch
-    mode: restart
-    then:
-      - lambda: bs_multi_touch->publish_state(true);
-      - delay: !lambda return nr_touch_duration->state;
-      - lambda: bs_multi_touch->publish_state(false);
+      - binary_sensor.template.publish:
+          id: bs_multi_touch
+          state: OFF  # yamllint disable-line rule:truthy
 
   - id: touch_on_press
     mode: restart
     parameters:
-      touch_position: uint8_t
+      button: uint8_t
+      position: uint8_t
     then:
     # Extended by:
     #   - HW Buttons
@@ -139,57 +313,30 @@ script:
       # Extended by:
       #   - HW Buttons
       #   - HW Vibration
-      - script.execute: touch_swipe_turn_off_binary_sensor
 
   - id: touch_swipe_left
     mode: restart
     then:
       # Extended by:
       #   - HW Buttons
-      - script.execute: touch_swipe_left_touch
-
-  - id: touch_swipe_left_touch
-    mode: restart
-    then:
       - binary_sensor.template.publish:
           id: bs_swipe_left
           state: ON  # yamllint disable-line rule:truthy
-      - delay: !lambda return nr_touch_duration->state;
-      - script.execute: touch_swipe_turn_off_binary_sensor
+      - binary_sensor.template.publish:
+          id: bs_swipe_down
+          state: ON  # yamllint disable-line rule:truthy
 
   - id: touch_swipe_right
     mode: restart
     then:
       # Extended by:
       #   - HW Buttons
-      - script.execute: touch_swipe_right_touch
-
-  - id: touch_swipe_right_touch
-    mode: restart
-    then:
       - binary_sensor.template.publish:
           id: bs_swipe_right
           state: ON  # yamllint disable-line rule:truthy
-      - delay: !lambda return nr_touch_duration->state;
-      - script.execute: touch_swipe_turn_off_binary_sensor
-
-  - id: touch_swipe_turn_off_binary_sensor
-    mode: restart
-    then:
-      - if:
-          condition:
-            binary_sensor.is_on: bs_swipe_left
-          then:
-            - binary_sensor.template.publish:
-                id: bs_swipe_left
-                state: OFF  # yamllint disable-line rule:truthy
-      - if:
-          condition:
-            binary_sensor.is_on: bs_swipe_right
-          then:
-            - binary_sensor.template.publish:
-                id: bs_swipe_right
-                state: OFF  # yamllint disable-line rule:truthy
+      - binary_sensor.template.publish:
+          id: bs_swipe_up
+          state: ON  # yamllint disable-line rule:truthy
 
 switch:
   - id: sw_touch_panel_power
@@ -216,17 +363,26 @@ tx_ultimate_easy:
         }
 
   on_multi_touch_release:
+    - homeassistant.event:
+        event: esphome.tx_ultimate_easy
+        data:
+          device_name: !lambda return tx_device_name->state.c_str();
+          firmware: ${version}
+          domain: touch
+          type: multi_touch
+          action: release
+          position: !lambda return touch.x;
     - lambda: ESP_LOGI("tx_ultimate_easy", "Multi-touch released");
     - script.execute: touch_on_multi_touch_release
 
   on_press:
     - lambda: |-
-        const uint8_t touch_position = static_cast<uint8_t>(touch.x);
-        if (touch_position > ${TOUCH_POSITION_MAX_VALUE}) {  // Check for valid range
-          ESP_LOGE("tx_ultimate_easy", "Invalid touch position: %" PRIu8, touch_position);
+        const uint8_t position = static_cast<uint8_t>(touch.x);
+        if (position > ${TOUCH_POSITION_MAX_VALUE}) {  // Check for valid range
+          ESP_LOGE("tx_ultimate_easy", "Invalid touch position: %" PRIu8, position);
         } else {
-          ESP_LOGI("tx_ultimate_easy", "Pressed at position %" PRIu8, touch_position);
-          touch_on_press->execute(touch_position);
+          ESP_LOGI("tx_ultimate_easy", "Pressed at position %" PRIu8, position);
+          touch_on_press->execute(static_cast<uint8_t>(touch.button), position);
         }
 
   on_release:
@@ -234,11 +390,41 @@ tx_ultimate_easy:
     - script.execute: touch_on_release
 
   on_swipe_left:
-    - lambda: ESP_LOGI("tx_ultimate_easy", "Swipe left");
+    - homeassistant.event:
+        event: esphome.tx_ultimate_easy
+        data:
+          device_name: !lambda return tx_device_name->state.c_str();
+          firmware: ${version}
+          domain: touch
+          type: swipe
+          action: !lambda |-
+            return sl_tx_model_format->state == "${TX_MODEL_FORMAT_US_TEXT}" ? "left" : "down";
+          swipe-direction: !lambda |-
+            return sl_tx_model_format->state == "${TX_MODEL_FORMAT_US_TEXT}" ? "left" : "down";
+          position: !lambda return touch.x;
+    - lambda: |-
+        ESP_LOGI("tx_ultimate_easy", "Swipe %s", sl_tx_model_format->state == "${TX_MODEL_FORMAT_US_TEXT}"
+                                                  ? "left"
+                                                  : "down");
     - script.execute: touch_swipe_left
 
   on_swipe_right:
-    - lambda: ESP_LOGI("tx_ultimate_easy", "Swipe right");
+    - homeassistant.event:
+        event: esphome.tx_ultimate_easy
+        data:
+          device_name: !lambda return tx_device_name->state.c_str();
+          firmware: ${version}
+          domain: touch
+          type: swipe
+          action: !lambda |-
+            return sl_tx_model_format->state == "${TX_MODEL_FORMAT_US_TEXT}" ? "right" : "up";
+          swipe-direction: !lambda |-
+            return sl_tx_model_format->state == "${TX_MODEL_FORMAT_US_TEXT}" ? "right" : "up";
+          position: !lambda return touch.x;
+    - lambda: |-
+        ESP_LOGI("tx_ultimate_easy", "Swipe %s", sl_tx_model_format->state == "${TX_MODEL_FORMAT_US_TEXT}"
+                                                  ? "right"
+                                                  : "up");
     - script.execute: touch_swipe_right
 
   on_touch_event:

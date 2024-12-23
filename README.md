@@ -44,38 +44,7 @@ device integration rather than implementing its own automation tools.
 TX Ultimate Easy uses Home Assistant's native Events system for reliable automation triggers.
 While sensors show the current state (e.g., button pressed/not pressed), events capture-specific actions like clicks, swipes, and long presses.
 
-To view available events:
-
-1. Go to Developer Tools in Home Assistant
-2. Select the "Events" tab
-3. Enter `esphome.tx_ultimate_easy` in the "Event to subscribe to" field
-4. Click "Start listening"
-5. Interact with your device to see events in real-time
-
-Example event trigger in automation (YAML):
-
-```yaml
-triggers:
-  - platform: event
-    event_type: esphome.tx_ultimate_easy
-    event_data:
-      device_name: your_device_name  # Replace with your specific device name
-      component: bs_button_1         # Button identifier (e.g., bs_button_1, bs_button_2, bs_button_3 or bs_button_4)
-      event: click
-actions:
-  - action: light.toggle
-    target:
-      entity_id: light.living_room
-```
-
-**Common event types**:
-- `click`: Single press and release
-- `double_click`: Two quick presses
-- `long_press`: Press and hold
-- `swipe_left`: Left swipe gesture
-- `swipe_right`: Right swipe gesture
-
-You can also create event-based automations through the Home Assistant UI by selecting "Event" as the trigger type and filtering by your device.
+For more details, please refeer to our **[Events docs](docs/events.md)**.
 
 ### Device Configuration
 #### Relay Modes
