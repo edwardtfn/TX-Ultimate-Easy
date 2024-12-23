@@ -189,7 +189,7 @@ script:
           }
 
           // Toggle relay if corresponding button action is enabled
-          switch (button_id) {
+          switch (button) {
             case ${BUTTON_1_ID}:
               if (sl_button_1_action->state != "${RELAY_MODE_TEXT_NOT_USED}")
                 sw_relay_1->toggle();

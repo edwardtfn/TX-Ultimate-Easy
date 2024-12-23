@@ -27,7 +27,6 @@ substitutions:
 
 packages:
   # yamllint disable rule:colons
-  core_api:          !include TX-Ultimate-Easy-ESPHome_core_api.yaml
   core_hw_buttons:   !include TX-Ultimate-Easy-ESPHome_core_hw_buttons.yaml
   core_hw_leds:      !include TX-Ultimate-Easy-ESPHome_core_hw_leds.yaml
   core_hw_relays:    !include TX-Ultimate-Easy-ESPHome_core_hw_relays.yaml
@@ -35,6 +34,12 @@ packages:
   core_hw_touch:     !include TX-Ultimate-Easy-ESPHome_core_hw_touch.yaml
   core_hw_vibration: !include TX-Ultimate-Easy-ESPHome_core_hw_vibration.yaml
   # yamllint enable rule:colons
+
+api:
+  id: api_server
+  on_client_connected:
+    then:
+      - script.execute: publish_device_info
 
 button:
   - id: bt_restart
@@ -82,13 +87,25 @@ ota:
 psram:
 
 script:
+  - id: api_send_ha_event_boot
+    mode: queued
+    parameters:
+      type: string
+    then:
+      - homeassistant.event:
+          event: esphome.tx_ultimate_easy
+          data:
+            device_name: !lambda return tx_device_name->state.c_str();
+            firmware: ${version}
+            domain: boot
+            type: !lambda return type.c_str();
+
   - id: boot_done
     mode: restart
     then:
       - script.execute:
-          id: send_event_to_ha
-          component: boot
-          event: done
+          id: api_send_ha_event_boot
+          type: done
 
   - id: boot_initialize
     mode: restart
@@ -98,9 +115,8 @@ script:
       #   - HW Relays
       #   - HW Touch
       - script.execute:
-          id: send_event_to_ha
-          component: boot
-          event: start
+          id: api_send_ha_event_boot
+          type: start
 
   - id: boot_sequence
     mode: restart
@@ -144,6 +160,9 @@ select:
     entity_category: config
     disabled_by_default: false
     icon: mdi:dip-switch
+    on_value:
+      then:
+        - lambda: tx_ultimate->set_gang_count(static_cast<uint8_t>(i)+1);
 
 text_sensor:
   - id: tx_fw_version
