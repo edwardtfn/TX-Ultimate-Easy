@@ -12,7 +12,9 @@
 ####################################################################################################
 ---
 substitutions:
-  tone_volume_change: "scale_up:d=32,o=5,b=100:c,c#,d#,e,f#,g#,a#,b"  # Use to "none" for no sound
+  # RTTTL format: name:d=duration,o=octave,b=tempo:notes
+  # d=32 (32nd note), o=5 (octave 5), b=100 (tempo 100)
+  tone_volume_change: "scale_up:d=32,o=5,b=100:c,c#,d#,e,f#,g#,a#,b"  # Use "none" to disable sound
 
 api:
   actions:

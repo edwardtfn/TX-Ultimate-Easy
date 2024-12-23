@@ -23,7 +23,7 @@ media_player:
     platform: i2s_audio
     i2s_dout_pin: GPIO15
     i2s_audio_id: if_i2s_audio
-    i2s_comm_fmt: lsb
+    i2s_comm_fmt: msb  # Experimental - It was 'lsb' until v2024.12.12
     dac_type: external
     mode: mono
 ...
