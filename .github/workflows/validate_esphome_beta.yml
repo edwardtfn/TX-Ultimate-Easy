@@ -13,9 +13,6 @@ on:  # yamllint disable-line rule:truthy
       - "*.py"
     branches:
       - main
-    paths-ignore:
-      - '**/VERSION'
-      - '**/VERSION_YAML'
   pull_request:
     paths:
       - "*.yaml"
