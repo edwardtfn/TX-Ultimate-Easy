@@ -207,24 +207,36 @@ script:
               if (sl_button_1_action->state != "${BUTTON_ACTION_NONE_TEXT}") {
                 ESP_LOGV("core_hw_relays", "Toggle relay 1: (%s)", sl_button_1_action->state.c_str());
                 sw_relay_1->toggle();
+              } else {
+                ESP_LOGV("core_hw_relays", "Ignoring toggle for relay 1: action is '%s'",
+                          sl_button_1_action->state.c_str());
               }
               break;
             case ${BUTTON_2_ID}:
               if (sl_button_2_action->state != "${BUTTON_ACTION_NONE_TEXT}") {
                 ESP_LOGV("core_hw_relays", "Toggle relay 2: (%s)", sl_button_2_action->state.c_str());
                 sw_relay_2->toggle();
+              } else {
+                ESP_LOGV("core_hw_relays", "Ignoring toggle for relay 2: action is '%s'",
+                          sl_button_2_action->state.c_str());
               }
               break;
             case ${BUTTON_3_ID}:
               if (sl_button_3_action->state != "${BUTTON_ACTION_NONE_TEXT}") {
                 ESP_LOGV("core_hw_relays", "Toggle relay 3: (%s)", sl_button_3_action->state.c_str());
                 sw_relay_3->toggle();
+              } else {
+                ESP_LOGV("core_hw_relays", "Ignoring toggle for relay 3: action is '%s'",
+                          sl_button_3_action->state.c_str());
               }
               break;
             case ${BUTTON_4_ID}:
               if (sl_button_4_action->state != "${BUTTON_ACTION_NONE_TEXT}") {
                 ESP_LOGV("core_hw_relays", "Toggle relay 4: (%s)", sl_button_4_action->state.c_str());
                 sw_relay_4->toggle();
+              } else {
+                ESP_LOGV("core_hw_relays", "Ignoring toggle for relay 4: action is '%s'",
+                          sl_button_4_action->state.c_str());
               }
               break;
           }
