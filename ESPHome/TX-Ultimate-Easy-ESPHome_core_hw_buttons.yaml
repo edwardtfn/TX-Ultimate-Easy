@@ -264,7 +264,7 @@ script:
                         press_duration <= ${BUTTON_CLICK_MAX_LENGTH}) { // Short/normal click
               button_click_event->execute(id(button_press_button), id(click_counter));
             } else if (press_duration >= ${BUTTON_LONG_PRESS_DELAY} and press_duration <= ${BUTTON_PRESS_TIMEOUT}) {
-              button_action->execute(id(button_press_button), "long_click", 1);
+              button_action->execute(id(button_press_button), "long_press", 1);
             } else if (press_duration > ${BUTTON_PRESS_TIMEOUT}) { // Timeout or invalid
               ESP_LOGW("core_hw_buttons", "Button press cancelled or timed out after ${BUTTON_PRESS_TIMEOUT} ms");
             }
