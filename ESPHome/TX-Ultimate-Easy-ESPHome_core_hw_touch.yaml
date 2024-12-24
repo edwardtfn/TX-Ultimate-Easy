@@ -358,9 +358,9 @@ tx_ultimate_easy:
     - lambda: |-
         const uint8_t touch_position = static_cast<uint8_t>(touch.x);
         if (touch_position > ${TOUCH_POSITION_MAX_VALUE}) {  // Check for valid range
-          ESP_LOGE("tx_ultimate_easy", "Invalid long-touch position: %" PRIu8, touch_position);
+          ESP_LOGE("core_hw_touch", "Invalid long-touch position: %" PRIu8, touch_position);
         } else {
-          ESP_LOGI("tx_ultimate_easy", "Long-touch released at position %" PRIu8, touch_position);
+          ESP_LOGI("core_hw_touch", "Long-touch released at position %" PRIu8, touch_position);
         }
 
   on_multi_touch_release:
@@ -373,21 +373,21 @@ tx_ultimate_easy:
           type: multi_touch
           action: release
           position: !lambda return touch.x;
-    - lambda: ESP_LOGI("tx_ultimate_easy", "Multi-touch released");
+    - lambda: ESP_LOGI("core_hw_touch", "Multi-touch released");
     - script.execute: touch_on_multi_touch_release
 
   on_press:
     - lambda: |-
         const uint8_t position = static_cast<uint8_t>(touch.x);
         if (position > ${TOUCH_POSITION_MAX_VALUE}) {  // Check for valid range
-          ESP_LOGE("tx_ultimate_easy", "Invalid touch position: %" PRIu8, position);
+          ESP_LOGE("core_hw_touch", "Invalid touch position: %" PRIu8, position);
         } else {
-          ESP_LOGI("tx_ultimate_easy", "Pressed at position %" PRIu8, position);
+          ESP_LOGI("core_hw_touch", "Pressed at position %" PRIu8, position);
           touch_on_press->execute(static_cast<uint8_t>(touch.button), position);
         }
 
   on_release:
-    - lambda: ESP_LOGI("tx_ultimate_easy", "Released");
+    - lambda: ESP_LOGI("core_hw_touch", "Released");
     - script.execute: touch_on_release
 
   on_swipe_left:
@@ -399,12 +399,12 @@ tx_ultimate_easy:
           domain: touch
           type: swipe
           action: !lambda |-
-            return sl_tx_model_format->state == "${TX_MODEL_FORMAT_US_TEXT}" ? "left" : "down";
+            return sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}" ? "left" : "down";
           swipe-direction: !lambda |-
-            return sl_tx_model_format->state == "${TX_MODEL_FORMAT_US_TEXT}" ? "left" : "down";
+            return sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}" ? "left" : "down";
           position: !lambda return touch.x;
     - lambda: |-
-        ESP_LOGI("tx_ultimate_easy", "Swipe %s", sl_tx_model_format->state == "${TX_MODEL_FORMAT_US_TEXT}"
+        ESP_LOGI("core_hw_touch", "Swipe %s", sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}"
                                                   ? "left"
                                                   : "down");
     - script.execute: touch_swipe_left
@@ -418,21 +418,21 @@ tx_ultimate_easy:
           domain: touch
           type: swipe
           action: !lambda |-
-            return sl_tx_model_format->state == "${TX_MODEL_FORMAT_US_TEXT}" ? "right" : "up";
+            return sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}" ? "right" : "up";
           swipe-direction: !lambda |-
-            return sl_tx_model_format->state == "${TX_MODEL_FORMAT_US_TEXT}" ? "right" : "up";
+            return sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}" ? "right" : "up";
           position: !lambda return touch.x;
     - lambda: |-
-        ESP_LOGI("tx_ultimate_easy", "Swipe %s", sl_tx_model_format->state == "${TX_MODEL_FORMAT_US_TEXT}"
+        ESP_LOGI("core_hw_touch", "Swipe %s", sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}"
                                                   ? "right"
                                                   : "up");
     - script.execute: touch_swipe_right
 
   on_touch_event:
     - lambda: |-
-        ESP_LOGD("tx_ultimate_easy", "Touch event:");
-        ESP_LOGD("tx_ultimate_easy", "  State:    %i (%s)", touch.state, touch.state_str.c_str());
-        ESP_LOGD("tx_ultimate_easy", "  Position: %i", touch.x);
+        ESP_LOGD("core_hw_touch", "Touch event:");
+        ESP_LOGD("core_hw_touch", "  State:    %i (%s)", touch.state, touch.state_str.c_str());
+        ESP_LOGD("core_hw_touch", "  Position: %i", touch.x);
 
 uart:
   - id: uart_touch
