@@ -644,8 +644,8 @@ light:
     <<: *light_partition_relays
     segments:
       - id: light_full
-        from: 17
-        to: 18
+        from: 16
+        to: 17
   - id: light_us_rl_3_3_right
     name: Light - Relay 3 of 3 (right)
     <<: *light_partition_relays
