@@ -208,5 +208,6 @@ time:
 web_server:
 
 wifi:
+  id: wifi_component
   ap:
 ...

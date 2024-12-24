@@ -192,7 +192,7 @@ script:
 
           // Toggle relay if corresponding button action is enabled
           const bool api_disconnected = !global_api_server->is_connected() or
-                                        !global_wifi_component->is_connected();
+                                        !wifi_component->is_connected();
           std::string select_state;
           bool toggle_relay = false;
           if (api_disconnected) {
