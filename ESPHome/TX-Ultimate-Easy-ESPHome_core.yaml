@@ -168,8 +168,10 @@ select:
 
 text_sensor:
   - id: esphome_fw_version
+    name: ESPHome Version
     platform: version
-    name: "ESPHome Version"
+    entity_category: diagnostic
+    internal: false
 
   - id: tx_fw_version
     name: TX Ultimate Easy Firmware Version
