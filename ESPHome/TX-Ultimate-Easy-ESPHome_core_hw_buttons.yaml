@@ -19,6 +19,10 @@ substitutions:
   BUTTON_2_ACTION_TEXT: "Relay 2 (toggle)"
   BUTTON_3_ACTION_TEXT: "Relay 3 (toggle)"
   BUTTON_4_ACTION_TEXT: "Relay 4 (toggle)"
+  BUTTON_1_ACTION_FAILSAFE_TEXT: "Relay 1 (API failsafe only)"
+  BUTTON_2_ACTION_FAILSAFE_TEXT: "Relay 2 (API failsafe only)"
+  BUTTON_3_ACTION_FAILSAFE_TEXT: "Relay 3 (API failsafe only)"
+  BUTTON_4_ACTION_FAILSAFE_TEXT: "Relay 4 (API failsafe only)"
 
   BUTTON_CLICK_MIN_LENGTH: '50'    # The minimum duration the click should last, in msec
   BUTTON_CLICK_MAX_LENGTH: '350'   # The maximum duration the click should last, in msec
@@ -289,6 +293,7 @@ select:
     options:
       - "${BUTTON_ACTION_NONE_TEXT}"
       - "${BUTTON_1_ACTION_TEXT}"
+      - "${BUTTON_1_ACTION_FAILSAFE_TEXT}"
     initial_option: "${BUTTON_1_ACTION_TEXT}"
     optimistic: true
     restore_value: true
@@ -303,6 +308,7 @@ select:
     options:
       - "${BUTTON_ACTION_NONE_TEXT}"
       - "${BUTTON_2_ACTION_TEXT}"
+      - "${BUTTON_2_ACTION_FAILSAFE_TEXT}"
     initial_option: "${BUTTON_2_ACTION_TEXT}"
     <<: *button_select_action_base
 
@@ -312,6 +318,7 @@ select:
     options:
       - "${BUTTON_ACTION_NONE_TEXT}"
       - "${BUTTON_3_ACTION_TEXT}"
+      - "${BUTTON_3_ACTION_FAILSAFE_TEXT}"
     initial_option: "${BUTTON_3_ACTION_TEXT}"
     <<: *button_select_action_base
 
@@ -321,6 +328,7 @@ select:
     options:
       - "${BUTTON_ACTION_NONE_TEXT}"
       - "${BUTTON_4_ACTION_TEXT}"
+      - "${BUTTON_4_ACTION_FAILSAFE_TEXT}"
     initial_option: "${BUTTON_4_ACTION_TEXT}"
     <<: *button_select_action_base
 ...
