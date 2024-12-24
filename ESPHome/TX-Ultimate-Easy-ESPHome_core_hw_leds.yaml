@@ -644,8 +644,8 @@ light:
     <<: *light_partition_relays
     segments:
       - id: light_full
-        from: 17
-        to: 18
+        from: 16
+        to: 17
   - id: light_us_rl_3_3_right
     name: Light - Relay 3 of 3 (right)
     <<: *light_partition_relays
@@ -658,8 +658,8 @@ light:
     <<: *light_partition_relays
     segments:
       - id: light_full
-        from: 12
-        to: 12
+        from: 23
+        to: 24
   - id: light_us_rl_1_4_right
     name: Light - Relay 1 of 4 (right)
     <<: *light_partition_relays
@@ -667,48 +667,51 @@ light:
       - id: light_full
         from: 31
         to: 31
+      - id: light_full
+        from: 0
+        to: 0
   - id: light_us_rl_2_4_left
     name: Light - Relay 2 of 4 (left)
     <<: *light_partition_relays
     segments:
       - id: light_full
-        from: 24
-        to: 24
+        from: 21
+        to: 22
   - id: light_us_rl_2_4_right
     name: Light - Relay 2 of 4 (right)
     <<: *light_partition_relays
     segments:
       - id: light_full
-        from: 2
+        from: 1
         to: 2
   - id: light_us_rl_3_4_left
     name: Light - Relay 3 of 4 (left)
     <<: *light_partition_relays
     segments:
       - id: light_full
-        from: 21
-        to: 21
+        from: 17
+        to: 18
   - id: light_us_rl_3_4_right
     name: Light - Relay 3 of 4 (right)
     <<: *light_partition_relays
     segments:
       - id: light_full
-        from: 4
-        to: 4
+        from: 5
+        to: 6
   - id: light_us_rl_4_4_left
     name: Light - Relay 4 of 4 (left)
     <<: *light_partition_relays
     segments:
       - id: light_full
-        from: 19
-        to: 19
+        from: 15
+        to: 16
   - id: light_us_rl_4_4_right
     name: Light - Relay 4 of 4 (right)
     <<: *light_partition_relays
     segments:
       - id: light_full
         from: 7
-        to: 7
+        to: 8
 
 script:
   - id: !extend boot_initialize
