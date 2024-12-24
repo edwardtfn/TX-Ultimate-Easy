@@ -75,6 +75,17 @@ esphome:
       then:
         - script.execute: boot_done
 
+globals:
+  - id: is_us_model
+    type: bool
+    restore_value: true
+    initial_value: 'false'
+
+  - id: gang_count
+    type: uint8_t
+    restore_value: true
+    initial_value: '0'
+
 improv_serial:
   id: serial_improv
 
@@ -146,6 +157,11 @@ select:
     entity_category: config
     disabled_by_default: false
     icon: mdi:tablet-cellphone
+    on_value:
+      then:
+        - lambda: |-
+            id(is_us_model) = (x == "${TX_MODEL_FORMAT_US_TEXT}");
+            ESP_LOGI("core", "New model selected: %s", id(is_us_model) ? "US" : "EU");
 
   - id: sl_tx_model_gang
     name: Model (Gang)
@@ -164,7 +180,10 @@ select:
     icon: mdi:dip-switch
     on_value:
       then:
-        - lambda: tx_ultimate->set_gang_count(static_cast<uint8_t>(i)+1);
+        - lambda: |-
+            id(gang_count) = static_cast<uint8_t>(i) + 1;
+            ESP_LOGI("core", "New model selected: %" PRIu8 "-%s", id(gang_count), id(gang_count) > 1 ? "Gangs" : "Gang");
+            tx_ultimate->set_gang_count(id(gang_count));
 
 text_sensor:
   - id: esphome_fw_version
