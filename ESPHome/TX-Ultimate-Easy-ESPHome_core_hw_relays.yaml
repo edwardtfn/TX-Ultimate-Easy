@@ -25,6 +25,18 @@ globals:
     type: bool
     restore_value: false
     initial_value: 'false'
+  - id: boot_initialization_relays_light_modes
+    type: bool
+    restore_value: false
+    initial_value: 'false'
+  - id: boot_initialization_relays_relay_leds
+    type: bool
+    restore_value: false
+    initial_value: 'false'
+  - id: boot_initialization_relays_relay_modes
+    type: bool
+    restore_value: false
+    initial_value: 'false'
 
 light:
   # These lights are used for the physical relays to be shown as lights
@@ -424,19 +436,112 @@ script:
   - id: boot_initialize_relays
     mode: restart
     then:
+      - script.execute: boot_initialize_relays_light_modes
+      - script.execute: boot_initialize_relays_relay_leds
+      - script.execute: boot_initialize_relays_relay_modes
+      - script.wait: boot_initialize_relays_light_modes
+      - script.wait: boot_initialize_relays_relay_leds
+      - script.wait: boot_initialize_relays_relay_modes
+      - wait_until:
+          condition:
+            - lambda: return id(boot_initialization_relays_light_modes);
+            - lambda: return id(boot_initialization_relays_relay_leds);
+            - lambda: return id(boot_initialization_relays_relay_modes);
+      - globals.set:
+          id: boot_initialization_relays
+          value: 'true'
+
+  - id: boot_initialize_relays_light_modes
+    mode: restart
+    then:
       - lambda: |-
-          sl_relay_1_mode->set_internal(id(gang_count) < 1);
+          // EU light modes
           sl_relay_1_light_mode_eu->set_internal(id(is_us_model) or id(gang_count) < 1);
-          sl_relay_1_light_mode_us->set_internal(!id(is_us_model) or id(gang_count) < 1);
-          sl_relay_2_mode->set_internal(id(gang_count) < 2);
           sl_relay_2_light_mode_eu->set_internal(id(is_us_model) or id(gang_count) < 2);
-          sl_relay_2_light_mode_us->set_internal(!id(is_us_model) or id(gang_count) < 2);
-          sl_relay_3_mode->set_internal(id(gang_count) < 3);
           sl_relay_3_light_mode_eu->set_internal(id(is_us_model) or id(gang_count) < 3);
-          sl_relay_3_light_mode_us->set_internal(!id(is_us_model) or id(gang_count) < 3);
-          sl_relay_4_mode->set_internal(id(gang_count) < 4);
           sl_relay_4_light_mode_eu->set_internal(id(is_us_model) or id(gang_count) < 4);
+
+          // US light modes
+          sl_relay_1_light_mode_us->set_internal(!id(is_us_model) or id(gang_count) < 1);
+          sl_relay_2_light_mode_us->set_internal(!id(is_us_model) or id(gang_count) < 2);
+          sl_relay_3_light_mode_us->set_internal(!id(is_us_model) or id(gang_count) < 3);
           sl_relay_4_light_mode_us->set_internal(!id(is_us_model) or id(gang_count) < 4);
+
+          // Set this section of initialization as completed
+          id(boot_initialization_relays_light_modes) = true;
+
+  - id: boot_initialize_relays_relay_leds
+    mode: restart
+    then:
+      - lambda: |-
+          const bool set_internal = not sw_expose_relays_leds_to_ha->state;
+
+          // EU model LEDs
+          // EU model - 1 Gang
+          light_eu_rl_1_1_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 1);
+          light_eu_rl_1_1_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 1);
+          // EU model - 2 Gang
+          light_eu_rl_1_2_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 2);
+          light_eu_rl_1_2_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 2);
+          light_eu_rl_2_2_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 2);
+          light_eu_rl_2_2_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 2);
+          // EU model - 3 Gang
+          light_eu_rl_1_3_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 3);
+          light_eu_rl_1_3_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 3);
+          light_eu_rl_2_3_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 3);
+          light_eu_rl_2_3_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 3);
+          light_eu_rl_3_3_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 3);
+          light_eu_rl_3_3_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 3);
+          // EU model - 4 Gang
+          light_eu_rl_1_4_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
+          light_eu_rl_1_4_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
+          light_eu_rl_2_4_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
+          light_eu_rl_2_4_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
+          light_eu_rl_3_4_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
+          light_eu_rl_3_4_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
+          light_eu_rl_4_4_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
+          light_eu_rl_4_4_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
+
+          // US model LEDs
+          // US model - 1 Gang
+          light_us_rl_1_1_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 1);
+          light_us_rl_1_1_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 1);
+          // US model - 2 Gang
+          light_us_rl_1_2_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 2);
+          light_us_rl_1_2_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 2);
+          light_us_rl_2_2_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 2);
+          light_us_rl_2_2_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 2);
+          // US model - 3 Gang
+          light_us_rl_1_3_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 3);
+          light_us_rl_1_3_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 3);
+          light_us_rl_2_3_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 3);
+          light_us_rl_2_3_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 3);
+          light_us_rl_3_3_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 3);
+          light_us_rl_3_3_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 3);
+          // US model - 4 Gang
+          light_us_rl_1_4_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
+          light_us_rl_1_4_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
+          light_us_rl_2_4_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
+          light_us_rl_2_4_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
+          light_us_rl_3_4_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
+          light_us_rl_3_4_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
+          light_us_rl_4_4_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
+          light_us_rl_4_4_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
+
+          // Set this section of initialization as completed
+          id(boot_initialization_relays_relay_leds) = true;
+
+  - id: boot_initialize_relays_relay_modes
+    mode: restart
+    then:
+      - lambda: |-
+          // Set selector internal based on the model (num of relays)
+          sl_relay_1_mode->set_internal(id(gang_count) < 1);
+          sl_relay_2_mode->set_internal(id(gang_count) < 2);
+          sl_relay_3_mode->set_internal(id(gang_count) < 3);
+          sl_relay_4_mode->set_internal(id(gang_count) < 4);
+
+          // Set indicator (either switch or light) visible on Home Assistant
           auto relay_mode_index = sl_relay_1_mode->active_index();
           if (relay_mode_index.has_value()) {
             light_output_1->set_internal(false or relay_mode_index.value() != 1);
@@ -457,48 +562,9 @@ script:
             light_output_4->set_internal(id(gang_count) < 4 or relay_mode_index.value() != 1);
             sw_relay_4->set_internal(id(gang_count) < 4 or relay_mode_index.value() != 0);
           }
-          const bool set_internal = not sw_expose_relays_leds_to_ha->state;
-          light_eu_rl_1_1_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 1);
-          light_eu_rl_1_1_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 1);
-          light_eu_rl_1_2_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 2);
-          light_eu_rl_1_2_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 2);
-          light_eu_rl_2_2_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 2);
-          light_eu_rl_2_2_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 2);
-          light_eu_rl_1_3_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 3);
-          light_eu_rl_1_3_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 3);
-          light_eu_rl_2_3_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 3);
-          light_eu_rl_2_3_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 3);
-          light_eu_rl_3_3_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 3);
-          light_eu_rl_3_3_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 3);
-          light_eu_rl_1_4_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
-          light_eu_rl_1_4_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
-          light_eu_rl_2_4_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
-          light_eu_rl_2_4_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
-          light_eu_rl_3_4_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
-          light_eu_rl_3_4_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
-          light_eu_rl_4_4_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
-          light_eu_rl_4_4_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
-          light_us_rl_1_1_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 1);
-          light_us_rl_1_1_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 1);
-          light_us_rl_1_2_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 2);
-          light_us_rl_1_2_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 2);
-          light_us_rl_2_2_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 2);
-          light_us_rl_2_2_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 2);
-          light_us_rl_1_3_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 3);
-          light_us_rl_1_3_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 3);
-          light_us_rl_2_3_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 3);
-          light_us_rl_2_3_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 3);
-          light_us_rl_3_3_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 3);
-          light_us_rl_3_3_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 3);
-          light_us_rl_1_4_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
-          light_us_rl_1_4_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
-          light_us_rl_2_4_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
-          light_us_rl_2_4_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
-          light_us_rl_3_4_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
-          light_us_rl_3_4_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
-          light_us_rl_4_4_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
-          light_us_rl_4_4_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
-          id(boot_initialization_relays) = true;
+
+          // Set this section of initialization as completed
+          id(boot_initialization_relays_relay_modes) = true;
 
   - id: !extend button_click_event
     then:

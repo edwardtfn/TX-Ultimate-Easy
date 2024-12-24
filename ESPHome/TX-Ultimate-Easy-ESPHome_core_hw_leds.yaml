@@ -435,6 +435,11 @@ script:
           light_us_left->set_internal(!id(is_us_model));
           light_us_right->set_internal(!id(is_us_model));
           light_us_top->set_internal(!id(is_us_model));
+
+          // LED Group Assignment:
+          // - For US model: gb_lights_1 = left side LEDs, gb_lights_2 = right side LEDs
+          // - For EU model: gb_lights_1 = bottom LEDs, gb_lights_2 = top LEDs
+          // Gang configurations determine which LED segments are active
           switch (id(gang_count)) {
             case 1:  // 1 Gang
               if (id(is_us_model)) {
