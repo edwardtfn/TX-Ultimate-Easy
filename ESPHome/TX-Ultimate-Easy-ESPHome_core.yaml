@@ -41,6 +41,15 @@ api:
     then:
       - script.execute: publish_device_info
 
+binary_sensor:
+  - id: bs_pending_restart
+    name: Pending Restart Status
+    internal: false
+    disabled_by_default: false
+    platform: template
+    entity_category: diagnostic
+    device_class: problem
+
 button:
   - id: bt_restart
     name: Restart
@@ -97,7 +106,7 @@ ota:
 
 psram:
   mode: octal
-  speed: 40MHz
+  speed: 80MHz
 
 script:
   - id: api_send_ha_event_boot
@@ -130,11 +139,24 @@ script:
       - script.execute:
           id: api_send_ha_event_boot
           type: start
+      - wait_until:
+          condition:
+            - lambda: return sl_tx_model_format->active_index().has_value();
+            - lambda: return sl_tx_model_gang->active_index().has_value();
+      - lambda: |-
+          id(is_us_model) = (sl_tx_model_format->state == "${TX_MODEL_FORMAT_US_TEXT}");
+          id(gang_count) = sl_tx_model_gang->active_index().value() + 1;
+          if (id(gang_count) < 1 || id(gang_count) > 4) {
+            ESP_LOGE("core_hw_leds", "Invalid number of gangs: %" PRIu8, id(gang_count));
+          }
 
   - id: boot_sequence
     mode: restart
     then:
       - script.execute: publish_device_info
+      - binary_sensor.template.publish:
+          id: bs_pending_restart
+          state: false
 
   - id: publish_device_info
     mode: restart
@@ -159,6 +181,9 @@ select:
     icon: mdi:tablet-cellphone
     on_value:
       then:
+        - binary_sensor.template.publish:
+            id: bs_pending_restart
+            state: true
         - lambda: |-
             id(is_us_model) = (x == "${TX_MODEL_FORMAT_US_TEXT}");
             ESP_LOGI("core", "New model selected: %s", id(is_us_model) ? "US" : "EU");
@@ -180,6 +205,9 @@ select:
     icon: mdi:dip-switch
     on_value:
       then:
+        - binary_sensor.template.publish:
+            id: bs_pending_restart
+            state: true
         - lambda: |-
             id(gang_count) = static_cast<uint8_t>(i) + 1;
             ESP_LOGI("core", "New model selected: %" PRIu8 "-%s", id(gang_count), id(gang_count) > 1 ? "Gangs" : "Gang");
