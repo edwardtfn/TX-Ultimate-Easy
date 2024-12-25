@@ -640,13 +640,21 @@ script:
           ESP_LOGCONFIG("core_hw_relays", "Relay%s mode%s:",
                         id(gang_count_plural_suffix).c_str(),
                         id(gang_count_plural_suffix).c_str());
-          ESP_LOGCONFIG("core_hw_relays", "  Relay 1: %s", sl_relay_1_mode->state.c_str());
+          ESP_LOGCONFIG("core_hw_relays", "  Relay 1: %s", sl_relay_1_mode->has_state()
+                                                            ? sl_relay_1_mode->state.c_str()
+                                                            : "Unknown");
           if (id(gang_count) >= 2)
-            ESP_LOGCONFIG("core_hw_relays", "  Relay 2: %s", sl_relay_2_mode->state.c_str());
+            ESP_LOGCONFIG("core_hw_relays", "  Relay 2: %s", sl_relay_2_mode->has_state()
+                                                              ? sl_relay_2_mode->state.c_str()
+                                                              : "Unknown");
           if (id(gang_count) >= 3)
-            ESP_LOGCONFIG("core_hw_relays", "  Relay 3: %s", sl_relay_3_mode->state.c_str());
+            ESP_LOGCONFIG("core_hw_relays", "  Relay 3: %s", sl_relay_3_mode->has_state()
+                                                              ? sl_relay_3_mode->state.c_str()
+                                                              : "Unknown");
           if (id(gang_count) >= 4)
-            ESP_LOGCONFIG("core_hw_relays", "  Relay 4: %s", sl_relay_4_mode->state.c_str());
+            ESP_LOGCONFIG("core_hw_relays", "  Relay 4: %s", sl_relay_4_mode->has_state()
+                                                              ? sl_relay_4_mode->state.c_str()
+                                                              : "Unknown");
           ESP_LOGCONFIG("core_hw_relays", "Relay%s state%s:",
                         id(gang_count_plural_suffix).c_str(),
                         id(gang_count_plural_suffix).c_str());
