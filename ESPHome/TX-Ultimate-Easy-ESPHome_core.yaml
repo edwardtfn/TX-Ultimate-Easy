@@ -31,7 +31,6 @@ packages:
   # yamllint disable rule:colons
   core_hw_buttons:      !include TX-Ultimate-Easy-ESPHome_core_hw_buttons.yaml
   core_hw_leds:         !include TX-Ultimate-Easy-ESPHome_core_hw_leds.yaml
-  core_hw_media_player: !include TX-Ultimate-Easy-ESPHome_core_hw_media_player.yaml
   core_hw_relays:       !include TX-Ultimate-Easy-ESPHome_core_hw_relays.yaml
   core_hw_touch:        !include TX-Ultimate-Easy-ESPHome_core_hw_touch.yaml
   core_hw_vibration:    !include TX-Ultimate-Easy-ESPHome_core_hw_vibration.yaml
@@ -71,8 +70,22 @@ captive_portal:
   id: ap_captive_portal
 
 esp32:
-  board: esp32dev
+  board: esp32dev  # adafruit_feather_esp32_v2  # esp32dev
   flash_size: 8MB
+  framework:
+    type: esp-idf
+    #sdkconfig_options:
+      #CONFIG_BT_ALLOCATION_FROM_SPIRAM_FIRST: "y"
+      #CONFIG_BT_BLE_DYNAMIC_ENV_MEMORY: "y"
+      #CONFIG_ESP32_REV_MIN_3: "y"
+      #CONFIG_ESPTOOLPY_FLASHSIZE_8MB: "y"
+      #CONFIG_MBEDTLS_DYNAMIC_BUFFER: "y"
+      #CONFIG_MBEDTLS_DYNAMIC_FREE_CA_CERT: "y"
+      #CONFIG_MBEDTLS_DYNAMIC_FREE_CONFIG_DATA: "y"
+      #CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC: "y"
+      #CONFIG_SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY: "y"
+      #CONFIG_SPIRAM_RODATA: "y"
+      #CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP: "y"
 
 esphome:
   name: ${name}

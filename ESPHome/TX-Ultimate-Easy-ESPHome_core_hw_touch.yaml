@@ -198,6 +198,11 @@ binary_sensor:
             id: bs_swipe_down
             state: OFF  # yamllint disable-line rule:truthy
 
+esphome:
+  platformio_options:
+    build_flags:
+      - -D TX_ULTIMATE_EASY_CORE_HW_TOUCH
+
 external_components:
   - source:
       type: git
@@ -286,6 +291,12 @@ script:
   - id: !extend dump_config
     then:
       - lambda: |-
+          // Check for requirements
+          #if !defined(TX_ULTIMATE_EASY_CORE)
+            #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
+          #endif
+
+          // Touch panel's state
           if (sw_touch_panel_power->state)
             ESP_LOGCONFIG("core_hw_touch", "Touch panel - Power: On");
           else

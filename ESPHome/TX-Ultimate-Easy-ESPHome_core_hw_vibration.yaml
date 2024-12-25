@@ -32,6 +32,11 @@ button:
       then:
         - script.execute: vibrate
 
+esphome:
+  platformio_options:
+    build_flags:
+      - -D TX_ULTIMATE_EASY_CORE_HW_VIBRATION
+
 number:
   - id: nr_vibrating_duration
     name: Vibrate duration
@@ -56,6 +61,11 @@ script:
   - id: !extend dump_config
     then:
       - lambda: |-
+          // Check for requirements
+          #if !defined(TX_ULTIMATE_EASY_CORE)
+            #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
+          #endif
+
           // Configuration
           ESP_LOGCONFIG("core_hw_vibration", "Touch - Vibration feedback: %s",
                         sl_touch_vibration_feedback->state.c_str());

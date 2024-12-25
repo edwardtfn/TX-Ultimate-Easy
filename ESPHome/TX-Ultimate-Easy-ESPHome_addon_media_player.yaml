@@ -2,7 +2,7 @@
 #####                              TX Ultimate Easy for ESPHome                                #####
 #####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
 ####################################################################################################
-##### Purpose: ESPHome Core - Add-on - BLE Proxy                                               #####
+##### Purpose: ESPHome - Add-on - Media player                                                 #####
 ####################################################################################################
 ##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
 ####################################################################################################
@@ -11,12 +11,28 @@
 ##### - For normal system use, modifications to this file are NOT required.                    #####
 ####################################################################################################
 ---
-bluetooth_proxy:
+packages:
+  core_hw_audio: !include TX-Ultimate-Easy-ESPHome_core_hw_audio.yaml
+
+esp32:
+  framework:
+    type: arduino
 
 esphome:
   platformio_options:
     build_flags:
-      - -D TX_ULTIMATE_EASY_ADDON_BLE_PROXY
+      - -D TX_ULTIMATE_EASY_ADDON_MEDIA_PLAYER
+
+media_player:
+  - id: mp_media_player
+    name: Media Player
+    internal: false
+    platform: i2s_audio
+    i2s_dout_pin: GPIO15
+    i2s_audio_id: if_i2s_audio
+    i2s_comm_fmt: msb  # Experimental - It was 'lsb' until v2024.12.12
+    dac_type: external
+    mode: mono
 
 script:
   - id: !extend dump_config
@@ -26,7 +42,10 @@ script:
           #if !defined(TX_ULTIMATE_EASY_CORE)
             #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
           #endif
+          #if !defined(TX_ULTIMATE_EASY_CORE_HW_AUDIO)
+            #error "The package TX-Ultimate-Easy-ESPHome_core_hw_audio.yaml is required."
+          #endif
 
           // Identify itself
-          ESP_LOGCONFIG("addon_ble_proxy", "Add-on BLE Proxy installed");
+          ESP_LOGCONFIG("addon_media_player", "Add-on Media Player installed");
 ...

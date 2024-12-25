@@ -19,6 +19,10 @@ substitutions:
   RELAY_RESTORE_MODE: RESTORE_DEFAULT_OFF
   LIGHT_RELAYS_RESTORE_MODE: RESTORE_DEFAULT_OFF
 
+esphome:
+  platformio_options:
+    build_flags:
+      - -D TX_ULTIMATE_EASY_CORE_HW_RELAYS
 
 globals:
   - id: boot_initialization_relays
@@ -637,6 +641,12 @@ script:
   - id: !extend dump_config
     then:
       - lambda: |-
+          // Check for requirements
+          #if !defined(TX_ULTIMATE_EASY_CORE)
+            #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
+          #endif
+
+          // Relay's modes
           ESP_LOGCONFIG("core_hw_relays", "Relay%s mode%s:",
                         id(gang_count_plural_suffix).c_str(),
                         id(gang_count_plural_suffix).c_str());
@@ -655,6 +665,8 @@ script:
             ESP_LOGCONFIG("core_hw_relays", "  Relay 4: %s", sl_relay_4_mode->has_state()
                                                               ? sl_relay_4_mode->state.c_str()
                                                               : "Unknown");
+
+          // Relay's states
           ESP_LOGCONFIG("core_hw_relays", "Relay%s state%s:",
                         id(gang_count_plural_suffix).c_str(),
                         id(gang_count_plural_suffix).c_str());
@@ -667,11 +679,15 @@ script:
             ESP_LOGCONFIG("core_hw_relays", "  Relay 4: %s", sw_relay_4->state ? "ON" : "OFF");
           ESP_LOGCONFIG("core_hw_relays", "Expose Relay's LEDs to Home Assistant: %s",
                         YESNO(sw_expose_relays_leds_to_ha->state));
+
+          // Boot initialization statuses
           ESP_LOGCONFIG("core_hw_relays", "Boot initialization flags:");
           ESP_LOGCONFIG("core_hw_relays", "  Overall:     %s", YESNO(id(boot_initialization_relays)));
           ESP_LOGCONFIG("core_hw_relays", "  Light modes: %s", YESNO(id(boot_initialization_relays_light_modes)));
           ESP_LOGCONFIG("core_hw_relays", "  Relay modes: %s", YESNO(id(boot_initialization_relays_relay_modes)));
           ESP_LOGCONFIG("core_hw_relays", "  Status LEDs: %s", YESNO(id(boot_initialization_relays_relay_leds)));
+
+          // Substitutions
           ESP_LOGCONFIG("core_hw_relays", "Restore modes:");
           ESP_LOGCONFIG("core_hw_relays", "  Relays: ${RELAY_RESTORE_MODE}");
           ESP_LOGCONFIG("core_hw_relays", "  Status LEDs: ${LIGHT_RELAYS_RESTORE_MODE}");

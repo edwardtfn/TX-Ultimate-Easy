@@ -2,7 +2,7 @@
 #####                              TX Ultimate Easy for ESPHome                                #####
 #####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
 ####################################################################################################
-##### Purpose: ESPHome Core - Add-on - BLE Proxy                                               #####
+##### Purpose: ESPHome - Core - I2S Audio                                                      #####
 ####################################################################################################
 ##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
 ####################################################################################################
@@ -11,12 +11,15 @@
 ##### - For normal system use, modifications to this file are NOT required.                    #####
 ####################################################################################################
 ---
-bluetooth_proxy:
-
 esphome:
   platformio_options:
     build_flags:
-      - -D TX_ULTIMATE_EASY_ADDON_BLE_PROXY
+      - -D TX_ULTIMATE_EASY_CORE_HW_AUDIO
+
+i2s_audio:
+  id: if_i2s_audio
+  i2s_bclk_pin: GPIO2
+  i2s_lrclk_pin: GPIO4
 
 script:
   - id: !extend dump_config
@@ -26,7 +29,4 @@ script:
           #if !defined(TX_ULTIMATE_EASY_CORE)
             #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
           #endif
-
-          // Identify itself
-          ESP_LOGCONFIG("addon_ble_proxy", "Add-on BLE Proxy installed");
 ...
