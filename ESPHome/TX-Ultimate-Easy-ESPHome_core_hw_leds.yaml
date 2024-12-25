@@ -489,9 +489,10 @@ script:
   - id: !extend dump_config
     then:
       - lambda: |-
+          // Relay's LEDs modes
           ESP_LOGCONFIG("core_hw_leds", "Relay%s LEDs mode%s:",
-                        id(gang_count) == 1 ? "" : "s",
-                        id(gang_count) == 1 ? "" : "s");
+                        id(gang_count_plural_suffix).c_str(),
+                        id(gang_count_plural_suffix).c_str());
           ESP_LOGCONFIG("core_hw_leds", "  Relay 1: %s", id(is_us_model)
                                                           ? sl_relay_1_light_mode_us->state.c_str()
                                                           : sl_relay_1_light_mode_eu->state.c_str());
@@ -507,7 +508,9 @@ script:
             ESP_LOGCONFIG("core_hw_leds", "  Relay 4: %s", id(is_us_model)
                                                             ? sl_relay_4_light_mode_us->state.c_str()
                                                             : sl_relay_4_light_mode_eu->state.c_str());
-          ESP_LOGCONFIG("core_hw_leds", "Transition time:");
+
+          // Transition times
+          ESP_LOGCONFIG("core_hw_leds", "Transition times:");
           ESP_LOGCONFIG("core_hw_leds", "  Default:     ${default_transition_length}");
           if (${LIGHT_TRANSITION_TURN_ON} > 0)
             ESP_LOGCONFIG("core_hw_leds", "  Turning on:  ${LIGHT_TRANSITION_TURN_ON}ms");
@@ -517,6 +520,8 @@ script:
             ESP_LOGCONFIG("core_hw_leds", "  Turning off: ${LIGHT_TRANSITION_TURN_OFF}ms");
           else
             ESP_LOGCONFIG("core_hw_leds", "  Turning off: Disabled");
+
+          // Restore modes
           ESP_LOGCONFIG("core_hw_leds", "LED restore modes:");
           ESP_LOGCONFIG("core_hw_leds", "  Light - All: ${LIGHT_FULL_RESTORE_MODE}");
           ESP_LOGCONFIG("core_hw_leds", "  Sides:       ${LIGHT_SIDES_RESTORE_MODE}");

@@ -56,10 +56,13 @@ script:
   - id: !extend dump_config
     then:
       - lambda: |-
+          // Configuration
           ESP_LOGCONFIG("core_hw_vibration", "Touch - Vibration feedback: %s",
                         sl_touch_vibration_feedback->state.c_str());
           ESP_LOGCONFIG("core_hw_vibration", "Vibrate duration: %.0fms", nr_vibrating_duration->state);
           ESP_LOGCONFIG("core_hw_vibration", "Vibrate max duration: ${vibration_max_duration}");
+
+          // State
           if (bs_vibrating->state)
             ESP_LOGW("core_hw_vibration", "Vibrating now: YES");
           else

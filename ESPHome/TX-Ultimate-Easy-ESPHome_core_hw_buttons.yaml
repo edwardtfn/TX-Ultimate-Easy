@@ -204,8 +204,8 @@ script:
     then:
       - lambda: |-
           ESP_LOGCONFIG("core_hw_buttons", "Button%s action%s:",
-                        id(gang_count) == 1 ? "" : "s",
-                        id(gang_count) == 1 ? "" : "s");
+                        id(gang_count_plural_suffix).c_str(),
+                        id(gang_count_plural_suffix).c_str());
           ESP_LOGCONFIG("core_hw_buttons", "  Relay 1: %s", sl_button_1_action->state.c_str());
           if (id(gang_count) >= 2)
             ESP_LOGCONFIG("core_hw_buttons", "  Relay 2: %s", sl_button_2_action->state.c_str());
