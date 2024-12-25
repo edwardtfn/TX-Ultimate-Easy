@@ -25,14 +25,16 @@ substitutions:
   TX_MODEL_3_GANG_TEXT: "3 Gang"
   TX_MODEL_4_GANG_TEXT: "4 Gang"
 
+  DUMP_CONFIG_CALLER_DELAY: 10s  # Delay to dump config after requested
+
 packages:
   # yamllint disable rule:colons
-  core_hw_buttons:   !include TX-Ultimate-Easy-ESPHome_core_hw_buttons.yaml
-  core_hw_leds:      !include TX-Ultimate-Easy-ESPHome_core_hw_leds.yaml
-  core_hw_relays:    !include TX-Ultimate-Easy-ESPHome_core_hw_relays.yaml
-  core_hw_speaker:   !include TX-Ultimate-Easy-ESPHome_core_hw_speaker.yaml
-  core_hw_touch:     !include TX-Ultimate-Easy-ESPHome_core_hw_touch.yaml
-  core_hw_vibration: !include TX-Ultimate-Easy-ESPHome_core_hw_vibration.yaml
+  core_hw_buttons:      !include TX-Ultimate-Easy-ESPHome_core_hw_buttons.yaml
+  core_hw_leds:         !include TX-Ultimate-Easy-ESPHome_core_hw_leds.yaml
+  core_hw_relays:       !include TX-Ultimate-Easy-ESPHome_core_hw_relays.yaml
+  core_hw_media_player: !include TX-Ultimate-Easy-ESPHome_core_hw_media_player.yaml
+  core_hw_touch:        !include TX-Ultimate-Easy-ESPHome_core_hw_touch.yaml
+  core_hw_vibration:    !include TX-Ultimate-Easy-ESPHome_core_hw_vibration.yaml
   # yamllint enable rule:colons
 
 api:
@@ -40,6 +42,7 @@ api:
   on_client_connected:
     then:
       - script.execute: publish_device_info
+      - script.execute: dump_config_caller
 
 binary_sensor:
   - id: bs_pending_restart
@@ -49,6 +52,13 @@ binary_sensor:
     platform: template
     entity_category: diagnostic
     device_class: problem
+    on_state:
+      then:
+        - lambda: |-
+            if (x)
+              ESP_LOGW("core", "Pending restart: YES");
+            else
+              ESP_LOGCONFIG("core", "Pending restart: No");
 
 button:
   - id: bt_restart
@@ -157,6 +167,40 @@ script:
       - binary_sensor.template.publish:
           id: bs_pending_restart
           state: false
+
+  - id: dump_config
+    mode: restart
+    then:
+      # Extended by all modules
+      - lambda: |-
+          ESP_LOGCONFIG("core", "Device friendly name: ${friendly_name}");
+          ESP_LOGCONFIG("core", "Device name: ${name}");
+          ESP_LOGCONFIG("core", "Device name (HA): %s", tx_device_name->state.c_str());
+          ESP_LOGCONFIG("core", "Device hostname: %s", App.get_name().c_str());
+          ESP_LOGCONFIG("core", "ESPHome builder: %s", esphome_fw_version->state.c_str());
+          ESP_LOGCONFIG("core", "TX Ultimate firmware version: ${version}");
+          // Report framework
+          #ifdef ARDUINO
+          ESP_LOGCONFIG("core", "Framework: Arduino");
+          #elif defined(USE_ESP_IDF)
+          ESP_LOGCONFIG("core", "Framework: ESP-IDF");
+          #else
+          ESP_LOGW("core", "Framework: UNKNOWN");
+          #endif
+          ESP_LOGCONFIG("core", "Model format (selected): %s", sl_tx_model_format->state.c_str());
+          ESP_LOGCONFIG("core", "Model format (detected): %s", id(is_us_model) ? "US" : "EU");
+          ESP_LOGCONFIG("core", "Gangs (selected): %s", sl_tx_model_gang->state.c_str());
+          ESP_LOGCONFIG("core", "Gangs (detected): %" PRIu8 "-Gang%s", id(gang_count), id(gang_count) == 1 ? "" : "s");
+          if (bs_pending_restart->state)
+            ESP_LOGW("core", "Pending restart: YES");
+          else
+            ESP_LOGCONFIG("core", "Pending restart: No");
+
+  - id: dump_config_caller
+    mode: restart
+    then:
+      - delay: ${DUMP_CONFIG_CALLER_DELAY}
+      - script.execute: dump_config
 
   - id: publish_device_info
     mode: restart

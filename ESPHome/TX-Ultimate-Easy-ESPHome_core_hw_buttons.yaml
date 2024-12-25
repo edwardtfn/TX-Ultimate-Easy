@@ -200,6 +200,20 @@ script:
             }
           }
 
+  - id: !extend dump_config
+    then:
+      - lambda: |-
+          ESP_LOGCONFIG("core_hw_buttons", "Button%s action%s:",
+                        id(gang_count) == 1 ? "" : "s",
+                        id(gang_count) == 1 ? "" : "s");
+          ESP_LOGCONFIG("core_hw_buttons", "  Relay 1: %s", sl_button_1_action->state.c_str());
+          if (id(gang_count) >= 2)
+            ESP_LOGCONFIG("core_hw_buttons", "  Relay 2: %s", sl_button_2_action->state.c_str());
+          if (id(gang_count) >= 3)
+            ESP_LOGCONFIG("core_hw_buttons", "  Relay 3: %s", sl_button_3_action->state.c_str());
+          if (id(gang_count) >= 4)
+            ESP_LOGCONFIG("core_hw_buttons", "  Relay 4: %s", sl_button_4_action->state.c_str());
+
   - id: !extend touch_on_multi_touch_release
     then:
       - script.execute: buttons_release

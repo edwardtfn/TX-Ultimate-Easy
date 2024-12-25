@@ -481,7 +481,46 @@ script:
                                     light_eu_rl_3_4_top, light_eu_rl_4_4_top };
               }
               break;
+            default:
+              ESP_LOGE("core_hw_leds", "Invalid gang count: %" PRIu8, id(gang_count));
+              break;
           }
+
+  - id: !extend dump_config
+    then:
+      - lambda: |-
+          ESP_LOGCONFIG("core_hw_leds", "Relay%s LEDs mode%s:",
+                        id(gang_count) == 1 ? "" : "s",
+                        id(gang_count) == 1 ? "" : "s");
+          ESP_LOGCONFIG("core_hw_leds", "  Relay 1: %s", id(is_us_model)
+                                                          ? sl_relay_1_light_mode_us->state.c_str()
+                                                          : sl_relay_1_light_mode_eu->state.c_str());
+          if (id(gang_count) >= 2)
+            ESP_LOGCONFIG("core_hw_leds", "  Relay 2: %s", id(is_us_model)
+                                                            ? sl_relay_2_light_mode_us->state.c_str()
+                                                            : sl_relay_2_light_mode_eu->state.c_str());
+          if (id(gang_count) >= 3)
+            ESP_LOGCONFIG("core_hw_leds", "  Relay 3: %s", id(is_us_model)
+                                                            ? sl_relay_3_light_mode_us->state.c_str()
+                                                            : sl_relay_3_light_mode_eu->state.c_str());
+          if (id(gang_count) >= 4)
+            ESP_LOGCONFIG("core_hw_leds", "  Relay 4: %s", id(is_us_model)
+                                                            ? sl_relay_4_light_mode_us->state.c_str()
+                                                            : sl_relay_4_light_mode_eu->state.c_str());
+          ESP_LOGCONFIG("core_hw_leds", "Transition time:");
+          ESP_LOGCONFIG("core_hw_leds", "  Default:     ${default_transition_length}");
+          if (${LIGHT_TRANSITION_TURN_ON} > 0)
+            ESP_LOGCONFIG("core_hw_leds", "  Turning on:  ${LIGHT_TRANSITION_TURN_ON}ms");
+          else
+            ESP_LOGCONFIG("core_hw_leds", "  Turning on:  Disabled");
+          if (${LIGHT_TRANSITION_TURN_OFF} > 0)
+            ESP_LOGCONFIG("core_hw_leds", "  Turning off: ${LIGHT_TRANSITION_TURN_OFF}ms");
+          else
+            ESP_LOGCONFIG("core_hw_leds", "  Turning off: Disabled");
+          ESP_LOGCONFIG("core_hw_leds", "LED restore modes:");
+          ESP_LOGCONFIG("core_hw_leds", "  Light - All: ${LIGHT_FULL_RESTORE_MODE}");
+          ESP_LOGCONFIG("core_hw_leds", "  Sides:       ${LIGHT_SIDES_RESTORE_MODE}");
+          ESP_LOGCONFIG("core_hw_leds", "  Individual:  ${LIGHT_INDIVIDUAL_RESTORE_MODE}");
 
   - id: light_set_state
     mode: parallel
@@ -571,15 +610,12 @@ select:
     entity_category: config
     disabled_by_default: false
     icon: mdi:dots-square
-
   - id: sl_relay_2_light_mode_eu
     name: Relay 2 light mode
     <<: *relay_light_mode_eu
-
   - id: sl_relay_3_light_mode_eu
     name: Relay 3 light mode
     <<: *relay_light_mode_eu
-
   - id: sl_relay_4_light_mode_eu
     name: Relay 4 light mode
     <<: *relay_light_mode_eu
@@ -601,15 +637,12 @@ select:
     entity_category: config
     disabled_by_default: false
     icon: mdi:dots-square
-
   - id: sl_relay_2_light_mode_us
     name: Relay 2 light mode
     <<: *relay_light_mode_us
-
   - id: sl_relay_3_light_mode_us
     name: Relay 3 light mode
     <<: *relay_light_mode_us
-
   - id: sl_relay_4_light_mode_us
     name: Relay 4 light mode
     <<: *relay_light_mode_us

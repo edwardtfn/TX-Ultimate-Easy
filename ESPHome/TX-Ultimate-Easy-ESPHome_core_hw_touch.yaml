@@ -283,6 +283,15 @@ script:
           bs_button_3_long_press_event->set_internal(id(gang_count) < 3);
           bs_button_4_long_press_event->set_internal(id(gang_count) < 4);
 
+  - id: !extend dump_config
+    then:
+      - lambda: |-
+          if (sw_touch_panel_power->state)
+            ESP_LOGCONFIG("core_hw_touch", "Touch panel - Power: On");
+          else
+            ESP_LOGW("core_hw_touch", "Touch panel - Power: OFF");
+          ESP_LOGCONFIG("core_hw_touch", "Touch event duration: %.0fms", nr_touch_duration->state);
+
   - id: touch_on_multi_touch_release
     mode: restart
     then:

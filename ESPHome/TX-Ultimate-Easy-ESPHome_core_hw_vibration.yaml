@@ -53,6 +53,18 @@ ota:
       - switch.turn_off: sw_vibration_motor
 
 script:
+  - id: !extend dump_config
+    then:
+      - lambda: |-
+          ESP_LOGCONFIG("core_hw_vibration", "Touch - Vibration feedback: %s",
+                        sl_touch_vibration_feedback->state.c_str());
+          ESP_LOGCONFIG("core_hw_vibration", "Vibrate duration: %.0fms", nr_vibrating_duration->state);
+          ESP_LOGCONFIG("core_hw_vibration", "Vibrate max duration: ${vibration_max_duration}");
+          if (bs_vibrating->state)
+            ESP_LOGW("core_hw_vibration", "Vibrating now: YES");
+          else
+            ESP_LOGCONFIG("core_hw_vibration", "Vibrating now: No");
+
   - id: !extend touch_on_multi_touch_release
     then:
       - script.execute: touch_on_multi_touch_release_vibration
@@ -133,5 +145,4 @@ switch:
         - binary_sensor.template.publish:
             id: bs_vibrating
             state: OFF  # yamllint disable-line rule:truthy
-
 ...

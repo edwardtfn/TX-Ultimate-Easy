@@ -96,6 +96,12 @@ rtttl:
   - id: rtttl_speaker
     speaker: mp_speaker
 
+script:
+  - id: !extend dump_config
+    then:
+      - lambda: |-
+          ESP_LOGCONFIG("addon_ble_proxy", "Add-on BLE Proxy installed");
+
 speaker:
   - id: mp_speaker
     platform: i2s_audio
