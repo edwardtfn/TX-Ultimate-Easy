@@ -34,9 +34,9 @@ media_player:
     dac_type: external
     mode: mono
     mute_pin:
-        number: GPIO26
-        inverted: true
-        allow_other_uses: true
+      number: GPIO26
+      inverted: true
+      allow_other_uses: true
 
 script:
   - id: !extend dump_config
