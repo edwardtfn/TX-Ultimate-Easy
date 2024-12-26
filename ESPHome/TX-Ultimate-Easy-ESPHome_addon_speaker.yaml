@@ -60,6 +60,14 @@ number:
         - speaker.volume_set:
             id: speaker_embedded
             volume: !lambda return x/100.0f;
+        - if:
+            condition:
+                - lambda: 'return x > 0;'
+                - lambda: 'return "${tone_volume_change}" != "none";'
+            then:
+              - rtttl.play:
+                  id: rtttl_speaker
+                  rtttl: "${tone_volume_change}"
 
 rtttl:
   - id: rtttl_speaker
