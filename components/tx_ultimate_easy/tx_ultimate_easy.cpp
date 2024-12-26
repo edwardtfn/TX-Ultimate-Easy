@@ -68,9 +68,9 @@ namespace esphome {
             if (this->gang_count_ == 1)
                 return 1;
 
-            // Calculate button number
-            const uint8_t width = (TOUCH_MAX_POSITION + 1) / this->gang_count_;  // Width of each button region
-            if (width < 1 or width > this->gang_count_)  // Invalid width - and prevents division by zero
+            //Calculate button number Change to round up insted of truncate (integer division)
+            const uint8_t width = (TOUCH_MAX_POSITION + gang_count_) / this->gang_count_;  // Width of each button region
+            if (width < 1)  // Invalid width - and prevents division by zero removed "width > gang_count_" issue with 2 gang 
                 return 0;
             const uint8_t button = std::min(
                 static_cast<uint8_t>((position / width) + 1), // Convert position to button index
