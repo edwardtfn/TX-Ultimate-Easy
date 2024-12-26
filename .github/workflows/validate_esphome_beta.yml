@@ -16,12 +16,14 @@ on:  # yamllint disable-line rule:truthy
   pull_request:
     paths:
       - "*.yaml"
-      - "ESPHome/*.yaml"
-      - ".test/*.yaml"
       - "*.h"
       - "*.c"
       - "*.cpp"
       - "*.py"
+      - ".test/*.*"
+      - "components/*.*"
+      - "components/tx_ultimate_easy/*.*"
+      - "ESPHome/*.*"
   workflow_dispatch:
 
 concurrency:
