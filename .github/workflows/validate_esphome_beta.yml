@@ -8,22 +8,10 @@ permissions:
 on:  # yamllint disable-line rule:truthy
   push:
     paths:
-      - "*.{yml,yaml,h,cpp,c,py}"
-      - ".github/workflows/*.{yml,yaml,h,cpp,c,py}"
-      - ".test/*.{yml,yaml,h,cpp,c,py}"
-      - "components/*.{yml,yaml,h,cpp,c,py}"
-      - "components/tx_ultimate_easy/*.{yml,yaml,h,cpp,c,py}"
-      - "ESPHome/*.{yml,yaml,h,cpp,c,py}"
-    branches:
-      - main
+      - "**/*.{yml,yaml,h,cpp,c,py}"  # Match any file with the extensions in any directory
   pull_request:
     paths:
-      - "*.{yml,yaml,h,cpp,c,py}"
-      - ".github/workflows/*.{yml,yaml,h,cpp,c,py}"
-      - ".test/*.{yml,yaml,h,cpp,c,py}"
-      - "components/*.{yml,yaml,h,cpp,c,py}"
-      - "components/tx_ultimate_easy/*.{yml,yaml,h,cpp,c,py}"
-      - "ESPHome/*.{yml,yaml,h,cpp,c,py}"
+      - "**/*.{yml,yaml,h,cpp,c,py}"  # Match any file with the extensions in any directory
   workflow_dispatch:
 
 concurrency:
