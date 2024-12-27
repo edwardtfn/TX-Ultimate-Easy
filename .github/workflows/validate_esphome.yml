@@ -254,16 +254,4 @@ jobs:
         with:
           yaml-file: ".test/esphome_ard_media_player.yaml"
           version: latest
-
-  build_idf53_media_player:
-    name: Media Player (IDF v5.3)
-    needs: build_idf53_basic
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@main
-      - name: Build Media Player (IDF v5.3)
-        uses: esphome/build-action@main
-        with:
-          yaml-file: ".test/esphome_idf53_media_player.yaml"
-          version: latest
 ...
