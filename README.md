@@ -170,10 +170,12 @@ We recommend using [ESPHome Web](https://web.esphome.io) for the simplest experi
 1. Open your TX Ultimate device carefully
 2. Locate the programming header pins
 3. Connect your USB-to-UART adapter:
-   - GND → GND
-   - 3.3V → 3.3V
-   - TX → RX
-   - RX → TX
+   | Adapter | Device |
+   |---------|--------|
+   | GND     | GND    |
+   | 3.3V    | 3.3V   |
+   | TX      | RX     |
+   | RX      | TX     |
 4. Put device in flash mode:
    - Temporarily connect the BOOT pin to GND using a jumper wire
    - While holding BOOT to GND, power up the device
@@ -200,7 +202,7 @@ through the ESPHome dashboard in your ESPHome add-on.
 
 After successful flashing:
 1. Ensure your device and Home Assistant are on the same network
-2. Device should be automatically discovered within 1-2 minutes
+2. Device should be automatically discovered within 1–2 minutes
 3. Accept the discovery notification in Home Assistant to add device
    Note: If discovery takes longer than 5 minutes, proceed to troubleshooting steps
 4. Device will appear in your Home Assistant Devices dashboard
@@ -234,6 +236,11 @@ If the device isn't discovered automatically:
    - Touch sensitivity
    - Haptic feedback
    - Audio feedback
+4. Test your configuration:
+   - Verify each relay responds to controls
+   - Test configured button actions
+   - Confirm LED behavior matches settings
+   - Check haptic/audio feedback if enabled
 
 > [!NOTE]  
 > Some changes may require a device restart
