@@ -92,12 +92,103 @@ Before getting started, ensure you have:
 
 ## Installation
 
-Detailed installation instructions coming soon. The process will include:
+Follow these steps to get your TX Ultimate device up and running with ESPHome.
 
-1. Initial ESPHome setup
-2. Device flashing
-3. Home Assistant integration
-4. Basic configuration
+### 1. ESPHome Integration Setup
+
+1. Install ESPHome add-on in Home Assistant if not already installed:
+   - Go to Settings → Add-ons → Add-on Store
+   - Search for "ESPHome" 
+   - Click Install
+2. Start the ESPHome add-on and verify it's running
+3. Access ESPHome dashboard through Home Assistant
+
+### 2. Device Configuration
+
+1. In ESPHome dashboard, click "+ New Device"
+2. Name your device (e.g., "tx-ultimate-living-room")
+3. Select ESP32 as your device type
+4. Copy this basic configuration to your new device:
+   ```yaml
+   substitutions:
+     name: tx-ultimate-easy  # Change this to your device name
+     friendly_name: TX Ultimate Easy
+   
+   packages:
+     remote_package:
+       url: https://github.com/edwardtfn/TX-Ultimate-Easy
+       ref: main  # For latest stable release
+       # ref: dev  # For testing new features
+       files:
+         - ESPHome/TX-Ultimate-Easy-ESPHome.yaml
+   
+   wifi:
+     ssid: !secret wifi_ssid
+     password: !secret wifi_password
+   ```
+5. Click "Save" and then "Install"
+
+### 3. Device Flashing
+
+Initial flashing must be done via serial connection.
+We recommend using [ESPHome Web](https://web.esphome.io) for the simplest experience.
+
+#### Required Hardware
+- USB-to-UART adapter (3.3V)
+- Small Phillips screwdriver
+- 5 wires for connections (including one for BOOT to GND)
+
+#### Flashing Process
+1. Open your TX Ultimate device carefully
+2. Locate the programming header pins
+3. Connect your USB-to-UART adapter:
+   - GND → GND
+   - 3.3V → 3.3V
+   - TX → RX
+   - RX → TX
+4. Put device in flash mode:
+   - Connect the BOOT pin to GND using a jumper wire
+   - Power up the device (keeping BOOT connected to GND)
+   - Remove the BOOT to GND connection
+5. Visit [ESPHome Web](https://web.esphome.io)
+6. Connect to your device and flash the firmware
+7. After successful flash, device will restart and be ready for OTA updates
+
+#### Detailed Visual Guides
+For step-by-step visual instructions, you can reference these existing guides:
+- 🇬🇧 [WirelessThings Guide](https://wirelessthings.net/how-to-flash-sonoff-tx-ultimate-with-esphome) -
+  English guide with detailed photos
+- 🇪🇸 [Un loco y su tecnología](https://youtu.be/58v8oqSQgXQ?t=143) - Spanish video tutorial
+- 🇩🇪 [SmartHome yourself](https://youtu.be/naDLhX89enQ?t=465) - German video tutorial
+
+Note: While these guides may use different firmware, the physical flashing process remains the same.
+
+#### Subsequent Updates
+After initial flashing, all future updates can be done wirelessly (OTA)
+through the ESPHome dashboard in your ESPHome add-on.
+
+### 4. Home Assistant Integration
+
+After successful flashing:
+1. Device will automatically be discovered by Home Assistant
+2. Accept the discovery notification to add device
+3. Device will appear in your Home Assistant Devices dashboard
+
+### 5. Initial Configuration
+
+1. In Home Assistant, navigate to:
+   - Settings → Devices & Services → ESPHome
+   - Click on your device to access its configuration page
+2. Set basic device parameters:
+   - Model format (EU/US)
+   - Number of gangs (1-4)
+   - Relay modes (switch/light)
+   - Button actions
+3. Optional: Configure advanced features
+   - LED behaviors
+   - Touch sensitivity
+   - Haptic feedback
+   - Audio feedback
 
 ## Usage
 
@@ -156,7 +247,8 @@ This project builds upon the work of several amazing projects and contributors:
 
 - [SmartHome yourself - SONOFF TX Ultimate for ESPHome](https://github.com/SmartHome-yourself/sonoff-tx-ultimate-for-esphome)
 - [Un loco y su tecnología - Sonoff TX Ultimate with ESPHome](https://www.youtube.com/watch?v=58v8oqSQgXQ)
-- @PxPert - [Sonoff TX Ultimate and Voice Assistant](https://community.home-assistant.io/t/sonoff-tx-ultimate-and-voice-assistant/682214?u=edwardtfn)
+- [@PxPert](https://github.com/PxPert) -
+  [Sonoff TX Ultimate and Voice Assistant](https://community.home-assistant.io/t/sonoff-tx-ultimate-and-voice-assistant/682214?u=edwardtfn)
 
 Special thanks to all contributors and community members who help make this project better.
 
