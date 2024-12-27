@@ -147,7 +147,7 @@ jobs:
 
   build_idf53_ble_proxy:
     name: Bluetooth Proxy (IDFv5.3)
-    needs: build_idf_basic
+    needs: build_idf53_basic
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -171,7 +171,7 @@ jobs:
 
   build_idf53_media_player:
     name: Media Player (IDFv5.3)
-    needs: build_idf_basic
+    needs: build_idf53_basic
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
