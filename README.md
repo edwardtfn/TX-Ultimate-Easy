@@ -118,13 +118,17 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
      remote_package:
        url: https://github.com/edwardtfn/TX-Ultimate-Easy
        ref: main  # For latest stable release
-       # ref: dev  # For testing new features
        files:
          - ESPHome/TX-Ultimate-Easy-ESPHome.yaml
    
    wifi:
      ssid: !secret wifi_ssid
      password: !secret wifi_password
+   ```
+
+   You can also use a specific version tag for better control over updates:
+   ```yaml
+   ref: v2025.1.3  # Replace with desired version (format: vYYYY.MM.nn)
    ```
 5. Click "Save" and then "Install"
 
@@ -171,9 +175,24 @@ through the ESPHome dashboard in your ESPHome add-on.
 ### 4. Home Assistant Integration
 
 After successful flashing:
-1. Device will automatically be discovered by Home Assistant
-2. Accept the discovery notification to add device
-3. Device will appear in your Home Assistant Devices dashboard
+1. Ensure your device and Home Assistant are on the same network
+2. Device should be automatically discovered within a couple of minutes
+3. Accept the discovery notification to add device
+4. Device will appear in your Home Assistant Devices dashboard
+
+#### Troubleshooting Integration
+If the device isn't discovered automatically:
+1. Verify your device is powered and connected to your network:
+   - Look for the device in your router's client list
+   - Consider using [manual IP](https://esphome.io/components/wifi.html#manual-ips) in your device
+2. If you missed the discovery notification:
+   - Go to Settings → Devices & Services
+   - Click "Add Integration"
+   - Search for "ESPHome" and enter your device's IP address
+3. Still having issues?
+   - Check your network allows mDNS/discovery traffic
+   - Verify there are no VLANs or network isolation preventing communication
+   - Try rebooting both the device and Home Assistant
 
 ### 5. Initial Configuration
 
