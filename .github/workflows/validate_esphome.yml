@@ -1,6 +1,10 @@
 ---
 name: Validate ESPHome (Latest)
 
+permissions:
+  contents: read
+  pull-requests: read
+
 on:  # yamllint disable-line rule:truthy
   workflow_dispatch:
 

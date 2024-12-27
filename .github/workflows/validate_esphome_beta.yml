@@ -1,33 +1,29 @@
 ---
 name: Validate ESPHome (Beta)
 
+permissions:
+  contents: read
+  pull-requests: read
+
 on:  # yamllint disable-line rule:truthy
   push:
     paths:
-      - "*.c"
-      - "*.cpp"
-      - "*.h"
-      - "*.py"
-      - "*.yaml"
-      - ".github/workflows/*.*"
-      - ".test/*.*"
-      - "components/*.*"
-      - "components/tx_ultimate_easy/*.*"
-      - "ESPHome/*.*"
+      - "*.{yml,yaml,h,cpp,c,py}"
+      - ".github/workflows/*.{yml,yaml,h,cpp,c,py}"
+      - ".test/*.{yml,yaml,h,cpp,c,py}"
+      - "components/*.{yml,yaml,h,cpp,c,py}"
+      - "components/tx_ultimate_easy/*.{yml,yaml,h,cpp,c,py}"
+      - "ESPHome/*.{yml,yaml,h,cpp,c,py}"
     branches:
       - main
   pull_request:
     paths:
-      - "*.c"
-      - "*.cpp"
-      - "*.h"
-      - "*.py"
-      - "*.yaml"
-      - ".github/workflows/*.*"
-      - ".test/*.*"
-      - "components/*.*"
-      - "components/tx_ultimate_easy/*.*"
-      - "ESPHome/*.*"
+      - "*.{yml,yaml,h,cpp,c,py}"
+      - ".github/workflows/*.{yml,yaml,h,cpp,c,py}"
+      - ".test/*.{yml,yaml,h,cpp,c,py}"
+      - "components/*.{yml,yaml,h,cpp,c,py}"
+      - "components/tx_ultimate_easy/*.{yml,yaml,h,cpp,c,py}"
+      - "ESPHome/*.{yml,yaml,h,cpp,c,py}"
   workflow_dispatch:
 
 concurrency:
