@@ -9,13 +9,8 @@
 [![Buy me an ice-cream][buymeacoffee-shield]](https://www.buymeacoffee.com/edwardfirmo)
 
 <!-- markdownlint-disable MD013 MD033 -->
-| &nbsp;
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="Assets/Logo_dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="Assets/Logo_light.png">
-  <img alt="TX Ultimate Easy Logo" src="Assets/Logo_light.png" width="100">
-</picture>
-| TX Ultimate Easy provides custom ESPHome firmware for Sonoff TX Ultimate devices. Our project focuses on user-friendly configuration through the Home Assistant UI, eliminating the need for manual YAML editing. Whether you're new to home automation or an experienced user, TX Ultimate Easy makes it simple to manage your device. |
+| &nbsp;<picture><source media="(prefers-color-scheme: dark)" srcset="Assets/Logo_dark.png"><source media="(prefers-color-scheme: light)" srcset="Assets/Logo_light.png"><img alt="TX Ultimate Easy Logo" src="Assets/Logo_light.png"></picture> | TX Ultimate Easy provides custom ESPHome firmware for Sonoff TX Ultimate devices. Our project focuses on user-friendly configuration through the Home Assistant UI, eliminating the need for manual YAML editing. Whether you're new to home automation or an experienced user, TX Ultimate Easy makes it simple to manage your device. |
+| --- | :-- |
 <!-- markdownlint-enable MD013 MD033 -->
 
 [version-shield]: https://img.shields.io/github/v/tag/edwardtfn/TX-Ultimate-Easy?label=version
