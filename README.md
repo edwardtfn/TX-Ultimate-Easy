@@ -96,7 +96,7 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
 
 ### ESPHome Integration Setup
 
-1. Install ESPHome add-on in Home Assistant if not already installed:
+1. Install the ESPHome add-on in Home Assistant if not already installed:
    - Go to Settings → Add-ons → Add-on Store
    - Search for "ESPHome" 
    - Click Install
@@ -105,7 +105,7 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
 
 ### Setup Device
 
-1. In ESPHome dashboard, click "+ New Device"
+1. In the ESPHome dashboard, click "+ New Device"
 2. Name your device (e.g., "tx-ultimate-living-room")
 3. Select ESP32 as your device type
 4. Copy this basic configuration to your new device:
@@ -167,12 +167,14 @@ We recommend using [ESPHome Web](https://web.esphome.io) for the simplest experi
 1. Open your TX Ultimate device carefully
 2. Locate the programming header pins
 3. Connect your USB-to-UART adapter:
+
    | Adapter | Device |
    |---------|--------|
    | GND     | GND    |
    | 3.3V    | 3.3V   |
    | TX      | RX     |
    | RX      | TX     |
+
 4. Put device in flash mode:
    - Temporarily connect the BOOT pin to GND using a jumper wire
    - While holding BOOT to GND, power up the device
