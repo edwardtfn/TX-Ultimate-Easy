@@ -4,22 +4,26 @@ name: Validate ESPHome (Beta)
 on:  # yamllint disable-line rule:truthy
   push:
     paths:
-      - "*.yaml"
-      - "ESPHome/*.yaml"
-      - ".test/*.yaml"
-      - "*.h"
       - "*.c"
       - "*.cpp"
+      - "*.h"
       - "*.py"
+      - "*.yaml"
+      - ".github/workflows/*.*"
+      - ".test/*.*"
+      - "components/*.*"
+      - "components/tx_ultimate_easy/*.*"
+      - "ESPHome/*.*"
     branches:
       - main
   pull_request:
     paths:
-      - "*.yaml"
-      - "*.h"
       - "*.c"
       - "*.cpp"
+      - "*.h"
       - "*.py"
+      - "*.yaml"
+      - ".github/workflows/*.*"
       - ".test/*.*"
       - "components/*.*"
       - "components/tx_ultimate_easy/*.*"
