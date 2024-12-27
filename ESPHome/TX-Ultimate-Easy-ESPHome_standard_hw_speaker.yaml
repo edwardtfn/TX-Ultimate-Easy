@@ -60,14 +60,11 @@ number:
         - speaker.volume_set:
             id: speaker_embedded
             volume: !lambda return x/100.0f;
-        - if:
-            condition:
-              - lambda: return x > 0;
-              - lambda: return "${tone_volume_change}" != "none";
-            then:
-              - rtttl.play:
-                  id: rtttl_speaker
-                  rtttl: "${tone_volume_change}"
+        - lambda: |-
+            static const std::string tone_volume_change = "${tone_volume_change}";
+            // Play sound if tone_volume_change is not "none"
+            if (x > 0 and !tone_volume_change.empty() and tone_volume_change != "none")
+              rtttl_speaker->play(tone_volume_change);
 
 rtttl:
   - id: rtttl_speaker
