@@ -130,8 +130,7 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
    ```yaml
    ref: v2024.12.2  # Using specific version for controlled updates
    ```
-    > [!NOTE]
-    > [Click here](https://github.com/edwardtfn/TX-Ultimate-Easy/tags) for a full list of versions available
+  **Note:** [Click here](https://github.com/edwardtfn/TX-Ultimate-Easy/tags) for a full list of versions available.
 5. Click "Save" and then "Install"
 
 ### Device Flashing
