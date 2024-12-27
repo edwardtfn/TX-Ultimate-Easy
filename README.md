@@ -94,7 +94,7 @@ Before getting started, ensure you have:
 
 Follow these steps to get your TX Ultimate device up and running with ESPHome.
 
-### 1. ESPHome Integration Setup
+### ESPHome Integration Setup
 
 1. Install ESPHome add-on in Home Assistant if not already installed:
    - Go to Settings → Add-ons → Add-on Store
@@ -103,7 +103,7 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
 2. Start the ESPHome add-on and verify it's running
 3. Access ESPHome dashboard through Home Assistant
 
-### 2. Device Configuration
+### Device Configuration
 
 1. In ESPHome dashboard, click "+ New Device"
 2. Name your device (e.g., "tx-ultimate-living-room")
@@ -136,7 +136,7 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
 
 5. Click "Save" and then "Install"
 
-### 3. Device Flashing
+### Device Flashing
 
 Initial flashing must be done via serial connection.
 We recommend using [ESPHome Web](https://web.esphome.io) for the simplest experience.
@@ -198,7 +198,7 @@ Note: While these guides may use different firmware, the physical flashing proce
 After initial flashing, all future updates can be done wirelessly (OTA)
 through the ESPHome dashboard in your ESPHome add-on.
 
-### 4. Home Assistant Integration
+### Home Assistant Integration
 
 After successful flashing:
 1. Ensure your device and Home Assistant are on the same network
@@ -221,7 +221,7 @@ If the device isn't discovered automatically:
    - Verify there are no VLANs or network isolation preventing communication
    - Try rebooting both the device and Home Assistant
 
-### 5. Initial Configuration
+### Initial Configuration
 
 1. In Home Assistant, navigate to:
    - Settings → Devices & Services → ESPHome
