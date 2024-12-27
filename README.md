@@ -128,7 +128,7 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
 
    You can also use a specific version tag for better control over updates:
    ```yaml
-   ref: v2025.1.3  # Replace with desired version (format: vYYYY.MM.nn)
+   ref: v[![version]][version]  # Using specific version for controlled updates
    ```
 5. Click "Save" and then "Install"
 
