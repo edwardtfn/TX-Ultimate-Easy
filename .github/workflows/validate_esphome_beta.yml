@@ -74,12 +74,12 @@ jobs:
           version: beta
 
   build_idf53_core:
-    name: Core (IDFv5.3)
+    name: Core (IDF v5.3)
     needs: code_scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build Core (IDFv5.3)
+      - name: Build Core (IDF v5.3)
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_idf53_core.yaml"
@@ -98,7 +98,7 @@ jobs:
           version: beta
 
   build_idf_basic:
-    name: Core (IDF)
+    name: Basic (IDF)
     needs: build_idf_core
     runs-on: ubuntu-latest
     steps:
@@ -110,15 +110,51 @@ jobs:
           version: beta
 
   build_idf53_basic:
-    name: Basic (IDFv5.3)
+    name: Basic (IDF v5.3)
     needs: build_idf53_core
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build Basic (IDFv5.3)
+      - name: Build Basic (IDF v5.3)
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_idf53_basic.yaml"
+          version: beta
+
+  build_ard_hw_relays:
+    name: HW Relays (Arduino)
+    needs: build_ard_core
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build HW Relays (Arduino)
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_ard_hw_relays.yaml"
+          version: beta
+
+  build_idf_hw_relays:
+    name: HW Relays (IDF)
+    needs: build_idf_core
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build HW Relays (IDF)
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_idf_hw_relays.yaml"
+          version: beta
+
+  build_idf53_hw_relays:
+    name: HW Relays (IDF v5.3)
+    needs: build_idf53_core
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build HW Relays (IDF v5.3)
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_idf53_hw_relays.yaml"
           version: beta
 
   build_ard_ble_proxy:
@@ -146,12 +182,12 @@ jobs:
           version: beta
 
   build_idf53_ble_proxy:
-    name: Bluetooth Proxy (IDFv5.3)
+    name: Bluetooth Proxy (IDF v5.3)
     needs: build_idf53_basic
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build BLE Proxy (IDFv5.3)
+      - name: Build BLE Proxy (IDF v5.3)
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_idf53_ble_proxy.yaml"
@@ -170,12 +206,12 @@ jobs:
           version: beta
 
   build_idf53_media_player:
-    name: Media Player (IDFv5.3)
+    name: Media Player (IDF v5.3)
     needs: build_idf53_basic
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build Media Player (IDFv5.3)
+      - name: Build Media Player (IDF v5.3)
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_idf53_media_player.yaml"
