@@ -6,7 +6,7 @@ packages:
 
 esp32:
   framework:
-    type: esp-idf
+    type: arduino
 
 wifi:
   ssid: !secret wifi_ssid

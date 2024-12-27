@@ -229,16 +229,16 @@ jobs:
           yaml-file: ".test/esphome_idf53_ble_proxy.yaml"
           version: beta
 
-  build_idf_media_player:
-    name: Media Player (IDF)
-    needs: build_idf_basic
+  build_ard_media_player:
+    name: Media Player (Ard)
+    needs: build_ard_basic
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build Media Player (IDF)
+      - name: Build Media Player (Ard)
         uses: esphome/build-action@main
         with:
-          yaml-file: ".test/esphome_idf_media_player.yaml"
+          yaml-file: ".test/esphome_ard_media_player.yaml"
           version: beta
 
   build_idf53_media_player:
