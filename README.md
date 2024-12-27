@@ -137,8 +137,26 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
 Initial flashing must be done via serial connection.
 We recommend using [ESPHome Web](https://web.esphome.io) for the simplest experience.
 
+> [!IMPORTANT]  
+> **SAFETY WARNINGS**
+> - ALWAYS disconnect the device from mains power before opening
+> - NEVER work on the device while connected to mains power
+> - Ensure the device is completely powered off before making any connections
+> - Keep your workspace clean, dry, and static-free
+> - Use proper insulated tools when working with electronics
+> - If unsure about any step, seek help from an experienced person
+
+> [!CAUTION]
+>⚡ **CRITICAL: VOLTAGE WARNING**
+> Using a UART adapter with voltage higher than 3.3V WILL DAMAGE YOUR DEVICE.
+> Double-check your adapter's voltage before connecting - many common FTDI adapters
+> default to 5V which will permanently damage the ESP32 chip.
+
 #### Required Hardware
-- USB-to-UART adapter (3.3V)
+- USB-to-UART adapter:
+  - 3.3V logic level ONLY (DO NOT use 5V adapters)
+  - Must be capable of supplying at least 500mA
+  - Common adapters: CP2102, CH340, FTDI (ensure 3.3V setting)
 - Small Phillips screwdriver
 - 5 wires for connections (including one for BOOT to GND)
 
