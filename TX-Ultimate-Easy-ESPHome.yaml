@@ -19,8 +19,8 @@ packages:
     ref: latest  # Or you can specify a version, like `ref: v2024.12.6`
     refresh: 5min
     files:
-      - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
+      - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml                  # Core (essential) packages
+      - ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml              # Non-essential, but recommended packages
       # - ESPHome/TX-Ultimate-Easy-ESPHome_addon_ble_proxy.yaml     # Adds BLE proxy support
       # - ESPHome/TX-Ultimate-Easy-ESPHome_addon_media_player.yaml  # Adds experimental Media Player (limited)
-      # - ESPHome/TX-Ultimate-Easy-ESPHome_addon_speaker.yaml       # Adds basic audio speaker support
 ...

@@ -29,11 +29,9 @@ substitutions:
 
 packages:
   # yamllint disable rule:colons
-  core_hw_buttons:      !include TX-Ultimate-Easy-ESPHome_core_hw_buttons.yaml
-  core_hw_leds:         !include TX-Ultimate-Easy-ESPHome_core_hw_leds.yaml
-  core_hw_relays:       !include TX-Ultimate-Easy-ESPHome_core_hw_relays.yaml
-  core_hw_touch:        !include TX-Ultimate-Easy-ESPHome_core_hw_touch.yaml
-  core_hw_vibration:    !include TX-Ultimate-Easy-ESPHome_core_hw_vibration.yaml
+  core_hw_buttons: !include TX-Ultimate-Easy-ESPHome_core_hw_buttons.yaml
+  core_hw_leds:    !include TX-Ultimate-Easy-ESPHome_core_hw_leds.yaml
+  core_hw_touch:   !include TX-Ultimate-Easy-ESPHome_core_hw_touch.yaml
   # yamllint enable rule:colons
 
 api:
@@ -60,15 +58,6 @@ binary_sensor:
               ESP_LOGCONFIG("core", "Pending restart: No");
         - script.execute: dump_config_caller
 
-button:
-  - id: bt_restart
-    name: Restart
-    internal: false
-    platform: restart
-
-captive_portal:
-  id: ap_captive_portal
-
 esp32:
   board: esp32dev  # adafruit_feather_esp32_v2  # esp32dev
   flash_size: 8MB
@@ -79,6 +68,9 @@ esphome:
   name: ${name}
   friendly_name: ${friendly_name}
   comment: TX Ultimate Easy
+  project:
+    name: "edwardtfn.tx_ultimate_easy"
+    version: ${version}
   platformio_options:
     build_flags:
       - -D TX_ULTIMATE_EASY_CORE
@@ -112,9 +104,6 @@ globals:
     restore_value: true
     max_restore_data_length: 3
     # initial_value: "''"
-
-improv_serial:
-  id: serial_improv
 
 logger:
   level: DEBUG
@@ -188,9 +177,7 @@ script:
           ESP_LOGCONFIG("core", "Device name (HA): %s", tx_device_name->state.c_str());
           ESP_LOGCONFIG("core", "Device hostname: %s", App.get_name().c_str());
 
-          // Version information
-          ESP_LOGCONFIG("core", "ESPHome builder: %s", esphome_fw_version->state.c_str());
-          ESP_LOGCONFIG("core", "TX Ultimate firmware version: ${version}");
+          dump_config_versions->execute();
 
           // Framework detection
           #ifdef USE_ARDUINO
@@ -218,6 +205,25 @@ script:
     then:
       - delay: ${DUMP_CONFIG_CALLER_DELAY}
       - script.execute: dump_config
+      - script.wait: dump_config
+      - script.execute: dump_config_list_packages
+
+  - id: dump_config_list_packages
+    mode: restart
+    then:
+      - script.wait: dump_config
+      - lambda: |-
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "Installed packages:");
+
+          // Identify itself
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Core");
+
+  - id: dump_config_versions
+    mode: restart
+    then:
+      - lambda: |-
+          // Version information
+          ESP_LOGCONFIG("core", "TX Ultimate firmware version: ${version}");
 
   - id: publish_device_info
     mode: restart
@@ -275,12 +281,6 @@ select:
             tx_ultimate->set_gang_count(id(gang_count));
 
 text_sensor:
-  - id: esphome_fw_version
-    name: ESPHome Version
-    platform: version
-    entity_category: diagnostic
-    internal: false
-
   - id: tx_fw_version
     name: TX Ultimate Easy Firmware Version
     platform: template
@@ -317,13 +317,6 @@ text_sensor:
           }
           return result;
 
-time:
-  - id: time_source
-    platform: homeassistant
-
-web_server:
-
 wifi:
   id: wifi_component
-  ap:
 ...

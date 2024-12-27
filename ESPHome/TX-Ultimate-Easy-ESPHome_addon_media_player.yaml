@@ -12,7 +12,7 @@
 ####################################################################################################
 ---
 packages:
-  core_hw_audio: !include TX-Ultimate-Easy-ESPHome_core_hw_audio.yaml
+  standard_hw_audio: !include TX-Ultimate-Easy-ESPHome_standard_hw_audio.yaml
 
 esp32:
   framework:
@@ -39,19 +39,20 @@ media_player:
       allow_other_uses: true
 
 script:
-  - id: !extend dump_config
+  - id: !extend dump_config_list_packages
     then:
+      - script.wait: dump_config
       - lambda: |-
           // Check for requirements
           #if !defined(TX_ULTIMATE_EASY_CORE)
             #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
           #endif
-          #if !defined(TX_ULTIMATE_EASY_CORE_HW_AUDIO)
-            #error "The package TX-Ultimate-Easy-ESPHome_core_hw_audio.yaml is required."
+          #if !defined(TX_ULTIMATE_EASY_STANDARD_HW_AUDIO)
+            #error "The package TX-Ultimate-Easy-ESPHome_standard_hw_audio.yaml is required."
           #endif
 
           // Identify itself
-          ESP_LOGCONFIG("addon_media_player", "Add-on Media Player installed");
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Add-on - Media Player");
 
 switch:
   - id: sw_speaker_amplifier

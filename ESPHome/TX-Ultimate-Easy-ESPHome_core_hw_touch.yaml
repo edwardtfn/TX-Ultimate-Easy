@@ -291,17 +291,24 @@ script:
   - id: !extend dump_config
     then:
       - lambda: |-
-          // Check for requirements
-          #if !defined(TX_ULTIMATE_EASY_CORE)
-            #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
-          #endif
-
           // Touch panel's state
           if (sw_touch_panel_power->state)
             ESP_LOGCONFIG("core_hw_touch", "Touch panel - Power: On");
           else
             ESP_LOGW("core_hw_touch", "Touch panel - Power: OFF");
           ESP_LOGCONFIG("core_hw_touch", "Touch event duration: %.0fms", nr_touch_duration->state);
+
+  - id: !extend dump_config_list_packages
+    then:
+      - script.wait: dump_config
+      - lambda: |-
+          // Check for requirements
+          #if !defined(TX_ULTIMATE_EASY_CORE)
+            #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
+          #endif
+
+          // Identify itself
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Core - Hardware - Touchpad");
 
   - id: touch_on_multi_touch_release
     mode: restart

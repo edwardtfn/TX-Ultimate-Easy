@@ -208,11 +208,6 @@ script:
   - id: !extend dump_config
     then:
       - lambda: |-
-          // Check for requirements
-          #if !defined(TX_ULTIMATE_EASY_CORE)
-            #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
-          #endif
-
           // Button's actions
           ESP_LOGCONFIG("core_hw_buttons", "Button%s action%s:",
                         id(gang_count_plural_suffix).c_str(),
@@ -232,6 +227,18 @@ script:
             ESP_LOGCONFIG("core_hw_buttons", "  Relay 4: %s", sl_button_4_action->has_state()
                                                                 ? sl_button_4_action->state.c_str()
                                                                 : "Unknown");
+
+  - id: !extend dump_config_list_packages
+    then:
+      - script.wait: dump_config
+      - lambda: |-
+          // Check for requirements
+          #if !defined(TX_ULTIMATE_EASY_CORE)
+            #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
+          #endif
+
+          // Identify itself
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Core - Hardware - Buttons");
 
   - id: !extend touch_on_multi_touch_release
     then:

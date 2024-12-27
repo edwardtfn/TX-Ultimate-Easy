@@ -2,8 +2,11 @@
 packages:
   core_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
   standard_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml
+  addon_media_player: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_addon_media_player.yaml
 
 esp32:
   framework:
-    type: arduino
+    type: esp-idf
+    version: 5.3.1
+    platform_version: 6.9.0
 ...

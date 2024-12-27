@@ -2,7 +2,7 @@
 #####                              TX Ultimate Easy for ESPHome                                #####
 #####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
 ####################################################################################################
-##### Purpose: ESPHome - Add-on - Speaker                                                      #####
+##### Purpose: ESPHome - Standard - Speaker                                                    #####
 ####################################################################################################
 ##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
 ####################################################################################################
@@ -17,7 +17,7 @@ substitutions:
   tone_volume_change: "scale_up:d=32,o=5,b=100:c,c#,d#,e,f#,g#,a#,b"  # Use "none" to disable sound
 
 packages:
-  core_hw_audio: !include TX-Ultimate-Easy-ESPHome_core_hw_audio.yaml
+  standard_hw_audio: !include TX-Ultimate-Easy-ESPHome_standard_hw_audio.yaml
 
 api:
   actions:
@@ -31,14 +31,14 @@ api:
         - lambda: |-
             rtttl_speaker->stop();
             if (speaker_volume->state > 0) {
-              ESP_LOGI("api", "Play tone: '%s'", tone.c_str());
+              ESP_LOGI("standard_speaker", "Play tone: '%s'", tone.c_str());
               rtttl_speaker->play(tone.c_str());
             }
 
 esphome:
   platformio_options:
     build_flags:
-      - -D TX_ULTIMATE_EASY_ADDON_SPEAKER
+      - -D TX_ULTIMATE_EASY_STANDARD_SPEAKER
 
 number:
   - id: speaker_volume
@@ -74,19 +74,20 @@ rtttl:
     speaker: speaker_embedded
 
 script:
-  - id: !extend dump_config
+  - id: !extend dump_config_list_packages
     then:
+      - script.wait: dump_config
       - lambda: |-
           // Check for requirements
           #if !defined(TX_ULTIMATE_EASY_CORE)
             #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
           #endif
-          #if !defined(TX_ULTIMATE_EASY_CORE_HW_AUDIO)
-            #error "The package TX-Ultimate-Easy-ESPHome_core_hw_audio.yaml is required."
+          #if !defined(TX_ULTIMATE_EASY_STANDARD_HW_AUDIO)
+            #error "The package TX-Ultimate-Easy-ESPHome_standard_hw_audio.yaml is required."
           #endif
 
           // Identify itself
-          ESP_LOGCONFIG("addon_speaker", "Add-on Speaker installed");
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Standard - Speaker");
 
   - id: speaker_play_click
     then:

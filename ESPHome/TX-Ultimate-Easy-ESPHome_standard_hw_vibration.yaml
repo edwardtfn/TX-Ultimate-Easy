@@ -2,7 +2,7 @@
 #####                              TX Ultimate Easy for ESPHome                                #####
 #####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
 ####################################################################################################
-##### Purpose: ESPHome Core - Hardware - Vibration system                                      #####
+##### Purpose: ESPHome - Standard - Hardware - Vibration system                                #####
 ####################################################################################################
 ##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
 ####################################################################################################
@@ -35,7 +35,7 @@ button:
 esphome:
   platformio_options:
     build_flags:
-      - -D TX_ULTIMATE_EASY_CORE_HW_VIBRATION
+      - -D TX_ULTIMATE_EASY_STANDARD_HW_VIBRATION
 
 number:
   - id: nr_vibrating_duration
@@ -61,22 +61,29 @@ script:
   - id: !extend dump_config
     then:
       - lambda: |-
+          // Configuration
+          ESP_LOGCONFIG("standard_hw_vibration", "Touch - Vibration feedback: %s",
+                        sl_touch_vibration_feedback->state.c_str());
+          ESP_LOGCONFIG("standard_hw_vibration", "Vibrate duration: %.0fms", nr_vibrating_duration->state);
+          ESP_LOGCONFIG("standard_hw_vibration", "Vibrate max duration: ${vibration_max_duration}");
+
+          // State
+          if (bs_vibrating->state)
+            ESP_LOGW("standard_hw_vibration", "Vibrating now: YES");
+          else
+            ESP_LOGCONFIG("standard_hw_vibration", "Vibrating now: No");
+
+  - id: !extend dump_config_list_packages
+    then:
+      - script.wait: dump_config
+      - lambda: |-
           // Check for requirements
           #if !defined(TX_ULTIMATE_EASY_CORE)
             #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
           #endif
 
-          // Configuration
-          ESP_LOGCONFIG("core_hw_vibration", "Touch - Vibration feedback: %s",
-                        sl_touch_vibration_feedback->state.c_str());
-          ESP_LOGCONFIG("core_hw_vibration", "Vibrate duration: %.0fms", nr_vibrating_duration->state);
-          ESP_LOGCONFIG("core_hw_vibration", "Vibrate max duration: ${vibration_max_duration}");
-
-          // State
-          if (bs_vibrating->state)
-            ESP_LOGW("core_hw_vibration", "Vibrating now: YES");
-          else
-            ESP_LOGCONFIG("core_hw_vibration", "Vibrating now: No");
+          // Identify itself
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Standard - Hardware - Vibration");
 
   - id: !extend touch_on_multi_touch_release
     then:
