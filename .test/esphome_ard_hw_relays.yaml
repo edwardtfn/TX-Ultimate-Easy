@@ -1,7 +1,7 @@
 ---
 packages:
   core_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
-  standard_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml
+  standard_hw_relays_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_relays.yaml
 
 esp32:
   framework:

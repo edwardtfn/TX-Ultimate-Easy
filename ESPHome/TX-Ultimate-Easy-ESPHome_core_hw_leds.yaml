@@ -29,6 +29,11 @@ substitutions:
   LIGHT_SIDES_RESTORE_MODE: RESTORE_DEFAULT_OFF
   LIGHT_INDIVIDUAL_RESTORE_MODE: RESTORE_DEFAULT_OFF
 
+esphome:
+  platformio_options:
+    build_flags:
+      - -D TX_ULTIMATE_EASY_CORE_HW_LEDS
+
 globals:
   - id: gb_lights_1
     type: std::vector<light::LightState*>
@@ -42,13 +47,15 @@ light:
   - id: light_full
     name: Light - All
     internal: true
-    platform: neopixelbus
-    type: GRB
-    variant: WS2811
-    # method: esp32_rmt
+    platform: esp32_rmt_led_strip
+    rgb_order: GRB
+    rmt_channel: 1
+    chipset: ws2812
     num_leds: 32
     pin: GPIO13
     restore_mode: ${LIGHT_FULL_RESTORE_MODE}
+    max_refresh_rate: 33ms
+    use_psram: true
 
   # Those lights are available based on the model selections
   - &light_partition_with_effects
@@ -436,56 +443,6 @@ script:
           light_us_right->set_internal(!id(is_us_model));
           light_us_top->set_internal(!id(is_us_model));
 
-          // LED Group Assignment:
-          // - For US model: gb_lights_1 = left side LEDs, gb_lights_2 = right side LEDs
-          // - For EU model: gb_lights_1 = bottom LEDs, gb_lights_2 = top LEDs
-          // Gang configurations determine which LED segments are active
-          switch (id(gang_count)) {
-            case 1:  // 1 Gang
-              if (id(is_us_model)) {
-                id(gb_lights_1) = { light_us_rl_1_1_left };
-                id(gb_lights_2) = { light_us_rl_1_1_right };
-              } else {
-                id(gb_lights_1) = { light_eu_rl_1_1_bottom };
-                id(gb_lights_2) = { light_eu_rl_1_1_top };
-              }
-              break;
-            case 2:  // 2 Gang
-              if (id(is_us_model)) {
-                id(gb_lights_1) = { light_us_rl_1_2_left, light_us_rl_2_2_left };
-                id(gb_lights_2) = { light_us_rl_1_2_right, light_us_rl_2_2_right };
-              } else {
-                id(gb_lights_1) = { light_eu_rl_1_2_bottom, light_eu_rl_2_2_bottom };
-                id(gb_lights_2) = { light_eu_rl_1_2_top, light_eu_rl_2_2_top };
-              }
-              break;
-            case 3:  // 3 Gang
-              if (id(is_us_model)) {
-                id(gb_lights_1) = { light_us_rl_1_3_left, light_us_rl_2_3_left, light_us_rl_3_3_left };
-                id(gb_lights_2) = { light_us_rl_1_3_right, light_us_rl_2_3_right, light_us_rl_3_3_right };
-              } else {
-                id(gb_lights_1) = { light_eu_rl_1_3_bottom, light_eu_rl_2_3_bottom, light_eu_rl_3_3_bottom };
-                id(gb_lights_2) = { light_eu_rl_1_3_top, light_eu_rl_2_3_top, light_eu_rl_3_3_top };
-              }
-              break;
-            case 4:  // 4 Gang
-              if (id(is_us_model)) {
-                id(gb_lights_1) = { light_us_rl_1_4_left, light_us_rl_2_4_left,
-                                    light_us_rl_3_4_left, light_us_rl_4_4_left };
-                id(gb_lights_2) = { light_us_rl_1_4_right, light_us_rl_2_4_right,
-                                    light_us_rl_3_4_right, light_us_rl_4_4_right };
-              } else {
-                id(gb_lights_1) = { light_eu_rl_1_4_bottom, light_eu_rl_2_4_bottom,
-                                    light_eu_rl_3_4_bottom, light_eu_rl_4_4_bottom };
-                id(gb_lights_2) = { light_eu_rl_1_4_top, light_eu_rl_2_4_top,
-                                    light_eu_rl_3_4_top, light_eu_rl_4_4_top };
-              }
-              break;
-            default:
-              ESP_LOGE("core_hw_leds", "Invalid gang count: %" PRIu8, id(gang_count));
-              break;
-          }
-
   - id: !extend dump_config
     then:
       - lambda: |-
@@ -526,6 +483,18 @@ script:
           ESP_LOGCONFIG("core_hw_leds", "  Light - All: ${LIGHT_FULL_RESTORE_MODE}");
           ESP_LOGCONFIG("core_hw_leds", "  Sides:       ${LIGHT_SIDES_RESTORE_MODE}");
           ESP_LOGCONFIG("core_hw_leds", "  Individual:  ${LIGHT_INDIVIDUAL_RESTORE_MODE}");
+
+  - id: !extend dump_config_list_packages
+    then:
+      - script.wait: dump_config
+      - lambda: |-
+          // Check for requirements
+          #if !defined(TX_ULTIMATE_EASY_CORE)
+            #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
+          #endif
+
+          // Identify itself
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Core - Hardware - LEDs");
 
   - id: light_set_state
     mode: parallel

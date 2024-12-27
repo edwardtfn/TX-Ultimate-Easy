@@ -2,7 +2,7 @@
 #####                              TX Ultimate Easy for ESPHome                                #####
 #####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
 ####################################################################################################
-##### Purpose: ESPHome Core - Hardware - Relays                                                #####
+##### Purpose: ESPHome - Standard - Hardware - Relays                                          #####
 ####################################################################################################
 ##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
 ####################################################################################################
@@ -19,9 +19,17 @@ substitutions:
   RELAY_RESTORE_MODE: RESTORE_DEFAULT_OFF
   LIGHT_RELAYS_RESTORE_MODE: RESTORE_DEFAULT_OFF
 
+esphome:
+  platformio_options:
+    build_flags:
+      - -D TX_ULTIMATE_EASY_STANDARD_HW_RELAYS
 
 globals:
   - id: boot_initialization_relays
+    type: bool
+    restore_value: false
+    initial_value: 'false'
+  - id: boot_initialization_relays_group_assignments
     type: bool
     restore_value: false
     initial_value: 'false'
@@ -436,20 +444,78 @@ script:
   - id: boot_initialize_relays
     mode: restart
     then:
+      - script.execute: boot_initialize_relays_group_assignments
       - script.execute: boot_initialize_relays_light_modes
       - script.execute: boot_initialize_relays_relay_leds
       - script.execute: boot_initialize_relays_relay_modes
+      - script.wait: boot_initialize_relays_group_assignments
       - script.wait: boot_initialize_relays_light_modes
       - script.wait: boot_initialize_relays_relay_leds
       - script.wait: boot_initialize_relays_relay_modes
       - wait_until:
           condition:
+            - lambda: return id(boot_initialization_relays_group_assignments);
             - lambda: return id(boot_initialization_relays_light_modes);
             - lambda: return id(boot_initialization_relays_relay_leds);
             - lambda: return id(boot_initialization_relays_relay_modes);
       - globals.set:
           id: boot_initialization_relays
           value: 'true'
+
+  - id: boot_initialize_relays_group_assignments
+    mode: restart
+    then:
+      - lambda: |-
+          // LED Group Assignment:
+          // - For US model: gb_lights_1 = left side LEDs, gb_lights_2 = right side LEDs
+          // - For EU model: gb_lights_1 = bottom LEDs, gb_lights_2 = top LEDs
+          // Gang configurations determine which LED segments are active
+          switch (id(gang_count)) {
+            case 1:  // 1 Gang
+              if (id(is_us_model)) {
+                id(gb_lights_1) = { light_us_rl_1_1_left };
+                id(gb_lights_2) = { light_us_rl_1_1_right };
+              } else {
+                id(gb_lights_1) = { light_eu_rl_1_1_bottom };
+                id(gb_lights_2) = { light_eu_rl_1_1_top };
+              }
+              break;
+            case 2:  // 2 Gang
+              if (id(is_us_model)) {
+                id(gb_lights_1) = { light_us_rl_1_2_left, light_us_rl_2_2_left };
+                id(gb_lights_2) = { light_us_rl_1_2_right, light_us_rl_2_2_right };
+              } else {
+                id(gb_lights_1) = { light_eu_rl_1_2_bottom, light_eu_rl_2_2_bottom };
+                id(gb_lights_2) = { light_eu_rl_1_2_top, light_eu_rl_2_2_top };
+              }
+              break;
+            case 3:  // 3 Gang
+              if (id(is_us_model)) {
+                id(gb_lights_1) = { light_us_rl_1_3_left, light_us_rl_2_3_left, light_us_rl_3_3_left };
+                id(gb_lights_2) = { light_us_rl_1_3_right, light_us_rl_2_3_right, light_us_rl_3_3_right };
+              } else {
+                id(gb_lights_1) = { light_eu_rl_1_3_bottom, light_eu_rl_2_3_bottom, light_eu_rl_3_3_bottom };
+                id(gb_lights_2) = { light_eu_rl_1_3_top, light_eu_rl_2_3_top, light_eu_rl_3_3_top };
+              }
+              break;
+            case 4:  // 4 Gang
+              if (id(is_us_model)) {
+                id(gb_lights_1) = { light_us_rl_1_4_left, light_us_rl_2_4_left,
+                                    light_us_rl_3_4_left, light_us_rl_4_4_left };
+                id(gb_lights_2) = { light_us_rl_1_4_right, light_us_rl_2_4_right,
+                                    light_us_rl_3_4_right, light_us_rl_4_4_right };
+              } else {
+                id(gb_lights_1) = { light_eu_rl_1_4_bottom, light_eu_rl_2_4_bottom,
+                                    light_eu_rl_3_4_bottom, light_eu_rl_4_4_bottom };
+                id(gb_lights_2) = { light_eu_rl_1_4_top, light_eu_rl_2_4_top,
+                                    light_eu_rl_3_4_top, light_eu_rl_4_4_top };
+              }
+              break;
+            default:
+              ESP_LOGE("standard_hw_relays", "Invalid gang count: %" PRIu8, id(gang_count));
+              break;
+          }
+          id(boot_initialization_relays_group_assignments) = true;
 
   - id: boot_initialize_relays_light_modes
     mode: restart
@@ -587,13 +653,13 @@ script:
           std::string select_state;
           bool toggle_relay = false;
           if (api_disconnected) {
-            ESP_LOGW("core_hw_relays", "Toggle relays:");
-            ESP_LOGW("core_hw_relays", "  API state: DISCONNECTED");
-            ESP_LOGW("core_hw_relays", "  Button:    %" PRIu8, button);
+            ESP_LOGW("standard_hw_relays", "Toggle relays:");
+            ESP_LOGW("standard_hw_relays", "  API state: DISCONNECTED");
+            ESP_LOGW("standard_hw_relays", "  Button:    %" PRIu8, button);
           } else {
-            ESP_LOGVV("core_hw_relays", "Toggle relays:");
-            ESP_LOGVV("core_hw_relays", "  API state: Connected");
-            ESP_LOGVV("core_hw_relays", "  Button:    %" PRIu8, button);
+            ESP_LOGVV("standard_hw_relays", "Toggle relays:");
+            ESP_LOGVV("standard_hw_relays", "  API state: Connected");
+            ESP_LOGVV("standard_hw_relays", "  Button:    %" PRIu8, button);
           }
           switch (button) {
             case ${BUTTON_1_ID}:
@@ -626,55 +692,76 @@ script:
               break;
           }
           if (toggle_relay) {
-            ESP_LOGI("core_hw_relays", "Toggle relay %" PRIu8 ": (%s)", button, select_state.c_str());
+            ESP_LOGI("standard_hw_relays", "Toggle relay %" PRIu8 ": (%s)", button, select_state.c_str());
           } else if (not select_state.empty()) {
-            ESP_LOGV("core_hw_relays", "Ignoring toggle for relay %" PRIu8 ": action is '%s'",
+            ESP_LOGV("standard_hw_relays", "Ignoring toggle for relay %" PRIu8 ": action is '%s'",
                                         button, select_state.c_str());
           } else {
-            ESP_LOGE("core_hw_relays", "No button action selected for button %" PRIu8, button);
+            ESP_LOGE("standard_hw_relays", "No button action selected for button %" PRIu8, button);
           }
 
   - id: !extend dump_config
     then:
       - lambda: |-
-          ESP_LOGCONFIG("core_hw_relays", "Relay%s mode%s:",
+          // Relay's modes
+          ESP_LOGCONFIG("standard_hw_relays", "Relay%s mode%s:",
                         id(gang_count_plural_suffix).c_str(),
                         id(gang_count_plural_suffix).c_str());
-          ESP_LOGCONFIG("core_hw_relays", "  Relay 1: %s", sl_relay_1_mode->has_state()
+          ESP_LOGCONFIG("standard_hw_relays", "  Relay 1: %s", sl_relay_1_mode->has_state()
                                                             ? sl_relay_1_mode->state.c_str()
                                                             : "Unknown");
           if (id(gang_count) >= 2)
-            ESP_LOGCONFIG("core_hw_relays", "  Relay 2: %s", sl_relay_2_mode->has_state()
+            ESP_LOGCONFIG("standard_hw_relays", "  Relay 2: %s", sl_relay_2_mode->has_state()
                                                               ? sl_relay_2_mode->state.c_str()
                                                               : "Unknown");
           if (id(gang_count) >= 3)
-            ESP_LOGCONFIG("core_hw_relays", "  Relay 3: %s", sl_relay_3_mode->has_state()
+            ESP_LOGCONFIG("standard_hw_relays", "  Relay 3: %s", sl_relay_3_mode->has_state()
                                                               ? sl_relay_3_mode->state.c_str()
                                                               : "Unknown");
           if (id(gang_count) >= 4)
-            ESP_LOGCONFIG("core_hw_relays", "  Relay 4: %s", sl_relay_4_mode->has_state()
+            ESP_LOGCONFIG("standard_hw_relays", "  Relay 4: %s", sl_relay_4_mode->has_state()
                                                               ? sl_relay_4_mode->state.c_str()
                                                               : "Unknown");
-          ESP_LOGCONFIG("core_hw_relays", "Relay%s state%s:",
+
+          // Relay's states
+          ESP_LOGCONFIG("standard_hw_relays", "Relay%s state%s:",
                         id(gang_count_plural_suffix).c_str(),
                         id(gang_count_plural_suffix).c_str());
-          ESP_LOGCONFIG("core_hw_relays", "  Relay 1: %s", sw_relay_1->state ? "ON" : "OFF");
+          ESP_LOGCONFIG("standard_hw_relays", "  Relay 1: %s", sw_relay_1->state ? "ON" : "OFF");
           if (id(gang_count) >= 2)
-            ESP_LOGCONFIG("core_hw_relays", "  Relay 2: %s", sw_relay_2->state ? "ON" : "OFF");
+            ESP_LOGCONFIG("standard_hw_relays", "  Relay 2: %s", sw_relay_2->state ? "ON" : "OFF");
           if (id(gang_count) >= 3)
-            ESP_LOGCONFIG("core_hw_relays", "  Relay 3: %s", sw_relay_3->state ? "ON" : "OFF");
+            ESP_LOGCONFIG("standard_hw_relays", "  Relay 3: %s", sw_relay_3->state ? "ON" : "OFF");
           if (id(gang_count) >= 4)
-            ESP_LOGCONFIG("core_hw_relays", "  Relay 4: %s", sw_relay_4->state ? "ON" : "OFF");
-          ESP_LOGCONFIG("core_hw_relays", "Expose Relay's LEDs to Home Assistant: %s",
+            ESP_LOGCONFIG("standard_hw_relays", "  Relay 4: %s", sw_relay_4->state ? "ON" : "OFF");
+          ESP_LOGCONFIG("standard_hw_relays", "Expose Relay's LEDs to Home Assistant: %s",
                         YESNO(sw_expose_relays_leds_to_ha->state));
-          ESP_LOGCONFIG("core_hw_relays", "Boot initialization flags:");
-          ESP_LOGCONFIG("core_hw_relays", "  Overall:     %s", YESNO(id(boot_initialization_relays)));
-          ESP_LOGCONFIG("core_hw_relays", "  Light modes: %s", YESNO(id(boot_initialization_relays_light_modes)));
-          ESP_LOGCONFIG("core_hw_relays", "  Relay modes: %s", YESNO(id(boot_initialization_relays_relay_modes)));
-          ESP_LOGCONFIG("core_hw_relays", "  Status LEDs: %s", YESNO(id(boot_initialization_relays_relay_leds)));
-          ESP_LOGCONFIG("core_hw_relays", "Restore modes:");
-          ESP_LOGCONFIG("core_hw_relays", "  Relays: ${RELAY_RESTORE_MODE}");
-          ESP_LOGCONFIG("core_hw_relays", "  Status LEDs: ${LIGHT_RELAYS_RESTORE_MODE}");
+
+          // Boot initialization statuses
+          ESP_LOGCONFIG("standard_hw_relays", "Boot initialization flags:");
+          ESP_LOGCONFIG("standard_hw_relays", "  Overall:     %s", YESNO(id(boot_initialization_relays)));
+          ESP_LOGCONFIG("standard_hw_relays", "  Groups:      %s",
+                        YESNO(id(boot_initialization_relays_group_assignments)));
+          ESP_LOGCONFIG("standard_hw_relays", "  Light modes: %s", YESNO(id(boot_initialization_relays_light_modes)));
+          ESP_LOGCONFIG("standard_hw_relays", "  Relay modes: %s", YESNO(id(boot_initialization_relays_relay_modes)));
+          ESP_LOGCONFIG("standard_hw_relays", "  Status LEDs: %s", YESNO(id(boot_initialization_relays_relay_leds)));
+
+          // Substitutions
+          ESP_LOGCONFIG("standard_hw_relays", "Restore modes:");
+          ESP_LOGCONFIG("standard_hw_relays", "  Relays: ${RELAY_RESTORE_MODE}");
+          ESP_LOGCONFIG("standard_hw_relays", "  Status LEDs: ${LIGHT_RELAYS_RESTORE_MODE}");
+
+  - id: !extend dump_config_list_packages
+    then:
+      - script.wait: dump_config
+      - lambda: |-
+          // Check for requirements
+          #if !defined(TX_ULTIMATE_EASY_CORE)
+            #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
+          #endif
+
+          // Identify itself
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Standard - Hardware - Relays");
 
   - id: show_relay_status
     mode: restart
@@ -682,7 +769,7 @@ script:
       - script.wait: boot_initialize_relays
       - lambda: |-
           if (not id(boot_initialization_relays)) {
-            ESP_LOGW("core_hw_relays", "Relays not initialized yet");
+            ESP_LOGW("standard_hw_relays", "Relays not initialized yet");
             if (not boot_initialize_relays->is_running())
               boot_initialize_relays->execute();
             return;
@@ -725,8 +812,8 @@ script:
                 break;
             }
 
-            ESP_LOGV("core_hw_relays", "Relay %" PRIu8 " is %s", i + 1, relay_state ? "ON" : "OFF");
-            ESP_LOGV("core_hw_relays", "Light Mode for Relay %" PRIu8 ": %s", i + 1, light_mode.c_str());
+            ESP_LOGV("standard_hw_relays", "Relay %" PRIu8 " is %s", i + 1, relay_state ? "ON" : "OFF");
+            ESP_LOGV("standard_hw_relays", "Light Mode for Relay %" PRIu8 ": %s", i + 1, light_mode.c_str());
 
             // Use light_set_state for light updates
             if (relay_state) {
