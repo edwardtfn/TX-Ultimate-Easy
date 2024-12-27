@@ -155,11 +155,12 @@ We recommend using [ESPHome Web](https://web.esphome.io) for the simplest experi
 7. After successful flash, device will restart and be ready for OTA updates
 
 #### Detailed Visual Guides
+<!-- markdownlint-disable MD013 -->
 For step-by-step visual instructions, you can reference these existing guides:
-- 🇬🇧 [WirelessThings Guide](https://wirelessthings.net/how-to-flash-sonoff-tx-ultimate-with-esphome) -
-  English guide with detailed photos
+- 🇬🇧 [WirelessThings Guide](https://wirelessthings.io/index.php/2023/12/19/how-to-flash-sonoff-tx-ultimate-with-esphome/) - English guide with detailed photos
 - 🇪🇸 [Un loco y su tecnología](https://youtu.be/58v8oqSQgXQ?t=143) - Spanish video tutorial
 - 🇩🇪 [SmartHome yourself](https://youtu.be/naDLhX89enQ?t=465) - German video tutorial
+<!-- markdownlint-enable MD013 -->
 
 Note: While these guides may use different firmware, the physical flashing process remains the same.
 
