@@ -132,7 +132,7 @@ light:
     name: Light - Relay 1 of 1 (bottom)
     platform: partition
     internal: true
-    disabled_by_default: true
+    disabled_by_default: false
     default_transition_length: ${default_transition_length}
     restore_mode: ${LIGHT_RELAYS_RESTORE_MODE}
     segments:
