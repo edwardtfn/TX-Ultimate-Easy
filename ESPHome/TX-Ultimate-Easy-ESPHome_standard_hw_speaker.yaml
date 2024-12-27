@@ -87,7 +87,7 @@ script:
           #endif
 
           // Identify itself
-          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Standard - Speaker");
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Standard - Hardware - Speaker");
 
   - id: speaker_play_click
     then:
