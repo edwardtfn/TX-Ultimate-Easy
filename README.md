@@ -103,7 +103,7 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
 2. Start the ESPHome add-on and verify it's running
 3. Access ESPHome dashboard through Home Assistant
 
-### Device Configuration
+### Setup Device
 
 1. In ESPHome dashboard, click "+ New Device"
 2. Name your device (e.g., "tx-ultimate-living-room")
@@ -130,10 +130,8 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
    ```yaml
    ref: v2024.12.2  # Using specific version for controlled updates
    ```
-
   > [!NOTE]
   > [Click here](https://github.com/edwardtfn/TX-Ultimate-Easy/tags) for a full list of versions available
-
 5. Click "Save" and then "Install"
 
 ### Device Flashing
