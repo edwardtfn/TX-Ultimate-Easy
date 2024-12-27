@@ -119,7 +119,7 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
        url: https://github.com/edwardtfn/TX-Ultimate-Easy
        ref: main  # For latest stable release
        files:
-         - ESPHome/TX-Ultimate-Easy-ESPHome.yaml
+         - TX-Ultimate-Easy-ESPHome.yaml
    
    wifi:
      ssid: !secret wifi_ssid
