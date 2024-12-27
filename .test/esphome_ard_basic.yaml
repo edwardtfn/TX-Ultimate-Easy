@@ -6,4 +6,8 @@ packages:
 esp32:
   framework:
     type: arduino
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
 ...

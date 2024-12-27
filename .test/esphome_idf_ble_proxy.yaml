@@ -7,4 +7,8 @@ packages:
 esp32:
   framework:
     type: esp-idf
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
 ...
