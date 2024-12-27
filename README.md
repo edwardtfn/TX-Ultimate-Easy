@@ -128,8 +128,12 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
 
    You can also use a specific version tag for better control over updates:
    ```yaml
-   ref: v[![version]][version]  # Using specific version for controlled updates
+   ref: v2024.12.2  # Using specific version for controlled updates
    ```
+
+  > [!NOTE]
+  > [Click here](https://github.com/edwardtfn/TX-Ultimate-Easy/tags) for a full list of versions available
+
 5. Click "Save" and then "Install"
 
 ### 3. Device Flashing
@@ -171,9 +175,9 @@ We recommend using [ESPHome Web](https://web.esphome.io) for the simplest experi
    - TX → RX
    - RX → TX
 4. Put device in flash mode:
-   - Connect the BOOT pin to GND using a jumper wire
-   - Power up the device (keeping BOOT connected to GND)
-   - Remove the BOOT to GND connection
+   - Temporarily connect the BOOT pin to GND using a jumper wire
+   - While holding BOOT to GND, power up the device
+   - After device powers up (wait a couple of seconds), remove the BOOT to GND connection
 5. Visit [ESPHome Web](https://web.esphome.io)
 6. Connect to your device and flash the firmware
 7. After successful flash, device will restart and be ready for OTA updates
@@ -196,8 +200,9 @@ through the ESPHome dashboard in your ESPHome add-on.
 
 After successful flashing:
 1. Ensure your device and Home Assistant are on the same network
-2. Device should be automatically discovered within a couple of minutes
-3. Accept the discovery notification to add device
+2. Device should be automatically discovered within 1-2 minutes
+3. Accept the discovery notification in Home Assistant to add device
+   Note: If discovery takes longer than 5 minutes, proceed to troubleshooting steps
 4. Device will appear in your Home Assistant Devices dashboard
 
 #### Troubleshooting Integration
@@ -229,6 +234,9 @@ If the device isn't discovered automatically:
    - Touch sensitivity
    - Haptic feedback
    - Audio feedback
+
+> [!NOTE]  
+> Some changes may require a device restart
 
 ## Usage
 
@@ -285,10 +293,11 @@ Note: For proper tracking and resolution:
 
 This project builds upon the work of several amazing projects and contributors:
 
+<!-- markdownlint-disable MD013 -->
 - [SmartHome yourself - SONOFF TX Ultimate for ESPHome](https://github.com/SmartHome-yourself/sonoff-tx-ultimate-for-esphome)
 - [Un loco y su tecnología - Sonoff TX Ultimate with ESPHome](https://www.youtube.com/watch?v=58v8oqSQgXQ)
-- [@PxPert](https://github.com/PxPert) -
-  [Sonoff TX Ultimate and Voice Assistant](https://community.home-assistant.io/t/sonoff-tx-ultimate-and-voice-assistant/682214?u=edwardtfn)
+- [@PxPert](https://github.com/PxPert) - [Sonoff TX Ultimate and Voice Assistant](https://community.home-assistant.io/t/sonoff-tx-ultimate-and-voice-assistant/682214?u=edwardtfn)
+<!-- markdownlint-enable MD013 -->
 
 Special thanks to all contributors and community members who help make this project better.
 
