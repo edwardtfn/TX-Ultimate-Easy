@@ -271,7 +271,10 @@ jobs:
 
   build_ard_media_player:
     name: Media Player (Ard)
-    needs: build_ard_basic
+    needs:
+      - build_ard_basic
+      - build_ard_hw_relays
+      - build_ard_hw_vibration
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
