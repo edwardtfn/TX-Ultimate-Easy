@@ -2,6 +2,7 @@
 
 #include "esphome/core/log.h"
 #include "tx_ultimate_easy.h"
+#include <cinttypes>
 #include <string>
 
 namespace esphome {
