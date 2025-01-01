@@ -318,7 +318,7 @@ script:
       #   - HW Vibration
       - binary_sensor.template.publish:
           id: bs_multi_touch
-          state: OFF  # yamllint disable-line rule:truthy
+          state: ON  # yamllint disable-line rule:truthy
 
   - id: touch_on_press
     mode: restart
