@@ -111,26 +111,31 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
 4. Copy this basic configuration to your new device:
    ```yaml
    substitutions:
-     name: tx-ultimate-easy  # Change this to your device name
+     name: tx-ultimate-easy
      friendly_name: TX Ultimate Easy
-   
-   packages:
-     remote_package:
-       url: https://github.com/edwardtfn/TX-Ultimate-Easy
-       ref: main  # For latest stable release
-       files:
-         - TX-Ultimate-Easy-ESPHome.yaml
-   
+
    wifi:
      ssid: !secret wifi_ssid
      password: !secret wifi_password
-   ```
 
+   packages:
+     remote_package:
+       url: https://github.com/edwardtfn/TX-Ultimate-Easy
+       ref: stable  # Or you can specify a version, like `ref: v2024.12.6` or `ref: latest` to the latest non-stable
+       refresh: 5min
+       files:
+         - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml                  # Core (essential) packages
+         - ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml              # Non-essential, but recommended packages
+         # - ESPHome/TX-Ultimate-Easy-ESPHome_addon_ble_proxy.yaml     # Adds BLE proxy support
+   ```
    You can also use a specific version tag for better control over updates:
    ```yaml
    ref: v2024.12.2  # Using specific version for controlled updates
    ```
-    **Note:** [Click here](https://github.com/edwardtfn/TX-Ultimate-Easy/tags) for a full list of versions available.
+    **Notes:**
+      - [Click here](https://github.com/edwardtfn/TX-Ultimate-Easy/tags) for a full list of versions available.
+      - [Click here](https://github.com/edwardtfn/TX-Ultimate-Easy/blob/main/TX-Ultimate-Easy-ESPHome.yaml)
+        for the latest version of this yaml.
 5. Click "Save" and then "Install"
 
 ### Device Flashing

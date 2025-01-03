@@ -4,7 +4,6 @@
 # 2. Manual dispatch - allows independent control over stable and latest tags
 
 ---
-
 name: Version and Tags
 
 on:  # yamllint disable-line rule:truthy
@@ -56,10 +55,9 @@ jobs:
 
       - name: Update stable tag
         if: |
-          success() && (
-            github.event_name == 'workflow_dispatch' && inputs.update_stable ||
-            github.event_name == 'push'
-          )
+          success() && 
+          github.event_name == 'workflow_dispatch' && 
+          inputs.update_stable
         run: |
           # Verify version bump was successful
           if [ ! -f "./versioning/VERSION" ]; then
