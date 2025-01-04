@@ -46,5 +46,6 @@ script:
     then:
       - lambda: |-
           // Version information
-          ESP_LOGCONFIG("standard", "ESPHome builder: %s", esphome_fw_version->state.c_str());
+          ESP_LOGCONFIG("standard", "ESPHome builder: " ESPHOME_VERSION);
+          ESP_LOGCONFIG("standard", "ESPHome build timestamp: %s", App.get_compilation_time().c_str());
 ...
