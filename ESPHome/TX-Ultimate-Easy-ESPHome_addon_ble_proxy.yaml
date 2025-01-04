@@ -63,4 +63,7 @@ script:
 
           // Identify itself
           ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Add-on - BLE Proxy");
+
+switch:
+  - id: !remove sw_speaker_amplifier
 ...
