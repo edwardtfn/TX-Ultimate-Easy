@@ -1,0 +1,10 @@
+---
+packages:
+  common_idf: !include common_idf.yaml
+
+esp32:
+  framework:
+    type: esp-idf
+    version: 5.3.1
+    platform_version: 6.9.0
+...
