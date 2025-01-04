@@ -14,10 +14,6 @@
 packages:
   standard_hw_audio: !include TX-Ultimate-Easy-ESPHome_standard_hw_audio.yaml
 
-esp32:
-  framework:
-    type: arduino
-
 esphome:
   platformio_options:
     build_flags:
@@ -44,6 +40,9 @@ script:
       - script.wait: dump_config
       - lambda: |-
           // Check for requirements
+          #ifdef USE_ESP_IDF
+            #error "This package is not compatible with ESP-IDF framework."
+          #endif
           #if !defined(TX_ULTIMATE_EASY_CORE)
             #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
           #endif
