@@ -59,10 +59,8 @@ binary_sensor:
         - script.execute: dump_config_caller
 
 esp32:
-  board: esp32dev  # adafruit_feather_esp32_v2  # esp32dev
+  board: esp32dev
   flash_size: 8MB
-  framework:
-    type: esp-idf
 
 esphome:
   name: ${name}

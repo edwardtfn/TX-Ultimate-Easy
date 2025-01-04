@@ -47,15 +47,12 @@ light:
   - id: light_full
     name: Light - All
     internal: true
-    platform: esp32_rmt_led_strip
-    rgb_order: GRB
-    rmt_channel: 1
-    chipset: ws2812
     num_leds: 32
     pin: GPIO13
     restore_mode: ${LIGHT_FULL_RESTORE_MODE}
-    max_refresh_rate: 33ms
-    use_psram: true
+    platform: neopixelbus
+    type: GRB
+    variant: WS2811
 
   # Those lights are available based on the model selections
   - &light_partition_with_effects
