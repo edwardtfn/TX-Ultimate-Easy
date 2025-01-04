@@ -136,9 +136,11 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
       - [Click here](https://github.com/edwardtfn/TX-Ultimate-Easy/tags) for a full list of versions available.
       - [Click here](https://github.com/edwardtfn/TX-Ultimate-Easy/blob/main/TX-Ultimate-Easy-ESPHome.yaml)
         for the latest version of this yaml.
-
    > [!IMPORTANT]  
-   > Starting from version 2025.1.0, non-essential components like `web_server`, `captive_portal`, and `wifi` are no longer included in the core package. If you need these components, you must add them manually to your local configuration file. For example:
+   > Starting from version 2025.1.0, non-essential components like `web_server`, `captive_portal`, and `wifi`
+   > are no longer included in the core package. If you need these components,
+   > you must add them manually to your local configuration file.
+   > For example:
    > ```yaml
    > # Add these to your configuration if needed
    > web_server:
@@ -146,7 +148,6 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
    > wifi:
    >   ap: # Access point configuration
    > ```
-
 5. Click "Save" and then "Install"
 
 ### Device Flashing
