@@ -11,7 +11,7 @@ on:  # yamllint disable-line rule:truthy
       - "**/*.yml"
       - "**/*.yaml"
       - "**/*.h"
-      - "**/*.cpp" 
+      - "**/*.cpp"
       - "**/*.c"
       - "**/*.py"
 
