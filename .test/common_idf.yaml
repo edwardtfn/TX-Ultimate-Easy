@@ -17,8 +17,6 @@ esp32:
       CONFIG_SPIRAM_RODATA: "y"
       CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP: "y"
 
-i2s_audio: !remove
-
 light:
   - id: !extend light_full
     platform: esp32_rmt_led_strip
@@ -29,6 +27,4 @@ light:
     use_psram: false
     type: !remove
     variant: !remove
-
-media_player: !remove
 ...
