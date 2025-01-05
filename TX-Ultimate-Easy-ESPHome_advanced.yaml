@@ -10,7 +10,7 @@
 ---
 substitutions:
   name: tx-ultimate-easy-adv
-  friendly_name: TX Ultimate Easy Advanced  
+  friendly_name: TX Ultimate Easy Advanced
 
 wifi:
   ssid: !secret wifi_ssid
@@ -30,7 +30,7 @@ packages:
 
       # Optional functionality - Can be enabled/disabled as needed
       - ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_relays.yaml     # Relay control
-      - ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_vibration.yaml  # Haptic feedback  
+      - ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_vibration.yaml  # Haptic feedback
 
       # Audio options (use none or choose only one - using both will fail)
       - ESPHome/TX-Ultimate-Easy-ESPHome_standard_media_player.yaml  # Media player (Recommended for most users)
