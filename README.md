@@ -152,7 +152,9 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
 > ```
 
 ### Advanced Settings
-For more granular control over components, you can use our [advanced configuration template](TX-Ultimate-Easy-ESPHome_advanced.yaml). This template allows you to selectively include specific packages, which can be useful for:
+For more granular control over components,
+you can use our [advanced configuration template](TX-Ultimate-Easy-ESPHome_advanced.yaml).
+This template allows you to selectively include specific packages, which can be useful for:
 
 - Troubleshooting specific components
 - Reducing memory usage by excluding unused features
