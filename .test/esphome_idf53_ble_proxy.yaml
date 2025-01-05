@@ -1,7 +1,12 @@
 ---
 packages:
-  common_idf53: !include common_idf53.yaml
   core_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
   standard_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml
   addon_bluetooth_proxy: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_addon_ble_proxy.yaml
+
+esp32:
+  framework:
+    type: esp-idf
+    version: 5.3.1
+    platform_version: 6.9.0
 ...
