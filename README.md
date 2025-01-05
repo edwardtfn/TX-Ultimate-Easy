@@ -165,7 +165,7 @@ Here's an example of the advanced configuration:
 packages:
   remote_package:
     url: https://github.com/edwardtfn/TX-Ultimate-Easy
-    ref: stable
+    ref: stable  # Or you can specify a version, like `ref: v2024.12.6` or `ref: latest` to the latest non-stable
     refresh: 5min
     files:
       # Core (essential) packages
