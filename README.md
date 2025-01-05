@@ -134,7 +134,7 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
    ```
     **Notes:**
       - [Click here](https://github.com/edwardtfn/TX-Ultimate-Easy/tags) for a full list of versions available.
-      - [Click here](https://github.com/edwardtfn/TX-Ultimate-Easy/blob/main/TX-Ultimate-Easy-ESPHome.yaml)
+      - [Click here](TX-Ultimate-Easy-ESPHome.yaml)
         for the latest version of this yaml.
 5. Click "Save" and then "Install"
 
@@ -150,6 +150,39 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
 > wifi:
 >   ap: # Access point configuration
 > ```
+
+### Advanced Settings
+For more granular control over components, you can use our [advanced configuration template](TX-Ultimate-Easy-ESPHome_advanced.yaml). This template allows you to selectively include specific packages, which can be useful for:
+
+- Troubleshooting specific components
+- Reducing memory usage by excluding unused features
+- Customizing functionality for specific use cases
+
+Here's an example of the advanced configuration:
+```yaml
+packages:
+  remote_package:
+    url: https://github.com/edwardtfn/TX-Ultimate-Easy
+    ref: stable
+    refresh: 5min
+    files:
+      # Core (essential) packages
+      - ESPHome/TX-Ultimate-Easy-ESPHome_core_common.yaml      # Basic shared settings
+      - ESPHome/TX-Ultimate-Easy-ESPHome_core_hw_buttons.yaml  # Button logic
+      - ESPHome/TX-Ultimate-Easy-ESPHome_core_hw_leds.yaml     # LED configuration
+      - ESPHome/TX-Ultimate-Easy-ESPHome_core_hw_touch.yaml    # Touch panel support
+
+      # Optional but recommended packages
+      - ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_relays.yaml     # Relay control
+      - ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_vibration.yaml  # Haptic feedback
+
+      # Audio options (use none or choose only one - using both will fail)
+      - ESPHome/TX-Ultimate-Easy-ESPHome_standard_media_player.yaml  # Media player (Recommended for most users)
+      # - ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_speaker.yaml  # Basic speaker
+```
+
+> [!NOTE]
+> Use the advanced configuration with caution. Excluding core packages may cause instability or reduced functionality.
 
 ### Device Flashing
 
