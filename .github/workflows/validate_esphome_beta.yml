@@ -8,10 +8,22 @@ permissions:
 on:  # yamllint disable-line rule:truthy
   push:
     paths:
-      - "**/*.{yml,yaml,h,cpp,c,py}"  # Match any file with the extensions in any directory
+      - "**/*.yml"
+      - "**/*.yaml"
+      - "**/*.h"
+      - "**/*.cpp"
+      - "**/*.c"
+      - "**/*.py"
+
   pull_request:
     paths:
-      - "**/*.{yml,yaml,h,cpp,c,py}"  # Match any file with the extensions in any directory
+      - "**/*.yml"
+      - "**/*.yaml"
+      - "**/*.h"
+      - "**/*.cpp"
+      - "**/*.c"
+      - "**/*.py"
+
   workflow_dispatch:
 
 concurrency:

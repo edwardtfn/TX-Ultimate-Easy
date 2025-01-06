@@ -2,7 +2,7 @@
 #####                              TX Ultimate Easy for ESPHome                                #####
 #####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
 ####################################################################################################
-##### Purpose: ESPHome Standard (non-essential, but recommended packages)                      #####
+##### Purpose: ESPHome Basic (includes core plus non-essential, but recommended packages)      #####
 ####################################################################################################
 ##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
 ####################################################################################################
@@ -13,8 +13,7 @@
 ---
 packages:
   # yamllint disable rule:colons
-  standard_hw_relays:    !include TX-Ultimate-Easy-ESPHome_standard_hw_relays.yaml
-  standard_hw_vibration: !include TX-Ultimate-Easy-ESPHome_standard_hw_vibration.yaml
-  standard_media_player: !include TX-Ultimate-Easy-ESPHome_standard_media_player.yaml
+  core:     !include TX-Ultimate-Easy-ESPHome_core.yaml
+  standard: !include TX-Ultimate-Easy-ESPHome_standard.yaml
   # yamllint enable rule:colons
 ...

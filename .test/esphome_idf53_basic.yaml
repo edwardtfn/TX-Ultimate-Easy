@@ -1,15 +1,11 @@
 ---
 packages:
+  common_idf53: !include common_idf53.yaml
   core_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
   standard_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml
 
-esp32:
-  framework:
-    type: esp-idf
-    version: 5.3.1
-    platform_version: 6.9.0
+media_player: !remove
 
-wifi:
-  ssid: !secret wifi_ssid
-  password: !secret wifi_password
+switch:
+  - id: !remove sw_speaker_amplifier
 ...

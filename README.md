@@ -111,27 +111,80 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
 4. Copy this basic configuration to your new device:
    ```yaml
    substitutions:
-     name: tx-ultimate-easy  # Change this to your device name
+     name: tx-ultimate-easy
      friendly_name: TX Ultimate Easy
-   
-   packages:
-     remote_package:
-       url: https://github.com/edwardtfn/TX-Ultimate-Easy
-       ref: main  # For latest stable release
-       files:
-         - TX-Ultimate-Easy-ESPHome.yaml
-   
+
    wifi:
      ssid: !secret wifi_ssid
      password: !secret wifi_password
-   ```
 
+   packages:
+     remote_package:
+       url: https://github.com/edwardtfn/TX-Ultimate-Easy
+       ref: stable  # Or you can specify a version, like `ref: v2024.12.6` or `ref: latest` to the latest non-stable
+       refresh: 5min
+       files:
+         - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml                  # Core (essential) packages
+         - ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml              # Non-essential, but recommended packages
+         # - ESPHome/TX-Ultimate-Easy-ESPHome_addon_ble_proxy.yaml     # Adds BLE proxy support
+   ```
    You can also use a specific version tag for better control over updates:
    ```yaml
    ref: v2024.12.2  # Using specific version for controlled updates
    ```
-    **Note:** [Click here](https://github.com/edwardtfn/TX-Ultimate-Easy/tags) for a full list of versions available.
+    **Notes:**
+      - [Click here](https://github.com/edwardtfn/TX-Ultimate-Easy/tags) for a full list of versions available.
+      - [Click here](TX-Ultimate-Easy-ESPHome.yaml)
+        for the latest version of this yaml.
 5. Click "Save" and then "Install"
+
+> [!IMPORTANT]  
+> Starting from version 2025.1.0, non-essential components like `web_server`, `captive_portal`, and `wifi`
+> are no longer included in the core package. If you need these components,
+> you must add them manually to your local configuration file.
+> For example:
+> ```yaml
+> # Add these to your configuration if needed
+> web_server:
+> captive_portal:
+> wifi:
+>   ap: # Access point configuration
+> ```
+
+### Advanced Settings
+For more granular control over components,
+you can use our [advanced configuration template](TX-Ultimate-Easy-ESPHome_advanced.yaml).
+This template allows you to selectively include specific packages, which can be useful for:
+
+- Troubleshooting specific components
+- Reducing memory usage by excluding unused features
+- Customizing functionality for specific use cases
+
+Here's an example of the advanced configuration:
+```yaml
+packages:
+  remote_package:
+    url: https://github.com/edwardtfn/TX-Ultimate-Easy
+    ref: stable  # Or you can specify a version, like `ref: v2024.12.6` or `ref: latest` to the latest non-stable
+    refresh: 5min
+    files:
+      # Core (essential) packages
+      - ESPHome/TX-Ultimate-Easy-ESPHome_core_common.yaml      # Basic shared settings
+      - ESPHome/TX-Ultimate-Easy-ESPHome_core_hw_buttons.yaml  # Button logic
+      - ESPHome/TX-Ultimate-Easy-ESPHome_core_hw_leds.yaml     # LED configuration
+      - ESPHome/TX-Ultimate-Easy-ESPHome_core_hw_touch.yaml    # Touch panel support
+
+      # Optional but recommended packages
+      - ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_relays.yaml     # Relay control
+      - ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_vibration.yaml  # Haptic feedback
+
+      # Audio options (use none or choose only one - using both will fail)
+      - ESPHome/TX-Ultimate-Easy-ESPHome_standard_media_player.yaml  # Media player (Recommended for most users)
+      # - ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_speaker.yaml  # Basic speaker
+```
+
+> [!NOTE]
+> Use the advanced configuration with caution. Excluding core packages may cause instability or reduced functionality.
 
 ### Device Flashing
 
