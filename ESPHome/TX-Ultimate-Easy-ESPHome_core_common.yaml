@@ -101,7 +101,6 @@ globals:
     type: std::string
     restore_value: true
     max_restore_data_length: 3
-    # initial_value: "''"
 
 logger:
   level: DEBUG
