@@ -2,6 +2,7 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome import automation
 from esphome.components import uart
+from esphome.components.esp32 import add_idf_sdkconfig_option
 from esphome.const import (
     CONF_ID,
 )
