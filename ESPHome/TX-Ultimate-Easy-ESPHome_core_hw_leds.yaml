@@ -28,7 +28,11 @@ substitutions:
   LIGHT_FULL_RESTORE_MODE: RESTORE_DEFAULT_OFF
   LIGHT_SIDES_RESTORE_MODE: RESTORE_DEFAULT_OFF
   LIGHT_INDIVIDUAL_RESTORE_MODE: RESTORE_DEFAULT_OFF
-  LIGHT_RELAYS_RESTORE_MODE: RESTORE_DEFAULT_OFF
+
+esphome:
+  platformio_options:
+    build_flags:
+      - -D TX_ULTIMATE_EASY_CORE_HW_LEDS
 
 globals:
   - id: gb_lights_1
@@ -43,13 +47,12 @@ light:
   - id: light_full
     name: Light - All
     internal: true
-    platform: neopixelbus
-    type: GRB
-    variant: WS2811
-    # method: esp32_rmt
     num_leds: 32
     pin: GPIO13
     restore_mode: ${LIGHT_FULL_RESTORE_MODE}
+    platform: neopixelbus
+    type: GRB
+    variant: WS2811
 
   # Those lights are available based on the model selections
   - &light_partition_with_effects
@@ -418,370 +421,77 @@ light:
         from: 31
         to: 31
 
-  # These lights are used to indicate relay's statuses
-  - &light_partition_relays
-    id: light_eu_rl_1_1_bottom
-    name: Light - Relay 1 of 1 (bottom)
-    platform: partition
-    internal: true
-    default_transition_length: ${default_transition_length}
-    restore_mode: ${LIGHT_RELAYS_RESTORE_MODE}
-    segments:
-      - id: light_full
-        from: 9
-        to: 9
-  - id: light_eu_rl_1_1_top
-    name: Light - Relay 1 of 1 (top)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 23
-        to: 23
-  - id: light_eu_rl_1_2_bottom
-    name: Light - Relay 1 of 2 (bottom)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 11
-        to: 11
-  - id: light_eu_rl_1_2_top
-    name: Light - Relay 1 of 2 (top)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 21
-        to: 21
-  - id: light_eu_rl_2_2_bottom
-    name: Light - Relay 2 of 2 (bottom)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 7
-        to: 7
-  - id: light_eu_rl_2_2_top
-    name: Light - Relay 2 of 2 (top)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 25
-        to: 25
-  - id: light_eu_rl_1_3_bottom
-    name: Light - Relay 1 of 3 (bottom)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 12
-        to: 12
-  - id: light_eu_rl_1_3_top
-    name: Light - Relay 1 of 3 (top)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 20
-        to: 20
-  - id: light_eu_rl_2_3_bottom
-    name: Light - Relay 2 of 3 (bottom)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 9
-        to: 9
-  - id: light_eu_rl_2_3_top
-    name: Light - Relay 2 of 3 (top)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 23
-        to: 23
-  - id: light_eu_rl_3_3_bottom
-    name: Light - Relay 3 of 3 (bottom)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 6
-        to: 6
-  - id: light_eu_rl_3_3_top
-    name: Light - Relay 3 of 3 (top)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 26
-        to: 26
-  - id: light_eu_rl_1_4_bottom
-    name: Light - Relay 1 of 4 (bottom)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 12
-        to: 12
-  - id: light_eu_rl_1_4_top
-    name: Light - Relay 1 of 4 (top)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 20
-        to: 20
-  - id: light_eu_rl_2_4_bottom
-    name: Light - Relay 2 of 4 (bottom)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 10
-        to: 10
-  - id: light_eu_rl_2_4_top
-    name: Light - Relay 2 of 4 (top)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 22
-        to: 22
-  - id: light_eu_rl_3_4_bottom
-    name: Light - Relay 3 of 4 (bottom)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 8
-        to: 8
-  - id: light_eu_rl_3_4_top
-    name: Light - Relay 3 of 4 (top)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 24
-        to: 24
-  - id: light_eu_rl_4_4_bottom
-    name: Light - Relay 4 of 4 (bottom)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 6
-        to: 6
-  - id: light_eu_rl_4_4_top
-    name: Light - Relay 4 of 4 (top)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 26
-        to: 26
-  - id: light_us_rl_1_1_left
-    name: Light - Relay 1 of 1 (left)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 15
-        to: 24
-  - id: light_us_rl_1_1_right
-    name: Light - Relay 1 of 1 (right)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 31
-        to: 31
-      - id: light_full
-        from: 0
-        to: 8
-  - id: light_us_rl_1_2_left
-    name: Light - Relay 1 of 2 (left)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 20
-        to: 24
-  - id: light_us_rl_1_2_right
-    name: Light - Relay 1 of 2 (right)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 31
-        to: 31
-      - id: light_full
-        from: 0
-        to: 3
-  - id: light_us_rl_2_2_left
-    name: Light - Relay 2 of 2 (left)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 15
-        to: 19
-  - id: light_us_rl_2_2_right
-    name: Light - Relay 2 of 2 (right)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 4
-        to: 8
-  - id: light_us_rl_1_3_left
-    name: Light - Relay 1 of 3 (left)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 22
-        to: 23
-  - id: light_us_rl_1_3_right
-    name: Light - Relay 1 of 3 (right)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 0
-        to: 1
-  - id: light_us_rl_2_3_left
-    name: Light - Relay 2 of 3 (left)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 19
-        to: 20
-  - id: light_us_rl_2_3_right
-    name: Light - Relay 2 of 3 (right)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 3
-        to: 4
-  - id: light_us_rl_3_3_left
-    name: Light - Relay 3 of 3 (left)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 17
-        to: 18
-  - id: light_us_rl_3_3_right
-    name: Light - Relay 3 of 3 (right)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 6
-        to: 7
-  - id: light_us_rl_1_4_left
-    name: Light - Relay 1 of 4 (left)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 12
-        to: 12
-  - id: light_us_rl_1_4_right
-    name: Light - Relay 1 of 4 (right)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 31
-        to: 31
-  - id: light_us_rl_2_4_left
-    name: Light - Relay 2 of 4 (left)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 24
-        to: 24
-  - id: light_us_rl_2_4_right
-    name: Light - Relay 2 of 4 (right)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 2
-        to: 2
-  - id: light_us_rl_3_4_left
-    name: Light - Relay 3 of 4 (left)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 21
-        to: 21
-  - id: light_us_rl_3_4_right
-    name: Light - Relay 3 of 4 (right)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 4
-        to: 4
-  - id: light_us_rl_4_4_left
-    name: Light - Relay 4 of 4 (left)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 19
-        to: 19
-  - id: light_us_rl_4_4_right
-    name: Light - Relay 4 of 4 (right)
-    <<: *light_partition_relays
-    segments:
-      - id: light_full
-        from: 7
-        to: 7
-
 script:
   - id: !extend boot_initialize
     then:
-      - wait_until:
-          condition:
-            - lambda: return sl_tx_model_format->active_index().has_value();
-            - lambda: return sl_tx_model_gang->active_index().has_value();
       - lambda: |-
-          const bool is_model_us = sl_tx_model_format->active_index().has_value() and
-                                    sl_tx_model_format->active_index().value() == 1;
-          const uint8_t num_gangs = (sl_tx_model_gang->active_index().has_value()) ?
-                                    (sl_tx_model_gang->active_index().value() + 1) : 0;
-          if (num_gangs < 1 || num_gangs > 4) {
-            ESP_LOGE("core_hw_leds", "Invalid number of gangs: %" PRIu8, num_gangs);
-            return;
-          }
-          light_28->set_internal(!is_model_us);
-          light_29->set_internal(!is_model_us);
-          light_30->set_internal(!is_model_us);
-          light_31->set_internal(!is_model_us);
-          light_eu->set_internal(is_model_us);
-          light_eu_bottom->set_internal(is_model_us);
-          light_eu_left->set_internal(is_model_us);
-          light_eu_right->set_internal(is_model_us);
-          light_eu_top->set_internal(is_model_us);
-          light_us->set_internal(!is_model_us);
-          light_us_bottom->set_internal(!is_model_us);
-          light_us_left->set_internal(!is_model_us);
-          light_us_right->set_internal(!is_model_us);
-          light_us_top->set_internal(!is_model_us);
-          switch (num_gangs) {
-            case 1:  // 1 Gang
-              if (is_model_us) {
-                id(gb_lights_1) = { light_us_rl_1_1_left };
-                id(gb_lights_2) = { light_us_rl_1_1_right };
-              } else {
-                id(gb_lights_1) = { light_eu_rl_1_1_bottom };
-                id(gb_lights_2) = { light_eu_rl_1_1_top };
-              }
-              break;
-            case 2:  // 2 Gang
-              if (is_model_us) {
-                id(gb_lights_1) = { light_us_rl_1_2_left, light_us_rl_2_2_left };
-                id(gb_lights_2) = { light_us_rl_1_2_right, light_us_rl_2_2_right };
-              } else {
-                id(gb_lights_1) = { light_eu_rl_1_2_bottom, light_eu_rl_2_2_bottom };
-                id(gb_lights_2) = { light_eu_rl_1_2_top, light_eu_rl_2_2_top };
-              }
-              break;
-            case 3:  // 3 Gang
-              if (is_model_us) {
-                id(gb_lights_1) = { light_us_rl_1_3_left, light_us_rl_2_3_left, light_us_rl_3_3_left };
-                id(gb_lights_2) = { light_us_rl_1_3_right, light_us_rl_2_3_right, light_us_rl_3_3_right };
-              } else {
-                id(gb_lights_1) = { light_eu_rl_1_3_bottom, light_eu_rl_2_3_bottom, light_eu_rl_3_3_bottom };
-                id(gb_lights_2) = { light_eu_rl_1_3_top, light_eu_rl_2_3_top, light_eu_rl_3_3_top };
-              }
-              break;
-            case 4:  // 4 Gang
-              if (is_model_us) {
-                id(gb_lights_1) = { light_us_rl_1_4_left, light_us_rl_2_4_left,
-                                    light_us_rl_3_4_left, light_us_rl_4_4_left };
-                id(gb_lights_2) = { light_us_rl_1_4_right, light_us_rl_2_4_right,
-                                    light_us_rl_3_4_right, light_us_rl_4_4_right };
-              } else {
-                id(gb_lights_1) = { light_eu_rl_1_4_bottom, light_eu_rl_2_4_bottom,
-                                    light_eu_rl_3_4_bottom, light_eu_rl_4_4_bottom };
-                id(gb_lights_2) = { light_eu_rl_1_4_top, light_eu_rl_2_4_top,
-                                    light_eu_rl_3_4_top, light_eu_rl_4_4_top };
-              }
-              break;
-          }
+          light_28->set_internal(!id(is_us_model));
+          light_29->set_internal(!id(is_us_model));
+          light_30->set_internal(!id(is_us_model));
+          light_31->set_internal(!id(is_us_model));
+          light_eu->set_internal(id(is_us_model));
+          light_eu_bottom->set_internal(id(is_us_model));
+          light_eu_left->set_internal(id(is_us_model));
+          light_eu_right->set_internal(id(is_us_model));
+          light_eu_top->set_internal(id(is_us_model));
+          light_us->set_internal(!id(is_us_model));
+          light_us_bottom->set_internal(!id(is_us_model));
+          light_us_left->set_internal(!id(is_us_model));
+          light_us_right->set_internal(!id(is_us_model));
+          light_us_top->set_internal(!id(is_us_model));
+
+  - id: !extend dump_config
+    then:
+      - lambda: |-
+          // Relay's LEDs modes
+          ESP_LOGCONFIG("core_hw_leds", "Relay%s LEDs mode%s:",
+                        id(gang_count_plural_suffix).c_str(),
+                        id(gang_count_plural_suffix).c_str());
+          ESP_LOGCONFIG("core_hw_leds", "  Relay 1: %s", id(is_us_model)
+                                                          ? sl_relay_1_light_mode_us->state.c_str()
+                                                          : sl_relay_1_light_mode_eu->state.c_str());
+          if (id(gang_count) >= 2)
+            ESP_LOGCONFIG("core_hw_leds", "  Relay 2: %s", id(is_us_model)
+                                                            ? sl_relay_2_light_mode_us->state.c_str()
+                                                            : sl_relay_2_light_mode_eu->state.c_str());
+          if (id(gang_count) >= 3)
+            ESP_LOGCONFIG("core_hw_leds", "  Relay 3: %s", id(is_us_model)
+                                                            ? sl_relay_3_light_mode_us->state.c_str()
+                                                            : sl_relay_3_light_mode_eu->state.c_str());
+          if (id(gang_count) >= 4)
+            ESP_LOGCONFIG("core_hw_leds", "  Relay 4: %s", id(is_us_model)
+                                                            ? sl_relay_4_light_mode_us->state.c_str()
+                                                            : sl_relay_4_light_mode_eu->state.c_str());
+
+          // Transition times
+          ESP_LOGCONFIG("core_hw_leds", "Transition times:");
+          ESP_LOGCONFIG("core_hw_leds", "  Default:     ${default_transition_length}");
+          if (${LIGHT_TRANSITION_TURN_ON} > 0)
+            ESP_LOGCONFIG("core_hw_leds", "  Turning on:  ${LIGHT_TRANSITION_TURN_ON}ms");
+          else
+            ESP_LOGCONFIG("core_hw_leds", "  Turning on:  Disabled");
+          if (${LIGHT_TRANSITION_TURN_OFF} > 0)
+            ESP_LOGCONFIG("core_hw_leds", "  Turning off: ${LIGHT_TRANSITION_TURN_OFF}ms");
+          else
+            ESP_LOGCONFIG("core_hw_leds", "  Turning off: Disabled");
+
+          // Restore modes
+          ESP_LOGCONFIG("core_hw_leds", "LED restore modes:");
+          ESP_LOGCONFIG("core_hw_leds", "  Light - All: ${LIGHT_FULL_RESTORE_MODE}");
+          ESP_LOGCONFIG("core_hw_leds", "  Sides:       ${LIGHT_SIDES_RESTORE_MODE}");
+          ESP_LOGCONFIG("core_hw_leds", "  Individual:  ${LIGHT_INDIVIDUAL_RESTORE_MODE}");
+
+  - id: !extend dump_config_list_packages
+    then:
+      - script.wait: dump_config
+      - lambda: |-
+          // Check for requirements
+          #if !defined(TX_ULTIMATE_EASY_CORE)
+            #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
+          #endif
+
+          // Identify itself
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Core - Hardware - LEDs");
 
   - id: light_set_state
     mode: parallel
@@ -795,10 +505,12 @@ script:
           static const uint32_t LIGHT_TRANSITION_TURN_OFF = ${LIGHT_TRANSITION_TURN_OFF};
           static const uint8_t LIGHT_BRIGHTNESS_TURN_ON = ${LIGHT_BRIGHTNESS_TURN_ON};
 
-          const bool is_model_us = sl_tx_model_format->active_index().has_value() and
-                                    sl_tx_model_format->active_index().value() == 1;
-          const std::string light_mode_group_1 = is_model_us ? "${LIGHT_MODE_LEFT_TEXT}" : "${LIGHT_MODE_BOTTOM_TEXT}";
-          const std::string light_mode_group_2 = is_model_us ? "${LIGHT_MODE_RIGHT_TEXT}" : "${LIGHT_MODE_TOP_TEXT}";
+          const std::string light_mode_group_1 = id(is_us_model)
+                                                  ? "${LIGHT_MODE_LEFT_TEXT}"
+                                                  : "${LIGHT_MODE_BOTTOM_TEXT}";
+          const std::string light_mode_group_2 = id(is_us_model)
+                                                  ? "${LIGHT_MODE_RIGHT_TEXT}"
+                                                  : "${LIGHT_MODE_TOP_TEXT}";
 
           switch (light_group) {
             case 1:
@@ -869,15 +581,12 @@ select:
     entity_category: config
     disabled_by_default: false
     icon: mdi:dots-square
-
   - id: sl_relay_2_light_mode_eu
     name: Relay 2 light mode
     <<: *relay_light_mode_eu
-
   - id: sl_relay_3_light_mode_eu
     name: Relay 3 light mode
     <<: *relay_light_mode_eu
-
   - id: sl_relay_4_light_mode_eu
     name: Relay 4 light mode
     <<: *relay_light_mode_eu
@@ -899,15 +608,12 @@ select:
     entity_category: config
     disabled_by_default: false
     icon: mdi:dots-square
-
   - id: sl_relay_2_light_mode_us
     name: Relay 2 light mode
     <<: *relay_light_mode_us
-
   - id: sl_relay_3_light_mode_us
     name: Relay 3 light mode
     <<: *relay_light_mode_us
-
   - id: sl_relay_4_light_mode_us
     name: Relay 4 light mode
     <<: *relay_light_mode_us

@@ -1,0 +1,5 @@
+---
+packages:
+  common_idf: !include common_idf.yaml
+  core_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
+...

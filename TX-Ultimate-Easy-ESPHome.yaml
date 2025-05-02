@@ -16,9 +16,10 @@ wifi:
 packages:
   remote_package:
     url: https://github.com/edwardtfn/TX-Ultimate-Easy
-    ref: latest  # Or you can specify a version, like `ref: v2024.12.6`
+    ref: stable  # Or you can specify a version, like `ref: v2024.12.6` or `ref: latest` to the latest non-stable
     refresh: 5min
     files:
-      - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
-      # - ESPHome/TX-Ultimate-Easy-ESPHome_addon_ble_proxy.yaml  # Adds experimental BLE proxy support (limited)
+      - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml                  # Core (essential) packages
+      - ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml              # Non-essential, but recommended packages
+      # - ESPHome/TX-Ultimate-Easy-ESPHome_addon_ble_proxy.yaml     # Adds BLE proxy support
 ...

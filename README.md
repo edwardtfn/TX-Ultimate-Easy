@@ -8,10 +8,10 @@
 [![Discord][discord-shield]](https://discord.gg/Db6WJWzWuf)
 [![Buy me an ice-cream][buymeacoffee-shield]](https://www.buymeacoffee.com/edwardfirmo)
 
-<!-- markdownlint-disable MD013 -->
-| &nbsp;![TX Ultimate Easy Logo](Assets/Logo.webp) | TX Ultimate Easy provides custom ESPHome firmware for Sonoff TX Ultimate devices. Our project focuses on user-friendly configuration through the Home Assistant UI, eliminating the need for manual YAML editing. Whether you're new to home automation or an experienced user, TX Ultimate Easy makes it simple to manage your device. |
+<!-- markdownlint-disable MD013 MD033 -->
+| &nbsp;<picture><source media="(prefers-color-scheme: dark)" srcset="Assets/Logo_dark.png"><source media="(prefers-color-scheme: light)" srcset="Assets/Logo_light.png"><img alt="TX Ultimate Easy Logo" src="Assets/Logo_light.png"></picture> | TX Ultimate Easy provides custom ESPHome firmware for Sonoff TX Ultimate devices. Our project focuses on user-friendly configuration through the Home Assistant UI, eliminating the need for manual YAML editing. Whether you're new to home automation or an experienced user, TX Ultimate Easy makes it simple to manage your device. |
 | --- | :-- |
-<!-- markdownlint-enable MD013 -->
+<!-- markdownlint-enable MD013 MD033 -->
 
 [version-shield]: https://img.shields.io/github/v/tag/edwardtfn/TX-Ultimate-Easy?label=version
 [version]: https://github.com/edwardtfn/TX-Ultimate-Easy/tags
@@ -92,12 +92,210 @@ Before getting started, ensure you have:
 
 ## Installation
 
-Detailed installation instructions coming soon. The process will include:
+Follow these steps to get your TX Ultimate device up and running with ESPHome.
 
-1. Initial ESPHome setup
-2. Device flashing
-3. Home Assistant integration
-4. Basic configuration
+### ESPHome Integration Setup
+
+1. Install the ESPHome add-on in Home Assistant if not already installed:
+   - Go to Settings → Add-ons → Add-on Store
+   - Search for "ESPHome" 
+   - Click Install
+2. Start the ESPHome add-on and verify it's running
+3. Access ESPHome dashboard through Home Assistant
+
+### Setup Device
+
+1. In the ESPHome dashboard, click "+ New Device"
+2. Name your device (e.g., "tx-ultimate-living-room")
+3. Select ESP32 as your device type
+4. Copy this basic configuration to your new device:
+   ```yaml
+   substitutions:
+     name: tx-ultimate-easy
+     friendly_name: TX Ultimate Easy
+
+   wifi:
+     ssid: !secret wifi_ssid
+     password: !secret wifi_password
+
+   packages:
+     remote_package:
+       url: https://github.com/edwardtfn/TX-Ultimate-Easy
+       ref: stable  # Or you can specify a version, like `ref: v2024.12.6` or `ref: latest` to the latest non-stable
+       refresh: 5min
+       files:
+         - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml                  # Core (essential) packages
+         - ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml              # Non-essential, but recommended packages
+         # - ESPHome/TX-Ultimate-Easy-ESPHome_addon_ble_proxy.yaml     # Adds BLE proxy support
+   ```
+   You can also use a specific version tag for better control over updates:
+   ```yaml
+   ref: v2024.12.2  # Using specific version for controlled updates
+   ```
+    **Notes:**
+      - [Click here](https://github.com/edwardtfn/TX-Ultimate-Easy/tags) for a full list of versions available.
+      - [Click here](TX-Ultimate-Easy-ESPHome.yaml)
+        for the latest version of this yaml.
+5. Click "Save" and then "Install"
+
+> [!IMPORTANT]  
+> Starting from version 2025.1.0, non-essential components like `web_server`, `captive_portal`, and `wifi`
+> are no longer included in the core package. If you need these components,
+> you must add them manually to your local configuration file.
+> For example:
+> ```yaml
+> # Add these to your configuration if needed
+> web_server:
+> captive_portal:
+> wifi:
+>   ap: # Access point configuration
+> ```
+
+### Advanced Settings
+For more granular control over components,
+you can use our [advanced configuration template](TX-Ultimate-Easy-ESPHome_advanced.yaml).
+This template allows you to selectively include specific packages, which can be useful for:
+
+- Troubleshooting specific components
+- Reducing memory usage by excluding unused features
+- Customizing functionality for specific use cases
+
+Here's an example of the advanced configuration:
+```yaml
+packages:
+  remote_package:
+    url: https://github.com/edwardtfn/TX-Ultimate-Easy
+    ref: stable  # Or you can specify a version, like `ref: v2024.12.6` or `ref: latest` to the latest non-stable
+    refresh: 5min
+    files:
+      # Core (essential) packages
+      - ESPHome/TX-Ultimate-Easy-ESPHome_core_common.yaml      # Basic shared settings
+      - ESPHome/TX-Ultimate-Easy-ESPHome_core_hw_buttons.yaml  # Button logic
+      - ESPHome/TX-Ultimate-Easy-ESPHome_core_hw_leds.yaml     # LED configuration
+      - ESPHome/TX-Ultimate-Easy-ESPHome_core_hw_touch.yaml    # Touch panel support
+
+      # Optional but recommended packages
+      - ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_relays.yaml     # Relay control
+      - ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_vibration.yaml  # Haptic feedback
+
+      # Audio options (use none or choose only one - using both will fail)
+      - ESPHome/TX-Ultimate-Easy-ESPHome_standard_media_player.yaml  # Media player (Recommended for most users)
+      # - ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_speaker.yaml  # Basic speaker
+```
+
+> [!NOTE]
+> Use the advanced configuration with caution. Excluding core packages may cause instability or reduced functionality.
+
+### Device Flashing
+
+Initial flashing must be done via serial connection.
+We recommend using [ESPHome Web](https://web.esphome.io) for the simplest experience.
+
+<!-- markdownlint-disable MD028 -->
+> [!IMPORTANT]  
+> **SAFETY WARNINGS**
+> - ALWAYS disconnect the device from mains power before opening
+> - NEVER work on the device while connected to mains power
+> - Ensure the device is completely powered off before making any connections
+> - Keep your workspace clean, dry, and static-free
+> - Use proper insulated tools when working with electronics
+> - If unsure about any step, seek help from an experienced person
+
+> [!CAUTION]
+>⚡ **CRITICAL: VOLTAGE WARNING**
+> Using a UART adapter with voltage higher than 3.3V WILL DAMAGE YOUR DEVICE.
+> Double-check your adapter's voltage before connecting - many common FTDI adapters
+> default to 5V which will permanently damage the ESP32 chip.
+<!-- markdownlint-enable MD028 -->
+
+#### Required Hardware
+- USB-to-UART adapter:
+  - 3.3V logic level ONLY (DO NOT use 5V adapters)
+  - Must be capable of supplying at least 500mA
+  - Common adapters: CP2102, CH340, FTDI (ensure 3.3V setting)
+- Small Phillips screwdriver
+- 5 wires for connections (including one for BOOT to GND)
+
+#### Flashing Process
+1. Open your TX Ultimate device carefully
+2. Locate the programming header pins
+3. Connect your USB-to-UART adapter:
+
+   | Adapter | Device |
+   |---------|--------|
+   | GND     | GND    |
+   | 3.3V    | 3.3V   |
+   | TX      | RX     |
+   | RX      | TX     |
+
+4. Put device in flash mode:
+   - Temporarily connect the BOOT pin to GND using a jumper wire
+   - While holding BOOT to GND, power up the device
+   - After device powers up (wait a couple of seconds), remove the BOOT to GND connection
+5. Visit [ESPHome Web](https://web.esphome.io)
+6. Connect to your device and flash the firmware
+7. After successful flash, device will restart and be ready for OTA updates
+
+#### Detailed Visual Guides
+<!-- markdownlint-disable MD013 -->
+For step-by-step visual instructions, you can reference these existing guides:
+- 🇬🇧 [WirelessThings Guide](https://wirelessthings.io/index.php/2023/12/19/how-to-flash-sonoff-tx-ultimate-with-esphome/) - English guide with detailed photos
+- 🇪🇸 [Un loco y su tecnología](https://youtu.be/58v8oqSQgXQ?t=143) - Spanish video tutorial
+- 🇩🇪 [SmartHome yourself](https://youtu.be/naDLhX89enQ?t=465) - German video tutorial
+<!-- markdownlint-enable MD013 -->
+
+Note: While these guides may use different firmware, the physical flashing process remains the same.
+
+#### Subsequent Updates
+After initial flashing, all future updates can be done wirelessly (OTA)
+through the ESPHome dashboard in your ESPHome add-on.
+
+### Home Assistant Integration
+
+After successful flashing:
+1. Ensure your device and Home Assistant are on the same network
+2. Device should be automatically discovered within 1–2 minutes
+3. Accept the discovery notification in Home Assistant to add device
+   Note: If discovery takes longer than 5 minutes, proceed to troubleshooting steps
+4. Device will appear in your Home Assistant Devices dashboard
+
+#### Troubleshooting Integration
+If the device isn't discovered automatically:
+1. Verify your device is powered and connected to your network:
+   - Look for the device in your router's client list
+   - Consider using [manual IP](https://esphome.io/components/wifi.html#manual-ips) in your device
+2. If you missed the discovery notification:
+   - Go to Settings → Devices & Services
+   - Click "Add Integration"
+   - Search for "ESPHome" and enter your device's IP address
+3. Still having issues?
+   - Check your network allows mDNS/discovery traffic
+   - Verify there are no VLANs or network isolation preventing communication
+   - Try rebooting both the device and Home Assistant
+
+### Initial Configuration
+
+1. In Home Assistant, navigate to:
+   - Settings → Devices & Services → ESPHome
+   - Click on your device to access its configuration page
+2. Set basic device parameters:
+   - Model format (EU/US)
+   - Number of gangs (1-4)
+   - Relay modes (switch/light)
+   - Button actions
+3. Optional: Configure advanced features
+   - LED behaviors
+   - Touch sensitivity
+   - Haptic feedback
+   - Audio feedback
+4. Test your configuration:
+   - Verify each relay responds to controls
+   - Test configured button actions
+   - Confirm LED behavior matches settings
+   - Check haptic/audio feedback if enabled
+
+> [!NOTE]  
+> Some changes may require a device restart
 
 ## Usage
 
@@ -154,8 +352,11 @@ Note: For proper tracking and resolution:
 
 This project builds upon the work of several amazing projects and contributors:
 
+<!-- markdownlint-disable MD013 -->
 - [SmartHome yourself - SONOFF TX Ultimate for ESPHome](https://github.com/SmartHome-yourself/sonoff-tx-ultimate-for-esphome)
 - [Un loco y su tecnología - Sonoff TX Ultimate with ESPHome](https://www.youtube.com/watch?v=58v8oqSQgXQ)
+- [@PxPert](https://github.com/PxPert) - [Sonoff TX Ultimate and Voice Assistant](https://community.home-assistant.io/t/sonoff-tx-ultimate-and-voice-assistant/682214?u=edwardtfn)
+<!-- markdownlint-enable MD013 -->
 
 Special thanks to all contributors and community members who help make this project better.
 
@@ -166,5 +367,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 <!-- markdownlint-disable MD033 -->
-<img src="Assets/Logo.webp" alt="TX Ultimate Easy Logo" width="100"/>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="Assets/Logo_dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="Assets/Logo_light.png">
+  <img alt="TX Ultimate Easy Logo" src="Assets/Logo_light.png" width="100">
+</picture>
 <!-- markdownlint-enable MD033 -->

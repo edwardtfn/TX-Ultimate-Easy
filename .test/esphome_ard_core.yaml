@@ -2,5 +2,4 @@
 packages:
   common_arduino: !include common_ard.yaml
   core_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
-  standard_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml
 ...

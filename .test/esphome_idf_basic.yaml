@@ -1,6 +1,11 @@
 ---
 packages:
-  common_arduino: !include common_ard.yaml
+  common_idf: !include common_idf.yaml
   core_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
   standard_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml
+
+media_player: !remove
+
+switch:
+  - id: !remove sw_speaker_amplifier
 ...
