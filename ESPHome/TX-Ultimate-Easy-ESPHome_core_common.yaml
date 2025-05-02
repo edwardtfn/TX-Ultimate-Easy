@@ -1,0 +1,320 @@
+####################################################################################################
+#####                              TX Ultimate Easy for ESPHome                                #####
+#####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
+####################################################################################################
+##### Purpose: ESPHome Core - Common                                                           #####
+####################################################################################################
+##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
+####################################################################################################
+##### NOTE:                                                                                    #####
+##### - Make changes ONLY if absolutely necessary and you have the required knowledge.         #####
+##### - For normal system use, modifications to this file are NOT required.                    #####
+####################################################################################################
+---
+substitutions:
+  name: tx-ultimate-easy
+  friendly_name: TX Ultimate Easy
+
+  <<: !include ../versioning/VERSION_YAML
+
+  TX_MODEL_FORMAT_EU_TEXT: "EU (Square, T5-xC-86)"
+  TX_MODEL_FORMAT_US_TEXT: "US (Rectangle, T5-xC-120)"
+
+  TX_MODEL_1_GANG_TEXT: "1 Gang"
+  TX_MODEL_2_GANG_TEXT: "2 Gang"
+  TX_MODEL_3_GANG_TEXT: "3 Gang"
+  TX_MODEL_4_GANG_TEXT: "4 Gang"
+
+  DUMP_CONFIG_CALLER_DELAY: 10s  # Delay to dump config after requested
+
+
+api:
+  id: api_server
+  on_client_connected:
+    then:
+      - script.execute: dump_config_caller
+      - script.execute: publish_device_info
+
+binary_sensor:
+  - id: bs_pending_restart
+    name: Pending Restart Status
+    internal: false
+    disabled_by_default: false
+    platform: template
+    entity_category: diagnostic
+    device_class: problem
+    on_state:
+      then:
+        - lambda: |-
+            if (x)
+              ESP_LOGW("core", "Pending restart: YES");
+            else
+              ESP_LOGCONFIG("core", "Pending restart: No");
+        - script.execute: dump_config_caller
+
+button:
+  - id: bt_restart
+    name: Restart
+    internal: false
+    platform: restart
+
+esp32:
+  board: esp32dev
+  flash_size: 8MB
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  comment: TX Ultimate Easy
+  project:
+    name: "edwardtfn.tx_ultimate_easy"
+    version: ${version}
+  platformio_options:
+    build_flags:
+      - -D TX_ULTIMATE_EASY_CORE
+
+  on_boot:
+    - priority: 700
+      then:
+        - script.execute: boot_initialize
+
+    - priority: 600  # This is where most sensors are set up.
+      then:
+        - script.execute: boot_sequence
+
+    - priority: -100  # At this priority, pretty much everything should already be initialized.
+      then:
+        - script.execute: boot_done
+
+globals:
+  - id: is_us_model
+    type: bool
+    restore_value: true
+    initial_value: 'false'
+
+  - id: gang_count
+    type: uint8_t
+    restore_value: true
+    initial_value: '0'
+
+  - id: gang_count_plural_suffix
+    type: std::string
+    restore_value: true
+    max_restore_data_length: 3
+
+logger:
+  level: DEBUG
+
+ota:
+  platform: esphome
+
+psram:
+
+script:
+  - id: api_send_ha_event_boot
+    mode: queued
+    parameters:
+      type: string
+    then:
+      - homeassistant.event:
+          event: esphome.tx_ultimate_easy
+          data:
+            device_name: !lambda return tx_device_name->state.c_str();
+            firmware: ${version}
+            domain: boot
+            type: !lambda return type.c_str();
+
+  - id: boot_done
+    mode: restart
+    then:
+      - script.execute:
+          id: api_send_ha_event_boot
+          type: done
+
+  - id: boot_initialize
+    mode: restart
+    then:
+      # Extended by:
+      #   - HW Buttons
+      #   - HW Relays
+      #   - HW Touch
+      - script.execute:
+          id: api_send_ha_event_boot
+          type: start
+      - wait_until:
+          condition:
+            - lambda: return sl_tx_model_format->active_index().has_value();
+            - lambda: return sl_tx_model_gang->active_index().has_value();
+      - lambda: |-
+          id(is_us_model) = (sl_tx_model_format->state == "${TX_MODEL_FORMAT_US_TEXT}");
+          id(gang_count) = sl_tx_model_gang->active_index().value() + 1;
+          if (id(gang_count) < 1 || id(gang_count) > 4) {
+            ESP_LOGE("core_hw_leds", "Invalid number of gangs: %" PRIu8, id(gang_count));
+          }
+          id(gang_count_plural_suffix) = id(gang_count) > 1 ? "s" : "";
+
+  - id: boot_sequence
+    mode: restart
+    then:
+      - script.execute: publish_device_info
+      - binary_sensor.template.publish:
+          id: bs_pending_restart
+          state: false
+
+  - id: dump_config
+    mode: restart
+    then:
+      # Extended by all modules
+      - lambda: |-
+          // Device identification
+          ESP_LOGCONFIG("core", "Device friendly name: ${friendly_name}");
+          ESP_LOGCONFIG("core", "Device name: ${name}");
+          ESP_LOGCONFIG("core", "Device name (HA): %s", tx_device_name->state.c_str());
+          ESP_LOGCONFIG("core", "Device hostname: %s", App.get_name().c_str());
+
+          dump_config_versions->execute();
+
+          // Framework detection
+          #ifdef USE_ARDUINO
+          ESP_LOGCONFIG("core", "Framework: Arduino");
+          #elif defined(USE_ESP_IDF)
+          ESP_LOGCONFIG("core", "Framework: ESP-IDF");
+          #else
+          ESP_LOGW("core", "Framework: UNKNOWN");
+          #endif
+
+          // Model configuration
+          ESP_LOGCONFIG("core", "Model format (selected): %s", sl_tx_model_format->state.c_str());
+          ESP_LOGCONFIG("core", "Model format (detected): %s", id(is_us_model) ? "US" : "EU");
+          ESP_LOGCONFIG("core", "Gangs (selected): %s", sl_tx_model_gang->state.c_str());
+          ESP_LOGCONFIG("core", "Gangs (detected): %" PRIu8 "-Gang%s", id(gang_count), id(gang_count_plural_suffix).c_str());
+
+          // System state
+          if (bs_pending_restart->state)
+            ESP_LOGW("core", "Pending restart: YES");
+          else
+            ESP_LOGCONFIG("core", "Pending restart: No");
+
+  - id: dump_config_caller
+    mode: restart
+    then:
+      - delay: ${DUMP_CONFIG_CALLER_DELAY}
+      - script.execute: dump_config
+      - script.wait: dump_config
+      - script.execute: dump_config_list_packages
+
+  - id: dump_config_list_packages
+    mode: restart
+    then:
+      - script.wait: dump_config
+      - lambda: |-
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "Installed packages:");
+
+          // Identify itself
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Core");
+
+  - id: dump_config_versions
+    mode: restart
+    then:
+      - lambda: |-
+          // Version information
+          ESP_LOGCONFIG("core", "TX Ultimate firmware version: ${version}");
+          // ESPHome builder information
+          ESP_LOGCONFIG("core", "ESPHome builder: " ESPHOME_VERSION);
+          ESP_LOGCONFIG("core", "ESPHome build timestamp: %s", App.get_compilation_time().c_str());
+
+  - id: publish_device_info
+    mode: restart
+    then:
+      - lambda: |-
+          tx_fw_version->publish_state("${version}");
+          tx_device_name->publish_state(App.get_name().c_str());
+
+select:
+  - id: sl_tx_model_format
+    name: Model (Format)
+    platform: template
+    options:
+      - "${TX_MODEL_FORMAT_EU_TEXT}"
+      - "${TX_MODEL_FORMAT_US_TEXT}"
+    initial_option: "${TX_MODEL_FORMAT_EU_TEXT}"
+    optimistic: true
+    restore_value: true
+    internal: false
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:tablet-cellphone
+    on_value:
+      then:
+        - binary_sensor.template.publish:
+            id: bs_pending_restart
+            state: true
+        - lambda: |-
+            id(is_us_model) = (x == "${TX_MODEL_FORMAT_US_TEXT}");
+            ESP_LOGI("core", "New model selected: %s", id(is_us_model) ? "US" : "EU");
+
+  - id: sl_tx_model_gang
+    name: Model (Gang)
+    platform: template
+    options:
+      - "${TX_MODEL_1_GANG_TEXT}"
+      - "${TX_MODEL_2_GANG_TEXT}"
+      - "${TX_MODEL_3_GANG_TEXT}"
+      - "${TX_MODEL_4_GANG_TEXT}"
+    initial_option: "${TX_MODEL_1_GANG_TEXT}"
+    optimistic: true
+    restore_value: true
+    internal: false
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dip-switch
+    on_value:
+      then:
+        - binary_sensor.template.publish:
+            id: bs_pending_restart
+            state: true
+        - lambda: |-
+            id(gang_count) = static_cast<uint8_t>(i) + 1;
+            ESP_LOGI("core", "New model selected: %" PRIu8 "-%s", id(gang_count), id(gang_count) > 1 ? "Gangs" : "Gang");
+            tx_ultimate->set_gang_count(id(gang_count));
+
+text_sensor:
+  - id: tx_fw_version
+    name: TX Ultimate Easy Firmware Version
+    platform: template
+    entity_category: diagnostic
+    icon: mdi:tag-text-outline
+    internal: false
+    update_interval: never
+    lambda: |-
+      return {"${version}"};
+
+  - id: tx_device_name
+    name: Device Name
+    platform: template
+    icon: mdi:identifier
+    entity_category: diagnostic
+    internal: false
+    disabled_by_default: false
+    update_interval: never
+    lambda: |-
+      return {"${name}"};
+    filters:
+      - lambda: |-
+          const std::string raw_name = x;
+          std::string result;
+          bool last_was_underscore = false;
+          for (const char& c : raw_name) {
+            if (isalnum(c)) {
+              result += tolower(c);  // Add alphanumeric characters as lowercase
+              last_was_underscore = false;
+            } else if (!last_was_underscore) {  // Replace non-alphanumeric with '_' but avoid consecutive '_'
+              result += '_';
+              last_was_underscore = true;
+            }
+          }
+          return result;
+
+wifi:
+  id: wifi_component
+...

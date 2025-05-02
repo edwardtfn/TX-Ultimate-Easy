@@ -1,0 +1,64 @@
+####################################################################################################
+#####                              TX Ultimate Easy for ESPHome                                #####
+#####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
+####################################################################################################
+##### Purpose: ESPHome - Add-on - Media player                                                 #####
+####################################################################################################
+##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
+####################################################################################################
+##### NOTE:                                                                                    #####
+##### - Make changes ONLY if absolutely necessary and you have the required knowledge.         #####
+##### - For normal system use, modifications to this file are NOT required.                    #####
+####################################################################################################
+---
+packages:
+  standard_hw_audio: !include TX-Ultimate-Easy-ESPHome_standard_hw_audio.yaml
+
+esphome:
+  platformio_options:
+    build_flags:
+      - -D TX_ULTIMATE_EASY_ADDON_MEDIA_PLAYER
+
+media_player:
+  - id: mp_media_player
+    name: Media Player
+    internal: false
+    platform: i2s_audio
+    i2s_dout_pin: GPIO15
+    i2s_audio_id: if_i2s_audio
+    i2s_comm_fmt: msb
+    dac_type: external
+    mode: mono
+    mute_pin:
+      number: GPIO26
+      inverted: true
+      allow_other_uses: true
+
+script:
+  - id: !extend dump_config_list_packages
+    then:
+      - script.wait: dump_config
+      - lambda: |-
+          // Check for requirements
+          #if !defined(TX_ULTIMATE_EASY_CORE)
+            #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
+          #endif
+          #if !defined(TX_ULTIMATE_EASY_STANDARD_HW_AUDIO)
+            #error "The package TX-Ultimate-Easy-ESPHome_standard_hw_audio.yaml is required."
+          #endif
+
+          // Identify itself
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Add-on - Media Player");
+
+switch:
+  - id: sw_speaker_amplifier
+    name: Speaker - Amplifier
+    platform: gpio
+    pin:
+      number: GPIO26
+      inverted: true
+      allow_other_uses: true
+    restore_mode: RESTORE_DEFAULT_ON
+    internal: true
+    entity_category: config
+...

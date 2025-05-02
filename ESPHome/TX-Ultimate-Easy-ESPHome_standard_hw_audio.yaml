@@ -1,0 +1,36 @@
+####################################################################################################
+#####                              TX Ultimate Easy for ESPHome                                #####
+#####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
+####################################################################################################
+##### Purpose: ESPHome - Standard - I2S Audio                                                  #####
+####################################################################################################
+##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
+####################################################################################################
+##### NOTE:                                                                                    #####
+##### - Make changes ONLY if absolutely necessary and you have the required knowledge.         #####
+##### - For normal system use, modifications to this file are NOT required.                    #####
+####################################################################################################
+---
+esphome:
+  platformio_options:
+    build_flags:
+      - -D TX_ULTIMATE_EASY_STANDARD_HW_AUDIO
+
+i2s_audio:
+  id: if_i2s_audio
+  i2s_bclk_pin: GPIO2
+  i2s_lrclk_pin: GPIO4
+
+script:
+  - id: !extend dump_config_list_packages
+    then:
+      - script.wait: dump_config
+      - lambda: |-
+          // Check for requirements
+          #if !defined(TX_ULTIMATE_EASY_CORE)
+            #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
+          #endif
+
+          // Identify itself
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Standard - Hardware - Audio");
+...

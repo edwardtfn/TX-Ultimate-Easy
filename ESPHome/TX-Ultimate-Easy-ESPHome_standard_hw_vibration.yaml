@@ -1,0 +1,168 @@
+####################################################################################################
+#####                              TX Ultimate Easy for ESPHome                                #####
+#####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
+####################################################################################################
+##### Purpose: ESPHome - Standard - Hardware - Vibration system                                #####
+####################################################################################################
+##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
+####################################################################################################
+##### NOTE:                                                                                    #####
+##### - Make changes ONLY if absolutely necessary and you have the required knowledge.         #####
+##### - For normal system use, modifications to this file are NOT required.                    #####
+####################################################################################################
+---
+substitutions:
+  vibration_max_duration: 2s
+
+binary_sensor:
+  - id: bs_vibrating
+    name: Vibrating
+    icon: mdi:vibrate
+    internal: false
+    platform: template
+    lambda: return sw_vibration_motor->state;
+
+button:
+  - id: bt_vibrate
+    name: Vibrate
+    icon: mdi:vibrate
+    internal: false
+    platform: template
+    on_press:
+      then:
+        - script.execute: vibrate
+
+esphome:
+  platformio_options:
+    build_flags:
+      - -D TX_ULTIMATE_EASY_STANDARD_HW_VIBRATION
+
+number:
+  - id: nr_vibrating_duration
+    name: Vibrate duration
+    icon: mdi:vibrate
+    unit_of_measurement: ms
+    internal: false
+    entity_category: config
+    platform: template
+    min_value: 1
+    max_value: 500
+    step: 1
+    initial_value: 15
+    optimistic: true
+    restore_value: true
+
+ota:
+  on_state_change:
+    then:
+      - switch.turn_off: sw_vibration_motor
+
+script:
+  - id: !extend dump_config
+    then:
+      - lambda: |-
+          // Configuration
+          ESP_LOGCONFIG("standard_hw_vibration", "Touch - Vibration feedback: %s",
+                        sl_touch_vibration_feedback->state.c_str());
+          ESP_LOGCONFIG("standard_hw_vibration", "Vibrate duration: %.0fms", nr_vibrating_duration->state);
+          ESP_LOGCONFIG("standard_hw_vibration", "Vibrate max duration: ${vibration_max_duration}");
+
+          // State
+          if (bs_vibrating->state)
+            ESP_LOGW("standard_hw_vibration", "Vibrating now: YES");
+          else
+            ESP_LOGCONFIG("standard_hw_vibration", "Vibrating now: No");
+
+  - id: !extend dump_config_list_packages
+    then:
+      - script.wait: dump_config
+      - lambda: |-
+          // Check for requirements
+          #if !defined(TX_ULTIMATE_EASY_CORE)
+            #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
+          #endif
+
+          // Identify itself
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Standard - Hardware - Vibration");
+
+  - id: !extend touch_on_multi_touch_release
+    then:
+      - script.execute: touch_on_multi_touch_release_vibration
+
+  - id: touch_on_multi_touch_release_vibration
+    mode: restart
+    then:
+      - lambda: |-
+          if (sl_touch_vibration_feedback->state != "Disabled")
+            vibrate->execute();
+
+  - id: !extend touch_on_press
+    then:
+      - script.execute: touch_on_press_vibration
+
+  - id: touch_on_press_vibration
+    mode: restart
+    then:
+      - lambda: |-
+          if (sl_touch_vibration_feedback->state == "On press" or sl_touch_vibration_feedback->state == "Always")
+            vibrate->execute();
+
+  - id: !extend touch_on_release
+    then:
+      - script.execute: touch_on_release_vibration
+
+  - id: touch_on_release_vibration
+    mode: restart
+    then:
+      - lambda: |-
+          if (sl_touch_vibration_feedback->state == "On release" or sl_touch_vibration_feedback->state == "Always")
+            vibrate->execute();
+
+  - id: vibrate
+    mode: restart
+    then:
+      - switch.turn_on: sw_vibration_motor
+      - delay: !lambda return nr_vibrating_duration->state;
+      - switch.turn_off: sw_vibration_motor
+
+select:
+  - id: sl_touch_vibration_feedback
+    name: Touch - Vibration feedback
+    platform: template
+    options:
+      - "Disabled"
+      - "On press"
+      - "On release"
+      - "Always"
+    initial_option: "Disabled"
+    optimistic: true
+    restore_value: true
+    internal: false
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:vibrate
+
+switch:
+  - id: sw_vibration_motor
+    name: Vibration motor
+    platform: gpio
+    pin: GPIO21
+    restore_mode: ALWAYS_OFF
+    internal: true
+    on_turn_on:
+      then:
+        - binary_sensor.template.publish:
+            id: bs_vibrating
+            state: ON  # yamllint disable-line rule:truthy
+        - delay: ${vibration_max_duration}
+        - if:
+            condition:
+              switch.is_on: sw_vibration_motor
+            then:
+              - switch.turn_off: sw_vibration_motor
+    on_turn_off:
+      then:
+        - binary_sensor.template.publish:
+            id: bs_vibrating
+            state: OFF  # yamllint disable-line rule:truthy
+...
