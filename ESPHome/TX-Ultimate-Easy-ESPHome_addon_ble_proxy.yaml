@@ -31,7 +31,7 @@ light:
   - id: !extend light_full
     platform: esp32_rmt_led_strip
     rgb_order: GRB
-    rmt_channel: 1
+    # rmt_channel: 1  # Not supported with IDF 5
     chipset: ws2812
     max_refresh_rate: 33ms
     use_psram: false
