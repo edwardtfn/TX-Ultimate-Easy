@@ -57,7 +57,7 @@ light:
   # Those lights are available based on the model selections
   - &light_partition_with_effects
     id: light_eu
-    name: Light
+    name: Light EU
     platform: partition
     default_transition_length: ${default_transition_length}
     internal: true
@@ -106,7 +106,7 @@ light:
         to: 27
 
   - id: light_us
-    name: Light
+    name: Light US
     <<: *light_partition_with_effects
     segments:
       - id: light_full
@@ -115,7 +115,7 @@ light:
 
   - &light_partition_with_effects_disabled
     id: light_eu_bottom
-    name: Light - Bottom
+    name: Light - Bottom EU
     disabled_by_default: true
     <<: *light_partition_with_effects
     segments:
@@ -124,7 +124,7 @@ light:
         to: 12
         reversed: true
   - id: light_eu_left
-    name: Light - Left
+    name: Light - Left EU
     <<: *light_partition_with_effects_disabled
     segments:
       - id: light_full
@@ -132,7 +132,7 @@ light:
         to: 19
         reversed: true
   - id: light_eu_right
-    name: Light - Right
+    name: Light - Right EU
     <<: *light_partition_with_effects_disabled
     segments:
       - id: light_full
@@ -144,7 +144,7 @@ light:
         to: 5
         reversed: false
   - id: light_eu_top
-    name: Light - Top
+    name: Light - Top EU
     <<: *light_partition_with_effects_disabled
     segments:
       - id: light_full
@@ -152,7 +152,7 @@ light:
         to: 26
         reversed: false
   - id: light_us_bottom
-    name: Light - Bottom
+    name: Light - Bottom US
     <<: *light_partition_with_effects_disabled
     segments:
       - id: light_full
@@ -160,7 +160,7 @@ light:
         to: 14
         reversed: true
   - id: light_us_left
-    name: Light - Left
+    name: Light - Left US
     <<: *light_partition_with_effects_disabled
     segments:
       - id: light_full
@@ -168,7 +168,7 @@ light:
         to: 24
         reversed: true
   - id: light_us_right
-    name: Light - Right
+    name: Light - Right US
     <<: *light_partition_with_effects_disabled
     segments:
       - id: light_full
@@ -180,7 +180,7 @@ light:
         to: 8
         reversed: false
   - id: light_us_top
-    name: Light - Top
+    name: Light - Top US
     <<: *light_partition_with_effects_disabled
     segments:
       - id: light_full
@@ -567,7 +567,7 @@ select:
   # EU relay light mode template
   - &relay_light_mode_eu
     id: sl_relay_1_light_mode_eu
-    name: Relay 1 light mode
+    name: Relay 1 light mode EU
     platform: template
     options:
       - "${LIGHT_MODE_DISABLED_TEXT}"
@@ -582,19 +582,19 @@ select:
     disabled_by_default: false
     icon: mdi:dots-square
   - id: sl_relay_2_light_mode_eu
-    name: Relay 2 light mode
+    name: Relay 2 light mode EU
     <<: *relay_light_mode_eu
   - id: sl_relay_3_light_mode_eu
-    name: Relay 3 light mode
+    name: Relay 3 light mode EU
     <<: *relay_light_mode_eu
   - id: sl_relay_4_light_mode_eu
-    name: Relay 4 light mode
+    name: Relay 4 light mode EU
     <<: *relay_light_mode_eu
 
   # US relay light mode template
   - &relay_light_mode_us
     id: sl_relay_1_light_mode_us
-    name: Relay 1 light mode
+    name: Relay 1 light mode US
     platform: template
     options:
       - "${LIGHT_MODE_DISABLED_TEXT}"
@@ -609,12 +609,12 @@ select:
     disabled_by_default: false
     icon: mdi:dots-square
   - id: sl_relay_2_light_mode_us
-    name: Relay 2 light mode
+    name: Relay 2 light mode US
     <<: *relay_light_mode_us
   - id: sl_relay_3_light_mode_us
-    name: Relay 3 light mode
+    name: Relay 3 light mode US
     <<: *relay_light_mode_us
   - id: sl_relay_4_light_mode_us
-    name: Relay 4 light mode
+    name: Relay 4 light mode US
     <<: *relay_light_mode_us
 ...
