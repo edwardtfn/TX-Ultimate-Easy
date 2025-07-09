@@ -17,6 +17,8 @@ substitutions:
 
   <<: !include ../versioning/VERSION_YAML
 
+  EVENT_NAME: esphome.tx_ultimate_easy
+
   TX_MODEL_FORMAT_EU_TEXT: "EU (Square, T5-xC-86)"
   TX_MODEL_FORMAT_US_TEXT: "US (Rectangle, T5-xC-120)"
 
@@ -116,13 +118,15 @@ script:
     parameters:
       type: string
     then:
-      - homeassistant.event:
-          event: esphome.tx_ultimate_easy
-          data:
-            device_name: !lambda return tx_device_name->state.c_str();
-            firmware: ${version}
-            domain: boot
-            type: !lambda return type.c_str();
+      - lambda: |-
+          // Send event to Home Assistant
+          esphome::api::CustomAPIDevice ha_event;
+          ha_event.fire_homeassistant_event("${EVENT_NAME}", {
+            {"device_name", id(tx_device_name).state.c_str()},
+            {"firmware", "${version}"},
+            {"domain", "boot"},
+            {"type", type.c_str()}
+          });
 
   - id: boot_done
     mode: restart

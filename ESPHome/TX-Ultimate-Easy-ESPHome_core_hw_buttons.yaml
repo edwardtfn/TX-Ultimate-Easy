@@ -112,18 +112,19 @@ script:
       action: string
       count: uint8_t
     then:
-      - homeassistant.event:
-          event: esphome.tx_ultimate_easy
-          data:
-            device_name: !lambda return tx_device_name->state.c_str();
-            firmware: ${version}
-            domain: touch
-            type: button
-            action: !lambda return action.c_str();
-            button_id: !lambda return button;
-            count: !lambda return count;
-            position: !lambda return id(button_press_position);
       - lambda: |-
+          // Send event to Home Assistant
+          esphome::api::CustomAPIDevice ha_event;
+          ha_event.fire_homeassistant_event("${EVENT_NAME}", {
+            {"device_name", id(tx_device_name).state.c_str()},
+            {"firmware", "${version}"},
+            {"domain", "touch"},
+            {"type", "button"},
+            {"action", action.c_str()},
+            {"button_id", std::to_string(button)},
+            {"count", std::to_string(count)},
+            {"position", std::to_string(id(button_press_position))}
+          });
           ESP_LOGI("core_hw_buttons", "Button %" PRIu8 " action: '%s'", button, action.c_str());
           if (action == "click") {
             switch (button) {
