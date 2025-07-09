@@ -396,7 +396,7 @@ tx_ultimate_easy:
             {"domain", "touch"},
             {"type", "multi_touch"},
             {"action", "release"},
-            {"position", to_string(touch.x)}
+            {"position", std::to_string(touch.x)}
           });
           ESP_LOGI("core_hw_touch", "Multi-touch released");
           touch_on_multi_touch_release->execute();
@@ -430,7 +430,7 @@ tx_ultimate_easy:
             {"type", "swipe"},
             {"action", swipe_direction.c_str()},
             {"swipe-direction", swipe_direction.c_str()},
-            {"position", to_string(touch.x)}
+            {"position", std::to_string(touch.x)}
           });
           ESP_LOGI("core_hw_touch", "Multi-touch released");
           touch_on_multi_touch_release->execute();
@@ -450,7 +450,7 @@ tx_ultimate_easy:
             {"type", "swipe"},
             {"action", swipe_direction.c_str()},
             {"swipe-direction", swipe_direction.c_str()},
-            {"position", to_string(touch.x)}
+            {"position", std::to_string(touch.x)}
           });
           ESP_LOGI("core_hw_touch", "Swipe %s", swipe_direction.c_str());
           touch_swipe_right->execute();

@@ -121,9 +121,9 @@ script:
             {"domain", "touch"},
             {"type", "button"},
             {"action", action.c_str()},
-            {"button_id", to_string(button)},
-            {"count", to_string(count)},
-            {"position", to_string(id(button_press_position))}
+            {"button_id", std::to_string(button)},
+            {"count", std::to_string(count)},
+            {"position", std::to_string(id(button_press_position))}
           });
           ESP_LOGI("core_hw_buttons", "Button %" PRIu8 " action: '%s'", button, action.c_str());
           if (action == "click") {
