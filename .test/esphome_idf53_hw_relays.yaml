@@ -1,6 +1,0 @@
----
-packages:
-  common_idf53: !include common_idf53.yaml
-  core_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
-  standard_hw_relays_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_relays.yaml
-...
