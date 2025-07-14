@@ -11,34 +11,12 @@
 ##### - For normal system use, modifications to this file are NOT required.                    #####
 ####################################################################################################
 ---
-packages:
-  standard_hw_speaker: !include TX-Ultimate-Easy-ESPHome_standard_hw_speaker.yaml
-
 bluetooth_proxy:
-
-esp32:
-  framework:
-    type: esp-idf
 
 esphome:
   platformio_options:
     build_flags:
       - -D TX_ULTIMATE_EASY_ADDON_BLE_PROXY
-
-i2s_audio: !remove
-
-light:
-  - id: !extend light_full
-    platform: esp32_rmt_led_strip
-    rgb_order: GRB
-    # rmt_channel: 1  # Not supported with IDF 5
-    chipset: ws2812
-    max_refresh_rate: 33ms
-    use_psram: false
-    type: !remove
-    variant: !remove
-
-media_player: !remove
 
 script:
   - id: !extend dump_config_list_packages
@@ -52,7 +30,4 @@ script:
 
           // Identify itself
           ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Add-on - BLE Proxy");
-
-switch:
-  - id: !remove sw_speaker_amplifier
 ...
