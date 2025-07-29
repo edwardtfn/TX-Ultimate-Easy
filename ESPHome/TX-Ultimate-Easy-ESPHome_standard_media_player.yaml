@@ -23,16 +23,11 @@ media_player:
   - id: mp_media_player
     name: Media Player
     internal: false
-    platform: i2s_audio
-    i2s_dout_pin: GPIO15
-    i2s_audio_id: if_i2s_audio
-    i2s_comm_fmt: msb
-    dac_type: external
-    mode: mono
-    mute_pin:
-      number: GPIO26
-      inverted: true
-      allow_other_uses: true
+    platform: speaker
+    announcement_pipeline:
+      speaker: announcement_spk_resampling_input
+    media_pipeline:
+      speaker: media_spk_resampling_input
 
 script:
   - id: !extend dump_config_list_packages
@@ -49,6 +44,20 @@ script:
 
           // Identify itself
           ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Add-on - Media Player");
+
+speaker:
+  - platform: mixer
+    id: mixer_speaker_embedded
+    output_speaker: speaker_embedded
+    source_speakers:
+      - id: announcement_speaker_embedded
+      - id: media_speaker_embedded
+  - platform: resampler
+    id: announcement_spk_resampling_input
+    output_speaker: announcement_speaker_embedded
+  - platform: resampler
+    id: media_spk_resampling_input
+    output_speaker: media_speaker_embedded
 
 switch:
   - id: sw_speaker_amplifier
