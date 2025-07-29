@@ -85,7 +85,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true  # If core fails, stop everything
-      max-parallel: 4
+      # max-parallel: 4
       matrix:
         framework: [idf, ard]
         version: ${{ fromJson(needs.setup_matrix.outputs.versions) }}
