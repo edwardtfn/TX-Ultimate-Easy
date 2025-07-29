@@ -318,8 +318,14 @@ jobs:
           echo "### ⚡ Advanced Features (Multi-Version)" >> $GITHUB_STEP_SUMMARY
           echo "| Component | 🤖 Arduino Latest | 🤖 Arduino Dev | 🔧 IDF Latest | 🔧 IDF Dev |" >> $GITHUB_STEP_SUMMARY
           echo "|-----------|-------------------|----------------|---------------|------------|" >> $GITHUB_STEP_SUMMARY
-          echo "| ⚡ BLE Proxy | ${{ needs.build_ard_ble_proxy_latest.result }} | ${{ needs.build_ard_ble_proxy_dev.result }} | ${{ needs.build_idf_ble_proxy_latest.result }} | ${{ needs.build_idf_ble_proxy_dev.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| ⚡ Media Player | ${{ needs.build_ard_media_player_latest.result }} | ${{ needs.build_ard_media_player_dev.result }} | ${{ needs.build_idf_media_player_latest.result }} | ${{ needs.build_idf_media_player_dev.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ⚡ BLE Proxy | ${{ needs.build_ard_ble_proxy_latest.result }} | \
+            ${{ needs.build_ard_ble_proxy_dev.result }} | \
+            ${{ needs.build_idf_ble_proxy_latest.result }} | \
+            ${{ needs.build_idf_ble_proxy_dev.result }} |" >> $GITHUB_STEP_SUMMARY
+                      echo "| ⚡ Media Player | ${{ needs.build_ard_media_player_latest.result }} | \
+            ${{ needs.build_ard_media_player_dev.result }} | \
+            ${{ needs.build_idf_media_player_latest.result }} | \
+            ${{ needs.build_idf_media_player_dev.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           # Environment Summary
