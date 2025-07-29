@@ -437,8 +437,6 @@ tx_ultimate_easy:
                 return "down";
             position: !lambda return std::to_string(touch.x);
       - lambda: |-
-          ESP_LOGI("core_hw_touch", "Multi-touch released");
-          touch_on_multi_touch_release->execute();
           ESP_LOGI("core_hw_touch", "Swipe %s",
                     (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}") ? "left" : "down");
           touch_swipe_left->execute();
