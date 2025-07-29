@@ -160,11 +160,11 @@ jobs:
           echo "**Strategy: Foundation on stable, validation on stable + dev**" >> $GITHUB_STEP_SUMMARY
           echo "**Build Order: Core → Basic → Hardware → Features → Complete**" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           # Build counts
           FOUNDATION_BUILDS=14  # 2+2+6+4
           COMPREHENSIVE_BUILDS=4  # 2 frameworks × 2 versions
-          
+
           if [ "${{ needs.build_comprehensive.result }}" == "skipped" ]; then
             TOTAL=$FOUNDATION_BUILDS
             echo "**Builds run:** $TOTAL (foundation only)" >> $GITHUB_STEP_SUMMARY
@@ -172,10 +172,10 @@ jobs:
             TOTAL=$((FOUNDATION_BUILDS + COMPREHENSIVE_BUILDS))
             echo "**Builds run:** $TOTAL ($FOUNDATION_BUILDS foundation + $COMPREHENSIVE_BUILDS comprehensive)" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           echo "**Efficiency:** $((100 - (TOTAL * 100 / 42)))% fewer builds than full matrix" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           # Results
           echo "| Stage | Result |" >> $GITHUB_STEP_SUMMARY
           echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
@@ -184,7 +184,7 @@ jobs:
           echo "| 🔌 Hardware | ${{ needs.build_hardware.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| ⚡ Features | ${{ needs.build_features.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| 🌍 Multi-version | ${{ needs.build_comprehensive.result }} |" >> $GITHUB_STEP_SUMMARY
-          
+
           # Final status
           if [ "${{ needs.build_core.result }}" != "success" ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
