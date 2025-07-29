@@ -425,9 +425,16 @@ tx_ultimate_easy:
             firmware: ${version}
             domain: touch
             type: swipe
-            action: !lambda return (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}") ? "left" : "down";
+            action: !lambda |-
+              if (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}")
+                return "left";
+              else
+                return "down";
             swipe-direction: !lambda |-
-              return (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}") ? "left" : "down";
+              if (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}")
+                return "left";
+              else
+                return "down";
             position: !lambda return std::to_string(touch.x);
       - lambda: |-
           ESP_LOGI("core_hw_touch", "Multi-touch released");
@@ -445,9 +452,16 @@ tx_ultimate_easy:
             firmware: ${version}
             domain: touch
             type: swipe
-            action: !lambda return (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}") ? "right" : "up";
+            action: !lambda |-
+              if (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}")
+                return "right";
+              else
+                return "up";
             swipe-direction: !lambda |-
-              return (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}") ? "right" : "up";
+              if (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}")
+                return "right";
+              else
+                return "up";
             position: !lambda return std::to_string(touch.x);
       - lambda: |-
           ESP_LOGI("core_hw_touch", "Swipe %s",
