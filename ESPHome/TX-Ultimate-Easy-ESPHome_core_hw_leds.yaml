@@ -54,20 +54,15 @@ light:
     type: GRB
     variant: WS2811
 
-  # Those lights are available based on the model selections
-  - &light_partition_with_effects
-    id: light_eu
-    name: Light EU
+  # Those lights contain common effects for both models
+  - &light_partition_with_effects_common
+    id: light_base
+    name: Light Base
     platform: partition
     default_transition_length: ${default_transition_length}
     internal: true
     restore_mode: ${LIGHT_SIDES_RESTORE_MODE}
     effects:
-      - addressable_rainbow:
-          name: "Rainbow"
-      - addressable_rainbow:
-          name: "Rainbow - Fast"
-          speed: 50
       - pulse:
           name: "Pulse"
           transition_length: 1s
@@ -105,9 +100,31 @@ light:
         from: 0
         to: 27
 
+  # Those lights are available based on the model selections
+  - &light_partition_with_effects
+    <<: *light_partition_with_effects_common
+    id: light_eu
+    name: Light EU
+    effects:
+      - addressable_rainbow:
+          name: "Rainbow"
+          width: 28
+      - addressable_rainbow:
+          name: "Rainbow - Fast"
+          width: 28
+          speed: 50
+
   - id: light_us
     name: Light US
-    <<: *light_partition_with_effects
+    <<: *light_partition_with_effects_common
+    effects:
+      - addressable_rainbow:
+          name: "Rainbow"
+          width: 32
+      - addressable_rainbow:
+          name: "Rainbow - Fast"
+          width: 32
+          speed: 50
     segments:
       - id: light_full
         from: 0
