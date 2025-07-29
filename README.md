@@ -27,6 +27,45 @@
 [buymeacoffee-shield]: https://img.shields.io/static/v1?label=Buy%20me%20an%20ice%20cream&message=❄&color=blue
 [buymeacoffee]: https://www.buymeacoffee.com/edwardfirmo
 
+## Framework Migration to ESP-IDF
+
+> [!IMPORTANT]  
+> **ESP-IDF Framework Migration**
+> 
+> Starting with version **2025.8.0**, TX Ultimate Easy will use **ESP-IDF** as the default framework, following ESPHome's direction towards ESP-IDF for better performance, stability, and feature support.
+> 
+> **What this means for you:**
+> - **New installations**: Will automatically use ESP-IDF (no action required)
+> - **Existing Arduino users**: Can continue using Arduino but with limited support
+> - **Migration recommended**: For better performance and full feature support
+> 
+> **Arduino Framework Support:**
+> - Still functional but **no longer actively tested**
+> - **Limited support** will be provided for Arduino-specific issues
+> - May miss out on new features optimized for ESP-IDF
+
+### Migration Guidelines
+
+#### For New Users
+No action required - ESP-IDF will be used automatically.
+
+#### For Existing Arduino Users
+
+**Option 1: Migrate to ESP-IDF (Recommended)**
+1. **Best practice**: Flash via serial/USB to ensure proper partition setup
+2. **Alternative**: If serial flashing isn't possible, flash OTA twice consecutively to improve success rate
+
+**Option 2: Continue with Arduino**
+Add this to your YAML configuration to force Arduino framework:
+```yaml
+esp32:
+  framework:
+    type: arduino
+```
+
+> [!WARNING]  
+> **Migration via OTA:** When switching frameworks via OTA, the partition table may not update correctly. Flash twice in succession to ensure both firmware partitions contain the latest firmware and prevent boot failures.
+
 ## Integration with Home Assistant
 
 TX Ultimate Easy exposes your device's components (sensors, touch panel, relays, etc.) to Home Assistant,
@@ -73,6 +112,7 @@ All device behaviors can be customized through Home Assistant automations withou
 - **BLE Proxy Support**: Optional Bluetooth Low Energy proxy functionality
 - **Audio Feedback**: Built-in speaker support for audible feedback
 - **Haptic Feedback**: Vibration motor support for tactile feedback
+- **ESP-IDF Framework**: Enhanced performance and stability with ESP-IDF support
 
 ## Hardware Support
 
