@@ -113,7 +113,7 @@ jobs:
           yaml-file: ".test/esphome_ard_hw_vibration.yaml"
           version: latest
 
-  build_ard_ble_proxy:
+  build_ard_ble_proxy_latest:
     name: "⚡ Arduino BLE Proxy (latest)"
     needs: [build_ard_core, build_ard_basic, build_ard_hw_relays, build_ard_hw_speaker, build_ard_hw_vibration]
     runs-on: ubuntu-latest
@@ -125,7 +125,20 @@ jobs:
           yaml-file: ".test/esphome_ard_ble_proxy.yaml"
           version: latest
 
-  build_ard_media_player:
+  build_ard_ble_proxy_dev:
+    name: "⚡ Arduino BLE Proxy (dev)"
+    needs: [build_ard_core, build_ard_basic, build_ard_hw_relays, build_ard_hw_speaker, build_ard_hw_vibration]
+    if: success() && !inputs.skip_dev
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build Arduino BLE Proxy - dev
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_ard_ble_proxy.yaml"
+          version: dev
+
+  build_ard_media_player_latest:
     name: "⚡ Arduino Media Player (latest)"
     needs: [build_ard_core, build_ard_basic, build_ard_hw_relays, build_ard_hw_speaker, build_ard_hw_vibration]
     runs-on: ubuntu-latest
@@ -136,6 +149,19 @@ jobs:
         with:
           yaml-file: ".test/esphome_ard_media_player.yaml"
           version: latest
+
+  build_ard_media_player_dev:
+    name: "⚡ Arduino Media Player (dev)"
+    needs: [build_ard_core, build_ard_basic, build_ard_hw_relays, build_ard_hw_speaker, build_ard_hw_vibration]
+    if: success() && !inputs.skip_dev
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build Arduino Media Player - dev
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_ard_media_player.yaml"
+          version: dev
 
   # IDF Framework - Foundation (latest)
   build_idf_core:
@@ -198,7 +224,7 @@ jobs:
           yaml-file: ".test/esphome_idf_hw_vibration.yaml"
           version: latest
 
-  build_idf_ble_proxy:
+  build_idf_ble_proxy_latest:
     name: "⚡ IDF BLE Proxy (latest)"
     needs: [build_idf_core, build_idf_basic, build_idf_hw_relays, build_idf_hw_speaker, build_idf_hw_vibration]
     runs-on: ubuntu-latest
@@ -210,7 +236,20 @@ jobs:
           yaml-file: ".test/esphome_idf_ble_proxy.yaml"
           version: latest
 
-  build_idf_media_player:
+  build_idf_ble_proxy_dev:
+    name: "⚡ IDF BLE Proxy (dev)"
+    needs: [build_idf_core, build_idf_basic, build_idf_hw_relays, build_idf_hw_speaker, build_idf_hw_vibration]
+    if: success() && !inputs.skip_dev
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build IDF BLE Proxy - dev
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_idf_ble_proxy.yaml"
+          version: dev
+
+  build_idf_media_player_latest:
     name: "⚡ IDF Media Player (latest)"
     needs: [build_idf_core, build_idf_basic, build_idf_hw_relays, build_idf_hw_speaker, build_idf_hw_vibration]
     runs-on: ubuntu-latest
@@ -222,57 +261,17 @@ jobs:
           yaml-file: ".test/esphome_idf_media_player.yaml"
           version: latest
 
-  # Comprehensive Testing - Multi-version validation
-  build_comprehensive_ard_latest:
-    name: "🌍 Arduino Complete (latest)"
-    needs: [build_ard_core, build_ard_basic, build_ard_hw_relays, build_ard_hw_speaker, build_ard_hw_vibration, build_ard_ble_proxy, build_ard_media_player]
+  build_idf_media_player_dev:
+    name: "⚡ IDF Media Player (dev)"
+    needs: [build_idf_core, build_idf_basic, build_idf_hw_relays, build_idf_hw_speaker, build_idf_hw_vibration]
     if: success() && !inputs.skip_dev
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build Arduino Complete - latest
+      - name: Build IDF Media Player - dev
         uses: esphome/build-action@main
         with:
-          yaml-file: ".test/esphome_ard_basic.yaml"
-          version: latest
-
-  build_comprehensive_ard_dev:
-    name: "🌍 Arduino Complete (dev)"
-    needs: [build_ard_core, build_ard_basic, build_ard_hw_relays, build_ard_hw_speaker, build_ard_hw_vibration, build_ard_ble_proxy, build_ard_media_player]
-    if: success() && !inputs.skip_dev
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@main
-      - name: Build Arduino Complete - dev
-        uses: esphome/build-action@main
-        with:
-          yaml-file: ".test/esphome_ard_basic.yaml"
-          version: dev
-
-  build_comprehensive_idf_latest:
-    name: "🌍 IDF Complete (latest)"
-    needs: [build_idf_core, build_idf_basic, build_idf_hw_relays, build_idf_hw_speaker, build_idf_hw_vibration, build_idf_ble_proxy, build_idf_media_player]
-    if: success() && !inputs.skip_dev
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@main
-      - name: Build IDF Complete - latest
-        uses: esphome/build-action@main
-        with:
-          yaml-file: ".test/esphome_idf_basic.yaml"
-          version: latest
-
-  build_comprehensive_idf_dev:
-    name: "🌍 IDF Complete (dev)"
-    needs: [build_idf_core, build_idf_basic, build_idf_hw_relays, build_idf_hw_speaker, build_idf_hw_vibration, build_idf_ble_proxy, build_idf_media_player]
-    if: success() && !inputs.skip_dev
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@main
-      - name: Build IDF Complete - dev
-        uses: esphome/build-action@main
-        with:
-          yaml-file: ".test/esphome_idf_basic.yaml"
+          yaml-file: ".test/esphome_idf_media_player.yaml"
           version: dev
 
   # Results summary
@@ -284,19 +283,19 @@ jobs:
       - build_ard_hw_relays
       - build_ard_hw_speaker
       - build_ard_hw_vibration
-      - build_ard_ble_proxy
-      - build_ard_media_player
+      - build_ard_ble_proxy_latest
+      - build_ard_ble_proxy_dev
+      - build_ard_media_player_latest
+      - build_ard_media_player_dev
       - build_idf_core
       - build_idf_basic
       - build_idf_hw_relays
       - build_idf_hw_speaker
       - build_idf_hw_vibration
-      - build_idf_ble_proxy
-      - build_idf_media_player
-      - build_comprehensive_ard_latest
-      - build_comprehensive_ard_dev
-      - build_comprehensive_idf_latest
-      - build_comprehensive_idf_dev
+      - build_idf_ble_proxy_latest
+      - build_idf_ble_proxy_dev
+      - build_idf_media_player_latest
+      - build_idf_media_player_dev
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -304,50 +303,61 @@ jobs:
         run: |
           echo "## 📋 ESPHome Build Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Strategy:** Framework-specific dependency chains with independent failure paths" >> $GITHUB_STEP_SUMMARY
+          echo "**Strategy:** Framework-specific dependency chains with multi-version testing for advanced features" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           # Arduino Results
           echo "### 🤖 Arduino Framework" >> $GITHUB_STEP_SUMMARY
-          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| 🏗️ Core | ${{ needs.build_ard_core.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 📦 Basic | ${{ needs.build_ard_basic.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔌 HW Relays | ${{ needs.build_ard_hw_relays.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔌 HW Speaker | ${{ needs.build_ard_hw_speaker.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔌 HW Vibration | ${{ needs.build_ard_hw_vibration.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| ⚡ BLE Proxy | ${{ needs.build_ard_ble_proxy.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| ⚡ Media Player | ${{ needs.build_ard_media_player.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🌍 Complete (latest) | ${{ needs.build_comprehensive_ard_latest.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🌍 Complete (dev) | ${{ needs.build_comprehensive_ard_dev.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Latest | Dev |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|-----|" >> $GITHUB_STEP_SUMMARY
+          echo "| 🏗️ Core | ${{ needs.build_ard_core.result }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📦 Basic | ${{ needs.build_ard_basic.result }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔌 HW Relays | ${{ needs.build_ard_hw_relays.result }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔌 HW Speaker | ${{ needs.build_ard_hw_speaker.result }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔌 HW Vibration | ${{ needs.build_ard_hw_vibration.result }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| ⚡ BLE Proxy | ${{ needs.build_ard_ble_proxy_latest.result }} | ${{ needs.build_ard_ble_proxy_dev.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ⚡ Media Player | ${{ needs.build_ard_media_player_latest.result }} | ${{ needs.build_ard_media_player_dev.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           # IDF Results
           echo "### 🔧 ESP-IDF Framework" >> $GITHUB_STEP_SUMMARY
-          echo "| Component | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| 🏗️ Core | ${{ needs.build_idf_core.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 📦 Basic | ${{ needs.build_idf_basic.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔌 HW Relays | ${{ needs.build_idf_hw_relays.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔌 HW Speaker | ${{ needs.build_idf_hw_speaker.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔌 HW Vibration | ${{ needs.build_idf_hw_vibration.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| ⚡ BLE Proxy | ${{ needs.build_idf_ble_proxy.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| ⚡ Media Player | ${{ needs.build_idf_media_player.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🌍 Complete (latest) | ${{ needs.build_comprehensive_idf_latest.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🌍 Complete (dev) | ${{ needs.build_comprehensive_idf_dev.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Component | Latest | Dev |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|-----|" >> $GITHUB_STEP_SUMMARY
+          echo "| 🏗️ Core | ${{ needs.build_idf_core.result }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📦 Basic | ${{ needs.build_idf_basic.result }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔌 HW Relays | ${{ needs.build_idf_hw_relays.result }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔌 HW Speaker | ${{ needs.build_idf_hw_speaker.result }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔌 HW Vibration | ${{ needs.build_idf_hw_vibration.result }} | - |" >> $GITHUB_STEP_SUMMARY
+          echo "| ⚡ BLE Proxy | ${{ needs.build_idf_ble_proxy_latest.result }} | ${{ needs.build_idf_ble_proxy_dev.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ⚡ Media Player | ${{ needs.build_idf_media_player_latest.result }} | ${{ needs.build_idf_media_player_dev.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Build counts
+          FOUNDATION_BUILDS=14  # 2+2+6+4 (core+basic+hw+features latest only)
+          ADDITIONAL_BUILDS=4   # BLE Proxy + Media Player on dev (if not skipped)
+
+          if [ "${{ inputs.skip_dev }}" == "true" ]; then
+            TOTAL=$FOUNDATION_BUILDS
+            echo "**Total builds:** $TOTAL (dev testing skipped)" >> $GITHUB_STEP_SUMMARY
+          else
+            TOTAL=$((FOUNDATION_BUILDS + ADDITIONAL_BUILDS))
+            echo "**Total builds:** $TOTAL ($FOUNDATION_BUILDS foundation + $ADDITIONAL_BUILDS dev testing)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "**Efficiency:** $((100 - (TOTAL * 100 / 42)))% fewer builds than full matrix" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           # Overall Status
           ARD_FAILED=false
           IDF_FAILED=false
 
-          # Check Arduino chain
+          # Check Arduino chain (foundation components must pass)
           if [ "${{ needs.build_ard_core.result }}" != "success" ] || \
              [ "${{ needs.build_ard_basic.result }}" != "success" ]; then
             ARD_FAILED=true
           fi
 
-          # Check IDF chain
+          # Check IDF chain (foundation components must pass)
           if [ "${{ needs.build_idf_core.result }}" != "success" ] || \
              [ "${{ needs.build_idf_basic.result }}" != "success" ]; then
             IDF_FAILED=true
@@ -365,5 +375,13 @@ jobs:
             exit 1
           else
             echo "✅ **All foundation builds passed!** Both frameworks working correctly 🎉" >> $GITHUB_STEP_SUMMARY
+
+            # Check advanced features
+            if [ "${{ needs.build_ard_ble_proxy_dev.result }}" == "failure" ] || \
+               [ "${{ needs.build_ard_media_player_dev.result }}" == "failure" ] || \
+               [ "${{ needs.build_idf_ble_proxy_dev.result }}" == "failure" ] || \
+               [ "${{ needs.build_idf_media_player_dev.result }}" == "failure" ]; then
+              echo "⚠️ **Some dev builds failed** - Advanced features may have compatibility issues with dev ESPHome" >> $GITHUB_STEP_SUMMARY
+            fi
           fi
 ...
