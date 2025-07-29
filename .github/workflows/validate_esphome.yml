@@ -25,6 +25,22 @@ on:  # yamllint disable-line rule:truthy
       - "**/*.py"
 
   workflow_dispatch:
+    inputs:
+      skip_features:
+        description: 'Skip feature builds (BLE proxy, media player)'
+        required: false
+        default: false
+        type: boolean
+      version_filter:
+        description: 'Test only specific version (latest, beta, dev, or all)'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - latest
+          - beta
+          - dev
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -46,16 +62,34 @@ jobs:
       - name: Validate YAML files
         run: find . -name "*.yaml" -exec yamllint -c ./.rules/yamllint.yml {} +
 
-  build:
-    name: ${{ matrix.target }} (${{ matrix.framework }}) - ${{ matrix.version }}
-    needs: code_scan
+  # Determine which versions to test based on input
+  setup_matrix:
+    name: Setup build matrix
+    runs-on: ubuntu-latest
+    outputs:
+      versions: ${{ steps.set-matrix.outputs.versions }}
+    steps:
+      - name: Set version matrix
+        id: set-matrix
+        run: |
+          if [ "${{ inputs.version_filter }}" == "all" ] || [ -z "${{ inputs.version_filter }}" ]; then
+            echo 'versions=["latest", "beta", "dev"]' >> $GITHUB_OUTPUT
+          else
+            echo 'versions=["${{ inputs.version_filter }}"]' >> $GITHUB_OUTPUT
+          fi
+
+  # Stage 1: Essential builds - Must pass for everything else to continue
+  build_essential:
+    name: "📦 ${{ matrix.target }} (${{ matrix.framework }}-${{ matrix.version }})"
+    needs: [code_scan, setup_matrix]
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
+      fail-fast: true  # Stop all essential builds if any fail
+      max-parallel: 4
       matrix:
         framework: [idf, ard]
-        version: [latest, beta, dev]
-        target: [core, basic, hw_relays, hw_speaker, hw_vibration, ble_proxy, media_player]
+        version: ${{ fromJson(needs.setup_matrix.outputs.versions) }}
+        target: [core, basic]
     steps:
       - uses: actions/checkout@main
       - name: Build ${{ matrix.target }} (${{ matrix.framework }}) - ${{ matrix.version }}
@@ -63,4 +97,77 @@ jobs:
         with:
           yaml-file: ".test/esphome_${{ matrix.framework }}_${{ matrix.target }}.yaml"
           version: ${{ matrix.version }}
+
+  # Stage 2: Hardware builds - Only if essential builds ALL passed
+  build_hardware:
+    name: "🔌 ${{ matrix.target }} (${{ matrix.framework }}-${{ matrix.version }})"
+    needs: [build_essential, setup_matrix]
+    if: success()  # Explicit check that previous stage succeeded
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # Hardware components can fail independently
+      max-parallel: 4
+      matrix:
+        framework: [idf, ard]
+        version: ${{ fromJson(needs.setup_matrix.outputs.versions) }}
+        target: [hw_relays, hw_speaker, hw_vibration]
+    steps:
+      - uses: actions/checkout@main
+      - name: Build ${{ matrix.target }} (${{ matrix.framework }}) - ${{ matrix.version }}
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_${{ matrix.framework }}_${{ matrix.target }}.yaml"
+          version: ${{ matrix.version }}
+
+  # Stage 3: Feature builds - Only if both previous stages passed and not skipped
+  build_features:
+    name: "⚡ ${{ matrix.target }} (${{ matrix.framework }}-${{ matrix.version }})"
+    needs: [build_essential, build_hardware, setup_matrix]
+    if: success() && !inputs.skip_features  # Run only if previous stages passed AND not skipped
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # Features can fail independently
+      max-parallel: 4
+      matrix:
+        framework: [idf, ard]
+        version: ${{ fromJson(needs.setup_matrix.outputs.versions) }}
+        target: [ble_proxy, media_player]
+    steps:
+      - uses: actions/checkout@main
+      - name: Build ${{ matrix.target }} (${{ matrix.framework }}) - ${{ matrix.version }}
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_${{ matrix.framework }}_${{ matrix.target }}.yaml"
+          version: ${{ matrix.version }}
+
+  # Results summary
+  build_summary:
+    name: "📊 Build Results Summary"
+    needs: [build_essential, build_hardware, build_features]
+    if: always()  # Always run to show results, even if some stages failed
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## 🔍 ESPHome Build Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Stage | Status | Result |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|---------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 📦 Essential | ${{ needs.build_essential.result }} | Core functionality builds |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🔌 Hardware | ${{ needs.build_hardware.result }} | Hardware component builds |" >> $GITHUB_STEP_SUMMARY
+          echo "| ⚡ Features | ${{ needs.build_features.result }} | Advanced feature builds |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.build_essential.result }}" != "success" ]; then
+            echo "❌ **Essential builds failed** - Check core and basic configurations" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          elif [ "${{ needs.build_hardware.result }}" != "success" ] && [ "${{ needs.build_hardware.result }}" != "skipped" ]; then
+            echo "⚠️ **Hardware builds failed** - Essential builds passed but hardware components have issues" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          elif [ "${{ needs.build_features.result }}" != "success" ] && [ "${{ needs.build_features.result }}" != "skipped" ]; then
+            echo "⚠️ **Feature builds failed** - Core functionality works but advanced features have issues" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "✅ **All builds completed successfully!** 🎉" >> $GITHUB_STEP_SUMMARY
+          fi
 ...
