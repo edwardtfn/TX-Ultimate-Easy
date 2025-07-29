@@ -2,32 +2,22 @@
 #####                              TX Ultimate Easy for ESPHome                                #####
 #####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
 ####################################################################################################
-##### Purpose: ESPHome Core - Add-on - BLE Proxy                                               #####
+##### Purpose: ESPHome Core - Add-on - BLE Proxy (REMOVED)                                     #####
 ####################################################################################################
 ##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
 ####################################################################################################
-##### NOTE:                                                                                    #####
-##### - Make changes ONLY if absolutely necessary and you have the required knowledge.         #####
-##### - For normal system use, modifications to this file are NOT required.                    #####
+##### REMOVAL NOTICE:                                                                          #####
+##### This package has been removed. Please update your configuration.                        #####
+##### Add BLE proxy functionality directly in your YAML configuration instead:                #####
+#####   bluetooth_proxy:                                                                       #####
 ####################################################################################################
 ---
-bluetooth_proxy:
-
-esphome:
-  platformio_options:
-    build_flags:
-      - -D TX_ULTIMATE_EASY_ADDON_BLE_PROXY
-
+# Trigger the error at compile time
 script:
-  - id: !extend dump_config_list_packages
+  - id: force_compilation_error
     then:
-      - script.wait: dump_config
       - lambda: |-
-          // Check for requirements
-          #if !defined(TX_ULTIMATE_EASY_CORE)
-            #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
-          #endif
-
-          // Identify itself
-          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Add-on - BLE Proxy");
+          #error "The package TX-Ultimate-Easy-ESPHome_addon_ble_proxy.yaml has been removed." \
+                 "Please remove this package from your configuration and add" \
+                 "'bluetooth_proxy:' directly to your YAML instead."
 ...
