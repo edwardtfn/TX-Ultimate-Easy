@@ -92,9 +92,7 @@ jobs:
 
   build_ard_hw_relays:
     name: "🔌 Arduino HW Relays (latest)"
-    needs:
-      - build_ard_core
-      - build_ard_basic
+    needs: build_ard_core
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -106,9 +104,7 @@ jobs:
 
   build_ard_hw_speaker:
     name: "🔌 Arduino HW Speaker (latest)"
-    needs:
-      - build_ard_core
-      - build_ard_basic
+    needs: build_ard_core
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -120,9 +116,7 @@ jobs:
 
   build_ard_hw_vibration:
     name: "🔌 Arduino HW Vibration (latest)"
-    needs:
-      - build_ard_core
-      - build_ard_basic
+    needs: build_ard_core
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -134,12 +128,7 @@ jobs:
 
   build_ard_ble_proxy_latest:
     name: "⚡ Arduino BLE Proxy (latest)"
-    needs:
-      - build_ard_core
-      - build_ard_basic
-      - build_ard_hw_relays
-      - build_ard_hw_speaker
-      - build_ard_hw_vibration
+    needs: build_ard_basic
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -151,12 +140,7 @@ jobs:
 
   build_ard_ble_proxy_dev:
     name: "⚡ Arduino BLE Proxy (dev)"
-    needs:
-      - build_ard_core
-      - build_ard_basic
-      - build_ard_hw_relays
-      - build_ard_hw_speaker
-      - build_ard_hw_vibration
+    needs: build_ard_basic_dev
     if: success() && !inputs.skip_dev
     runs-on: ubuntu-latest
     steps:
@@ -170,10 +154,8 @@ jobs:
   build_ard_media_player_latest:
     name: "⚡ Arduino Media Player (latest)"
     needs:
-      - build_ard_core
       - build_ard_basic
       - build_ard_hw_relays
-      - build_ard_hw_speaker
       - build_ard_hw_vibration
     runs-on: ubuntu-latest
     steps:
@@ -186,12 +168,7 @@ jobs:
 
   build_ard_media_player_dev:
     name: "⚡ Arduino Media Player (dev)"
-    needs:
-      - build_ard_core
-      - build_ard_basic
-      - build_ard_hw_relays
-      - build_ard_hw_speaker
-      - build_ard_hw_vibration
+    needs: build_ard_basic_dev
     if: success() && !inputs.skip_dev
     runs-on: ubuntu-latest
     steps:
@@ -242,7 +219,7 @@ jobs:
 
   build_idf_hw_relays:
     name: "🔌 IDF HW Relays (latest)"
-    needs: [build_idf_core, build_idf_basic]
+    needs: build_idf_core
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -254,9 +231,7 @@ jobs:
 
   build_idf_hw_speaker:
     name: "🔌 IDF HW Speaker (latest)"
-    needs:
-      - build_idf_core
-      - build_idf_basic
+    needs: build_idf_core
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -268,9 +243,7 @@ jobs:
 
   build_idf_hw_vibration:
     name: "🔌 IDF HW Vibration (latest)"
-    needs:
-      - build_idf_core
-      - build_idf_basic
+    needs: build_idf_core
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -282,12 +255,7 @@ jobs:
 
   build_idf_ble_proxy_latest:
     name: "⚡ IDF BLE Proxy (latest)"
-    needs:
-      - build_idf_core
-      - build_idf_basic
-      - build_idf_hw_relays
-      - build_idf_hw_speaker
-      - build_idf_hw_vibration
+    needs: build_idf_basic
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -299,12 +267,7 @@ jobs:
 
   build_idf_ble_proxy_dev:
     name: "⚡ IDF BLE Proxy (dev)"
-    needs:
-      - build_idf_core
-      - build_idf_basic
-      - build_idf_hw_relays
-      - build_idf_hw_speaker
-      - build_idf_hw_vibration
+    needs: build_idf_basic_dev
     if: success() && !inputs.skip_dev
     runs-on: ubuntu-latest
     steps:
@@ -318,10 +281,8 @@ jobs:
   build_idf_media_player_latest:
     name: "⚡ IDF Media Player (latest)"
     needs:
-      - build_idf_core
       - build_idf_basic
       - build_idf_hw_relays
-      - build_idf_hw_speaker
       - build_idf_hw_vibration
     runs-on: ubuntu-latest
     steps:
@@ -334,12 +295,7 @@ jobs:
 
   build_idf_media_player_dev:
     name: "⚡ IDF Media Player (dev)"
-    needs:
-      - build_idf_core
-      - build_idf_basic
-      - build_idf_hw_relays
-      - build_idf_hw_speaker
-      - build_idf_hw_vibration
+    needs: build_idf_basic_dev
     if: success() && !inputs.skip_dev
     runs-on: ubuntu-latest
     steps:
