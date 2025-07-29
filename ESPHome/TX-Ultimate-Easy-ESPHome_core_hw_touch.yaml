@@ -466,7 +466,6 @@ tx_ultimate_easy:
       - lambda: |-
           ESP_LOGI("core_hw_touch", "Swipe %s",
                     (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}") ? "right" : "up");
-          ESP_LOGI("core_hw_touch", "Swipe %s", swipe_direction.c_str());
           touch_swipe_right->execute();
 
   on_touch_event:
