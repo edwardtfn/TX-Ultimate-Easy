@@ -53,7 +53,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        framework: [ard, idf]
+        framework: [idf, ard]
         version: [latest, beta, dev]
         target: [core, basic, hw_relays, hw_speaker, hw_vibration, ble_proxy, media_player]
     steps:
