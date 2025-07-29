@@ -432,8 +432,6 @@ tx_ultimate_easy:
             {"swipe-direction", swipe_direction.c_str()},
             {"position", std::to_string(touch.x)}
           });
-          ESP_LOGI("core_hw_touch", "Multi-touch released");
-          touch_on_multi_touch_release->execute();
           ESP_LOGI("core_hw_touch", "Swipe %s", swipe_direction.c_str());
           touch_swipe_left->execute();
 
