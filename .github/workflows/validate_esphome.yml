@@ -274,132 +274,144 @@ jobs:
           yaml-file: ".test/esphome_idf_media_player.yaml"
           version: dev
 
-  # Results summary
-  build_summary:
-    name: "📊 Build Summary"
-    needs:
-      - build_ard_core
-      - build_ard_basic
-      - build_ard_hw_relays
-      - build_ard_hw_speaker
-      - build_ard_hw_vibration
-      - build_ard_ble_proxy_latest
-      - build_ard_ble_proxy_dev
-      - build_ard_media_player_latest
-      - build_ard_media_player_dev
-      - build_idf_core
-      - build_idf_basic
-      - build_idf_hw_relays
-      - build_idf_hw_speaker
-      - build_idf_hw_vibration
-      - build_idf_ble_proxy_latest
-      - build_idf_ble_proxy_dev
-      - build_idf_media_player_latest
-      - build_idf_media_player_dev
+  # Summary Jobs - Grouped by framework and environment
+  summary_arduino:
+    name: "📊 Arduino Framework"
+    needs: [build_ard_core, build_ard_basic, build_ard_hw_relays, build_ard_hw_speaker, build_ard_hw_vibration, build_ard_ble_proxy_latest, build_ard_ble_proxy_dev, build_ard_media_player_latest, build_ard_media_player_dev]
     if: always()
     runs-on: ubuntu-latest
     steps:
-      - name: Generate Results Summary
+      - name: Arduino Framework Results
         run: |
-          echo "## 📋 ESPHome Build Results" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          # Build Matrix Summary
-          echo "### 🏗️ Foundation Components (Latest Only)" >> $GITHUB_STEP_SUMMARY
-          echo "| Component | 🤖 Arduino | 🔧 ESP-IDF |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----------|-------------|------------|" >> $GITHUB_STEP_SUMMARY
-          echo "| 🏗️ Core | ${{ needs.build_ard_core.result }} | ${{ needs.build_idf_core.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 📦 Basic | ${{ needs.build_ard_basic.result }} | ${{ needs.build_idf_basic.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔌 HW Relays | ${{ needs.build_ard_hw_relays.result }} | ${{ needs.build_idf_hw_relays.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔌 HW Speaker | ${{ needs.build_ard_hw_speaker.result }} | ${{ needs.build_idf_hw_speaker.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔌 HW Vibration | ${{ needs.build_ard_hw_vibration.result }} | ${{ needs.build_idf_hw_vibration.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          echo "### ⚡ Advanced Features (Multi-Version)" >> $GITHUB_STEP_SUMMARY
-          echo "| Component | 🤖 Arduino Latest | 🤖 Arduino Dev | 🔧 IDF Latest | 🔧 IDF Dev |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----------|-------------------|----------------|---------------|------------|" >> $GITHUB_STEP_SUMMARY
-          echo "| ⚡ BLE Proxy | ${{ needs.build_ard_ble_proxy_latest.result }} | \
-            ${{ needs.build_ard_ble_proxy_dev.result }} | \
-            ${{ needs.build_idf_ble_proxy_latest.result }} | \
-            ${{ needs.build_idf_ble_proxy_dev.result }} |" >> $GITHUB_STEP_SUMMARY
-                      echo "| ⚡ Media Player | ${{ needs.build_ard_media_player_latest.result }} | \
-            ${{ needs.build_ard_media_player_dev.result }} | \
-            ${{ needs.build_idf_media_player_latest.result }} | \
-            ${{ needs.build_idf_media_player_dev.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          # Environment Summary
-          echo "### 🌍 Environment Summary" >> $GITHUB_STEP_SUMMARY
-
-          # Count successes per environment
-          ARD_LATEST_SUCCESS=0
-          ARD_DEV_SUCCESS=0
-          IDF_LATEST_SUCCESS=0
-          IDF_DEV_SUCCESS=0
-
-          # Arduino Latest (7 builds)
-          [ "${{ needs.build_ard_core.result }}" == "success" ] && ARD_LATEST_SUCCESS=$((ARD_LATEST_SUCCESS + 1))
-          [ "${{ needs.build_ard_basic.result }}" == "success" ] && ARD_LATEST_SUCCESS=$((ARD_LATEST_SUCCESS + 1))
-          [ "${{ needs.build_ard_hw_relays.result }}" == "success" ] && ARD_LATEST_SUCCESS=$((ARD_LATEST_SUCCESS + 1))
-          [ "${{ needs.build_ard_hw_speaker.result }}" == "success" ] && ARD_LATEST_SUCCESS=$((ARD_LATEST_SUCCESS + 1))
-          [ "${{ needs.build_ard_hw_vibration.result }}" == "success" ] && ARD_LATEST_SUCCESS=$((ARD_LATEST_SUCCESS + 1))
-          [ "${{ needs.build_ard_ble_proxy_latest.result }}" == "success" ] && ARD_LATEST_SUCCESS=$((ARD_LATEST_SUCCESS + 1))
-          [ "${{ needs.build_ard_media_player_latest.result }}" == "success" ] && ARD_LATEST_SUCCESS=$((ARD_LATEST_SUCCESS + 1))
-
-          # Arduino Dev (2 builds if not skipped)
+          SUCCESS=0
+          TOTAL=0
+          
+          # Count latest builds (always run)
+          [ "${{ needs.build_ard_core.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_basic.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_hw_relays.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_hw_speaker.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_media_player_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          TOTAL=$((TOTAL + 7))
+          
+          # Count dev builds (if not skipped)
           if [ "${{ inputs.skip_dev }}" != "true" ]; then
-            [ "${{ needs.build_ard_ble_proxy_dev.result }}" == "success" ] && ARD_DEV_SUCCESS=$((ARD_DEV_SUCCESS + 1))
-            [ "${{ needs.build_ard_media_player_dev.result }}" == "success" ] && ARD_DEV_SUCCESS=$((ARD_DEV_SUCCESS + 1))
+            [ "${{ needs.build_ard_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+            [ "${{ needs.build_ard_media_player_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+            TOTAL=$((TOTAL + 2))
+          fi
+          
+          echo "🤖 Arduino Framework: $SUCCESS/$TOTAL builds passed"
+          
+          if [ "$SUCCESS" -eq "$TOTAL" ]; then
+            echo "✅ All Arduino builds successful!"
+          else
+            echo "❌ Some Arduino builds failed"
+            exit 1
           fi
 
-          # IDF Latest (7 builds)
-          [ "${{ needs.build_idf_core.result }}" == "success" ] && IDF_LATEST_SUCCESS=$((IDF_LATEST_SUCCESS + 1))
-          [ "${{ needs.build_idf_basic.result }}" == "success" ] && IDF_LATEST_SUCCESS=$((IDF_LATEST_SUCCESS + 1))
-          [ "${{ needs.build_idf_hw_relays.result }}" == "success" ] && IDF_LATEST_SUCCESS=$((IDF_LATEST_SUCCESS + 1))
-          [ "${{ needs.build_idf_hw_speaker.result }}" == "success" ] && IDF_LATEST_SUCCESS=$((IDF_LATEST_SUCCESS + 1))
-          [ "${{ needs.build_idf_hw_vibration.result }}" == "success" ] && IDF_LATEST_SUCCESS=$((IDF_LATEST_SUCCESS + 1))
-          [ "${{ needs.build_idf_ble_proxy_latest.result }}" == "success" ] && IDF_LATEST_SUCCESS=$((IDF_LATEST_SUCCESS + 1))
-          [ "${{ needs.build_idf_media_player_latest.result }}" == "success" ] && IDF_LATEST_SUCCESS=$((IDF_LATEST_SUCCESS + 1))
-
-          # IDF Dev (2 builds if not skipped)
+  summary_idf:
+    name: "📊 ESP-IDF Framework"
+    needs: [build_idf_core, build_idf_basic, build_idf_hw_relays, build_idf_hw_speaker, build_idf_hw_vibration, build_idf_ble_proxy_latest, build_idf_ble_proxy_dev, build_idf_media_player_latest, build_idf_media_player_dev]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: ESP-IDF Framework Results
+        run: |
+          SUCCESS=0
+          TOTAL=0
+          
+          # Count latest builds (always run)
+          [ "${{ needs.build_idf_core.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_basic.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_hw_relays.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_hw_speaker.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_media_player_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          TOTAL=$((TOTAL + 7))
+          
+          # Count dev builds (if not skipped)
           if [ "${{ inputs.skip_dev }}" != "true" ]; then
-            [ "${{ needs.build_idf_ble_proxy_dev.result }}" == "success" ] && IDF_DEV_SUCCESS=$((IDF_DEV_SUCCESS + 1))
-            [ "${{ needs.build_idf_media_player_dev.result }}" == "success" ] && IDF_DEV_SUCCESS=$((IDF_DEV_SUCCESS + 1))
+            [ "${{ needs.build_idf_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+            [ "${{ needs.build_idf_media_player_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+            TOTAL=$((TOTAL + 2))
+          fi
+          
+          echo "🔧 ESP-IDF Framework: $SUCCESS/$TOTAL builds passed"
+          
+          if [ "$SUCCESS" -eq "$TOTAL" ]; then
+            echo "✅ All ESP-IDF builds successful!"
+          else
+            echo "❌ Some ESP-IDF builds failed"
+            exit 1
           fi
 
-          echo "| Framework | Latest ESPHome | Dev ESPHome |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----------|----------------|-------------|" >> $GITHUB_STEP_SUMMARY
-          echo "| 🤖 **Arduino** | ✅ $ARD_LATEST_SUCCESS/7 | ✅ $ARD_DEV_SUCCESS/2 |" >> $GITHUB_STEP_SUMMARY
-          echo "| 🔧 **ESP-IDF** | ✅ $IDF_LATEST_SUCCESS/7 | ✅ $IDF_DEV_SUCCESS/2 |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          # Framework Summary
-          echo "### 🎯 Framework Summary" >> $GITHUB_STEP_SUMMARY
-          ARD_TOTAL=$((ARD_LATEST_SUCCESS + ARD_DEV_SUCCESS))
-          IDF_TOTAL=$((IDF_LATEST_SUCCESS + IDF_DEV_SUCCESS))
-
-          if [ "${{ inputs.skip_dev }}" == "true" ]; then
-            ARD_MAX=7
-            IDF_MAX=7
-            TOTAL_MAX=14
+  summary_latest:
+    name: "📊 ESPHome (Latest)"
+    needs: [build_ard_core, build_ard_basic, build_ard_hw_relays, build_ard_hw_speaker, build_ard_hw_vibration, build_ard_ble_proxy_latest, build_ard_media_player_latest, build_idf_core, build_idf_basic, build_idf_hw_relays, build_idf_hw_speaker, build_idf_hw_vibration, build_idf_ble_proxy_latest, build_idf_media_player_latest]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Latest ESPHome Results
+        run: |
+          SUCCESS=0
+          TOTAL=14
+          
+          # Arduino Latest builds
+          [ "${{ needs.build_ard_core.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_basic.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_hw_relays.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_hw_speaker.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_media_player_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          
+          # ESP-IDF Latest builds
+          [ "${{ needs.build_idf_core.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_basic.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_hw_relays.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_hw_speaker.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_media_player_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          
+          echo "📋 Latest ESPHome: $SUCCESS/$TOTAL builds passed"
+          
+          if [ "$SUCCESS" -eq "$TOTAL" ]; then
+            echo "✅ All builds on latest ESPHome successful!"
           else
-            ARD_MAX=9
-            IDF_MAX=9
-            TOTAL_MAX=18
+            echo "❌ Some builds on latest ESPHome failed"
+            exit 1
           fi
 
-          GRAND_TOTAL=$((ARD_TOTAL + IDF_TOTAL))
-
-          echo "- 🤖 **Arduino**: $ARD_TOTAL/$ARD_MAX builds passed" >> $GITHUB_STEP_SUMMARY
-          echo "- 🔧 **ESP-IDF**: $IDF_TOTAL/$IDF_MAX builds passed" >> $GITHUB_STEP_SUMMARY
-          echo "- 🎯 **Overall**: $GRAND_TOTAL/$TOTAL_MAX builds passed" >> $GITHUB_STEP_SUMMARY
-
-          # Final status emoji
-          if [ "$GRAND_TOTAL" -eq "$TOTAL_MAX" ]; then
-            echo "- 🎉 **Status**: All builds successful!" >> $GITHUB_STEP_SUMMARY
-          elif [ "$GRAND_TOTAL" -gt "$((TOTAL_MAX * 3 / 4))" ]; then
-            echo "- ⚠️ **Status**: Most builds successful, some issues detected" >> $GITHUB_STEP_SUMMARY
+  summary_dev:
+    name: "📊 ESPHome (Dev)"
+    needs: [build_ard_ble_proxy_dev, build_ard_media_player_dev, build_idf_ble_proxy_dev, build_idf_media_player_dev]
+    if: always() && !inputs.skip_dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dev ESPHome Results
+        run: |
+          SUCCESS=0
+          TOTAL=4
+          
+          # Arduino Dev builds
+          [ "${{ needs.build_ard_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_media_player_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          
+          # ESP-IDF Dev builds
+          [ "${{ needs.build_idf_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_media_player_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          
+          echo "🚀 Dev ESPHome: $SUCCESS/$TOTAL builds passed"
+          
+          if [ "$SUCCESS" -eq "$TOTAL" ]; then
+            echo "✅ All builds on dev ESPHome successful!"
           else
-            echo "- ❌ **Status**: Multiple build failures detected" >> $GITHUB_STEP_SUMMARY
+            echo "❌ Some builds on dev ESPHome failed"
+            exit 1
           fi
 ...
