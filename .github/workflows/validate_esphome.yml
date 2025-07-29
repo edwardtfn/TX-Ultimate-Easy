@@ -6,6 +6,24 @@ permissions:
   pull-requests: read
 
 on:  # yamllint disable-line rule:truthy
+  push:
+    paths:
+      - "**/*.yml"
+      - "**/*.yaml"
+      - "**/*.h"
+      - "**/*.cpp"
+      - "**/*.c"
+      - "**/*.py"
+
+  pull_request:
+    paths:
+      - "**/*.yml"
+      - "**/*.yaml"
+      - "**/*.h"
+      - "**/*.cpp"
+      - "**/*.c"
+      - "**/*.py"
+
   workflow_dispatch:
 
 concurrency:
