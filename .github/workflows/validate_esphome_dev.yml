@@ -1,0 +1,210 @@
+---
+name: Validate ESPHome (Dev)
+
+permissions:
+  contents: read
+  pull-requests: read
+
+on:  # yamllint disable-line rule:truthy
+  push:
+    paths:
+      - "**/*.yml"
+      - "**/*.yaml"
+      - "**/*.h"
+      - "**/*.cpp"
+      - "**/*.c"
+      - "**/*.py"
+
+  pull_request:
+    paths:
+      - "**/*.yml"
+      - "**/*.yaml"
+      - "**/*.h"
+      - "**/*.cpp"
+      - "**/*.c"
+      - "**/*.py"
+
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  code_scan:
+    name: Code scan (YAML)
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@main
+
+      - name: Setup Python
+        uses: actions/setup-python@main
+        with:
+          python-version: '3.8'
+
+      - name: Install Yamllint
+        run: pip install yamllint
+
+      - name: Validate YAML files
+        run: find . -name "*.yaml" -exec yamllint -c ./.rules/yamllint.yml {} +
+
+  build_ard_core:
+    name: Core (Arduino)
+    needs: code_scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build Core (Arduino)
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_ard_core.yaml"
+          version: dev
+
+  build_idf_core:
+    name: Core (IDF)
+    needs: code_scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build Core (IDF)
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_idf_core.yaml"
+          version: dev
+
+  build_ard_basic:
+    name: Basic (Arduino)
+    needs: build_ard_core
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build Basic (Arduino)
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_ard_basic.yaml"
+          version: dev
+
+  build_idf_basic:
+    name: Basic (IDF)
+    needs: build_idf_core
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build Basic (IDF)
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_idf_basic.yaml"
+          version: dev
+
+  build_ard_hw_relays:
+    name: HW Relays (Arduino)
+    needs: build_ard_core
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build HW Relays (Arduino)
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_ard_hw_relays.yaml"
+          version: dev
+
+  build_idf_hw_relays:
+    name: HW Relays (IDF)
+    needs: build_idf_core
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build HW Relays (IDF)
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_idf_hw_relays.yaml"
+          version: dev
+
+  build_ard_hw_speaker:
+    name: HW Speaker (Arduino)
+    needs: build_ard_core
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build HW Speaker (Arduino)
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_ard_hw_speaker.yaml"
+          version: dev
+
+  build_idf_hw_speaker:
+    name: HW Speaker (IDF)
+    needs: build_idf_core
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build HW Speaker (IDF)
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_idf_hw_speaker.yaml"
+          version: dev
+
+  build_ard_hw_vibration:
+    name: HW Vibration (Arduino)
+    needs: build_ard_core
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build HW Vibration (Arduino)
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_ard_hw_vibration.yaml"
+          version: dev
+
+  build_idf_hw_vibration:
+    name: HW Vibration (IDF)
+    needs: build_idf_core
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build HW Vibration (IDF)
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_idf_hw_vibration.yaml"
+          version: dev
+
+  build_ard_ble_proxy:
+    name: Bluetooth Proxy (Ard)
+    needs: build_ard_basic
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build BLE Proxy (Ard)
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_ard_ble_proxy.yaml"
+          version: dev
+
+  build_idf_ble_proxy:
+    name: Bluetooth Proxy (IDF)
+    needs: build_idf_basic
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build BLE Proxy (IDF)
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_idf_ble_proxy.yaml"
+          version: dev
+
+  build_ard_media_player:
+    name: Media Player (Ard)
+    needs:
+      - build_ard_basic
+      - build_ard_hw_relays
+      - build_ard_hw_vibration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build Media Player (Ard)
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_ard_media_player.yaml"
+          version: dev
+...
