@@ -52,171 +52,171 @@ jobs:
       - name: Validate YAML files
         run: find . -name "*.yaml" -exec yamllint -c ./.rules/yamllint.yml {} +
 
-  # Arduino Framework - Foundation
+  # Arduino Framework - Foundation (latest)
   build_ard_core:
-    name: "🏗️ Arduino Core"
+    name: "🏗️ Arduino Core (latest)"
     needs: code_scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build Arduino Core
+      - name: Build Arduino Core - latest
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_ard_core.yaml"
           version: latest
 
   build_ard_basic:
-    name: "📦 Arduino Basic"
+    name: "📦 Arduino Basic (latest)"
     needs: build_ard_core
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build Arduino Basic
+      - name: Build Arduino Basic - latest
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_ard_basic.yaml"
           version: latest
 
   build_ard_hw_relays:
-    name: "🔌 Arduino HW Relays"
+    name: "🔌 Arduino HW Relays (latest)"
     needs: [build_ard_core, build_ard_basic]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build Arduino HW Relays
+      - name: Build Arduino HW Relays - latest
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_ard_hw_relays.yaml"
           version: latest
 
   build_ard_hw_speaker:
-    name: "🔌 Arduino HW Speaker"
+    name: "🔌 Arduino HW Speaker (latest)"
     needs: [build_ard_core, build_ard_basic]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build Arduino HW Speaker
+      - name: Build Arduino HW Speaker - latest
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_ard_hw_speaker.yaml"
           version: latest
 
   build_ard_hw_vibration:
-    name: "🔌 Arduino HW Vibration"
+    name: "🔌 Arduino HW Vibration (latest)"
     needs: [build_ard_core, build_ard_basic]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build Arduino HW Vibration
+      - name: Build Arduino HW Vibration - latest
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_ard_hw_vibration.yaml"
           version: latest
 
   build_ard_ble_proxy:
-    name: "⚡ Arduino BLE Proxy"
+    name: "⚡ Arduino BLE Proxy (latest)"
     needs: [build_ard_core, build_ard_basic, build_ard_hw_relays, build_ard_hw_speaker, build_ard_hw_vibration]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build Arduino BLE Proxy
+      - name: Build Arduino BLE Proxy - latest
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_ard_ble_proxy.yaml"
           version: latest
 
   build_ard_media_player:
-    name: "⚡ Arduino Media Player"
+    name: "⚡ Arduino Media Player (latest)"
     needs: [build_ard_core, build_ard_basic, build_ard_hw_relays, build_ard_hw_speaker, build_ard_hw_vibration]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build Arduino Media Player
+      - name: Build Arduino Media Player - latest
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_ard_media_player.yaml"
           version: latest
 
-  # IDF Framework - Foundation
+  # IDF Framework - Foundation (latest)
   build_idf_core:
-    name: "🏗️ IDF Core"
+    name: "🏗️ IDF Core (latest)"
     needs: code_scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build IDF Core
+      - name: Build IDF Core - latest
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_idf_core.yaml"
           version: latest
 
   build_idf_basic:
-    name: "📦 IDF Basic"
+    name: "📦 IDF Basic (latest)"
     needs: build_idf_core
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build IDF Basic
+      - name: Build IDF Basic - latest
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_idf_basic.yaml"
           version: latest
 
   build_idf_hw_relays:
-    name: "🔌 IDF HW Relays"
+    name: "🔌 IDF HW Relays (latest)"
     needs: [build_idf_core, build_idf_basic]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build IDF HW Relays
+      - name: Build IDF HW Relays - latest
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_idf_hw_relays.yaml"
           version: latest
 
   build_idf_hw_speaker:
-    name: "🔌 IDF HW Speaker"
+    name: "🔌 IDF HW Speaker (latest)"
     needs: [build_idf_core, build_idf_basic]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build IDF HW Speaker
+      - name: Build IDF HW Speaker - latest
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_idf_hw_speaker.yaml"
           version: latest
 
   build_idf_hw_vibration:
-    name: "🔌 IDF HW Vibration"
+    name: "🔌 IDF HW Vibration (latest)"
     needs: [build_idf_core, build_idf_basic]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build IDF HW Vibration
+      - name: Build IDF HW Vibration - latest
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_idf_hw_vibration.yaml"
           version: latest
 
   build_idf_ble_proxy:
-    name: "⚡ IDF BLE Proxy"
+    name: "⚡ IDF BLE Proxy (latest)"
     needs: [build_idf_core, build_idf_basic, build_idf_hw_relays, build_idf_hw_speaker, build_idf_hw_vibration]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build IDF BLE Proxy
+      - name: Build IDF BLE Proxy - latest
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_idf_ble_proxy.yaml"
           version: latest
 
   build_idf_media_player:
-    name: "⚡ IDF Media Player"
+    name: "⚡ IDF Media Player (latest)"
     needs: [build_idf_core, build_idf_basic, build_idf_hw_relays, build_idf_hw_speaker, build_idf_hw_vibration]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build IDF Media Player
+      - name: Build IDF Media Player - latest
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_idf_media_player.yaml"
