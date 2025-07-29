@@ -36,9 +36,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@main
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@main
         with:
           python-version: '3.11'
       - name: Install Yamllint
@@ -57,9 +57,9 @@ jobs:
         version: [latest, beta, dev]
         target: [core, basic, hw_relays, hw_speaker, hw_vibration, ble_proxy, media_player]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@main
       - name: Build ${{ matrix.target }} (${{ matrix.framework }}) - ${{ matrix.version }}
-        uses: esphome/build-action@v4
+        uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_${{ matrix.framework }}_${{ matrix.target }}.yaml"
           version: ${{ matrix.version }}
