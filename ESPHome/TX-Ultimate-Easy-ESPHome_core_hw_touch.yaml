@@ -387,17 +387,16 @@ tx_ultimate_easy:
 
   on_multi_touch_release:
     then:
+      - homeassistant.event:
+          event: ${EVENT_NAME}
+          data:
+            device_name: !lambda return id(tx_device_name).state.c_str();
+            firmware: ${version}
+            domain: touch
+            type: multi_touch
+            action: release
+            position: !lambda return std::to_string(touch.x);
       - lambda: |-
-          // Send event to Home Assistant
-          esphome::api::CustomAPIDevice ha_event;
-          ha_event.fire_homeassistant_event("${EVENT_NAME}", {
-            {"device_name", id(tx_device_name).state.c_str()},
-            {"firmware", "${version}"},
-            {"domain", "touch"},
-            {"type", "multi_touch"},
-            {"action", "release"},
-            {"position", std::to_string(touch.x)}
-          });
           ESP_LOGI("core_hw_touch", "Multi-touch released");
           touch_on_multi_touch_release->execute();
 
@@ -419,39 +418,40 @@ tx_ultimate_easy:
 
   on_swipe_left:
     then:
+      - homeassistant.event:
+          event: ${EVENT_NAME}
+          data:
+            device_name: !lambda return id(tx_device_name).state.c_str();
+            firmware: ${version}
+            domain: touch
+            type: swipe
+            action: !lambda return (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}") ? "left" : "down";
+            swipe-direction: !lambda |-
+              return (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}") ? "left" : "down";
+            position: !lambda return std::to_string(touch.x);
       - lambda: |-
-          std::string swipe_direction = (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}") ? "left" : "down";
-          // Send event to Home Assistant
-          esphome::api::CustomAPIDevice ha_event;
-          ha_event.fire_homeassistant_event("${EVENT_NAME}", {
-            {"device_name", id(tx_device_name).state.c_str()},
-            {"firmware", "${version}"},
-            {"domain", "touch"},
-            {"type", "swipe"},
-            {"action", swipe_direction.c_str()},
-            {"swipe-direction", swipe_direction.c_str()},
-            {"position", std::to_string(touch.x)}
-          });
           ESP_LOGI("core_hw_touch", "Multi-touch released");
           touch_on_multi_touch_release->execute();
-          ESP_LOGI("core_hw_touch", "Swipe %s", swipe_direction.c_str());
+          ESP_LOGI("core_hw_touch", "Swipe %s",
+                    (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}") ? "left" : "down");
           touch_swipe_left->execute();
 
   on_swipe_right:
     then:
+      - homeassistant.event:
+          event: ${EVENT_NAME}
+          data:
+            device_name: !lambda return id(tx_device_name).state.c_str();
+            firmware: ${version}
+            domain: touch
+            type: swipe
+            action: !lambda return (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}") ? "right" : "up";
+            swipe-direction: !lambda |-
+              return (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}") ? "right" : "up";
+            position: !lambda return std::to_string(touch.x);
       - lambda: |-
-          std::string swipe_direction = (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}") ? "right" : "up";
-          // Send event to Home Assistant
-          esphome::api::CustomAPIDevice ha_event;
-          ha_event.fire_homeassistant_event("${EVENT_NAME}", {
-            {"device_name", id(tx_device_name).state.c_str()},
-            {"firmware", "${version}"},
-            {"domain", "touch"},
-            {"type", "swipe"},
-            {"action", swipe_direction.c_str()},
-            {"swipe-direction", swipe_direction.c_str()},
-            {"position", std::to_string(touch.x)}
-          });
+          ESP_LOGI("core_hw_touch", "Swipe %s",
+                    (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}") ? "right" : "up");
           ESP_LOGI("core_hw_touch", "Swipe %s", swipe_direction.c_str());
           touch_swipe_right->execute();
 
