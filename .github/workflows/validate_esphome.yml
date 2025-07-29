@@ -277,7 +277,9 @@ jobs:
   # Summary Jobs - Grouped by framework and environment
   summary_arduino:
     name: "📊 Arduino Framework"
-    needs: [build_ard_core, build_ard_basic, build_ard_hw_relays, build_ard_hw_speaker, build_ard_hw_vibration, build_ard_ble_proxy_latest, build_ard_ble_proxy_dev, build_ard_media_player_latest, build_ard_media_player_dev]
+    needs: [build_ard_core, build_ard_basic, build_ard_hw_relays, build_ard_hw_speaker,
+            build_ard_hw_vibration, build_ard_ble_proxy_latest, build_ard_ble_proxy_dev,
+            build_ard_media_player_latest, build_ard_media_player_dev]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -285,7 +287,7 @@ jobs:
         run: |
           SUCCESS=0
           TOTAL=0
-          
+
           # Count latest builds (always run)
           [ "${{ needs.build_ard_core.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_basic.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
@@ -295,16 +297,16 @@ jobs:
           [ "${{ needs.build_ard_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_media_player_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           TOTAL=$((TOTAL + 7))
-          
+
           # Count dev builds (if not skipped)
           if [ "${{ inputs.skip_dev }}" != "true" ]; then
             [ "${{ needs.build_ard_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             [ "${{ needs.build_ard_media_player_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             TOTAL=$((TOTAL + 2))
           fi
-          
+
           echo "🤖 Arduino Framework: $SUCCESS/$TOTAL builds passed"
-          
+
           if [ "$SUCCESS" -eq "$TOTAL" ]; then
             echo "✅ All Arduino builds successful!"
           else
@@ -314,7 +316,9 @@ jobs:
 
   summary_idf:
     name: "📊 ESP-IDF Framework"
-    needs: [build_idf_core, build_idf_basic, build_idf_hw_relays, build_idf_hw_speaker, build_idf_hw_vibration, build_idf_ble_proxy_latest, build_idf_ble_proxy_dev, build_idf_media_player_latest, build_idf_media_player_dev]
+    needs: [build_idf_core, build_idf_basic, build_idf_hw_relays, build_idf_hw_speaker,
+            build_idf_hw_vibration, build_idf_ble_proxy_latest, build_idf_ble_proxy_dev,
+            build_idf_media_player_latest, build_idf_media_player_dev]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -322,7 +326,7 @@ jobs:
         run: |
           SUCCESS=0
           TOTAL=0
-          
+
           # Count latest builds (always run)
           [ "${{ needs.build_idf_core.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_basic.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
@@ -332,16 +336,16 @@ jobs:
           [ "${{ needs.build_idf_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_media_player_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           TOTAL=$((TOTAL + 7))
-          
+
           # Count dev builds (if not skipped)
           if [ "${{ inputs.skip_dev }}" != "true" ]; then
             [ "${{ needs.build_idf_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             [ "${{ needs.build_idf_media_player_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             TOTAL=$((TOTAL + 2))
           fi
-          
+
           echo "🔧 ESP-IDF Framework: $SUCCESS/$TOTAL builds passed"
-          
+
           if [ "$SUCCESS" -eq "$TOTAL" ]; then
             echo "✅ All ESP-IDF builds successful!"
           else
@@ -351,7 +355,10 @@ jobs:
 
   summary_latest:
     name: "📊 ESPHome (Latest)"
-    needs: [build_ard_core, build_ard_basic, build_ard_hw_relays, build_ard_hw_speaker, build_ard_hw_vibration, build_ard_ble_proxy_latest, build_ard_media_player_latest, build_idf_core, build_idf_basic, build_idf_hw_relays, build_idf_hw_speaker, build_idf_hw_vibration, build_idf_ble_proxy_latest, build_idf_media_player_latest]
+    needs: [build_ard_core, build_ard_basic, build_ard_hw_relays, build_ard_hw_speaker,
+            build_ard_hw_vibration, build_ard_ble_proxy_latest, build_ard_media_player_latest,
+            build_idf_core, build_idf_basic, build_idf_hw_relays, build_idf_hw_speaker,
+            build_idf_hw_vibration, build_idf_ble_proxy_latest, build_idf_media_player_latest]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -359,7 +366,7 @@ jobs:
         run: |
           SUCCESS=0
           TOTAL=14
-          
+
           # Arduino Latest builds
           [ "${{ needs.build_ard_core.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_basic.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
@@ -368,7 +375,7 @@ jobs:
           [ "${{ needs.build_ard_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_media_player_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-          
+
           # ESP-IDF Latest builds
           [ "${{ needs.build_idf_core.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_basic.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
@@ -377,9 +384,9 @@ jobs:
           [ "${{ needs.build_idf_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_media_player_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-          
-          echo "📋 Latest ESPHome: $SUCCESS/$TOTAL builds passed"
-          
+
+          echo "📋 ESPHome (Latest): $SUCCESS/$TOTAL builds passed"
+
           if [ "$SUCCESS" -eq "$TOTAL" ]; then
             echo "✅ All builds on latest ESPHome successful!"
           else
@@ -389,7 +396,8 @@ jobs:
 
   summary_dev:
     name: "📊 ESPHome (Dev)"
-    needs: [build_ard_ble_proxy_dev, build_ard_media_player_dev, build_idf_ble_proxy_dev, build_idf_media_player_dev]
+    needs: [build_ard_ble_proxy_dev, build_ard_media_player_dev, build_idf_ble_proxy_dev,
+            build_idf_media_player_dev]
     if: always() && !inputs.skip_dev
     runs-on: ubuntu-latest
     steps:
@@ -397,17 +405,17 @@ jobs:
         run: |
           SUCCESS=0
           TOTAL=4
-          
+
           # Arduino Dev builds
           [ "${{ needs.build_ard_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_media_player_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-          
+
           # ESP-IDF Dev builds
           [ "${{ needs.build_idf_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_media_player_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-          
-          echo "🚀 Dev ESPHome: $SUCCESS/$TOTAL builds passed"
-          
+
+          echo "🚀 ESPHome (Dev): $SUCCESS/$TOTAL builds passed"
+
           if [ "$SUCCESS" -eq "$TOTAL" ]; then
             echo "✅ All builds on dev ESPHome successful!"
           else
