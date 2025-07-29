@@ -92,7 +92,7 @@ jobs:
 
   build_ard_hw_relays:
     name: "🔌 Arduino HW Relays (latest)"
-    needs: build_ard_core
+    needs: build_ard_basic
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -104,7 +104,7 @@ jobs:
 
   build_ard_hw_speaker:
     name: "🔌 Arduino HW Speaker (latest)"
-    needs: build_ard_core
+    needs: build_ard_basic
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -116,7 +116,7 @@ jobs:
 
   build_ard_hw_vibration:
     name: "🔌 Arduino HW Vibration (latest)"
-    needs: build_ard_core
+    needs: build_ard_basic
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -219,7 +219,7 @@ jobs:
 
   build_idf_hw_relays:
     name: "🔌 IDF HW Relays (latest)"
-    needs: build_idf_core
+    needs: build_idf_basic
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -231,7 +231,7 @@ jobs:
 
   build_idf_hw_speaker:
     name: "🔌 IDF HW Speaker (latest)"
-    needs: build_idf_core
+    needs: build_idf_basic
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -243,7 +243,7 @@ jobs:
 
   build_idf_hw_vibration:
     name: "🔌 IDF HW Vibration (latest)"
-    needs: build_idf_core
+    needs: build_idf_basic
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
