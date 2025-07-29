@@ -12,7 +12,7 @@
 ####################################################################################################
 ---
 packages:
-  standard_hw_audio: !include TX-Ultimate-Easy-ESPHome_standard_hw_audio.yaml
+  standard_hw_speaker: !include TX-Ultimate-Easy-ESPHome_standard_hw_speaker.yaml
 
 esphome:
   platformio_options:
@@ -38,8 +38,8 @@ script:
           #if !defined(TX_ULTIMATE_EASY_CORE)
             #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
           #endif
-          #if !defined(TX_ULTIMATE_EASY_STANDARD_HW_AUDIO)
-            #error "The package TX-Ultimate-Easy-ESPHome_standard_hw_audio.yaml is required."
+          #if !defined(TX_ULTIMATE_EASY_STANDARD_HW_SPEAKER)
+            #error "The package TX-Ultimate-Easy-ESPHome_standard_hw_speaker.yaml is required."
           #endif
 
           // Identify itself
