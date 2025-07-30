@@ -29,19 +29,14 @@ media_player:
     task_stack_in_psram: false
     announcement_pipeline:
       speaker: announcement_spk_resampling_input
-      #format: WAV
-      #num_channels: 1
-      #sample_rate: 48000
+      # format: WAV
+      # num_channels: 1
+      # sample_rate: 48000
     media_pipeline:
       speaker: media_spk_resampling_input
-      #format: FLAC
-      #num_channels: 1
-      #sample_rate: 48000
-    #on_announcement:
-    #  - mixer_speaker.apply_ducking:
-    #      id: media_speaker_embedded
-    #      decibel_reduction: 20
-    #      duration: 0.0s
+      # format: FLAC
+      # num_channels: 1
+      # sample_rate: 48000
 
 script:
   - id: !extend dump_config_list_packages

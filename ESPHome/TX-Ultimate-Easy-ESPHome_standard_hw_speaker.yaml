@@ -179,10 +179,10 @@ speaker:
     i2s_audio_id: if_i2s_audio
     i2s_comm_fmt: stand_msb
     channel: mono
-    #timeout: never
-    #bits_per_sample: 16bit
-    #sample_rate: 48000
-    #buffer_duration: 500ms
+    # timeout: never
+    # bits_per_sample: 16bit
+    # sample_rate: 48000
+    # buffer_duration: 500ms
 
 switch:
   - id: sw_speaker_amplifier
