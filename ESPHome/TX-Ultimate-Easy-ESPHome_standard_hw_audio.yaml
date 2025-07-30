@@ -17,11 +17,9 @@ esphome:
       - -D TX_ULTIMATE_EASY_STANDARD_HW_AUDIO
 
 i2s_audio:
-  id: if_i2s_audio
-  i2s_bclk_pin: GPIO2
-  i2s_lrclk_pin: GPIO4
-  i2s_comm_fmt: stand_msb
-  channel: mono
+  - id: if_i2s_audio
+    i2s_bclk_pin: GPIO2
+    i2s_lrclk_pin: GPIO4
 
 script:
   - id: !extend dump_config_list_packages
