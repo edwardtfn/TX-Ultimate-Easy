@@ -74,42 +74,34 @@ light:
           name: "Pulse"
           transition_length: 1s
           update_interval: 1s
-          width: 28
       - pulse:
           name: "Pulse - Slow"
           transition_length: 2s
           update_interval: 2s
-          width: 28
       - addressable_scan:
           name: "Scan"
           move_interval: 100ms
           scan_width: 3
-          width: 28
       - addressable_twinkle:
           name: "Twinkle"
           twinkle_probability: 5%
           progress_interval: 4ms
-          width: 28
       - addressable_random_twinkle:
           name: "Random Twinkle"
           twinkle_probability: 20%
           progress_interval: 32ms
-          width: 28
       - addressable_fireworks:
           name: "Fireworks"
           update_interval: 32ms
           spark_probability: 10%
           use_random_color: false
           fade_out_rate: 120
-          width: 28
       - addressable_flicker:
           name: "Flicker"
           update_interval: 16ms
           intensity: 5%
-          width: 28
       - random:
           name: "Random"
-          width: 28
     segments:
       - id: light_full
         from: 0
@@ -134,52 +126,47 @@ light:
           name: "Pulse"
           transition_length: 1s
           update_interval: 1s
-          width: 32
       - pulse:
           name: "Pulse - Slow"
           transition_length: 2s
           update_interval: 2s
-          width: 32
       - addressable_scan:
           name: "Scan"
           move_interval: 100ms
           scan_width: 3
-          width: 32
       - addressable_twinkle:
           name: "Twinkle"
           twinkle_probability: 5%
           progress_interval: 4ms
-          width: 32
       - addressable_random_twinkle:
           name: "Random Twinkle"
           twinkle_probability: 20%
           progress_interval: 32ms
-          width: 32
       - addressable_fireworks:
           name: "Fireworks"
           update_interval: 32ms
           spark_probability: 10%
           use_random_color: false
           fade_out_rate: 120
-          width: 32
       - addressable_flicker:
           name: "Flicker"
           update_interval: 16ms
           intensity: 5%
-          width: 32
       - random:
           name: "Random"
-          width: 32
     segments:
       - id: light_full
         from: 0
         to: 31
 
-  - &light_partition_with_effects_eu_disabled
+  - &light_partition_no_effects_disabled
     id: light_eu_bottom
     name: Light - Bottom EU
+    platform: partition
     disabled_by_default: true
-    <<: *light_partition_with_effects_eu
+    default_transition_length: ${default_transition_length}
+    restore_mode: ${LIGHT_SIDES_RESTORE_MODE}
+    internal: true
     segments:
       - id: light_full
         from: 6
@@ -187,7 +174,7 @@ light:
         reversed: true
   - id: light_eu_left
     name: Light - Left EU
-    <<: *light_partition_with_effects_eu_disabled
+    <<: *light_partition_no_effects_disabled
     segments:
       - id: light_full
         from: 13
@@ -195,7 +182,7 @@ light:
         reversed: true
   - id: light_eu_right
     name: Light - Right EU
-    <<: *light_partition_with_effects_eu_disabled
+    <<: *light_partition_no_effects_disabled
     segments:
       - id: light_full
         from: 27
@@ -207,7 +194,7 @@ light:
         reversed: false
   - id: light_eu_top
     name: Light - Top EU
-    <<: *light_partition_with_effects_eu_disabled
+    <<: *light_partition_no_effects_disabled
     segments:
       - id: light_full
         from: 20
@@ -215,17 +202,15 @@ light:
         reversed: false
   - id: light_us_bottom
     name: Light - Bottom US
-    <<: *light_partition_with_effects_eu_disabled
+    <<: *light_partition_no_effects_disabled
     segments:
       - id: light_full
         from: 9
         to: 14
         reversed: true
-  - &light_partition_with_effects_us_disabled
-    id: light_us_left
+  - id: light_us_left
     name: Light - Left US
-    disabled_by_default: true
-    <<: *light_partition_with_effects_us
+    <<: *light_partition_no_effects_disabled
     segments:
       - id: light_full
         from: 15
@@ -233,7 +218,7 @@ light:
         reversed: true
   - id: light_us_right
     name: Light - Right US
-    <<: *light_partition_with_effects_us_disabled
+    <<: *light_partition_no_effects_disabled
     segments:
       - id: light_full
         from: 31
@@ -245,7 +230,7 @@ light:
         reversed: false
   - id: light_us_top
     name: Light - Top US
-    <<: *light_partition_with_effects_us_disabled
+    <<: *light_partition_no_effects_disabled
     segments:
       - id: light_full
         from: 25
