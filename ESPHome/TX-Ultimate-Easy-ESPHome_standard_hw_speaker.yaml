@@ -178,11 +178,11 @@ speaker:
     i2s_dout_pin: GPIO15
     i2s_audio_id: if_i2s_audio
     i2s_comm_fmt: stand_msb
-    channel: mono
-    # timeout: never
-    # bits_per_sample: 16bit
-    # sample_rate: 48000
-    # buffer_duration: 500ms
+    channel: stereo
+    timeout: never
+    bits_per_sample: 16bit
+    sample_rate: 48000
+    buffer_duration: 500ms
 
 switch:
   - id: sw_speaker_amplifier
@@ -190,8 +190,8 @@ switch:
     platform: gpio
     pin:
       number: GPIO26
-      inverted: true
-    restore_mode: ALWAYS_OFF
+      inverted: false
+    restore_mode: ALWAYS_ON
     internal: true
     entity_category: config
 ...
