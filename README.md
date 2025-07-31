@@ -109,7 +109,7 @@ All device behaviors can be customized through Home Assistant automations withou
 - **Flexible Light Control**: Customize LED behavior and effects
 - **Touch Panel Support**: Full support for touch gestures and multi-touch capabilities
 - **Advanced Automations**: Create complex automations using Home Assistant's powerful automation engine
-- **BLE Proxy Support**: Optional Bluetooth Low Energy proxy functionality
+- **Bluetooth Proxy Support**: Compatible with ESPHome's bluetooth_proxy component for BLE device integration
 - **Audio Feedback**: Built-in speaker support for audible feedback
 - **Haptic Feedback**: Vibration motor support for tactile feedback
 - **ESP-IDF Framework**: Enhanced performance and stability with ESP-IDF support
@@ -166,7 +166,6 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
        files:
          - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml                  # Core (essential) packages
          - ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml              # Non-essential, but recommended packages
-         # - ESPHome/TX-Ultimate-Easy-ESPHome_addon_ble_proxy.yaml     # Adds BLE proxy support
    ```
    You can also use a specific version tag for better control over updates:
    ```yaml
@@ -190,6 +189,27 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
 > wifi:
 >   ap: # Access point configuration
 > ```
+
+### Optional Features
+
+#### Bluetooth Proxy
+TX Ultimate Easy is fully compatible with ESPHome's `bluetooth_proxy` component.
+To enable Bluetooth proxy functionality, add the following to your device configuration:
+
+```yaml
+bluetooth_proxy:
+  # Optional: Configure specific settings
+  # active: true
+```
+
+**Requirements for Bluetooth Proxy:**
+- ESP-IDF framework (default framework, not recommended with Arduino framework)
+- Sufficient memory (TX Ultimate Easy components are compatible,
+  but adding additional custom components may require memory optimization)
+
+> [!NOTE]
+> Bluetooth proxy functionality is provided by ESPHome's native component.
+> TX Ultimate Easy ensures compatibility but does not include it by default to maintain optimal memory usage.
 
 ### Advanced Settings
 For more granular control over components,
@@ -221,6 +241,9 @@ packages:
       # Audio options (use none or choose only one - using both will fail)
       - ESPHome/TX-Ultimate-Easy-ESPHome_standard_media_player.yaml  # Media player (Recommended for most users)
       # - ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_speaker.yaml  # Basic speaker
+
+# Optional: Add Bluetooth proxy support
+bluetooth_proxy:
 ```
 
 > [!NOTE]
@@ -345,7 +368,7 @@ After installation, you can:
 2. Customize touch behaviors
 3. Set up LED patterns and effects
 4. Create automations
-5. Enable optional features like BLE proxy
+5. Enable optional features like Bluetooth proxy
 
 ## Configuration Options
 
@@ -356,6 +379,7 @@ TX Ultimate Easy offers extensive configuration options:
 - Relay modes and functions
 - Audio and haptic feedback settings
 - Network and connectivity options
+- Optional Bluetooth proxy functionality
 
 ## Contributing
 
