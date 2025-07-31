@@ -69,7 +69,6 @@ number:
     min_value: 0
     max_value: 100
     step: 1
-    initial_value: 100
     optimistic: false
     restore_value: true
     lambda: |-
