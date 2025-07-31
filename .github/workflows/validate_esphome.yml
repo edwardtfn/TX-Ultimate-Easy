@@ -360,7 +360,7 @@ jobs:
       - name: Latest ESPHome Results
         run: |
           SUCCESS=0
-          TOTAL=14
+          TOTAL=12
 
           # Arduino Latest builds
           [ "${{ needs.build_ard_core.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
@@ -400,7 +400,7 @@ jobs:
       - name: Dev ESPHome Results
         run: |
           SUCCESS=0
-          TOTAL=6
+          TOTAL=4
 
           # Arduino Dev builds
           [ "${{ needs.build_ard_basic_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
