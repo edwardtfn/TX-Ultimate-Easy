@@ -42,7 +42,7 @@ esphome:
 
 number:
   - id: speaker_volume
-    name: Volume - Speaker
+    name: Speaker Volume
     platform: template
     max_value: 100
     min_value: 0
