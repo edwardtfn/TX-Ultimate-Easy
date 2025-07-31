@@ -277,13 +277,13 @@ jobs:
           [ "${{ needs.build_ard_hw_speaker.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-          TOTAL=$((TOTAL + 7))
+          TOTAL=$((TOTAL + 6))
 
           # Count dev builds (if not skipped)
           if [ "${{ inputs.skip_dev }}" != "true" ]; then
             [ "${{ needs.build_ard_basic_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             [ "${{ needs.build_ard_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-            TOTAL=$((TOTAL + 3))
+            TOTAL=$((TOTAL + 2))
           fi
 
           echo "🤖 Arduino Framework: $SUCCESS/$TOTAL builds passed"
@@ -321,13 +321,13 @@ jobs:
           [ "${{ needs.build_idf_hw_speaker.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-          TOTAL=$((TOTAL + 7))
+          TOTAL=$((TOTAL + 6))
 
           # Count dev builds (if not skipped)
           if [ "${{ inputs.skip_dev }}" != "true" ]; then
             [ "${{ needs.build_idf_basic_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             [ "${{ needs.build_idf_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-            TOTAL=$((TOTAL + 3))
+            TOTAL=$((TOTAL + 2))
           fi
 
           echo "🔧 ESP-IDF Framework: $SUCCESS/$TOTAL builds passed"
