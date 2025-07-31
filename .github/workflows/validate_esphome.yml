@@ -151,34 +151,6 @@ jobs:
           yaml-file: ".test/esphome_ard_ble_proxy.yaml"
           version: dev
 
-  build_ard_media_player_latest:
-    name: "⚡ Arduino Media Player (latest)"
-    needs:
-      - build_ard_basic
-      - build_ard_hw_relays
-      - build_ard_hw_vibration
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@main
-      - name: Build Arduino Media Player - latest
-        uses: esphome/build-action@main
-        with:
-          yaml-file: ".test/esphome_ard_media_player.yaml"
-          version: latest
-
-  build_ard_media_player_dev:
-    name: "⚡ Arduino Media Player (dev)"
-    needs: build_ard_basic_dev
-    if: success() && !inputs.skip_dev
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@main
-      - name: Build Arduino Media Player - dev
-        uses: esphome/build-action@main
-        with:
-          yaml-file: ".test/esphome_ard_media_player.yaml"
-          version: dev
-
   # IDF Framework - Foundation (latest)
   build_idf_core:
     name: "🏗️ IDF Core (latest)"
