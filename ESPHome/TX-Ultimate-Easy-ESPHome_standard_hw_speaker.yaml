@@ -42,7 +42,7 @@ esphome:
 
 number:
   - id: speaker_volume
-    name: Sound - Volume
+    name: Volume - Speaker
     platform: template
     max_value: 100
     min_value: 0
@@ -183,15 +183,4 @@ speaker:
     bits_per_sample: 16bit
     sample_rate: 48000
     buffer_duration: 500ms
-
-switch:
-  - id: sw_speaker_amplifier
-    name: Speaker - Amplifier
-    platform: gpio
-    pin:
-      number: GPIO26
-      inverted: false
-    restore_mode: ALWAYS_ON
-    internal: true
-    entity_category: config
 ...

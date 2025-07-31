@@ -33,4 +33,15 @@ script:
 
           // Identify itself
           ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Standard - Hardware - Audio");
+
+switch:
+  - id: sw_enable_audio
+    name: Enable Audio
+    platform: gpio
+    pin:
+      number: GPIO26
+      inverted: true
+    restore_mode: RESTORE_DEFAULT_ON
+    internal: true
+    entity_category: config
 ...
