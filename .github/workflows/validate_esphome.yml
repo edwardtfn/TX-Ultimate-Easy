@@ -278,34 +278,6 @@ jobs:
           yaml-file: ".test/esphome_idf_ble_proxy.yaml"
           version: dev
 
-  build_idf_media_player_latest:
-    name: "⚡ IDF Media Player (latest)"
-    needs:
-      - build_idf_basic
-      - build_idf_hw_relays
-      - build_idf_hw_vibration
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@main
-      - name: Build IDF Media Player - latest
-        uses: esphome/build-action@main
-        with:
-          yaml-file: ".test/esphome_idf_media_player.yaml"
-          version: latest
-
-  build_idf_media_player_dev:
-    name: "⚡ IDF Media Player (dev)"
-    needs: build_idf_basic_dev
-    if: success() && !inputs.skip_dev
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@main
-      - name: Build IDF Media Player - dev
-        uses: esphome/build-action@main
-        with:
-          yaml-file: ".test/esphome_idf_media_player.yaml"
-          version: dev
-
   # Summary Jobs - Grouped by framework and environment
   summary_arduino:
     name: "📊 Arduino Framework"
@@ -318,8 +290,6 @@ jobs:
       - build_ard_hw_vibration
       - build_ard_ble_proxy_latest
       - build_ard_ble_proxy_dev
-      - build_ard_media_player_latest
-      - build_ard_media_player_dev
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -335,14 +305,12 @@ jobs:
           [ "${{ needs.build_ard_hw_speaker.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-          [ "${{ needs.build_ard_media_player_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           TOTAL=$((TOTAL + 7))
 
           # Count dev builds (if not skipped)
           if [ "${{ inputs.skip_dev }}" != "true" ]; then
             [ "${{ needs.build_ard_basic_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             [ "${{ needs.build_ard_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-            [ "${{ needs.build_ard_media_player_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             TOTAL=$((TOTAL + 3))
           fi
 
@@ -366,8 +334,6 @@ jobs:
       - build_idf_hw_vibration
       - build_idf_ble_proxy_latest
       - build_idf_ble_proxy_dev
-      - build_idf_media_player_latest
-      - build_idf_media_player_dev
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -383,14 +349,12 @@ jobs:
           [ "${{ needs.build_idf_hw_speaker.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-          [ "${{ needs.build_idf_media_player_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           TOTAL=$((TOTAL + 7))
 
           # Count dev builds (if not skipped)
           if [ "${{ inputs.skip_dev }}" != "true" ]; then
             [ "${{ needs.build_idf_basic_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             [ "${{ needs.build_idf_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-            [ "${{ needs.build_idf_media_player_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             TOTAL=$((TOTAL + 3))
           fi
 
@@ -412,14 +376,12 @@ jobs:
       - build_ard_hw_speaker
       - build_ard_hw_vibration
       - build_ard_ble_proxy_latest
-      - build_ard_media_player_latest
       - build_idf_core
       - build_idf_basic
       - build_idf_hw_relays
       - build_idf_hw_speaker
       - build_idf_hw_vibration
       - build_idf_ble_proxy_latest
-      - build_idf_media_player_latest
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -435,7 +397,6 @@ jobs:
           [ "${{ needs.build_ard_hw_speaker.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-          [ "${{ needs.build_ard_media_player_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
 
           # ESP-IDF Latest builds
           [ "${{ needs.build_idf_core.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
@@ -444,7 +405,6 @@ jobs:
           [ "${{ needs.build_idf_hw_speaker.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-          [ "${{ needs.build_idf_media_player_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
 
           echo "📋 ESPHome (Latest): $SUCCESS/$TOTAL builds passed"
 
@@ -460,10 +420,8 @@ jobs:
     needs:
       - build_ard_basic_dev
       - build_ard_ble_proxy_dev
-      - build_ard_media_player_dev
       - build_idf_basic_dev
       - build_idf_ble_proxy_dev
-      - build_idf_media_player_dev
     if: always() && !inputs.skip_dev
     runs-on: ubuntu-latest
     steps:
@@ -475,12 +433,10 @@ jobs:
           # Arduino Dev builds
           [ "${{ needs.build_ard_basic_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-          [ "${{ needs.build_ard_media_player_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
 
           # ESP-IDF Dev builds
           [ "${{ needs.build_idf_basic_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-          [ "${{ needs.build_idf_media_player_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
 
           echo "🚀 ESPHome (Dev): $SUCCESS/$TOTAL builds passed"
 
