@@ -703,10 +703,11 @@ script:
   - id: !extend dump_config
     then:
       - lambda: |-
+          std:string gang_count_plural_suffix = id(gang_count) > 1 ? "s" : "";
           // Relay's modes
           ESP_LOGCONFIG("standard_hw_relays", "Relay%s mode%s:",
-                        id(gang_count_plural_suffix).c_str(),
-                        id(gang_count_plural_suffix).c_str());
+                        gang_count_plural_suffix.c_str(),
+                        gang_count_plural_suffix.c_str());
           ESP_LOGCONFIG("standard_hw_relays", "  Relay 1: %s", sl_relay_1_mode->has_state()
                                                             ? sl_relay_1_mode->state.c_str()
                                                             : "Unknown");
@@ -725,8 +726,8 @@ script:
 
           // Relay's states
           ESP_LOGCONFIG("standard_hw_relays", "Relay%s state%s:",
-                        id(gang_count_plural_suffix).c_str(),
-                        id(gang_count_plural_suffix).c_str());
+                        gang_count_plural_suffix.c_str(),
+                        gang_count_plural_suffix.c_str());
           ESP_LOGCONFIG("standard_hw_relays", "  Relay 1: %s", sw_relay_1->state ? "ON" : "OFF");
           if (id(gang_count) >= 2)
             ESP_LOGCONFIG("standard_hw_relays", "  Relay 2: %s", sw_relay_2->state ? "ON" : "OFF");
