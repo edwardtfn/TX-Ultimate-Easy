@@ -29,7 +29,6 @@ substitutions:
 
   DUMP_CONFIG_CALLER_DELAY: 10s  # Delay to dump config after requested
 
-
 api:
   id: api_server
   on_client_connected:
@@ -101,11 +100,6 @@ globals:
     restore_value: true
     initial_value: '0'
 
-  - id: gang_count_plural_suffix
-    type: std::string
-    restore_value: true
-    max_restore_data_length: 3
-
 logger:
   level: DEBUG
 
@@ -157,7 +151,6 @@ script:
           if (id(gang_count) < 1 || id(gang_count) > 4) {
             ESP_LOGE("core_hw_leds", "Invalid number of gangs: %" PRIu8, id(gang_count));
           }
-          id(gang_count_plural_suffix) = id(gang_count) > 1 ? "s" : "";
 
   - id: boot_sequence
     mode: restart
@@ -193,7 +186,7 @@ script:
           ESP_LOGCONFIG("core", "Model format (selected): %s", sl_tx_model_format->state.c_str());
           ESP_LOGCONFIG("core", "Model format (detected): %s", id(is_us_model) ? "US" : "EU");
           ESP_LOGCONFIG("core", "Gangs (selected): %s", sl_tx_model_gang->state.c_str());
-          ESP_LOGCONFIG("core", "Gangs (detected): %" PRIu8 "-Gang%s", id(gang_count), id(gang_count_plural_suffix).c_str());
+          ESP_LOGCONFIG("core", "Gangs (detected): %" PRIu8 "-Gang%s", id(gang_count), id(gang_count) > 1 ? "s" : "");
 
           // System state
           if (bs_pending_restart->state)
