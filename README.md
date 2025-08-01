@@ -27,6 +27,45 @@
 [buymeacoffee-shield]: https://img.shields.io/static/v1?label=Buy%20me%20an%20ice%20cream&message=❄&color=blue
 [buymeacoffee]: https://www.buymeacoffee.com/edwardfirmo
 
+## Framework Migration to ESP-IDF
+
+> [!IMPORTANT]  
+> **ESP-IDF Framework Migration**
+> 
+> Starting with version **2025.8.0**, TX Ultimate Easy will use **ESP-IDF** as the default framework, following ESPHome's direction towards ESP-IDF for better performance, stability, and feature support.
+> 
+> **What this means for you:**
+> - **New installations**: Will automatically use ESP-IDF (no action required)
+> - **Existing Arduino users**: Can continue using Arduino but with limited support
+> - **Migration recommended**: For better performance and full feature support
+> 
+> **Arduino Framework Support:**
+> - Still functional but **no longer actively tested**
+> - **Limited support** will be provided for Arduino-specific issues
+> - May miss out on new features optimized for ESP-IDF
+
+### Migration Guidelines
+
+#### For New Users
+No action required - ESP-IDF will be used automatically.
+
+#### For Existing Arduino Users
+
+**Option 1: Migrate to ESP-IDF (Recommended)**
+1. **Best practice**: Flash via serial/USB to ensure proper partition setup
+2. **Alternative**: If serial flashing isn't possible, flash OTA twice consecutively to improve success rate
+
+**Option 2: Continue with Arduino**
+Add this to your YAML configuration to force Arduino framework:
+```yaml
+esp32:
+  framework:
+    type: arduino
+```
+
+> [!WARNING]  
+> **Migration via OTA:** When switching frameworks via OTA, the partition table may not update correctly. Flash twice in succession to ensure both firmware partitions contain the latest firmware and prevent boot failures.
+
 ## Integration with Home Assistant
 
 TX Ultimate Easy exposes your device's components (sensors, touch panel, relays, etc.) to Home Assistant,
@@ -70,9 +109,10 @@ All device behaviors can be customized through Home Assistant automations withou
 - **Flexible Light Control**: Customize LED behavior and effects
 - **Touch Panel Support**: Full support for touch gestures and multi-touch capabilities
 - **Advanced Automations**: Create complex automations using Home Assistant's powerful automation engine
-- **BLE Proxy Support**: Optional Bluetooth Low Energy proxy functionality
+- **Bluetooth Proxy Support**: Compatible with ESPHome's bluetooth_proxy component for BLE device integration
 - **Audio Feedback**: Built-in speaker support for audible feedback
 - **Haptic Feedback**: Vibration motor support for tactile feedback
+- **ESP-IDF Framework**: Enhanced performance and stability with ESP-IDF support
 
 ## Hardware Support
 
@@ -126,7 +166,6 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
        files:
          - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml                  # Core (essential) packages
          - ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml              # Non-essential, but recommended packages
-         # - ESPHome/TX-Ultimate-Easy-ESPHome_addon_ble_proxy.yaml     # Adds BLE proxy support
    ```
    You can also use a specific version tag for better control over updates:
    ```yaml
@@ -150,6 +189,27 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
 > wifi:
 >   ap: # Access point configuration
 > ```
+
+### Optional Features
+
+#### Bluetooth Proxy
+TX Ultimate Easy is fully compatible with ESPHome's `bluetooth_proxy` component.
+To enable Bluetooth proxy functionality, add the following to your device configuration:
+
+```yaml
+bluetooth_proxy:
+  # Optional: Configure specific settings
+  # active: true
+```
+
+**Requirements for Bluetooth Proxy:**
+- ESP-IDF framework (default framework, not recommended with Arduino framework)
+- Sufficient memory (TX Ultimate Easy components are compatible,
+  but adding additional custom components may require memory optimization)
+
+> [!NOTE]
+> Bluetooth proxy functionality is provided by ESPHome's native component.
+> TX Ultimate Easy ensures compatibility but does not include it by default to maintain optimal memory usage.
 
 ### Advanced Settings
 For more granular control over components,
@@ -181,6 +241,9 @@ packages:
       # Audio options (use none or choose only one - using both will fail)
       - ESPHome/TX-Ultimate-Easy-ESPHome_standard_media_player.yaml  # Media player (Recommended for most users)
       # - ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_speaker.yaml  # Basic speaker
+
+# Optional: Add Bluetooth proxy support
+bluetooth_proxy:
 ```
 
 > [!NOTE]
@@ -305,7 +368,7 @@ After installation, you can:
 2. Customize touch behaviors
 3. Set up LED patterns and effects
 4. Create automations
-5. Enable optional features like BLE proxy
+5. Enable optional features like Bluetooth proxy
 
 ## Configuration Options
 
@@ -316,6 +379,7 @@ TX Ultimate Easy offers extensive configuration options:
 - Relay modes and functions
 - Audio and haptic feedback settings
 - Network and connectivity options
+- Optional Bluetooth proxy functionality
 
 ## Contributing
 

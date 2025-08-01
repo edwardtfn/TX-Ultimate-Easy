@@ -38,11 +38,11 @@ api:
 esphome:
   platformio_options:
     build_flags:
-      - -D TX_ULTIMATE_EASY_STANDARD_SPEAKER
+      - -D TX_ULTIMATE_EASY_STANDARD_HW_SPEAKER
 
 number:
   - id: speaker_volume
-    name: Sound - Volume
+    name: Speaker Volume
     platform: template
     max_value: 100
     min_value: 0
@@ -179,4 +179,8 @@ speaker:
     i2s_audio_id: if_i2s_audio
     i2s_comm_fmt: stand_msb
     channel: mono
+    timeout: never
+    bits_per_sample: 16bit
+    sample_rate: 48000
+    buffer_duration: 500ms
 ...

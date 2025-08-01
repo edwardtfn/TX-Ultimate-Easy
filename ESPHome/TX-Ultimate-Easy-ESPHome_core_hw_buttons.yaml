@@ -209,10 +209,11 @@ script:
   - id: !extend dump_config
     then:
       - lambda: |-
+          std::string gang_count_plural_suffix = id(gang_count) > 1 ? "s" : "";
           // Button's actions
           ESP_LOGCONFIG("core_hw_buttons", "Button%s action%s:",
-                        id(gang_count_plural_suffix).c_str(),
-                        id(gang_count_plural_suffix).c_str());
+                        gang_count_plural_suffix.c_str(),
+                        gang_count_plural_suffix.c_str());
           ESP_LOGCONFIG("core_hw_buttons", "  Relay 1: %s", sl_button_1_action->has_state()
                                                               ? sl_button_1_action->state.c_str()
                                                               : "Unknown");

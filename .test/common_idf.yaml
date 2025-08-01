@@ -5,14 +5,4 @@ packages:
 esp32:
   framework:
     type: esp-idf
-
-light:
-  - id: !extend light_full
-    platform: esp32_rmt_led_strip
-    rgb_order: GRB
-    chipset: ws2812
-    max_refresh_rate: 33ms
-    use_psram: false
-    type: !remove
-    variant: !remove
 ...

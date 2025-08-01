@@ -1,8 +1,0 @@
----
-packages:
-  common_arduino: !include common_ard.yaml
-  core_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
-  standard_hw_relays_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_relays.yaml
-  standard_hw_vibration_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_vibration.yaml
-  addon_media_player: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_addon_media_player.yaml
-...

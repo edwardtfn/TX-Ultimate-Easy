@@ -1,12 +1,36 @@
 ---
-name: Validate ESPHome (Latest)
+name: Validate ESPHome
 
 permissions:
   contents: read
   pull-requests: read
 
 on:  # yamllint disable-line rule:truthy
+  push:
+    paths:
+      - "**/*.yml"
+      - "**/*.yaml"
+      - "**/*.h"
+      - "**/*.cpp"
+      - "**/*.c"
+      - "**/*.py"
+
+  pull_request:
+    paths:
+      - "**/*.yml"
+      - "**/*.yaml"
+      - "**/*.h"
+      - "**/*.cpp"
+      - "**/*.c"
+      - "**/*.py"
+
   workflow_dispatch:
+    inputs:
+      skip_dev:
+        description: 'Skip dev testing (test only on latest)'
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -15,178 +39,383 @@ concurrency:
 jobs:
   code_scan:
     name: Code scan (YAML)
-    runs-on: "ubuntu-latest"
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@main
-
       - name: Setup Python
         uses: actions/setup-python@main
         with:
-          python-version: '3.8'
-
+          python-version: '3.11'
       - name: Install Yamllint
         run: pip install yamllint
-
       - name: Validate YAML files
         run: find . -name "*.yaml" -exec yamllint -c ./.rules/yamllint.yml {} +
 
+  # Arduino Framework - Foundation (latest)
   build_ard_core:
-    name: Core (Arduino)
+    name: "🏗️ Arduino Core (latest)"
     needs: code_scan
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build Core (Arduino)
+      - name: Build Arduino Core - latest
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_ard_core.yaml"
           version: latest
 
-  build_idf_core:
-    name: Core (IDF)
-    needs: code_scan
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@main
-      - name: Build Core (IDF)
-        uses: esphome/build-action@main
-        with:
-          yaml-file: ".test/esphome_idf_core.yaml"
-          version: latest
-
   build_ard_basic:
-    name: Basic (Arduino)
+    name: "📦 Arduino Basic (latest)"
     needs: build_ard_core
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build Basic (Arduino)
+      - name: Build Arduino Basic - latest
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_ard_basic.yaml"
           version: latest
 
-  build_idf_basic:
-    name: Basic (IDF)
-    needs: build_idf_core
+  build_ard_basic_dev:
+    name: "📦 Arduino Basic (dev)"
+    needs: build_ard_core
+    if: success() && !github.event.inputs.skip_dev
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build Basic (IDF)
+      - name: Build Arduino Basic - dev
         uses: esphome/build-action@main
         with:
-          yaml-file: ".test/esphome_idf_basic.yaml"
-          version: latest
+          yaml-file: ".test/esphome_ard_basic.yaml"
+          version: dev
 
   build_ard_hw_relays:
-    name: HW Relays (Arduino)
-    needs: build_ard_core
+    name: "🔌 Arduino HW Relays (latest)"
+    needs: build_ard_basic
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build HW Relays (Arduino)
+      - name: Build Arduino HW Relays - latest
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_ard_hw_relays.yaml"
           version: latest
 
-  build_idf_hw_relays:
-    name: HW Relays (IDF)
-    needs: build_idf_core
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@main
-      - name: Build HW Relays (IDF)
-        uses: esphome/build-action@main
-        with:
-          yaml-file: ".test/esphome_idf_hw_relays.yaml"
-          version: latest
-
   build_ard_hw_speaker:
-    name: HW Speaker (Arduino)
-    needs: build_ard_core
+    name: "🔌 Arduino HW Speaker (latest)"
+    needs: build_ard_basic
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build HW Speaker (Arduino)
+      - name: Build Arduino HW Speaker - latest
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_ard_hw_speaker.yaml"
           version: latest
 
-  build_idf_hw_speaker:
-    name: HW Speaker (IDF)
-    needs: build_idf_core
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@main
-      - name: Build HW Speaker (IDF)
-        uses: esphome/build-action@main
-        with:
-          yaml-file: ".test/esphome_idf_hw_speaker.yaml"
-          version: latest
-
   build_ard_hw_vibration:
-    name: HW Vibration (Arduino)
-    needs: build_ard_core
+    name: "🔌 Arduino HW Vibration (latest)"
+    needs: build_ard_basic
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build HW Vibration (Arduino)
+      - name: Build Arduino HW Vibration - latest
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_ard_hw_vibration.yaml"
           version: latest
 
-  build_idf_hw_vibration:
-    name: HW Vibration (IDF)
-    needs: build_idf_core
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@main
-      - name: Build HW Vibration (IDF)
-        uses: esphome/build-action@main
-        with:
-          yaml-file: ".test/esphome_idf_hw_vibration.yaml"
-          version: latest
-
-  build_ard_ble_proxy:
-    name: Bluetooth Proxy (Ard)
+  build_ard_ble_proxy_latest:
+    name: "⚡ Arduino BLE Proxy (latest)"
     needs: build_ard_basic
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build BLE Proxy (Ard)
+      - name: Build Arduino BLE Proxy - latest
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_ard_ble_proxy.yaml"
           version: latest
 
-  build_idf_ble_proxy:
-    name: Bluetooth Proxy (IDF)
+  build_ard_ble_proxy_dev:
+    name: "⚡ Arduino BLE Proxy (dev)"
+    needs: build_ard_basic_dev
+    if: success() && !github.event.inputs.skip_dev
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build Arduino BLE Proxy - dev
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_ard_ble_proxy.yaml"
+          version: dev
+
+  # IDF Framework - Foundation (latest)
+  build_idf_core:
+    name: "🏗️ IDF Core (latest)"
+    needs: code_scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build IDF Core - latest
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_idf_core.yaml"
+          version: latest
+
+  build_idf_basic:
+    name: "📦 IDF Basic (latest)"
+    needs: build_idf_core
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build IDF Basic - latest
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_idf_basic.yaml"
+          version: latest
+
+  build_idf_basic_dev:
+    name: "📦 IDF Basic (dev)"
+    needs: build_idf_core
+    if: success() && !github.event.inputs.skip_dev
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build IDF Basic - dev
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_idf_basic.yaml"
+          version: dev
+
+  build_idf_hw_relays:
+    name: "🔌 IDF HW Relays (latest)"
     needs: build_idf_basic
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build BLE Proxy (IDF)
+      - name: Build IDF HW Relays - latest
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_idf_hw_relays.yaml"
+          version: latest
+
+  build_idf_hw_speaker:
+    name: "🔌 IDF HW Speaker (latest)"
+    needs: build_idf_basic
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build IDF HW Speaker - latest
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_idf_hw_speaker.yaml"
+          version: latest
+
+  build_idf_hw_vibration:
+    name: "🔌 IDF HW Vibration (latest)"
+    needs: build_idf_basic
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build IDF HW Vibration - latest
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_idf_hw_vibration.yaml"
+          version: latest
+
+  build_idf_ble_proxy_latest:
+    name: "⚡ IDF BLE Proxy (latest)"
+    needs: build_idf_basic
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build IDF BLE Proxy - latest
         uses: esphome/build-action@main
         with:
           yaml-file: ".test/esphome_idf_ble_proxy.yaml"
           version: latest
 
-  build_ard_media_player:
-    name: Media Player (Ard)
-    needs:
-      - build_ard_basic
-      - build_ard_hw_relays
-      - build_ard_hw_vibration
+  build_idf_ble_proxy_dev:
+    name: "⚡ IDF BLE Proxy (dev)"
+    needs: build_idf_basic_dev
+    if: success() && !github.event.inputs.skip_dev
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - name: Build Media Player (Ard)
+      - name: Build IDF BLE Proxy - dev
         uses: esphome/build-action@main
         with:
-          yaml-file: ".test/esphome_ard_media_player.yaml"
-          version: latest
+          yaml-file: ".test/esphome_idf_ble_proxy.yaml"
+          version: dev
+
+  # Summary Jobs - Grouped by framework and environment
+  summary_arduino:
+    name: "📊 Arduino Framework"
+    needs:
+      - build_ard_core
+      - build_ard_basic
+      - build_ard_basic_dev
+      - build_ard_hw_relays
+      - build_ard_hw_speaker
+      - build_ard_hw_vibration
+      - build_ard_ble_proxy_latest
+      - build_ard_ble_proxy_dev
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Arduino Framework Results
+        run: |
+          SUCCESS=0
+          TOTAL=0
+
+          # Count latest builds (always run)
+          [ "${{ needs.build_ard_core.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_basic.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_hw_relays.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_hw_speaker.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          TOTAL=$((TOTAL + 6))
+
+          # Count dev builds (if not skipped)
+          if [ "${{ github.event.inputs.skip_dev }}" != "true" ]; then
+            [ "${{ needs.build_ard_basic_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+            [ "${{ needs.build_ard_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+            TOTAL=$((TOTAL + 2))
+          fi
+
+          echo "🤖 Arduino Framework: $SUCCESS/$TOTAL builds passed"
+
+          if [ "$SUCCESS" -eq "$TOTAL" ]; then
+            echo "✅ All Arduino builds successful!"
+          else
+            echo "❌ Some Arduino builds failed"
+            exit 1
+          fi
+
+  summary_idf:
+    name: "📊 ESP-IDF Framework"
+    needs:
+      - build_idf_core
+      - build_idf_basic
+      - build_idf_basic_dev
+      - build_idf_hw_relays
+      - build_idf_hw_speaker
+      - build_idf_hw_vibration
+      - build_idf_ble_proxy_latest
+      - build_idf_ble_proxy_dev
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: ESP-IDF Framework Results
+        run: |
+          SUCCESS=0
+          TOTAL=0
+
+          # Count latest builds (always run)
+          [ "${{ needs.build_idf_core.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_basic.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_hw_relays.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_hw_speaker.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          TOTAL=$((TOTAL + 6))
+
+          # Count dev builds (if not skipped)
+          if [ "${{ github.event.inputs.skip_dev }}" != "true" ]; then
+            [ "${{ needs.build_idf_basic_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+            [ "${{ needs.build_idf_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+            TOTAL=$((TOTAL + 2))
+          fi
+
+          echo "🔧 ESP-IDF Framework: $SUCCESS/$TOTAL builds passed"
+
+          if [ "$SUCCESS" -eq "$TOTAL" ]; then
+            echo "✅ All ESP-IDF builds successful!"
+          else
+            echo "❌ Some ESP-IDF builds failed"
+            exit 1
+          fi
+
+  summary_latest:
+    name: "📊 ESPHome (Latest)"
+    needs:
+      - build_ard_core
+      - build_ard_basic
+      - build_ard_hw_relays
+      - build_ard_hw_speaker
+      - build_ard_hw_vibration
+      - build_ard_ble_proxy_latest
+      - build_idf_core
+      - build_idf_basic
+      - build_idf_hw_relays
+      - build_idf_hw_speaker
+      - build_idf_hw_vibration
+      - build_idf_ble_proxy_latest
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Latest ESPHome Results
+        run: |
+          SUCCESS=0
+          TOTAL=12
+
+          # Arduino Latest builds
+          [ "${{ needs.build_ard_core.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_basic.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_hw_relays.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_hw_speaker.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+
+          # ESP-IDF Latest builds
+          [ "${{ needs.build_idf_core.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_basic.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_hw_relays.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_hw_speaker.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+
+          echo "📋 ESPHome (Latest): $SUCCESS/$TOTAL builds passed"
+
+          if [ "$SUCCESS" -eq "$TOTAL" ]; then
+            echo "✅ All builds on latest ESPHome successful!"
+          else
+            echo "❌ Some builds on latest ESPHome failed"
+            exit 1
+          fi
+
+  summary_dev:
+    name: "📊 ESPHome (Dev)"
+    needs:
+      - build_ard_basic_dev
+      - build_ard_ble_proxy_dev
+      - build_idf_basic_dev
+      - build_idf_ble_proxy_dev
+    if: always() && !github.event.inputs.skip_dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dev ESPHome Results
+        run: |
+          SUCCESS=0
+          TOTAL=4
+
+          # Arduino Dev builds
+          [ "${{ needs.build_ard_basic_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+
+          # ESP-IDF Dev builds
+          [ "${{ needs.build_idf_basic_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+
+          echo "🚀 ESPHome (Dev): $SUCCESS/$TOTAL builds passed"
+
+          if [ "$SUCCESS" -eq "$TOTAL" ]; then
+            echo "✅ All builds on dev ESPHome successful!"
+          else
+            echo "❌ Some builds on dev ESPHome failed"
+            exit 1
+          fi
 ...

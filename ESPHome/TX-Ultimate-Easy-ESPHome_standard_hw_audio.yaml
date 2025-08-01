@@ -11,15 +11,18 @@
 ##### - For normal system use, modifications to this file are NOT required.                    #####
 ####################################################################################################
 ---
+substitutions:
+  SWITCH_AUDIO_AMPLIFIER_RESTORE_MODE: RESTORE_DEFAULT_ON
+
 esphome:
   platformio_options:
     build_flags:
       - -D TX_ULTIMATE_EASY_STANDARD_HW_AUDIO
 
 i2s_audio:
-  id: if_i2s_audio
-  i2s_bclk_pin: GPIO2
-  i2s_lrclk_pin: GPIO4
+  - id: if_i2s_audio
+    i2s_bclk_pin: GPIO2
+    i2s_lrclk_pin: GPIO4
 
 script:
   - id: !extend dump_config_list_packages
@@ -33,4 +36,15 @@ script:
 
           // Identify itself
           ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Standard - Hardware - Audio");
+
+switch:
+  - id: sw_audio_amplifier
+    name: Audio Amplifier
+    platform: gpio
+    pin:
+      number: GPIO26
+      inverted: false
+    restore_mode: ${SWITCH_AUDIO_AMPLIFIER_RESTORE_MODE}
+    internal: true
+    entity_category: config
 ...
