@@ -80,7 +80,7 @@ jobs:
   build_ard_basic_dev:
     name: "📦 Arduino Basic (dev)"
     needs: build_ard_core
-    if: success() && !inputs.skip_dev
+    if: success() && !github.event.inputs.skip_dev
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -141,7 +141,7 @@ jobs:
   build_ard_ble_proxy_dev:
     name: "⚡ Arduino BLE Proxy (dev)"
     needs: build_ard_basic_dev
-    if: success() && !inputs.skip_dev
+    if: success() && !github.event.inputs.skip_dev
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -179,7 +179,7 @@ jobs:
   build_idf_basic_dev:
     name: "📦 IDF Basic (dev)"
     needs: build_idf_core
-    if: success() && !inputs.skip_dev
+    if: success() && !github.event.inputs.skip_dev
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -240,7 +240,7 @@ jobs:
   build_idf_ble_proxy_dev:
     name: "⚡ IDF BLE Proxy (dev)"
     needs: build_idf_basic_dev
-    if: success() && !inputs.skip_dev
+    if: success() && !github.event.inputs.skip_dev
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -280,7 +280,7 @@ jobs:
           TOTAL=$((TOTAL + 6))
 
           # Count dev builds (if not skipped)
-          if [ "${{ inputs.skip_dev }}" != "true" ]; then
+          if [ "${{ github.event.inputs.skip_dev }}" != "true" ]; then
             [ "${{ needs.build_ard_basic_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             [ "${{ needs.build_ard_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             TOTAL=$((TOTAL + 2))
@@ -324,7 +324,7 @@ jobs:
           TOTAL=$((TOTAL + 6))
 
           # Count dev builds (if not skipped)
-          if [ "${{ inputs.skip_dev }}" != "true" ]; then
+          if [ "${{ github.event.inputs.skip_dev }}" != "true" ]; then
             [ "${{ needs.build_idf_basic_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             [ "${{ needs.build_idf_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             TOTAL=$((TOTAL + 2))
@@ -394,7 +394,7 @@ jobs:
       - build_ard_ble_proxy_dev
       - build_idf_basic_dev
       - build_idf_ble_proxy_dev
-    if: always() && !inputs.skip_dev
+    if: always() && !github.event.inputs.skip_dev
     runs-on: ubuntu-latest
     steps:
       - name: Dev ESPHome Results
