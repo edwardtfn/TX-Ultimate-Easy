@@ -703,7 +703,7 @@ script:
   - id: !extend dump_config
     then:
       - lambda: |-
-          std:string gang_count_plural_suffix = id(gang_count) > 1 ? "s" : "";
+          std::string gang_count_plural_suffix = id(gang_count) > 1 ? "s" : "";
           // Relay's modes
           ESP_LOGCONFIG("standard_hw_relays", "Relay%s mode%s:",
                         gang_count_plural_suffix.c_str(),

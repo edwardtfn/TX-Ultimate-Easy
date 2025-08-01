@@ -209,7 +209,7 @@ script:
   - id: !extend dump_config
     then:
       - lambda: |-
-          std:string gang_count_plural_suffix = id(gang_count) > 1 ? "s" : "";
+          std::string gang_count_plural_suffix = id(gang_count) > 1 ? "s" : "";
           // Button's actions
           ESP_LOGCONFIG("core_hw_buttons", "Button%s action%s:",
                         gang_count_plural_suffix.c_str(),
