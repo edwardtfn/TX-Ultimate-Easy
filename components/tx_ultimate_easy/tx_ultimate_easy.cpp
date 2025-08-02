@@ -69,9 +69,9 @@ namespace esphome {
             if (this->gang_count_ == 1)
                 return 1;
 
-            //Calculate button number Change to round up insted of truncate (integer division)
+            // Calculate button number Change to round up instead of truncate (integer division)
             const uint8_t width = (TOUCH_MAX_POSITION + gang_count_) / this->gang_count_;  // Width of each button region
-            if (width < 1)  // Invalid width - and prevents division by zero removed "width > gang_count_" issue with 2 gang 
+            if (width < 1)  // Invalid width - and prevents division by zero 
                 return 0;
             const uint8_t button = std::min(
                 static_cast<uint8_t>((position / width) + 1), // Convert position to button index
@@ -141,8 +141,36 @@ namespace esphome {
             switch (uart_received_bytes[4]) {
                 case TOUCH_STATE_RELEASE:
                 case TOUCH_STATE_MULTI_TOUCH:
+                    return uart_received_bytes[5];
+
                 case TOUCH_STATE_SWIPE_LEFT:
                 case TOUCH_STATE_SWIPE_RIGHT:
+                    // uart_received_bytes[5] indicates swipe direction:
+                    // 12 = find last touch position (scan right to left)
+                    // 13 = find first touch position (scan left to right)
+                    // Bytes 6-7 contain a 10-bit bitmap of touch positions:
+                    // Byte 7: bits 0-7 represent positions 1-8
+                    // Byte 6: bits 0-1 represent positions 9-10
+                    switch (uart_received_bytes[5]) {
+                        case 12:
+                            for (uint8_t i = 10; i > 0; i--) {
+                                if (i > 8
+                                    ? uart_received_bytes[6] & (1 << (i - 9))
+                                    : uart_received_bytes[7] & (1 << (i - 1))) {
+                                    return i;
+                                }
+                            }
+                            break;
+                        case 13:
+                            for (uint8_t i = 1; i <= 10; i++) {
+                                if (i > 8
+                                    ? uart_received_bytes[6] & (1 << (i - 9))
+                                    : uart_received_bytes[7] & (1 << (i - 1))) {
+                                    return i;
+                                }
+                            }
+                            break;
+                    }
                     return uart_received_bytes[5];
 
                 default:
@@ -152,8 +180,10 @@ namespace esphome {
 
         int TxUltimateEasy::get_touch_state(const std::array<int, UART_RECEIVED_BYTES_SIZE> &uart_received_bytes) {
             int state = uart_received_bytes[4];
-            if (state == TOUCH_STATE_PRESS && uart_received_bytes[5] != 0) state = TOUCH_STATE_RELEASE;
-            if (state == TOUCH_STATE_RELEASE && uart_received_bytes[5] == TOUCH_STATE_MULTI_TOUCH) state = TOUCH_STATE_MULTI_TOUCH;
+            if (state == TOUCH_STATE_PRESS && uart_received_bytes[5] != 0)
+                state = TOUCH_STATE_RELEASE;
+            if (state == TOUCH_STATE_RELEASE && uart_received_bytes[5] == TOUCH_STATE_MULTI_TOUCH)
+                state = TOUCH_STATE_MULTI_TOUCH;
             if (state == TOUCH_STATE_SWIPE) {
                 state = (uart_received_bytes[5] == TOUCH_STATE_SWIPE_RIGHT) ? TOUCH_STATE_SWIPE_RIGHT : 
                         (uart_received_bytes[5] == TOUCH_STATE_SWIPE_LEFT) ? TOUCH_STATE_SWIPE_LEFT : state;

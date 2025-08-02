@@ -55,9 +55,10 @@ jobs:
 
       - name: Update stable tag
         if: |
-          success() &&
-          github.event_name == 'workflow_dispatch' &&
-          inputs.update_stable
+          success() && (
+            github.event_name == 'workflow_dispatch' && inputs.update_stable ||
+            github.event_name == 'push'
+          )
         run: |
           # Verify version bump was successful
           if [ ! -f "./versioning/VERSION" ]; then
@@ -74,7 +75,7 @@ jobs:
           # Update tag
           NEW_VERSION=$(cat ./versioning/VERSION)
           echo "Updating stable tag to $NEW_VERSION"
-          git tag -fa stable -m "Update stable tag"
+          git tag -fa stable -m "Update stable tag to $NEW_VERSION"
           git push origin stable --force
 
       - name: Update latest tag
@@ -99,6 +100,6 @@ jobs:
           # Update tag
           NEW_VERSION=$(cat ./versioning/VERSION)
           echo "Updating latest tag to $NEW_VERSION"
-          git tag -fa latest -m "Update latest tag"
+          git tag -fa latest -m "Update latest tag to $NEW_VERSION"
           git push origin latest --force
 ...
