@@ -161,11 +161,11 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
    packages:
      remote_package:
        url: https://github.com/edwardtfn/TX-Ultimate-Easy
-       ref: stable  # Or you can specify a version, like `ref: v2024.12.6` or `ref: latest` to the latest non-stable
+       ref: main  # Or you can specify a version, like `ref: v2024.12.6` or `ref: latest`
        refresh: 5min
        files:
-         - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml                  # Core (essential) packages
-         - ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml              # Non-essential, but recommended packages
+         - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml      # Core (essential) packages
+         - ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml  # Non-essential, but recommended packages
    ```
    You can also use a specific version tag for better control over updates:
    ```yaml
