@@ -141,9 +141,33 @@ namespace esphome {
             switch (uart_received_bytes[4]) {
                 case TOUCH_STATE_RELEASE:
                 case TOUCH_STATE_MULTI_TOUCH:
+                    return uart_received_bytes[5];
+
                 case TOUCH_STATE_SWIPE_LEFT:
                 case TOUCH_STATE_SWIPE_RIGHT:
-                    return uart_received_bytes[5];
+                    switch (uart_received_bytes[5]) {
+                        case 12: {
+                            for (i = 10; i > 0; i--) {
+                                if (i > 8
+                                    ? uart_received_bytes[6] & (1 << (i - 9))
+                                    : uart_received_bytes[7] & (1 << (i - 1))) {
+                                    return i;
+                                }
+                            }
+                            break;
+                        }
+                        case 13: {
+                            for (i = 1; i <= 10; i++) {
+                                if (i > 8
+                                    ? uart_received_bytes[6] & (1 << (i - 9))
+                                    : uart_received_bytes[7] & (1 << (i - 1))) {
+                                    return i;
+                                }
+                            }
+                            break;
+                        }
+                        return uart_received_bytes[5];
+                    }
 
                 default:
                     return uart_received_bytes[6];
