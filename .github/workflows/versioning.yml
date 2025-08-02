@@ -19,12 +19,12 @@ on:  # yamllint disable-line rule:truthy
       update_stable:
         description: "Update stable tag?"
         required: true
-        default: true
+        default: false
         type: boolean
       update_latest:
         description: "Update latest tag?"
         required: true
-        default: true
+        default: false
         type: boolean
 
 jobs:
