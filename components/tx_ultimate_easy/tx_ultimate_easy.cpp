@@ -147,7 +147,7 @@ namespace esphome {
                 case TOUCH_STATE_SWIPE_RIGHT:
                     switch (uart_received_bytes[5]) {
                         case 12: {
-                            for (i = 10; i > 0; i--) {
+                            for (uint8_t i = 10; i > 0; i--) {
                                 if (i > 8
                                     ? uart_received_bytes[6] & (1 << (i - 9))
                                     : uart_received_bytes[7] & (1 << (i - 1))) {
@@ -157,7 +157,7 @@ namespace esphome {
                             break;
                         }
                         case 13: {
-                            for (i = 1; i <= 10; i++) {
+                            for (uint8_t i = 1; i <= 10; i++) {
                                 if (i > 8
                                     ? uart_received_bytes[6] & (1 << (i - 9))
                                     : uart_received_bytes[7] & (1 << (i - 1))) {
