@@ -48,9 +48,9 @@ binary_sensor:
       then:
         - lambda: |-
             if (x)
-              ESP_LOGW("core", "Pending restart: YES");
+              ESP_LOGW("binary_sensor.bs_pending_restart.core.common", "Pending restart: YES");
             else
-              ESP_LOGCONFIG("core", "Pending restart: No");
+              ESP_LOGCONFIG("binary_sensor.bs_pending_restart.core.common", "Pending restart: No");
         - script.execute: dump_config_caller
 
 button:
@@ -77,6 +77,10 @@ esphome:
       - -D TX_ULTIMATE_EASY_CORE
 
   on_boot:
+    - priority: 750
+      then:
+        - script.execute: restore_from_nvs
+
     - priority: 700
       then:
         - script.execute: boot_initialize
@@ -149,7 +153,7 @@ script:
           id(is_us_model) = (sl_tx_model_format->state == "${TX_MODEL_FORMAT_US_TEXT}");
           id(gang_count) = sl_tx_model_gang->active_index().value() + 1;
           if (id(gang_count) < 1 || id(gang_count) > 4) {
-            ESP_LOGE("core_hw_leds", "Invalid number of gangs: %" PRIu8, id(gang_count));
+            ESP_LOGE("script.boot_initialize.core.common", "Invalid number of gangs: %" PRIu8, id(gang_count));
           }
 
   - id: boot_sequence
@@ -166,33 +170,37 @@ script:
       # Extended by all modules
       - lambda: |-
           // Device identification
-          ESP_LOGCONFIG("core", "Device friendly name: ${friendly_name}");
-          ESP_LOGCONFIG("core", "Device name: ${name}");
-          ESP_LOGCONFIG("core", "Device name (HA): %s", tx_device_name->state.c_str());
-          ESP_LOGCONFIG("core", "Device hostname: %s", App.get_name().c_str());
+          ESP_LOGCONFIG("script.dump_config.core.common", "Device friendly name: ${friendly_name}");
+          ESP_LOGCONFIG("script.dump_config.core.common", "Device name: ${name}");
+          ESP_LOGCONFIG("script.dump_config.core.common", "Device name (HA): %s", tx_device_name->state.c_str());
+          ESP_LOGCONFIG("script.dump_config.core.common", "Device hostname: %s", App.get_name().c_str());
 
           dump_config_versions->execute();
 
           // Framework detection
           #ifdef USE_ARDUINO
-          ESP_LOGCONFIG("core", "Framework: Arduino");
+          ESP_LOGCONFIG("script.dump_config.core.common", "Framework: Arduino");
           #elif defined(USE_ESP_IDF)
-          ESP_LOGCONFIG("core", "Framework: ESP-IDF");
+          ESP_LOGCONFIG("script.dump_config.core.common", "Framework: ESP-IDF");
           #else
-          ESP_LOGW("core", "Framework: UNKNOWN");
+          ESP_LOGW("script.dump_config.core.common", "Framework: UNKNOWN");
           #endif
 
           // Model configuration
-          ESP_LOGCONFIG("core", "Model format (selected): %s", sl_tx_model_format->state.c_str());
-          ESP_LOGCONFIG("core", "Model format (detected): %s", id(is_us_model) ? "US" : "EU");
-          ESP_LOGCONFIG("core", "Gangs (selected): %s", sl_tx_model_gang->state.c_str());
-          ESP_LOGCONFIG("core", "Gangs (detected): %" PRIu8 "-Gang%s", id(gang_count), id(gang_count) > 1 ? "s" : "");
+          ESP_LOGCONFIG("script.dump_config.core.common", "Model format (selected): %s",
+                          sl_tx_model_format->state.c_str());
+          ESP_LOGCONFIG("script.dump_config.core.common", "Model format (detected): %s",
+                          id(is_us_model) ? "US" : "EU");
+          ESP_LOGCONFIG("script.dump_config.core.common", "Gangs (selected): %s",
+                          sl_tx_model_gang->state.c_str());
+          ESP_LOGCONFIG("script.dump_config.core.common", "Gangs (detected): %" PRIu8 "-Gang%s",
+                          id(gang_count), id(gang_count) > 1 ? "s" : "");
 
           // System state
           if (bs_pending_restart->state)
-            ESP_LOGW("core", "Pending restart: YES");
+            ESP_LOGW("script.dump_config.core.common", "Pending restart: YES");
           else
-            ESP_LOGCONFIG("core", "Pending restart: No");
+            ESP_LOGCONFIG("script.dump_config.core.common", "Pending restart: No");
 
   - id: dump_config_caller
     mode: restart
@@ -229,6 +237,16 @@ script:
           tx_fw_version->publish_state("${version}");
           tx_device_name->publish_state(App.get_name().c_str());
 
+  - id: restore_from_nvs
+    mode: single
+    then:
+      - select.set_index:
+          id: sl_tx_model_format
+          index: !lambda if (id(is_us_model)) return 1; else return 0;
+      - select.set_index:
+          id: sl_tx_model_gang
+          index: !lambda return (id(gang_count)-1);
+
 select:
   - id: sl_tx_model_format
     name: Model (Format)
@@ -238,7 +256,7 @@ select:
       - "${TX_MODEL_FORMAT_US_TEXT}"
     initial_option: "${TX_MODEL_FORMAT_EU_TEXT}"
     optimistic: true
-    restore_value: true
+    restore_value: false
     internal: false
     entity_category: config
     disabled_by_default: false
@@ -250,7 +268,7 @@ select:
             state: true
         - lambda: |-
             id(is_us_model) = (x == "${TX_MODEL_FORMAT_US_TEXT}");
-            ESP_LOGI("core", "New model selected: %s", id(is_us_model) ? "US" : "EU");
+            ESP_LOGI("select.sl_tx_model_gang.core.common", "New model selected: %s", id(is_us_model) ? "US" : "EU");
 
   - id: sl_tx_model_gang
     name: Model (Gang)
@@ -262,7 +280,7 @@ select:
       - "${TX_MODEL_4_GANG_TEXT}"
     initial_option: "${TX_MODEL_1_GANG_TEXT}"
     optimistic: true
-    restore_value: true
+    restore_value: false
     internal: false
     entity_category: config
     disabled_by_default: false
@@ -274,7 +292,8 @@ select:
             state: true
         - lambda: |-
             id(gang_count) = static_cast<uint8_t>(i) + 1;
-            ESP_LOGI("core", "New model selected: %" PRIu8 "-%s", id(gang_count), id(gang_count) > 1 ? "Gangs" : "Gang");
+            ESP_LOGI("select.sl_tx_model_gang.core.common", "New model selected: %" PRIu8 "-%s",
+                      id(gang_count), id(gang_count) > 1 ? "Gangs" : "Gang");
             tx_ultimate->set_gang_count(id(gang_count));
 
 text_sensor:
