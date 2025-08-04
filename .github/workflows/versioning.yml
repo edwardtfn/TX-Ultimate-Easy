@@ -41,10 +41,86 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
 
+      - name: Get PR information
+        id: pr_info
+        if: github.event_name == 'push'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              // Get the commit that triggered this workflow
+              const commit = await github.rest.repos.getCommit({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: context.sha
+              });
+              
+              // Look for PR number in commit message (GitHub merge commits include this)
+              const commitMessage = commit.data.commit.message;
+              const prMatch = commitMessage.match(/Merge pull request #(\d+)/);
+              
+              if (prMatch) {
+                const prNumber = parseInt(prMatch[1]);
+                const pr = await github.rest.pulls.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: prNumber
+                });
+                
+                return {
+                  title: pr.data.title,
+                  body: pr.data.body || 'No description provided',
+                  number: prNumber
+                };
+              } else {
+                // Fallback for direct pushes
+                return {
+                  title: 'Direct push to main',
+                  body: commitMessage,
+                  number: null
+                };
+              }
+            } catch (error) {
+              console.log('Could not get PR info:', error.message);
+              return {
+                title: 'Version update',
+                body: 'Automated version bump',
+                number: null
+              };
+            }
+
       - name: Bump version
         run: |
           chmod +x ./versioning/bump_version.sh
           ./versioning/bump_version.sh
+
+      - name: Create tag message
+        id: tag_message
+        run: |
+          NEW_VERSION=$(cat ./versioning/VERSION)
+          
+          if [ "${{ github.event_name }}" == "push" ]; then
+            # Use PR information from previous step
+            PR_TITLE='${{ fromJson(steps.pr_info.outputs.result).title }}'
+            PR_BODY='${{ fromJson(steps.pr_info.outputs.result).body }}'
+            
+            # Create formatted tag message
+            cat > tag_message.txt << EOF
+          # v${NEW_VERSION} - ${PR_TITLE}
+          
+          ${PR_BODY}
+          EOF
+          else
+            # Manual dispatch - simpler message
+            cat > tag_message.txt << EOF
+          # v${NEW_VERSION} - Manual tag update
+          
+          Tag updated via manual workflow dispatch.
+          EOF
+          fi
+          
+          # Store the message for use in subsequent steps
+          echo "TAG_MESSAGE_FILE=tag_message.txt" >> $GITHUB_ENV
 
       - name: Push Changes and Tags
         env:
@@ -72,10 +148,10 @@ jobs:
             echo "Backing up current stable tag ($OLD_STABLE)"
           fi
 
-          # Update tag
+          # Update tag with detailed message
           NEW_VERSION=$(cat ./versioning/VERSION)
           echo "Updating stable tag to $NEW_VERSION"
-          git tag -fa stable -m "Update stable tag to $NEW_VERSION"
+          git tag -fa stable -F "$TAG_MESSAGE_FILE"
           git push origin stable --force
 
       - name: Update latest tag
@@ -97,9 +173,15 @@ jobs:
             echo "Backing up current latest tag ($OLD_LATEST)"
           fi
 
-          # Update tag
+          # Update tag with detailed message
           NEW_VERSION=$(cat ./versioning/VERSION)
           echo "Updating latest tag to $NEW_VERSION"
-          git tag -fa latest -m "Update latest tag to $NEW_VERSION"
+          git tag -fa latest -F "$TAG_MESSAGE_FILE"
           git push origin latest --force
+
+      - name: Cleanup
+        if: always()
+        run: |
+          # Clean up temporary files
+          [ -f tag_message.txt ] && rm tag_message.txt || true
 ...
