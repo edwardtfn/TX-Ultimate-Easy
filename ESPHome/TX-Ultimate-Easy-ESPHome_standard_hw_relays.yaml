@@ -813,11 +813,11 @@ script:
           switch (light_group) {
             case 1:
               if (light_index >= id(gb_lights_1).size()) {
-                ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid set with %s light for Relay %" PRIu8, light_mode_group_1.c_str(), light_index+1);
+                ESP_LOGE("${TAG_STD_HW_RELAYS}", "Invalid set with %s light for Relay %" PRIu8, light_mode_group_1.c_str(), light_index+1);
                 return;
               }
               if (state and !id(gb_lights_1)[light_index]->current_values.is_on()) {
-                ESP_LOGI("${TAG_CORE_HW_LEDS}", "Turn-on %s light for Relay %" PRIu8, light_mode_group_1.c_str(), light_index+1);
+                ESP_LOGI("${TAG_STD_HW_RELAYS}", "Turn-on %s light for Relay %" PRIu8, light_mode_group_1.c_str(), light_index+1);
                 auto call = id(gb_lights_1)[light_index]->turn_on();
                 if (LIGHT_TRANSITION_TURN_ON > 0)
                   call.set_transition_length(LIGHT_TRANSITION_TURN_ON);  // in ms
@@ -825,7 +825,7 @@ script:
                   call.set_brightness(LIGHT_BRIGHTNESS_TURN_ON / 100.0f);
                 call.perform();
               } else if (!state and id(gb_lights_1)[light_index]->current_values.is_on()) {
-                ESP_LOGI("${TAG_CORE_HW_LEDS}", "Turn-off %s light for Relay %" PRIu8, light_mode_group_1.c_str(), light_index+1);
+                ESP_LOGI("${TAG_STD_HW_RELAYS}", "Turn-off %s light for Relay %" PRIu8, light_mode_group_1.c_str(), light_index+1);
                 auto call = id(gb_lights_1)[light_index]->turn_off();
                 if (LIGHT_TRANSITION_TURN_OFF > 0)
                   call.set_transition_length(LIGHT_TRANSITION_TURN_OFF);  // in ms
@@ -834,11 +834,11 @@ script:
               break;
             case 2:
               if (light_index >= id(gb_lights_2).size()) {
-                ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid set with %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
+                ESP_LOGE("${TAG_STD_HW_RELAYS}", "Invalid set with %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
                 return;
               }
               if (state and !id(gb_lights_2)[light_index]->current_values.is_on()) {
-                ESP_LOGI("${TAG_CORE_HW_LEDS}", "Turn-on %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
+                ESP_LOGI("${TAG_STD_HW_RELAYS}", "Turn-on %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
                 auto call = id(gb_lights_2)[light_index]->turn_on();
                 if (LIGHT_TRANSITION_TURN_ON > 0)
                   call.set_transition_length(LIGHT_TRANSITION_TURN_ON);  // in ms
@@ -846,7 +846,7 @@ script:
                   call.set_brightness(LIGHT_BRIGHTNESS_TURN_ON / 100.0f);
                 call.perform();
               } else if (!state and id(gb_lights_2)[light_index]->current_values.is_on()) {
-                ESP_LOGI("${TAG_CORE_HW_LEDS}", "Turn-off %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
+                ESP_LOGI("${TAG_STD_HW_RELAYS}", "Turn-off %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
                 auto call = id(gb_lights_2)[light_index]->turn_off();
                 if (LIGHT_TRANSITION_TURN_OFF > 0)
                   call.set_transition_length(LIGHT_TRANSITION_TURN_OFF);  // in ms
