@@ -54,11 +54,11 @@ jobs:
                 repo: context.repo.repo,
                 commit_sha: context.sha
               });
-              
+
               if (associatedPRs.length > 0) {
                 // Get the most recent merged PR
                 const pr = associatedPRs.find(pr => pr.state === 'closed' && pr.merged_at) || associatedPRs[0];
-                
+
                 return {
                   title: pr.title,
                   body: pr.body || 'No description provided',
@@ -72,7 +72,7 @@ jobs:
                   repo: context.repo.repo,
                   ref: context.sha
                 });
-                
+
                 return {
                   title: 'Direct push to main',
                   body: commit.data.commit.message,
@@ -99,23 +99,23 @@ jobs:
         id: tag_message
         run: |
           NEW_VERSION=$(cat ./versioning/VERSION)
-          
+
           if [ "${{ github.event_name }}" == "push" ] && [ "${{ steps.pr_info.outcome }}" == "success" ]; then
             # Use PR information directly in heredoc to avoid quoting issues
             cat > tag_message.txt << EOF
           # v${NEW_VERSION} - ${{ fromJson(steps.pr_info.outputs.result).title }}
-          
+
           ${{ fromJson(steps.pr_info.outputs.result).body }}
           EOF
           else
             # Manual dispatch or PR info unavailable - simpler message
             cat > tag_message.txt << EOF
           # v${NEW_VERSION} - Manual tag update
-          
+
           Tag updated via manual workflow dispatch.
           EOF
           fi
-          
+
           # Store the message for use in subsequent steps
           echo "TAG_MESSAGE_FILE=tag_message.txt" >> $GITHUB_ENV
 
