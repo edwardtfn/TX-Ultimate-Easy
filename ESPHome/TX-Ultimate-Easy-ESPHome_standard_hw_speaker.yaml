@@ -16,6 +16,8 @@ substitutions:
   # d=32 (32nd note), o=5 (octave 5), b=100 (tempo 100)
   tone_volume_change: "scale_up:d=32,o=5,b=100:c,c#,d#,e,f#,g#,a#,b"  # Use "none" to disable sound
 
+  TAG_STD_HW_SPEAKER: std.hw.speaker
+
 packages:
   standard_hw_audio: !include TX-Ultimate-Easy-ESPHome_standard_hw_audio.yaml
 
@@ -29,11 +31,9 @@ api:
         tone: string
       then:
         - lambda: |-
-            static const char *TAG = "api.actions.rtttl_play.standard.hw.speaker";
-
             rtttl_speaker->stop();
             if (speaker_volume->state > 0) {
-              ESP_LOGI(TAG, "Play tone: '%s'", tone.c_str());
+              ESP_LOGI("${TAG_STD_HW_SPEAKER}", "Play tone: '%s'", tone.c_str());
               rtttl_speaker->play(tone.c_str());
             }
 

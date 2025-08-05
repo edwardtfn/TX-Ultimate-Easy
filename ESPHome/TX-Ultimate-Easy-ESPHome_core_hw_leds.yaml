@@ -29,6 +29,8 @@ substitutions:
   LIGHT_SIDES_RESTORE_MODE: RESTORE_DEFAULT_OFF
   LIGHT_INDIVIDUAL_RESTORE_MODE: RESTORE_DEFAULT_OFF
 
+  TAG_CORE_HW_LEDS: core.hw.leds
+
 esphome:
   platformio_options:
     build_flags:
@@ -497,46 +499,44 @@ script:
   - id: !extend dump_config
     then:
       - lambda: |-
-          static const char *TAG = "script.dump_config.core.hw.leds";
-
           std::string gang_count_plural_suffix = id(gang_count) > 1 ? "s" : "";
           // Relay's LEDs modes
-          ESP_LOGCONFIG(TAG, "Relay%s LEDs mode%s:",
+          ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "Relay%s LEDs mode%s:",
                         gang_count_plural_suffix.c_str(),
                         gang_count_plural_suffix.c_str());
-          ESP_LOGCONFIG(TAG, "  Relay 1: %s", id(is_us_model) ?
+          ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "  Relay 1: %s", id(is_us_model) ?
                                               sl_relay_1_light_mode_us->state.c_str() :
                                               sl_relay_1_light_mode_eu->state.c_str());
           if (id(gang_count) >= 2)
-            ESP_LOGCONFIG(TAG, "  Relay 2: %s", id(is_us_model) ?
+            ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "  Relay 2: %s", id(is_us_model) ?
                                                 sl_relay_2_light_mode_us->state.c_str() :
                                                 sl_relay_2_light_mode_eu->state.c_str());
           if (id(gang_count) >= 3)
-            ESP_LOGCONFIG(TAG, "  Relay 3: %s", id(is_us_model) ?
+            ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "  Relay 3: %s", id(is_us_model) ?
                                                 sl_relay_3_light_mode_us->state.c_str() :
                                                 sl_relay_3_light_mode_eu->state.c_str());
           if (id(gang_count) >= 4)
-            ESP_LOGCONFIG(TAG, "  Relay 4: %s", id(is_us_model) ?
+            ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "  Relay 4: %s", id(is_us_model) ?
                                                 sl_relay_4_light_mode_us->state.c_str() :
                                                 sl_relay_4_light_mode_eu->state.c_str());
 
           // Transition times
-          ESP_LOGCONFIG(TAG, "Transition times:");
-          ESP_LOGCONFIG(TAG, "  Default:     ${default_transition_length}");
+          ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "Transition times:");
+          ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "  Default:     ${default_transition_length}");
           if (${LIGHT_TRANSITION_TURN_ON} > 0)
-            ESP_LOGCONFIG(TAG, "  Turning on:  ${LIGHT_TRANSITION_TURN_ON}ms");
+            ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "  Turning on:  ${LIGHT_TRANSITION_TURN_ON}ms");
           else
-            ESP_LOGCONFIG(TAG, "  Turning on:  Disabled");
+            ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "  Turning on:  Disabled");
           if (${LIGHT_TRANSITION_TURN_OFF} > 0)
-            ESP_LOGCONFIG(TAG, "  Turning off: ${LIGHT_TRANSITION_TURN_OFF}ms");
+            ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "  Turning off: ${LIGHT_TRANSITION_TURN_OFF}ms");
           else
-            ESP_LOGCONFIG(TAG, "  Turning off: Disabled");
+            ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "  Turning off: Disabled");
 
           // Restore modes
-          ESP_LOGCONFIG(TAG, "LED restore modes:");
-          ESP_LOGCONFIG(TAG, "  Light - All: ${LIGHT_FULL_RESTORE_MODE}");
-          ESP_LOGCONFIG(TAG, "  Sides:       ${LIGHT_SIDES_RESTORE_MODE}");
-          ESP_LOGCONFIG(TAG, "  Individual:  ${LIGHT_INDIVIDUAL_RESTORE_MODE}");
+          ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "LED restore modes:");
+          ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "  Light - All: ${LIGHT_FULL_RESTORE_MODE}");
+          ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "  Sides:       ${LIGHT_SIDES_RESTORE_MODE}");
+          ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "  Individual:  ${LIGHT_INDIVIDUAL_RESTORE_MODE}");
 
   - id: !extend dump_config_list_packages
     then:
@@ -558,8 +558,6 @@ script:
       state: bool
     then:
       - lambda: |-
-          static const char *TAG = "script.light_set_state.core.hw.leds";
-
           static const uint32_t LIGHT_TRANSITION_TURN_ON = ${LIGHT_TRANSITION_TURN_ON};
           static const uint32_t LIGHT_TRANSITION_TURN_OFF = ${LIGHT_TRANSITION_TURN_OFF};
           static const uint8_t LIGHT_BRIGHTNESS_TURN_ON = ${LIGHT_BRIGHTNESS_TURN_ON};
@@ -574,11 +572,11 @@ script:
           switch (light_group) {
             case 1:
               if (light_index >= id(gb_lights_1).size()) {
-                ESP_LOGE(TAG, "Invalid set with %s light for Relay %" PRIu8, light_mode_group_1.c_str(), light_index+1);
+                ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid set with %s light for Relay %" PRIu8, light_mode_group_1.c_str(), light_index+1);
                 return;
               }
               if (state and !id(gb_lights_1)[light_index]->current_values.is_on()) {
-                ESP_LOGI(TAG, "Turn-on %s light for Relay %" PRIu8, light_mode_group_1.c_str(), light_index+1);
+                ESP_LOGI("${TAG_CORE_HW_LEDS}", "Turn-on %s light for Relay %" PRIu8, light_mode_group_1.c_str(), light_index+1);
                 auto call = id(gb_lights_1)[light_index]->turn_on();
                 if (LIGHT_TRANSITION_TURN_ON > 0)
                   call.set_transition_length(LIGHT_TRANSITION_TURN_ON);  // in ms
@@ -586,7 +584,7 @@ script:
                   call.set_brightness(LIGHT_BRIGHTNESS_TURN_ON / 100.0f);
                 call.perform();
               } else if (!state and id(gb_lights_1)[light_index]->current_values.is_on()) {
-                ESP_LOGI(TAG, "Turn-off %s light for Relay %" PRIu8, light_mode_group_1.c_str(), light_index+1);
+                ESP_LOGI("${TAG_CORE_HW_LEDS}", "Turn-off %s light for Relay %" PRIu8, light_mode_group_1.c_str(), light_index+1);
                 auto call = id(gb_lights_1)[light_index]->turn_off();
                 if (LIGHT_TRANSITION_TURN_OFF > 0)
                   call.set_transition_length(LIGHT_TRANSITION_TURN_OFF);  // in ms
@@ -595,11 +593,11 @@ script:
               break;
             case 2:
               if (light_index >= id(gb_lights_2).size()) {
-                ESP_LOGE(TAG, "Invalid set with %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
+                ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid set with %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
                 return;
               }
               if (state and !id(gb_lights_2)[light_index]->current_values.is_on()) {
-                ESP_LOGI(TAG, "Turn-on %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
+                ESP_LOGI("${TAG_CORE_HW_LEDS}", "Turn-on %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
                 auto call = id(gb_lights_2)[light_index]->turn_on();
                 if (LIGHT_TRANSITION_TURN_ON > 0)
                   call.set_transition_length(LIGHT_TRANSITION_TURN_ON);  // in ms
@@ -607,7 +605,7 @@ script:
                   call.set_brightness(LIGHT_BRIGHTNESS_TURN_ON / 100.0f);
                 call.perform();
               } else if (!state and id(gb_lights_2)[light_index]->current_values.is_on()) {
-                ESP_LOGI(TAG, "Turn-off %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
+                ESP_LOGI("${TAG_CORE_HW_LEDS}", "Turn-off %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
                 auto call = id(gb_lights_2)[light_index]->turn_off();
                 if (LIGHT_TRANSITION_TURN_OFF > 0)
                   call.set_transition_length(LIGHT_TRANSITION_TURN_OFF);  // in ms

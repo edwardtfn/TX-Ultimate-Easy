@@ -36,6 +36,8 @@ substitutions:
   BUTTON_3_ID: '3'
   BUTTON_4_ID: '4'
 
+  TAG_CORE_HW_BUTTONS: core.hw.buttons
+
 binary_sensor:
   - &binary_sensor_button_base
     id: bs_button_2
@@ -121,8 +123,6 @@ script:
       count: uint8_t
     then:
       - lambda: |-
-          static const char *TAG = "script.button_action.core.hw.buttons";
-
           // Send event to Home Assistant
           esphome::api::CustomAPIDevice ha_event;
           ha_event.fire_homeassistant_event("${EVENT_NAME}", {
@@ -135,7 +135,7 @@ script:
             {"count", std::to_string(count)},
             {"position", std::to_string(id(button_press_position))}
           });
-          ESP_LOGI(TAG, "Button %" PRIu8 " action: '%s'", button, action.c_str());
+          ESP_LOGI("${TAG_CORE_HW_BUTTONS}", "Button %" PRIu8 " action: '%s'", button, action.c_str());
           if (action == "click") {
             switch (button) {
               case ${BUTTON_1_ID}:
@@ -219,24 +219,22 @@ script:
   - id: !extend dump_config
     then:
       - lambda: |-
-          static const char *TAG = "script.dump_config.core.hw.buttons";
-
           std::string gang_count_plural_suffix = id(gang_count) > 1 ? "s" : "";
           // Button's actions
-          ESP_LOGCONFIG(TAG, "Button%s action%s:",
+          ESP_LOGCONFIG("${TAG_CORE_HW_BUTTONS}", "Button%s action%s:",
                         gang_count_plural_suffix.c_str(),
                         gang_count_plural_suffix.c_str());
-          ESP_LOGCONFIG(TAG, "  Relay 1: %s", sl_button_1_action->has_state() ?
-                                              sl_button_1_action->state.c_str() : "Unknown");
+          ESP_LOGCONFIG("${TAG_CORE_HW_BUTTONS}", "  Relay 1: %s", sl_button_1_action->has_state() ?
+                                                                    sl_button_1_action->state.c_str() : "Unknown");
           if (id(gang_count) >= 2)
-            ESP_LOGCONFIG(TAG, "  Relay 2: %s", sl_button_2_action->has_state() ?
-                                                sl_button_2_action->state.c_str() : "Unknown");
+            ESP_LOGCONFIG("${TAG_CORE_HW_BUTTONS}", "  Relay 2: %s", sl_button_2_action->has_state() ?
+                                                                      sl_button_2_action->state.c_str() : "Unknown");
           if (id(gang_count) >= 3)
-            ESP_LOGCONFIG(TAG, "  Relay 3: %s", sl_button_3_action->has_state() ?
-                                                sl_button_3_action->state.c_str() : "Unknown");
+            ESP_LOGCONFIG("${TAG_CORE_HW_BUTTONS}", "  Relay 3: %s", sl_button_3_action->has_state() ?
+                                                                      sl_button_3_action->state.c_str() : "Unknown");
           if (id(gang_count) >= 4)
-            ESP_LOGCONFIG(TAG, "  Relay 4: %s", sl_button_4_action->has_state() ?
-                                                sl_button_4_action->state.c_str() : "Unknown");
+            ESP_LOGCONFIG("${TAG_CORE_HW_BUTTONS}", "  Relay 4: %s", sl_button_4_action->has_state() ?
+                                                                      sl_button_4_action->state.c_str() : "Unknown");
 
   - id: !extend dump_config_list_packages
     then:
@@ -311,27 +309,26 @@ script:
   - id: !extend touch_on_release
     then:
       - lambda: |-
-          static const char *TAG = "script.touch_on_release.core.hw.buttons";
-
           uint32_t current_time = millis();
           buttons_release->execute();
           if (id(button_press_start_time) > 0 and
               id(button_press_start_time) < current_time) {
             uint32_t press_duration  = current_time - id(button_press_start_time);
             // Handle overflow (optional, since it's unlikely to happen here)
-            ESP_LOGI(TAG, "Button press duration: %" PRIu32 " ms", press_duration);
+            ESP_LOGI("${TAG_CORE_HW_BUTTONS}", "Button press duration: %" PRIu32 " ms", press_duration);
             if (press_duration < ${BUTTON_CLICK_MIN_LENGTH}) {
-              ESP_LOGW(TAG, "Ignoring button press (too short)");
+              ESP_LOGW("${TAG_CORE_HW_BUTTONS}", "Ignoring button press (too short)");
             } else if (press_duration >= ${BUTTON_CLICK_MIN_LENGTH} and
                         press_duration <= ${BUTTON_CLICK_MAX_LENGTH}) { // Short/normal click
               button_click_event->execute(id(button_press_button), id(click_counter));
             } else if (press_duration >= ${BUTTON_LONG_PRESS_DELAY} and press_duration <= ${BUTTON_PRESS_TIMEOUT}) {
               button_action->execute(id(button_press_button), "long_press", 1);
             } else if (press_duration > ${BUTTON_PRESS_TIMEOUT}) { // Timeout or invalid
-              ESP_LOGW(TAG, "Button press cancelled or timed out after ${BUTTON_PRESS_TIMEOUT} ms");
+              ESP_LOGW("${TAG_CORE_HW_BUTTONS}",
+                        "Button press cancelled or timed out after ${BUTTON_PRESS_TIMEOUT} ms");
             }
           } else {
-            ESP_LOGW(TAG, "Press event timestamp not recorded yet");
+            ESP_LOGW("${TAG_CORE_HW_BUTTONS}", "Press event timestamp not recorded yet");
           }
           id(button_press_start_time) = 0;
 

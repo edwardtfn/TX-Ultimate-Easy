@@ -14,6 +14,8 @@
 substitutions:
   SWITCH_AUDIO_AMPLIFIER_RESTORE_MODE: RESTORE_DEFAULT_ON
 
+  TAG_STD_HW_AUDIO: std.hw.audio
+
 esphome:
   platformio_options:
     build_flags:
