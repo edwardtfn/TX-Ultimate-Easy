@@ -50,11 +50,13 @@ media_player:
     on_state:
       then:
         - lambda: |-
+            static const char *TAG = "media_player.on_state.standard.hw.media_player";
+
             // Check if volume has changed and update number entity
             id(persistent_media_player_volume) = static_cast<uint8_t>(mp_media_player->volume * 100.0f);
             if (id(persistent_media_player_volume) != id(last_media_player_volume)) {
               id(last_media_player_volume) = id(persistent_media_player_volume);
-              ESP_LOGD("media_player_volume", "Media player volume changed to %" PRIu8 "%%, updating number entity", id(persistent_media_player_volume));
+              ESP_LOGD(TAG, "Media player volume changed to %" PRIu8 "%%, updating number entity", id(persistent_media_player_volume));
             }
 
 script:
@@ -65,10 +67,12 @@ script:
   - id: !extend dump_config
     then:
       - lambda: |-
+          static const char *TAG = "script.boot_sequence.standard.hw.media_player";
+
           // Volume sync configuration
-          ESP_LOGCONFIG("standard_media_player", "Media Player Volume Sync:");
-          ESP_LOGCONFIG("standard_media_player", "  Persistent volume: %" PRIu8 "%", id(persistent_media_player_volume));
-          ESP_LOGCONFIG("standard_media_player", "  Current volume: %.1f%%", mp_media_player->volume * 100.0f);
+          ESP_LOGCONFIG(TAG, "Media Player Volume Sync:");
+          ESP_LOGCONFIG(TAG, "  Persistent volume: %" PRIu8 "%", id(persistent_media_player_volume));
+          ESP_LOGCONFIG(TAG, "  Current volume: %.1f%%", mp_media_player->volume * 100.0f);
 
   - id: !extend dump_config_list_packages
     then:
@@ -93,8 +97,10 @@ script:
           id: mp_media_player
           volume: !lambda return id(persistent_media_player_volume) / 100.0f;
       - lambda: |-
+          static const char *TAG = "script.sync_initial_volume.standard.hw.media_player";
+
           id(last_media_player_volume) = id(persistent_media_player_volume);
-          ESP_LOGI("media_player_volume", "Initial volume sync: %.1f%% (restored from persistence)", id(persistent_media_player_volume));
+          ESP_LOGI(TAG, "Initial volume sync: %.1f%% (restored from persistence)", id(persistent_media_player_volume));
 
 speaker:
   - platform: mixer

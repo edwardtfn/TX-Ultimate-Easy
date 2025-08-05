@@ -29,9 +29,11 @@ api:
         tone: string
       then:
         - lambda: |-
+            static const char *TAG = "api.actions.rtttl_play.standard.hw.speaker";
+
             rtttl_speaker->stop();
             if (speaker_volume->state > 0) {
-              ESP_LOGI("standard_speaker", "Play tone: '%s'", tone.c_str());
+              ESP_LOGI(TAG, "Play tone: '%s'", tone.c_str());
               rtttl_speaker->play(tone.c_str());
             }
 

@@ -61,17 +61,19 @@ script:
   - id: !extend dump_config
     then:
       - lambda: |-
+          static const char *TAG = "script.dump_config.standard.hw.vibration";
+
           // Configuration
-          ESP_LOGCONFIG("standard_hw_vibration", "Touch - Vibration feedback: %s",
+          ESP_LOGCONFIG(TAG, "Touch - Vibration feedback: %s",
                         sl_touch_vibration_feedback->state.c_str());
-          ESP_LOGCONFIG("standard_hw_vibration", "Vibrate duration: %.0fms", nr_vibrating_duration->state);
-          ESP_LOGCONFIG("standard_hw_vibration", "Vibrate max duration: ${vibration_max_duration}");
+          ESP_LOGCONFIG(TAG, "Vibrate duration: %.0fms", nr_vibrating_duration->state);
+          ESP_LOGCONFIG(TAG, "Vibrate max duration: ${vibration_max_duration}");
 
           // State
           if (bs_vibrating->state)
-            ESP_LOGW("standard_hw_vibration", "Vibrating now: YES");
+            ESP_LOGW(TAG, "Vibrating now: YES");
           else
-            ESP_LOGCONFIG("standard_hw_vibration", "Vibrating now: No");
+            ESP_LOGCONFIG(TAG, "Vibrating now: No");
 
   - id: !extend dump_config_list_packages
     then:
