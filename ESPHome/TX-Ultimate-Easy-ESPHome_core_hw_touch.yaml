@@ -205,15 +205,6 @@ esphome:
     build_flags:
       - -D TX_ULTIMATE_EASY_CORE_HW_TOUCH
 
-external_components:
-  - source:
-      type: git
-      url: https://github.com/edwardtfn/TX-Ultimate-Easy
-      ref: v${version}
-    refresh: 1h
-    components:
-      - tx_ultimate_easy
-
 number:
   - id: nr_touch_duration
     name: Touch event duration
@@ -305,8 +296,8 @@ script:
       - script.wait: dump_config
       - lambda: |-
           // Check for requirements
-          #if !defined(TX_ULTIMATE_EASY_CORE)
-            #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
+          #if !defined(TX_ULTIMATE_EASY_CORE_COMMON)
+            #error "The package TX-Ultimate-Easy-ESPHome_core_common.yaml is required."
           #endif
 
           // Identify itself
@@ -375,7 +366,6 @@ switch:
     entity_category: config
 
 tx_ultimate_easy:
-  id: tx_ultimate
   uart: uart_touch
 
   on_long_touch_release:

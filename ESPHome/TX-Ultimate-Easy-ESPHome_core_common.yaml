@@ -76,7 +76,7 @@ esphome:
     version: ${version}
   platformio_options:
     build_flags:
-      - -D TX_ULTIMATE_EASY_CORE
+      - -D TX_ULTIMATE_EASY_CORE_COMMON
 
   on_boot:
     - priority: 750
@@ -94,6 +94,15 @@ esphome:
     - priority: -100  # At this priority, pretty much everything should already be initialized.
       then:
         - script.execute: boot_done
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/edwardtfn/TX-Ultimate-Easy
+      ref: v${version}
+    refresh: 1h
+    components:
+      - tx_ultimate_easy
 
 globals:
   - id: is_us_model
@@ -331,6 +340,9 @@ text_sensor:
             }
           }
           return result;
+
+tx_ultimate_easy:
+  id: tx_ultimate
 
 wifi:
   id: wifi_component
