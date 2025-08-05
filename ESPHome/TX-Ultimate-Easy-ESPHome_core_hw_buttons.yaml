@@ -362,8 +362,8 @@ select:
     on_value:
       then:
         - lambda: |-
-            id(button_actions_packed) = (id(button_actions_packed) & ~(0x07 << 0)) |
-                                        ((id(sl_button_1_action).active_index().value_or(1) & 0x07) << 0);
+            id(button_actions_packed) = (id(button_actions_packed) & ~(0x0F << 0)) |
+                                        ((id(sl_button_1_action).active_index().value_or(1) & 0x0F) << 0);
 
   - id: sl_button_2_action
     name: Button 2 action
@@ -377,8 +377,8 @@ select:
     on_value:
       then:
         - lambda: |-
-            id(button_actions_packed) = (id(button_actions_packed) & ~(0x07 << 4)) |
-                                        ((id(sl_button_2_action).active_index().value_or(1) & 0x07) << 4);
+            id(button_actions_packed) = (id(button_actions_packed) & ~(0x0F << 4)) |
+                                        ((id(sl_button_2_action).active_index().value_or(1) & 0x0F) << 4);
 
   - id: sl_button_3_action
     name: Button 3 action
@@ -392,8 +392,8 @@ select:
     on_value:
       then:
         - lambda: |-
-            id(button_actions_packed) = (id(button_actions_packed) & ~(0x07 << 8)) |
-                                        ((id(sl_button_3_action).active_index().value_or(1) & 0x07) << 8);
+            id(button_actions_packed) = (id(button_actions_packed) & ~(0x0F << 8)) |
+                                        ((id(sl_button_3_action).active_index().value_or(1) & 0x0F) << 8);
 
   - id: sl_button_4_action
     name: Button 4 action
@@ -407,6 +407,6 @@ select:
     on_value:
       then:
         - lambda: |-
-            id(button_actions_packed) = (id(button_actions_packed) & ~(0x07 << 12)) |
-                                        ((id(sl_button_4_action).active_index().value_or(1) & 0x07) << 12);
+            id(button_actions_packed) = (id(button_actions_packed) & ~(0x0F << 12)) |
+                                        ((id(sl_button_4_action).active_index().value_or(1) & 0x0F) << 12);
 ...
