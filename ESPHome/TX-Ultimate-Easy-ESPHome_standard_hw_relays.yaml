@@ -65,7 +65,7 @@ globals:
 #  - id: attr_light_output_1
 #    type: tx_ultimate_easy::LightAttributes
 #    restore_value: true
-#    initial_value: 
+#    initial_value:
 
 light:
   # These lights are used for the physical relays to be shown as lights
