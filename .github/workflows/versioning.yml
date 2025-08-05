@@ -48,36 +48,36 @@ jobs:
         with:
           script: |
             try {
-              // Get the commit that triggered this workflow
-              const commit = await github.rest.repos.getCommit({
+              // Use GitHub's reliable API to find PRs associated with this commit
+              const { data: associatedPRs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: context.sha
+                commit_sha: context.sha
               });
               
-              // Look for PR number in commit message (GitHub merge commits include this)
-              const commitMessage = commit.data.commit.message;
-              const prMatch = commitMessage.match(/Merge pull request #(\d+)/);
-              
-              if (prMatch) {
-                const prNumber = parseInt(prMatch[1]);
-                const pr = await github.rest.pulls.get({
+              if (associatedPRs.length > 0) {
+                // Get the most recent merged PR
+                const pr = associatedPRs.find(pr => pr.state === 'closed' && pr.merged_at) || associatedPRs[0];
+                
+                return {
+                  title: pr.title,
+                  body: pr.body || 'No description provided',
+                  number: pr.number,
+                  found: true
+                };
+              } else {
+                // Fallback for direct pushes or when no PR is found
+                const commit = await github.rest.repos.getCommit({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  pull_number: prNumber
+                  ref: context.sha
                 });
                 
                 return {
-                  title: pr.data.title,
-                  body: pr.data.body || 'No description provided',
-                  number: prNumber
-                };
-              } else {
-                // Fallback for direct pushes
-                return {
                   title: 'Direct push to main',
-                  body: commitMessage,
-                  number: null
+                  body: commit.data.commit.message,
+                  number: null,
+                  found: false
                 };
               }
             } catch (error) {
@@ -85,7 +85,8 @@ jobs:
               return {
                 title: 'Version update',
                 body: 'Automated version bump',
-                number: null
+                number: null,
+                found: false
               };
             }
 
@@ -99,19 +100,15 @@ jobs:
         run: |
           NEW_VERSION=$(cat ./versioning/VERSION)
           
-          if [ "${{ github.event_name }}" == "push" ]; then
-            # Use PR information from previous step
-            PR_TITLE='${{ fromJson(steps.pr_info.outputs.result).title }}'
-            PR_BODY='${{ fromJson(steps.pr_info.outputs.result).body }}'
-            
-            # Create formatted tag message
+          if [ "${{ github.event_name }}" == "push" ] && [ "${{ steps.pr_info.outcome }}" == "success" ]; then
+            # Use PR information directly in heredoc to avoid quoting issues
             cat > tag_message.txt << EOF
-          # v${NEW_VERSION} - ${PR_TITLE}
+          # v${NEW_VERSION} - ${{ fromJson(steps.pr_info.outputs.result).title }}
           
-          ${PR_BODY}
+          ${{ fromJson(steps.pr_info.outputs.result).body }}
           EOF
           else
-            # Manual dispatch - simpler message
+            # Manual dispatch or PR info unavailable - simpler message
             cat > tag_message.txt << EOF
           # v${NEW_VERSION} - Manual tag update
           
