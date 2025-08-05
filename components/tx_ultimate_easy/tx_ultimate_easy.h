@@ -34,6 +34,13 @@ namespace esphome {
         // Log tag
         static const char *TAG = "tx_ultimate_easy";
 
+        struct LightAttributes {
+            uint8_t brightness;
+            uint8_t red;
+            uint8_t green;
+            uint8_t blue;
+        };
+
         struct TouchPoint {
             uint8_t button = 0;
             int8_t x = -1;

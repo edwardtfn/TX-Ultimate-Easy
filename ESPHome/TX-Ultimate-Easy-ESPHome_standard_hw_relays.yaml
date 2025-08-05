@@ -16,8 +16,7 @@ substitutions:
   RELAY_MODE_TEXT_LIGHT: "Light"
   RELAY_MODE_TEXT_NOT_USED: "Not in use"
 
-  RELAY_RESTORE_MODE: RESTORE_DEFAULT_OFF
-  LIGHT_RELAYS_RESTORE_MODE: RESTORE_DEFAULT_OFF
+  LIGHT_RELAYS_RESTORE_MODE: ALWAYS_OFF
 
   TAG_STD_HW_RELAYS: std.hw.relays
 
@@ -48,6 +47,26 @@ globals:
     restore_value: false
     initial_value: 'false'
 
+  # Packed relay modes - replaces 4 separate selects
+  - id: relay_modes_packed
+    type: uint16_t
+    restore_value: true
+    initial_value: '0'  # Binary: 0000000000000000 = all relay modes set to option 0 (default action - switch)
+    # Bit layout: [unused][relay4(4)][relay3(4)][relay2(4)][relay1(4)]
+    # 16-bit value with 4 bits per relay: 0=Switch, 1=Light, 2=Not in use, 3-15=Reserved
+
+  # Packed switch states - replaces 5 separate switches
+  - id: relay_switches_packed
+    type: uint8_t
+    restore_value: true
+    initial_value: '0'  # All switches default to OFF
+    # Bit layout: [unused(3)][sw_relay4][sw_relay3][sw_relay2][sw_relay1][sw_expose_leds]
+
+#  - id: attr_light_output_1
+#    type: tx_ultimate_easy::LightAttributes
+#    restore_value: true
+#    initial_value: 
+
 light:
   # These lights are used for the physical relays to be shown as lights
   - id: light_output_1
@@ -55,7 +74,7 @@ light:
     output: output_relay_1
     platform: binary
     internal: true
-    restore_mode: ${RELAY_RESTORE_MODE}
+    restore_mode: ${LIGHT_RELAYS_RESTORE_MODE}
     on_turn_on:
       then:
         - if:
@@ -743,11 +762,6 @@ script:
           ESP_LOGCONFIG("${TAG_STD_HW_RELAYS}", "  Relay modes: %s", YESNO(id(boot_initialization_relays_relay_modes)));
           ESP_LOGCONFIG("${TAG_STD_HW_RELAYS}", "  Status LEDs: %s", YESNO(id(boot_initialization_relays_relay_leds)));
 
-          // Substitutions
-          ESP_LOGCONFIG("${TAG_STD_HW_RELAYS}", "Restore modes:");
-          ESP_LOGCONFIG("${TAG_STD_HW_RELAYS}", "  Relays: ${RELAY_RESTORE_MODE}");
-          ESP_LOGCONFIG("${TAG_STD_HW_RELAYS}", "  Status LEDs: ${LIGHT_RELAYS_RESTORE_MODE}");
-
   - id: !extend dump_config_list_packages
     then:
       - script.wait: dump_config
@@ -759,6 +773,126 @@ script:
 
           // Identify itself
           ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Standard - Hardware - Relays");
+
+  - id: light_set_state
+    mode: parallel
+    parameters:
+      light_group: uint8_t
+      light_index: uint8_t
+      state: bool
+    then:
+      - lambda: |-
+          static const uint32_t LIGHT_TRANSITION_TURN_ON = ${LIGHT_TRANSITION_TURN_ON};
+          static const uint32_t LIGHT_TRANSITION_TURN_OFF = ${LIGHT_TRANSITION_TURN_OFF};
+          static const uint8_t LIGHT_BRIGHTNESS_TURN_ON = ${LIGHT_BRIGHTNESS_TURN_ON};
+
+          const std::string light_mode_group_1 = id(is_us_model)
+                                                  ? "${LIGHT_MODE_LEFT_TEXT}"
+                                                  : "${LIGHT_MODE_BOTTOM_TEXT}";
+          const std::string light_mode_group_2 = id(is_us_model)
+                                                  ? "${LIGHT_MODE_RIGHT_TEXT}"
+                                                  : "${LIGHT_MODE_TOP_TEXT}";
+
+          switch (light_group) {
+            case 1:
+              if (light_index >= id(gb_lights_1).size()) {
+                ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid set with %s light for Relay %" PRIu8, light_mode_group_1.c_str(), light_index+1);
+                return;
+              }
+              if (state and !id(gb_lights_1)[light_index]->current_values.is_on()) {
+                ESP_LOGI("${TAG_CORE_HW_LEDS}", "Turn-on %s light for Relay %" PRIu8, light_mode_group_1.c_str(), light_index+1);
+                auto call = id(gb_lights_1)[light_index]->turn_on();
+                if (LIGHT_TRANSITION_TURN_ON > 0)
+                  call.set_transition_length(LIGHT_TRANSITION_TURN_ON);  // in ms
+                if (LIGHT_BRIGHTNESS_TURN_ON > 0 and LIGHT_BRIGHTNESS_TURN_ON <= 100)
+                  call.set_brightness(LIGHT_BRIGHTNESS_TURN_ON / 100.0f);
+                call.perform();
+              } else if (!state and id(gb_lights_1)[light_index]->current_values.is_on()) {
+                ESP_LOGI("${TAG_CORE_HW_LEDS}", "Turn-off %s light for Relay %" PRIu8, light_mode_group_1.c_str(), light_index+1);
+                auto call = id(gb_lights_1)[light_index]->turn_off();
+                if (LIGHT_TRANSITION_TURN_OFF > 0)
+                  call.set_transition_length(LIGHT_TRANSITION_TURN_OFF);  // in ms
+                call.perform();
+              }
+              break;
+            case 2:
+              if (light_index >= id(gb_lights_2).size()) {
+                ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid set with %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
+                return;
+              }
+              if (state and !id(gb_lights_2)[light_index]->current_values.is_on()) {
+                ESP_LOGI("${TAG_CORE_HW_LEDS}", "Turn-on %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
+                auto call = id(gb_lights_2)[light_index]->turn_on();
+                if (LIGHT_TRANSITION_TURN_ON > 0)
+                  call.set_transition_length(LIGHT_TRANSITION_TURN_ON);  // in ms
+                if (LIGHT_BRIGHTNESS_TURN_ON > 0 and LIGHT_BRIGHTNESS_TURN_ON <= 100)
+                  call.set_brightness(LIGHT_BRIGHTNESS_TURN_ON / 100.0f);
+                call.perform();
+              } else if (!state and id(gb_lights_2)[light_index]->current_values.is_on()) {
+                ESP_LOGI("${TAG_CORE_HW_LEDS}", "Turn-off %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
+                auto call = id(gb_lights_2)[light_index]->turn_off();
+                if (LIGHT_TRANSITION_TURN_OFF > 0)
+                  call.set_transition_length(LIGHT_TRANSITION_TURN_OFF);  // in ms
+                call.perform();
+              }
+              break;
+          }
+
+  - id: !extend restore_from_nvs
+    then:
+      # Relay modes
+      - select.set_index:
+          id: sl_relay_1_mode
+          index: !lambda return std::min((uint8_t)(id(relay_modes_packed) & 0x0F), (uint8_t)2);
+      - select.set_index:
+          id: sl_relay_2_mode
+          index: !lambda return std::min((uint8_t)((id(relay_modes_packed) >> 4) & 0x0F), (uint8_t)2);
+      - select.set_index:
+          id: sl_relay_3_mode
+          index: !lambda return std::min((uint8_t)((id(relay_modes_packed) >> 8) & 0x0F), (uint8_t)2);
+      - select.set_index:
+          id: sl_relay_4_mode
+          index: !lambda return std::min((uint8_t)((id(relay_modes_packed) >> 12) & 0x0F), (uint8_t)2);
+
+      # Switch states (new - your improved version)
+      - if:
+          condition:
+            lambda: return (id(relay_switches_packed) & 0x01) == 0;
+          then:
+            - switch.turn_off: sw_expose_relays_leds_to_ha
+          else:
+            - switch.turn_on: sw_expose_relays_leds_to_ha
+      - if:
+          condition:
+            lambda: return (id(relay_switches_packed) & 0x02) == 0;
+          then:
+            - switch.turn_off: sw_relay_1
+          else:
+            - switch.turn_on: sw_relay_1
+      - if:
+          condition:
+            lambda: return (id(relay_switches_packed) & 0x04) == 0;
+          then:
+            - switch.turn_off: sw_relay_2
+          else:
+            - switch.turn_on: sw_relay_2
+      - if:
+          condition:
+            lambda: return (id(relay_switches_packed) & 0x08) == 0;
+          then:
+            - switch.turn_off: sw_relay_3
+          else:
+            - switch.turn_on: sw_relay_3
+      - if:
+          condition:
+            lambda: return (id(relay_switches_packed) & 0x10) == 0;
+          then:
+            - switch.turn_off: sw_relay_4
+          else:
+            - switch.turn_on: sw_relay_4
+
+      # update lights based on new relay statuses (catch up, as this should be done when each relay is updated)
+      - script.execute: show_relay_status
 
   - id: show_relay_status
     mode: restart
@@ -827,8 +961,7 @@ script:
           }
 
 select:
-  - &relay_select_mode_base
-    id: sl_relay_1_mode
+  - id: sl_relay_1_mode
     name: Relay 1 display mode
     platform: template
     options:
@@ -847,21 +980,81 @@ select:
         - binary_sensor.template.publish:
             id: bs_pending_restart
             state: true
+        - lambda: |-
+            id(relay_modes_packed) = (id(relay_modes_packed) & ~(0x0F << 0)) |
+                                      ((id(sl_relay_1_mode).active_index().value_or(1) & 0x0F) << 0);
   - id: sl_relay_2_mode
     name: Relay 2 display mode
-    <<: *relay_select_mode_base
+    platform: template
+    options:
+      - "${RELAY_MODE_TEXT_SWITCH}"
+      - "${RELAY_MODE_TEXT_LIGHT}"
+      - "${RELAY_MODE_TEXT_NOT_USED}"
+    initial_option: "${RELAY_MODE_TEXT_SWITCH}"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dip-switch
+    on_value:
+      then:
+        - binary_sensor.template.publish:
+            id: bs_pending_restart
+            state: true
+        - lambda: |-
+            id(relay_modes_packed) = (id(relay_modes_packed) & ~(0x0F << 4)) |
+                                      ((id(sl_relay_2_mode).active_index().value_or(1) & 0x0F) << 4);
   - id: sl_relay_3_mode
     name: Relay 3 display mode
-    <<: *relay_select_mode_base
+    platform: template
+    options:
+      - "${RELAY_MODE_TEXT_SWITCH}"
+      - "${RELAY_MODE_TEXT_LIGHT}"
+      - "${RELAY_MODE_TEXT_NOT_USED}"
+    initial_option: "${RELAY_MODE_TEXT_SWITCH}"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dip-switch
+    on_value:
+      then:
+        - binary_sensor.template.publish:
+            id: bs_pending_restart
+            state: true
+        - lambda: |-
+            id(relay_modes_packed) = (id(relay_modes_packed) & ~(0x0F << 8)) |
+                                      ((id(sl_relay_3_mode).active_index().value_or(1) & 0x0F) << 8);
   - id: sl_relay_4_mode
     name: Relay 4 display mode
-    <<: *relay_select_mode_base
+    platform: template
+    options:
+      - "${RELAY_MODE_TEXT_SWITCH}"
+      - "${RELAY_MODE_TEXT_LIGHT}"
+      - "${RELAY_MODE_TEXT_NOT_USED}"
+    initial_option: "${RELAY_MODE_TEXT_SWITCH}"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dip-switch
+    on_value:
+      then:
+        - binary_sensor.template.publish:
+            id: bs_pending_restart
+            state: true
+        - lambda: |-
+            id(relay_modes_packed) = (id(relay_modes_packed) & ~(0x0F << 12)) |
+                                      ((id(sl_relay_4_mode).active_index().value_or(1) & 0x0F) << 12);
 
 switch:
   - id: sw_expose_relays_leds_to_ha
     name: Expose Relay's LEDs to Home Assistant
     platform: template
-    restore_mode: RESTORE_DEFAULT_OFF
+    restore_mode: ALWAYS_OFF
     optimistic: true
     internal: false
     entity_category: config
@@ -870,17 +1063,21 @@ switch:
         - binary_sensor.template.publish:
             id: bs_pending_restart
             state: true
+        - lambda: |-
+            id(relay_switches_packed) |= 0x01;  // Set bit 0
     on_turn_off:
       then:
         - binary_sensor.template.publish:
             id: bs_pending_restart
             state: true
+        - lambda: |-
+            id(relay_switches_packed) &= ~0x01;  // Clear bit 0
 
   - id: sw_relay_1
     name: Relay 1
     output: output_relay_1
     platform: output
-    restore_mode: ${RELAY_RESTORE_MODE}
+    restore_mode: ALWAYS_OFF
     internal: true
     on_turn_on:
       then:
@@ -890,6 +1087,8 @@ switch:
               - light.is_off: light_output_1
             then:
               light.turn_on: light_output_1
+        - lambda: |-
+            id(relay_switches_packed) |= 0x02;  // Set bit 1
     on_turn_off:
       then:
         - script.execute: show_relay_status
@@ -898,11 +1097,13 @@ switch:
               - light.is_on: light_output_1
             then:
               - light.turn_off: light_output_1
+        - lambda: |-
+            id(relay_switches_packed) &= ~0x02;  // Clear bit 1
   - id: sw_relay_2
     name: Relay 2
     output: output_relay_2
     platform: output
-    restore_mode: ${RELAY_RESTORE_MODE}
+    restore_mode: ALWAYS_OFF
     internal: true
     on_turn_on:
       then:
@@ -912,6 +1113,8 @@ switch:
               - light.is_off: light_output_2
             then:
               light.turn_on: light_output_2
+        - lambda: |-
+            id(relay_switches_packed) |= 0x04;  // Set bit 2
     on_turn_off:
       then:
         - script.execute: show_relay_status
@@ -920,11 +1123,13 @@ switch:
               - light.is_on: light_output_2
             then:
               - light.turn_off: light_output_2
+        - lambda: |-
+            id(relay_switches_packed) &= ~0x04;  // Clear bit 2
   - id: sw_relay_3
     name: Relay 3
     output: output_relay_3
     platform: output
-    restore_mode: ${RELAY_RESTORE_MODE}
+    restore_mode: ALWAYS_OFF
     internal: true
     on_turn_on:
       then:
@@ -934,6 +1139,8 @@ switch:
               - light.is_off: light_output_3
             then:
               - light.turn_on: light_output_3
+        - lambda: |-
+            id(relay_switches_packed) |= 0x08;  // Set bit 3
     on_turn_off:
       then:
         - script.execute: show_relay_status
@@ -942,11 +1149,13 @@ switch:
               - light.is_on: light_output_3
             then:
               - light.turn_off: light_output_3
+        - lambda: |-
+            id(relay_switches_packed) &= ~0x08;  // Clear bit 3
   - id: sw_relay_4
     name: Relay 4
     output: output_relay_4
     platform: output
-    restore_mode: ${RELAY_RESTORE_MODE}
+    restore_mode: ALWAYS_OFF
     internal: true
     on_turn_on:
       then:
@@ -956,6 +1165,8 @@ switch:
               - light.is_off: light_output_4
             then:
               - light.turn_on: light_output_4
+        - lambda: |-
+            id(relay_switches_packed) |= 0x10;  // Set bit 4
     on_turn_off:
       then:
         - script.execute: show_relay_status
@@ -964,4 +1175,6 @@ switch:
               - light.is_on: light_output_4
             then:
               - light.turn_off: light_output_4
+        - lambda: |-
+            id(relay_switches_packed) &= ~0x10;  // Clear bit 4
 ...
