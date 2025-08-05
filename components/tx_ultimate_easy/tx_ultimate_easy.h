@@ -34,13 +34,6 @@ namespace esphome {
         // Log tag
         static const char *TAG = "tx_ultimate_easy";
 
-        struct LightAttributes {
-            uint8_t brightness;
-            uint8_t red;
-            uint8_t green;
-            uint8_t blue;
-        };
-
         struct TouchPoint {
             uint8_t button = 0;
             int8_t x = -1;
@@ -88,6 +81,74 @@ namespace esphome {
             uint8_t gang_count_ = 1;
 
         }; // class TxUltimateEasy
+
+        /**
+        * @brief Light attributes structure for storing color and brightness data.
+        * 
+        * This structure represents the visual attributes of a light without the state (on/off).
+        * It's designed to be packed efficiently into a 32-bit integer for NVS storage.
+        * RGB components use the full 8-bit range (0-255) while brightness uses percentage (0-100).
+        */
+        struct LightAttributes {
+            uint8_t brightness;  ///< Light brightness percentage (0-100, where 100 = full brightness)
+            uint8_t red;         ///< Red color component (0-255)
+            uint8_t green;       ///< Green color component (0-255)  
+            uint8_t blue;        ///< Blue color component (0-255)
+        };
+
+        /**
+        * @brief Packs LightAttributes structure into a 32-bit integer for storage.
+        * 
+        * Bit layout: [brightness(8)][red(8)][green(8)][blue(8)]
+        * This allows efficient storage in ESPHome globals with restore_value support.
+        * Note: Brightness values > 100 will be clamped to 100 during packing.
+        * 
+        * @param attr The LightAttributes structure to pack
+        * @return uint32_t Packed representation suitable for NVS storage
+        * 
+        * @example
+        * LightAttributes attrs = {75, 255, 128, 64};
+        * uint32_t packed = pack_light_attributes(attrs);  // Returns 0x4BFF8040
+        */
+        uint32_t pack_light_attributes(const LightAttributes& attr);
+
+        /**
+        * @brief Unpacks a 32-bit integer back into LightAttributes structure.
+        * 
+        * Reverses the packing operation to extract individual color and brightness values.
+        * Brightness values > 100 in the packed data will be clamped to 100.
+        * 
+        * @param packed The packed 32-bit representation
+        * @return LightAttributes The unpacked structure with individual components
+        * 
+        * @example
+        * uint32_t packed = 0x4BFF8040;
+        * LightAttributes attrs = unpack_light_attributes(packed);
+        * // attrs.brightness = 75, attrs.red = 255, attrs.green = 128, attrs.blue = 64
+        */
+        LightAttributes unpack_light_attributes(uint32_t packed);
+
+        /**
+        * @brief Default light attributes for initialization.
+        * 
+        * Provides sensible defaults for new lights:
+        * - Brightness: 100 (full brightness)
+        * - Red: 255 (full intensity)
+        * - Green: 255 (full intensity) 
+        * - Blue: 255 (full intensity)
+        * Result: Pure white color at full brightness
+        */
+        extern const LightAttributes LIGHT_ATTRS_DEFAULT;
+
+        /**
+        * @brief Pre-packed version of DEFAULT_LIGHT_ATTRS for convenience.
+        * 
+        * This constant contains LIGHT_ATTRS_DEFAULT already packed into uint32_t format,
+        * suitable for direct use in ESPHome YAML initial_value fields.
+        * 
+        * Value: 0x64FFFFFF (brightness=100, RGB=255,255,255)
+        */
+        extern const uint32_t LIGHT_ATTRS_DEFAULT_PACKED;
 
     } // namespace tx_ultimate_easy
 } // namespace esphome

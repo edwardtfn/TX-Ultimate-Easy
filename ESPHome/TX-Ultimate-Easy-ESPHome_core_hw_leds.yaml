@@ -29,20 +29,14 @@ substitutions:
   LIGHT_SIDES_RESTORE_MODE: RESTORE_DEFAULT_OFF
   LIGHT_INDIVIDUAL_RESTORE_MODE: RESTORE_DEFAULT_OFF
 
+  LIGHT_ATTRS_DEFAULT: '0x64FFFFFF'  # brightness=100, RGB=255,255,255
+
   TAG_CORE_HW_LEDS: core.hw.leds
 
 esphome:
   platformio_options:
     build_flags:
       - -D TX_ULTIMATE_EASY_CORE_HW_LEDS
-
-globals:
-  - id: gb_lights_1
-    type: std::vector<light::LightState*>
-    restore_value: false
-  - id: gb_lights_2
-    type: std::vector<light::LightState*>
-    restore_value: false
 
 light:
   # These lights are controlling the LEDs on the device
@@ -549,6 +543,40 @@ script:
 
           // Identify itself
           ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Core - Hardware - LEDs");
+
+  - id: light_attributes_restore
+    mode: parallel
+    parameters:
+      light_ptr: light::LightState*
+      attr_global_ptr: uint32_t*
+    then:
+      - lambda: |-
+          tx_ultimate_easy::LightAttributes attrs = tx_ultimate_easy::unpack_light_attributes(*attr_global_ptr);
+          auto call = light_ptr->make_call();
+          call.set_brightness(attrs.brightness / 100.0f);
+          call.set_rgb(attrs.red / 255.0f, attrs.green / 255.0f, attrs.blue / 255.0f);
+          call.perform();
+          ESP_LOGI("${TAG_CORE_HW_LEDS}", "Restored light attributes: brightness=%d%%, RGB=(%d,%d,%d)",
+                                          attrs.brightness, attrs.red, attrs.green, attrs.blue);
+
+  - id: light_attributes_save
+    mode: parallel
+    parameters:
+      light_ptr: light::LightState*
+      attr_global_ptr: uint32_t*
+    then:
+      - lambda: |-
+          auto current = light_ptr->current_values;
+          tx_ultimate_easy::LightAttributes attrs = {
+            .brightness = uint8_t(current.get_brightness() * 100.0f),
+            .red = uint8_t(current.get_red() * 255.0f),
+            .green = uint8_t(current.get_green() * 255.0f),
+            .blue = uint8_t(current.get_blue() * 255.0f)
+          };
+
+          *attr_global_ptr = tx_ultimate_easy::pack_light_attributes(attrs);
+          ESP_LOGD("${TAG_CORE_HW_LEDS}", "Saved light attributes: brightness=%d%%, RGB=(%d,%d,%d)",
+                                          attrs.brightness, attrs.red, attrs.green, attrs.blue);
 
 select:
   # EU relay light mode template

@@ -223,5 +223,28 @@ namespace esphome {
             return tp;
         }
 
+        // LightAttributes
+
+        // Constant definitions
+        const LightAttributes LIGHT_ATTRS_DEFAULT = {100, 255, 255, 255};
+        const uint32_t LIGHT_ATTRS_DEFAULT_PACKED = 0x64FFFFFF;
+
+        // Function implementations
+        uint32_t pack_light_attributes(const LightAttributes& attr) {
+            return (uint32_t(attr.brightness) << 24) |
+                (uint32_t(attr.red) << 16) |
+                (uint32_t(attr.green) << 8) |
+                (uint32_t(attr.blue));
+        }
+
+        LightAttributes unpack_light_attributes(uint32_t packed) {
+            return {
+                .brightness = uint8_t((packed >> 24) & 0xFF),
+                .red = uint8_t((packed >> 16) & 0xFF),
+                .green = uint8_t((packed >> 8) & 0xFF),
+                .blue = uint8_t(packed & 0xFF)
+            };
+        }
+
     } // namespace tx_ultimate_easy
 } // namespace esphome

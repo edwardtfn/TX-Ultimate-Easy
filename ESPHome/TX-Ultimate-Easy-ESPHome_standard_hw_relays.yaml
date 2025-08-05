@@ -47,6 +47,13 @@ globals:
     restore_value: false
     initial_value: 'false'
 
+  - id: gb_lights_1
+    type: std::vector<light::LightState*>
+    restore_value: false
+  - id: gb_lights_2
+    type: std::vector<light::LightState*>
+    restore_value: false
+
   # Packed relay modes - replaces 4 separate selects
   - id: relay_modes_packed
     type: uint16_t
@@ -62,10 +69,10 @@ globals:
     initial_value: '0'  # All switches default to OFF
     # Bit layout: [unused(3)][sw_relay4][sw_relay3][sw_relay2][sw_relay1][sw_expose_leds]
 
-#  - id: attr_light_output_1
-#    type: tx_ultimate_easy::LightAttributes
-#    restore_value: true
-#    initial_value:
+  - id: attr_light_output_1
+    type: uint32_t
+    restore_value: true
+    initial_value: '${LIGHT_ATTRS_DEFAULT}'
 
 light:
   # These lights are used for the physical relays to be shown as lights
@@ -89,6 +96,12 @@ light:
               - switch.is_on: sw_relay_1
             then:
               - switch.turn_off: sw_relay_1
+    on_state:
+      then:
+        - script.execute:
+            id: light_attributes_save
+            light_ptr: !lambda return id(light_output_1);
+            attr_global_ptr: !lambda return &id(attr_light_output_1);
   - id: light_output_2
     name: Light output 2
     output: output_relay_2
@@ -770,6 +783,10 @@ script:
           #if !defined(TX_ULTIMATE_EASY_CORE)
             #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
           #endif
+          #if !defined(TX_ULTIMATE_EASY_CORE_HW_LEDS)
+            #error "The package TX-Ultimate-Easy-ESPHome_core_hw_leds.yaml is required."
+          #endif  // TX_ULTIMATE_EASY_CORE_HW_LEDS
+
 
           // Identify itself
           ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Standard - Hardware - Relays");
