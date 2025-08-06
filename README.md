@@ -27,6 +27,9 @@
 [buymeacoffee-shield]: https://img.shields.io/static/v1?label=Buy%20me%20an%20ice%20cream&message=❄&color=blue
 [buymeacoffee]: https://www.buymeacoffee.com/edwardfirmo
 
+> [!WARNING]
+> ESPHome builder v2025.8.0+ is required
+
 ## Framework Migration to ESP-IDF
 
 > [!IMPORTANT]  
