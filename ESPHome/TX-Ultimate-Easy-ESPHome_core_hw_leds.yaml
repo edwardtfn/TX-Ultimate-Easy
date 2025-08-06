@@ -570,7 +570,7 @@ script:
       - lambda: |-
           auto attrs_pair = tx_ultimate_easy::unpack_dual_light_attributes(*attr_global_ptr);
           tx_ultimate_easy::LightAttributes attrs = (group_index == 1) ? attrs_pair.first : attrs_pair.second;
-          
+
           auto call = light_ptr->make_call();
           call.set_brightness(attrs.brightness / 100.0f);
           call.set_rgb(attrs.red / 255.0f, attrs.green / 255.0f, attrs.blue / 255.0f);
@@ -610,10 +610,10 @@ script:
             .green = uint8_t(current.get_green() * 255.0f),
             .blue = uint8_t(current.get_blue() * 255.0f)
           };
-          
+
           // Unpack existing dual attributes
           auto existing = tx_ultimate_easy::unpack_dual_light_attributes(*attr_global_ptr);
-          
+
           // Update the appropriate group
           if (group_index == 1) {
             *attr_global_ptr = tx_ultimate_easy::pack_dual_light_attributes(new_attrs, existing.second);
