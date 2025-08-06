@@ -1168,7 +1168,7 @@ script:
       - lambda: |-
           // Restore all light attributes based on current model and gang count
           switch (id(gang_count)) {
-            case 1:
+            case 1:  // 1-Gang
               if (id(is_us_model)) {
                 light_attributes_restore_dual->execute(id(light_us_rl_1_1_left), &id(attr_light_rl_1_1_both), 1);
                 light_attributes_restore_dual->execute(id(light_us_rl_1_1_right), &id(attr_light_rl_1_1_both), 2);
@@ -1177,7 +1177,7 @@ script:
                 light_attributes_restore_dual->execute(id(light_eu_rl_1_1_top), &id(attr_light_rl_1_1_both), 2);
               }
               break;
-            case 2:
+            case 2:  // 2-Gang
               if (id(is_us_model)) {
                 light_attributes_restore_dual->execute(id(light_us_rl_1_2_left), &id(attr_light_rl_1_2_both), 1);
                 light_attributes_restore_dual->execute(id(light_us_rl_1_2_right), &id(attr_light_rl_1_2_both), 2);
@@ -1190,7 +1190,7 @@ script:
                 light_attributes_restore_dual->execute(id(light_eu_rl_2_2_top), &id(attr_light_rl_2_2_both), 2);
               }
               break;
-            case 3:
+            case 3:  // 3-Gang
               if (id(is_us_model)) {
                 light_attributes_restore_dual->execute(id(light_us_rl_1_3_left), &id(attr_light_rl_1_3_both), 1);
                 light_attributes_restore_dual->execute(id(light_us_rl_1_3_right), &id(attr_light_rl_1_3_both), 2);
@@ -1207,7 +1207,7 @@ script:
                 light_attributes_restore_dual->execute(id(light_eu_rl_3_3_top), &id(attr_light_rl_3_3_both), 2);
               }
               break;
-            case 3:
+            case 4:  // 4-Gang
               if (id(is_us_model)) {
                 light_attributes_restore_dual->execute(id(light_us_rl_1_4_left), &id(attr_light_rl_1_4_both), 1);
                 light_attributes_restore_dual->execute(id(light_us_rl_1_4_right), &id(attr_light_rl_1_4_both), 2);
