@@ -1493,7 +1493,7 @@ select:
     on_value:
       - lambda: |-
           id(relay_light_modes_packed) = (id(relay_light_modes_packed) & ~(0x0F << 12)) |
-                                        ((id(sl_relay_4_light_mode_eu).active_index().value_or(1) & 0x0F) << 12);
+                                        ((id(sl_relay_4_light_mode_us).active_index().value_or(1) & 0x0F) << 12);
 
   - id: sl_relay_4_mode
     name: Relay 4 display mode
