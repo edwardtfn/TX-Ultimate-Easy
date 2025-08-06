@@ -964,16 +964,13 @@ script:
             ESP_LOGV("${TAG_STD_HW_RELAYS}", "Light Mode for Relay %" PRIu8 ": %s", i + 1, light_mode.c_str());
 
             // Use light_set_state for light updates
-            if (relay_state) {
+            if (light_mode != "${LIGHT_MODE_DISABLED_TEXT}") {
               if (light_mode == light_mode_group_1 || light_mode == "${LIGHT_MODE_BOTH_TEXT}") {
-                light_set_state->execute(1, i, true);  // Left/bottom light
+                light_set_state->execute(1, i, relay_state);  // Left/bottom light
               }
               if (light_mode == light_mode_group_2 || light_mode == "${LIGHT_MODE_BOTH_TEXT}") {
-                light_set_state->execute(2, i, true);  // Right/top light
+                light_set_state->execute(2, i, relay_state);  // Right/top light
               }
-            } else {
-              light_set_state->execute(1, i, false);  // Turn off left/bottom light
-              light_set_state->execute(2, i, false);  // Turn off right/top light
             }
           }
 
