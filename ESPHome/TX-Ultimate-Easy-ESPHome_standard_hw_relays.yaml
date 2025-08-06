@@ -69,10 +69,89 @@ globals:
     initial_value: '0'  # All switches default to OFF
     # Bit layout: [unused(3)][sw_relay4][sw_relay3][sw_relay2][sw_relay1][sw_expose_leds]
 
-  - id: attr_light_output_1
+  - &global_attr_light
+    id: attr_light_eu_rl_1_1_bottom
     type: uint32_t
     restore_value: true
     initial_value: '${LIGHT_ATTRS_DEFAULT}'
+  - id: attr_light_eu_rl_1_1_top
+    <<: *global_attr_light
+  - id: attr_light_eu_rl_1_2_bottom
+    <<: *global_attr_light
+  - id: attr_light_eu_rl_1_2_top
+    <<: *global_attr_light
+  - id: attr_light_eu_rl_2_2_bottom
+    <<: *global_attr_light
+  - id: attr_light_eu_rl_2_2_top
+    <<: *global_attr_light
+  - id: attr_light_eu_rl_1_3_bottom
+    <<: *global_attr_light
+  - id: attr_light_eu_rl_1_3_top
+    <<: *global_attr_light
+  - id: attr_light_eu_rl_2_3_bottom
+    <<: *global_attr_light
+  - id: attr_light_eu_rl_2_3_top
+    <<: *global_attr_light
+  - id: attr_light_eu_rl_3_3_bottom
+    <<: *global_attr_light
+  - id: attr_light_eu_rl_3_3_top
+    <<: *global_attr_light
+  - id: attr_light_eu_rl_1_4_bottom
+    <<: *global_attr_light
+  - id: attr_light_eu_rl_1_4_top
+    <<: *global_attr_light
+  - id: attr_light_eu_rl_2_4_bottom
+    <<: *global_attr_light
+  - id: attr_light_eu_rl_2_4_top
+    <<: *global_attr_light
+  - id: attr_light_eu_rl_3_4_bottom
+    <<: *global_attr_light
+  - id: attr_light_eu_rl_3_4_top
+    <<: *global_attr_light
+  - id: attr_light_eu_rl_4_4_bottom
+    <<: *global_attr_light
+  - id: attr_light_eu_rl_4_4_top
+    <<: *global_attr_light
+  - id: attr_light_us_rl_1_1_left
+    <<: *global_attr_light
+  - id: attr_light_us_rl_1_1_right
+    <<: *global_attr_light
+  - id: attr_light_us_rl_1_2_left
+    <<: *global_attr_light
+  - id: attr_light_us_rl_1_2_right
+    <<: *global_attr_light
+  - id: attr_light_us_rl_2_2_left
+    <<: *global_attr_light
+  - id: attr_light_us_rl_2_2_right
+    <<: *global_attr_light
+  - id: attr_light_us_rl_1_3_left
+    <<: *global_attr_light
+  - id: attr_light_us_rl_1_3_right
+    <<: *global_attr_light
+  - id: attr_light_us_rl_2_3_left
+    <<: *global_attr_light
+  - id: attr_light_us_rl_2_3_right
+    <<: *global_attr_light
+  - id: attr_light_us_rl_3_3_left
+    <<: *global_attr_light
+  - id: attr_light_us_rl_3_3_right
+    <<: *global_attr_light
+  - id: attr_light_us_rl_1_4_left
+    <<: *global_attr_light
+  - id: attr_light_us_rl_1_4_right
+    <<: *global_attr_light
+  - id: attr_light_us_rl_2_4_left
+    <<: *global_attr_light
+  - id: attr_light_us_rl_2_4_right
+    <<: *global_attr_light
+  - id: attr_light_us_rl_3_4_left
+    <<: *global_attr_light
+  - id: attr_light_us_rl_3_4_right
+    <<: *global_attr_light
+  - id: attr_light_us_rl_4_4_left
+    <<: *global_attr_light
+  - id: attr_light_us_rl_4_4_right
+    <<: *global_attr_light
 
 light:
   # These lights are used for the physical relays to be shown as lights
@@ -96,12 +175,6 @@ light:
               - switch.is_on: sw_relay_1
             then:
               - switch.turn_off: sw_relay_1
-    on_state:
-      then:
-        - script.execute:
-            id: light_attributes_save
-            light_ptr: !lambda return id(light_output_1);
-            attr_global_ptr: !lambda return &id(attr_light_output_1);
   - id: light_output_2
     name: Light output 2
     output: output_relay_2
@@ -173,6 +246,11 @@ light:
       - id: light_full
         from: 9
         to: 9
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_eu_rl_1_1_bottom);
+          attr_global_ptr: !lambda return &id(attr_light_eu_rl_1_1_bottom);
   - id: light_eu_rl_1_1_top
     name: Light - Relay 1 of 1 (top)
     <<: *light_partition_relays
@@ -180,6 +258,11 @@ light:
       - id: light_full
         from: 23
         to: 23
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_eu_rl_1_1_top);
+          attr_global_ptr: !lambda return &id(attr_light_eu_rl_1_1_top);
   - id: light_eu_rl_1_2_bottom
     name: Light - Relay 1 of 2 (bottom)
     <<: *light_partition_relays
@@ -187,6 +270,11 @@ light:
       - id: light_full
         from: 11
         to: 11
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_eu_rl_1_2_bottom);
+          attr_global_ptr: !lambda return &id(attr_light_eu_rl_1_2_bottom);
   - id: light_eu_rl_1_2_top
     name: Light - Relay 1 of 2 (top)
     <<: *light_partition_relays
@@ -194,6 +282,11 @@ light:
       - id: light_full
         from: 21
         to: 21
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_eu_rl_1_2_top);
+          attr_global_ptr: !lambda return &id(attr_light_eu_rl_1_2_top);
   - id: light_eu_rl_2_2_bottom
     name: Light - Relay 2 of 2 (bottom)
     <<: *light_partition_relays
@@ -201,6 +294,11 @@ light:
       - id: light_full
         from: 7
         to: 7
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_eu_rl_2_2_bottom);
+          attr_global_ptr: !lambda return &id(attr_light_eu_rl_2_2_bottom);
   - id: light_eu_rl_2_2_top
     name: Light - Relay 2 of 2 (top)
     <<: *light_partition_relays
@@ -208,6 +306,11 @@ light:
       - id: light_full
         from: 25
         to: 25
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_eu_rl_2_2_top);
+          attr_global_ptr: !lambda return &id(attr_light_eu_rl_2_2_top);
   - id: light_eu_rl_1_3_bottom
     name: Light - Relay 1 of 3 (bottom)
     <<: *light_partition_relays
@@ -215,6 +318,11 @@ light:
       - id: light_full
         from: 12
         to: 12
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_eu_rl_1_3_bottom);
+          attr_global_ptr: !lambda return &id(attr_light_eu_rl_1_3_bottom);
   - id: light_eu_rl_1_3_top
     name: Light - Relay 1 of 3 (top)
     <<: *light_partition_relays
@@ -222,6 +330,11 @@ light:
       - id: light_full
         from: 20
         to: 20
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_eu_rl_1_3_top);
+          attr_global_ptr: !lambda return &id(attr_light_eu_rl_1_3_top);
   - id: light_eu_rl_2_3_bottom
     name: Light - Relay 2 of 3 (bottom)
     <<: *light_partition_relays
@@ -229,6 +342,11 @@ light:
       - id: light_full
         from: 9
         to: 9
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_eu_rl_2_3_bottom);
+          attr_global_ptr: !lambda return &id(attr_light_eu_rl_2_3_bottom);
   - id: light_eu_rl_2_3_top
     name: Light - Relay 2 of 3 (top)
     <<: *light_partition_relays
@@ -236,6 +354,11 @@ light:
       - id: light_full
         from: 23
         to: 23
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_eu_rl_2_3_top);
+          attr_global_ptr: !lambda return &id(attr_light_eu_rl_2_3_top);
   - id: light_eu_rl_3_3_bottom
     name: Light - Relay 3 of 3 (bottom)
     <<: *light_partition_relays
@@ -243,6 +366,11 @@ light:
       - id: light_full
         from: 6
         to: 6
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_eu_rl_3_3_bottom);
+          attr_global_ptr: !lambda return &id(attr_light_eu_rl_3_3_bottom);
   - id: light_eu_rl_3_3_top
     name: Light - Relay 3 of 3 (top)
     <<: *light_partition_relays
@@ -250,6 +378,11 @@ light:
       - id: light_full
         from: 26
         to: 26
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_eu_rl_3_3_top);
+          attr_global_ptr: !lambda return &id(attr_light_eu_rl_3_3_top);
   - id: light_eu_rl_1_4_bottom
     name: Light - Relay 1 of 4 (bottom)
     <<: *light_partition_relays
@@ -257,6 +390,11 @@ light:
       - id: light_full
         from: 12
         to: 12
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_eu_rl_1_4_bottom);
+          attr_global_ptr: !lambda return &id(attr_light_eu_rl_1_4_bottom);
   - id: light_eu_rl_1_4_top
     name: Light - Relay 1 of 4 (top)
     <<: *light_partition_relays
@@ -264,6 +402,11 @@ light:
       - id: light_full
         from: 20
         to: 20
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_eu_rl_1_4_top);
+          attr_global_ptr: !lambda return &id(attr_light_eu_rl_1_4_top);
   - id: light_eu_rl_2_4_bottom
     name: Light - Relay 2 of 4 (bottom)
     <<: *light_partition_relays
@@ -271,6 +414,11 @@ light:
       - id: light_full
         from: 10
         to: 10
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_eu_rl_2_4_bottom);
+          attr_global_ptr: !lambda return &id(attr_light_eu_rl_2_4_bottom);
   - id: light_eu_rl_2_4_top
     name: Light - Relay 2 of 4 (top)
     <<: *light_partition_relays
@@ -278,6 +426,11 @@ light:
       - id: light_full
         from: 22
         to: 22
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_eu_rl_2_4_top);
+          attr_global_ptr: !lambda return &id(attr_light_eu_rl_2_4_top);
   - id: light_eu_rl_3_4_bottom
     name: Light - Relay 3 of 4 (bottom)
     <<: *light_partition_relays
@@ -285,6 +438,11 @@ light:
       - id: light_full
         from: 8
         to: 8
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_eu_rl_3_4_bottom);
+          attr_global_ptr: !lambda return &id(attr_light_eu_rl_3_4_bottom);
   - id: light_eu_rl_3_4_top
     name: Light - Relay 3 of 4 (top)
     <<: *light_partition_relays
@@ -292,6 +450,11 @@ light:
       - id: light_full
         from: 24
         to: 24
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_eu_rl_3_4_top);
+          attr_global_ptr: !lambda return &id(attr_light_eu_rl_3_4_top);
   - id: light_eu_rl_4_4_bottom
     name: Light - Relay 4 of 4 (bottom)
     <<: *light_partition_relays
@@ -299,6 +462,11 @@ light:
       - id: light_full
         from: 6
         to: 6
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_eu_rl_4_4_bottom);
+          attr_global_ptr: !lambda return &id(attr_light_eu_rl_4_4_bottom);
   - id: light_eu_rl_4_4_top
     name: Light - Relay 4 of 4 (top)
     <<: *light_partition_relays
@@ -306,6 +474,11 @@ light:
       - id: light_full
         from: 26
         to: 26
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_eu_rl_4_4_top);
+          attr_global_ptr: !lambda return &id(attr_light_eu_rl_4_4_top);
   - id: light_us_rl_1_1_left
     name: Light - Relay 1 of 1 (left)
     <<: *light_partition_relays
@@ -313,6 +486,11 @@ light:
       - id: light_full
         from: 15
         to: 24
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_us_rl_1_1_left);
+          attr_global_ptr: !lambda return &id(attr_light_us_rl_1_1_left);
   - id: light_us_rl_1_1_right
     name: Light - Relay 1 of 1 (right)
     <<: *light_partition_relays
@@ -323,6 +501,11 @@ light:
       - id: light_full
         from: 0
         to: 8
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_us_rl_1_1_right);
+          attr_global_ptr: !lambda return &id(attr_light_us_rl_1_1_right);
   - id: light_us_rl_1_2_left
     name: Light - Relay 1 of 2 (left)
     <<: *light_partition_relays
@@ -330,6 +513,11 @@ light:
       - id: light_full
         from: 20
         to: 24
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_us_rl_1_2_left);
+          attr_global_ptr: !lambda return &id(attr_light_us_rl_1_2_left);
   - id: light_us_rl_1_2_right
     name: Light - Relay 1 of 2 (right)
     <<: *light_partition_relays
@@ -340,6 +528,11 @@ light:
       - id: light_full
         from: 0
         to: 3
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_us_rl_1_2_right);
+          attr_global_ptr: !lambda return &id(attr_light_us_rl_1_2_right);
   - id: light_us_rl_2_2_left
     name: Light - Relay 2 of 2 (left)
     <<: *light_partition_relays
@@ -347,6 +540,11 @@ light:
       - id: light_full
         from: 15
         to: 19
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_us_rl_2_2_left);
+          attr_global_ptr: !lambda return &id(attr_light_us_rl_2_2_left);
   - id: light_us_rl_2_2_right
     name: Light - Relay 2 of 2 (right)
     <<: *light_partition_relays
@@ -354,6 +552,11 @@ light:
       - id: light_full
         from: 4
         to: 8
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_us_rl_2_2_right);
+          attr_global_ptr: !lambda return &id(attr_light_us_rl_2_2_right);
   - id: light_us_rl_1_3_left
     name: Light - Relay 1 of 3 (left)
     <<: *light_partition_relays
@@ -361,6 +564,11 @@ light:
       - id: light_full
         from: 22
         to: 23
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_us_rl_1_3_left);
+          attr_global_ptr: !lambda return &id(attr_light_us_rl_1_3_left);
   - id: light_us_rl_1_3_right
     name: Light - Relay 1 of 3 (right)
     <<: *light_partition_relays
@@ -368,6 +576,11 @@ light:
       - id: light_full
         from: 0
         to: 1
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_us_rl_1_3_right);
+          attr_global_ptr: !lambda return &id(attr_light_us_rl_1_3_right);
   - id: light_us_rl_2_3_left
     name: Light - Relay 2 of 3 (left)
     <<: *light_partition_relays
@@ -375,6 +588,11 @@ light:
       - id: light_full
         from: 19
         to: 20
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_us_rl_2_3_left);
+          attr_global_ptr: !lambda return &id(attr_light_us_rl_2_3_left);
   - id: light_us_rl_2_3_right
     name: Light - Relay 2 of 3 (right)
     <<: *light_partition_relays
@@ -382,6 +600,11 @@ light:
       - id: light_full
         from: 3
         to: 4
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_us_rl_2_3_right);
+          attr_global_ptr: !lambda return &id(attr_light_us_rl_2_3_right);
   - id: light_us_rl_3_3_left
     name: Light - Relay 3 of 3 (left)
     <<: *light_partition_relays
@@ -389,6 +612,11 @@ light:
       - id: light_full
         from: 16
         to: 17
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_us_rl_3_3_left);
+          attr_global_ptr: !lambda return &id(attr_light_us_rl_3_3_left);
   - id: light_us_rl_3_3_right
     name: Light - Relay 3 of 3 (right)
     <<: *light_partition_relays
@@ -396,6 +624,11 @@ light:
       - id: light_full
         from: 6
         to: 7
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_us_rl_3_3_right);
+          attr_global_ptr: !lambda return &id(attr_light_us_rl_3_3_right);
   - id: light_us_rl_1_4_left
     name: Light - Relay 1 of 4 (left)
     <<: *light_partition_relays
@@ -403,6 +636,11 @@ light:
       - id: light_full
         from: 23
         to: 24
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_us_rl_1_4_left);
+          attr_global_ptr: !lambda return &id(attr_light_us_rl_1_4_left);
   - id: light_us_rl_1_4_right
     name: Light - Relay 1 of 4 (right)
     <<: *light_partition_relays
@@ -413,6 +651,11 @@ light:
       - id: light_full
         from: 0
         to: 0
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_us_rl_1_4_right);
+          attr_global_ptr: !lambda return &id(attr_light_us_rl_1_4_right);
   - id: light_us_rl_2_4_left
     name: Light - Relay 2 of 4 (left)
     <<: *light_partition_relays
@@ -420,6 +663,11 @@ light:
       - id: light_full
         from: 21
         to: 22
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_us_rl_2_4_left);
+          attr_global_ptr: !lambda return &id(attr_light_us_rl_2_4_left);
   - id: light_us_rl_2_4_right
     name: Light - Relay 2 of 4 (right)
     <<: *light_partition_relays
@@ -427,6 +675,11 @@ light:
       - id: light_full
         from: 1
         to: 2
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_us_rl_2_4_right);
+          attr_global_ptr: !lambda return &id(attr_light_us_rl_2_4_right);
   - id: light_us_rl_3_4_left
     name: Light - Relay 3 of 4 (left)
     <<: *light_partition_relays
@@ -434,6 +687,11 @@ light:
       - id: light_full
         from: 17
         to: 18
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_us_rl_3_4_left);
+          attr_global_ptr: !lambda return &id(attr_light_us_rl_3_4_left);
   - id: light_us_rl_3_4_right
     name: Light - Relay 3 of 4 (right)
     <<: *light_partition_relays
@@ -441,6 +699,11 @@ light:
       - id: light_full
         from: 5
         to: 6
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_us_rl_3_4_right);
+          attr_global_ptr: !lambda return &id(attr_light_us_rl_3_4_right);
   - id: light_us_rl_4_4_left
     name: Light - Relay 4 of 4 (left)
     <<: *light_partition_relays
@@ -448,6 +711,11 @@ light:
       - id: light_full
         from: 15
         to: 16
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_us_rl_4_4_left);
+          attr_global_ptr: !lambda return &id(attr_light_us_rl_4_4_left);
   - id: light_us_rl_4_4_right
     name: Light - Relay 4 of 4 (right)
     <<: *light_partition_relays
@@ -455,6 +723,11 @@ light:
       - id: light_full
         from: 7
         to: 8
+    on_state:
+      - script.execute:
+          id: light_attributes_save
+          light_ptr: !lambda return id(light_us_rl_4_4_right);
+          attr_global_ptr: !lambda return &id(attr_light_us_rl_4_4_right);
 
 output:
   - id: output_relay_1
