@@ -13,6 +13,8 @@
 
 namespace esphome {
     namespace tx_ultimate_easy {
+        // Log tag
+        static const char *TAG = "tx_ultimate_easy.light";
 
         /**
         * @brief Light attributes structure for storing color and brightness data.
