@@ -2,6 +2,8 @@
 
 #pragma once
 
+#ifdef TX_ULTIMATE_EASY_CORE_HW_LEDS
+
 #include "esphome/core/automation.h"
 #include "esphome/core/component.h"
 #include "esphome/components/uart/uart.h"
@@ -13,9 +15,6 @@
 
 namespace esphome {
     namespace tx_ultimate_easy {
-        // Log tag
-        static const char *TAG = "tx_ultimate_easy.light";
-
         /**
         * @brief Light attributes structure for storing color and brightness data.
         * 
@@ -113,3 +112,5 @@ namespace esphome {
 
     } // namespace tx_ultimate_easy
 } // namespace esphome
+
+#endif  // TX_ULTIMATE_EASY_CORE_HW_LEDS
