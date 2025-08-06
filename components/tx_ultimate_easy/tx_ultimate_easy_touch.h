@@ -32,7 +32,7 @@ namespace esphome {
         constexpr int VALID_DATA_BYTE_3 = 0x02;
 
         // Log tag
-        static const char *TAG = "tx_ultimate_easy";
+        static const char *TAG = "tx_ultimate_easy.touch";
 
         struct TouchPoint {
             uint8_t button = 0;
