@@ -1,5 +1,7 @@
 // tx_ultimate_easy_light.cpp
 
+#ifdef TX_ULTIMATE_EASY_CORE_HW_LEDS
+
 #include "esphome/core/log.h"
 #include "tx_ultimate_easy_light.h"
 #include <cinttypes>
@@ -7,6 +9,9 @@
 
 namespace esphome {
     namespace tx_ultimate_easy {
+
+        // Log tag
+        static const char *TAG = "tx_ultimate_easy.light";
 
         // Constant definitions
         const LightAttributes LIGHT_ATTRS_DEFAULT = {100, 255, 255, 255};
@@ -49,3 +54,5 @@ namespace esphome {
 
     } // namespace tx_ultimate_easy
 } // namespace esphome
+
+#endif  // TX_ULTIMATE_EASY_CORE_HW_LEDS

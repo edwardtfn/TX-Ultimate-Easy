@@ -1,5 +1,7 @@
 // tx_ultimate_easy_touch.cpp
 
+#ifdef TX_ULTIMATE_EASY_CORE_HW_TOUCH
+
 #include "esphome/core/log.h"
 #include "tx_ultimate_easy_touch.h"
 #include <cinttypes>
@@ -7,6 +9,9 @@
 
 namespace esphome {
     namespace tx_ultimate_easy {
+
+        // Log tag
+        static const char *TAG = "tx_ultimate_easy.touch";
 
         void TxUltimateEasy::setup() {
             ESP_LOGI(TAG, "TX Ultimate Easy is initialized");
@@ -225,3 +230,5 @@ namespace esphome {
 
     } // namespace tx_ultimate_easy
 } // namespace esphome
+
+#endif  // TX_ULTIMATE_EASY_CORE_HW_TOUCH
