@@ -1028,6 +1028,25 @@ script:
           ESP_LOGCONFIG("${TAG_STD_HW_RELAYS}", "  Relay modes: %s", YESNO(id(boot_initialization_relays_relay_modes)));
           ESP_LOGCONFIG("${TAG_STD_HW_RELAYS}", "  Status LEDs: %s", YESNO(id(boot_initialization_relays_relay_leds)));
 
+          // Relay's LEDs modes
+          ESP_LOGCONFIG("${TAG_STD_HW_RELAYS}", "Relay%s LEDs mode%s:", gang_count_plural_suffix.c_str(),
+                                                                        gang_count_plural_suffix.c_str());
+          ESP_LOGCONFIG("${TAG_STD_HW_RELAYS}", "  Relay 1: %s", id(is_us_model) ?
+                                                                  sl_relay_1_light_mode_us->state.c_str() :
+                                                                  sl_relay_1_light_mode_eu->state.c_str());
+          if (id(gang_count) >= 2)
+            ESP_LOGCONFIG("${TAG_STD_HW_RELAYS}", "  Relay 2: %s", id(is_us_model) ?
+                                                                  sl_relay_2_light_mode_us->state.c_str() :
+                                                                  sl_relay_2_light_mode_eu->state.c_str());
+          if (id(gang_count) >= 3)
+            ESP_LOGCONFIG("${TAG_STD_HW_RELAYS}", "  Relay 3: %s", id(is_us_model) ?
+                                                                  sl_relay_3_light_mode_us->state.c_str() :
+                                                                  sl_relay_3_light_mode_eu->state.c_str());
+          if (id(gang_count) >= 4)
+            ESP_LOGCONFIG("${TAG_STD_HW_RELAYS}", "  Relay 4: %s", id(is_us_model) ?
+                                                                  sl_relay_4_light_mode_us->state.c_str() :
+                                                                  sl_relay_4_light_mode_eu->state.c_str());
+
   - id: !extend dump_config_list_packages
     then:
       - script.wait: dump_config
@@ -1294,6 +1313,42 @@ script:
           }
 
 select:
+  # EU relay light mode template
+  - &relay_light_mode_eu
+    id: sl_relay_1_light_mode_eu
+    name: Relay 1 light mode EU
+    platform: template
+    options:
+      - "${LIGHT_MODE_DISABLED_TEXT}"
+      - "${LIGHT_MODE_BOTTOM_TEXT}"
+      - "${LIGHT_MODE_TOP_TEXT}"
+      - "${LIGHT_MODE_BOTH_TEXT}"
+    initial_option: "${LIGHT_MODE_BOTTOM_TEXT}"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dots-square
+
+  # US relay light mode template
+  - &relay_light_mode_us
+    id: sl_relay_1_light_mode_us
+    name: Relay 1 light mode US
+    platform: template
+    options:
+      - "${LIGHT_MODE_DISABLED_TEXT}"
+      - "${LIGHT_MODE_LEFT_TEXT}"
+      - "${LIGHT_MODE_RIGHT_TEXT}"
+      - "${LIGHT_MODE_BOTH_TEXT}"
+    initial_option: "${LIGHT_MODE_RIGHT_TEXT}"
+    optimistic: true
+    restore_value: true
+    internal: true
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:dots-square
+
   - id: sl_relay_1_mode
     name: Relay 1 display mode
     platform: template
@@ -1316,6 +1371,15 @@ select:
         - lambda: |-
             id(relay_modes_packed) = (id(relay_modes_packed) & ~(0x0F << 0)) |
                                       ((id(sl_relay_1_mode).active_index().value_or(1) & 0x0F) << 0);
+
+  - id: sl_relay_2_light_mode_eu
+    name: Relay 2 light mode EU
+    <<: *relay_light_mode_eu
+
+  - id: sl_relay_2_light_mode_us
+    name: Relay 2 light mode US
+    <<: *relay_light_mode_us
+
   - id: sl_relay_2_mode
     name: Relay 2 display mode
     platform: template
@@ -1338,6 +1402,15 @@ select:
         - lambda: |-
             id(relay_modes_packed) = (id(relay_modes_packed) & ~(0x0F << 4)) |
                                       ((id(sl_relay_2_mode).active_index().value_or(1) & 0x0F) << 4);
+
+  - id: sl_relay_3_light_mode_eu
+    name: Relay 3 light mode EU
+    <<: *relay_light_mode_eu
+
+  - id: sl_relay_3_light_mode_us
+    name: Relay 3 light mode US
+    <<: *relay_light_mode_us
+
   - id: sl_relay_3_mode
     name: Relay 3 display mode
     platform: template
@@ -1360,6 +1433,15 @@ select:
         - lambda: |-
             id(relay_modes_packed) = (id(relay_modes_packed) & ~(0x0F << 8)) |
                                       ((id(sl_relay_3_mode).active_index().value_or(1) & 0x0F) << 8);
+
+  - id: sl_relay_4_light_mode_eu
+    name: Relay 4 light mode EU
+    <<: *relay_light_mode_eu
+
+  - id: sl_relay_4_light_mode_us
+    name: Relay 4 light mode US
+    <<: *relay_light_mode_us
+
   - id: sl_relay_4_mode
     name: Relay 4 display mode
     platform: template
@@ -1510,4 +1592,5 @@ switch:
               - light.turn_off: light_output_4
         - lambda: |-
             id(relay_switches_packed) &= ~0x10;  // Clear bit 4
+
 ...
