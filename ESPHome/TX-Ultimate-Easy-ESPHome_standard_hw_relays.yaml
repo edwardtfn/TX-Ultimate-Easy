@@ -25,7 +25,36 @@ esphome:
     build_flags:
       - -D TX_ULTIMATE_EASY_STANDARD_HW_RELAYS
 
+external_components:
+  - source: github://pr#10105  # To-do: remove after this PR is released
+    components: [switch]
+    refresh: 1h
+
 globals:
+  - &global_attr_dual_light
+    id: attr_light_rl_1_1_both  # 1-gang: relay 1, both groups
+    type: uint64_t
+    restore_value: true
+    initial_value: '${LIGHT_DUAL_ATTRS_DEFAULT}'
+  - id: attr_light_rl_1_2_both  # 2-gang: relay 1, both groups
+    <<: *global_attr_dual_light
+  - id: attr_light_rl_2_2_both  # 2-gang: relay 2, both groups
+    <<: *global_attr_dual_light
+  - id: attr_light_rl_1_3_both  # 3-gang: relay 1, both groups
+    <<: *global_attr_dual_light
+  - id: attr_light_rl_2_3_both  # 3-gang: relay 2, both groups
+    <<: *global_attr_dual_light
+  - id: attr_light_rl_3_3_both  # 3-gang: relay 3, both groups
+    <<: *global_attr_dual_light
+  - id: attr_light_rl_1_4_both  # 4-gang: relay 1, both groups
+    <<: *global_attr_dual_light
+  - id: attr_light_rl_2_4_both  # 4-gang: relay 2, both groups
+    <<: *global_attr_dual_light
+  - id: attr_light_rl_3_4_both  # 4-gang: relay 3, both groups
+    <<: *global_attr_dual_light
+  - id: attr_light_rl_4_4_both  # 4-gang: relay 4, both groups
+    <<: *global_attr_dual_light
+
   - id: boot_initialization_relays
     type: bool
     restore_value: false
@@ -54,6 +83,14 @@ globals:
     type: std::vector<light::LightState*>
     restore_value: false
 
+  # Packed relay light modes - stores current model's 4 light modes
+  - id: relay_light_modes_packed
+    type: uint16_t
+    restore_value: true
+    initial_value: '0x1111'  # All 4 relays set to option 1 (bottom/left)
+    # Bit layout: [relay4(4)][relay3(4)][relay2(4)][relay1(4)]
+    # 16-bit value with 4 bits per relay: 0=Disabled, 1=Bottom/Left, 2=Top/Right, 3=Both, 4-15=Reserved
+
   # Packed relay modes - replaces 4 separate selects
   - id: relay_modes_packed
     type: uint16_t
@@ -68,30 +105,6 @@ globals:
     restore_value: true
     initial_value: '0'  # All switches default to OFF
     # Bit layout: [unused(3)][sw_relay4][sw_relay3][sw_relay2][sw_relay1][sw_expose_leds]
-
-  - &global_attr_dual_light
-    id: attr_light_rl_1_1_both  # 1-gang: relay 1, both groups
-    type: uint64_t
-    restore_value: true
-    initial_value: '${LIGHT_DUAL_ATTRS_DEFAULT}'
-  - id: attr_light_rl_1_2_both  # 2-gang: relay 1, both groups
-    <<: *global_attr_dual_light
-  - id: attr_light_rl_2_2_both  # 2-gang: relay 2, both groups
-    <<: *global_attr_dual_light
-  - id: attr_light_rl_1_3_both  # 3-gang: relay 1, both groups
-    <<: *global_attr_dual_light
-  - id: attr_light_rl_2_3_both  # 3-gang: relay 2, both groups
-    <<: *global_attr_dual_light
-  - id: attr_light_rl_3_3_both  # 3-gang: relay 3, both groups
-    <<: *global_attr_dual_light
-  - id: attr_light_rl_1_4_both  # 4-gang: relay 1, both groups
-    <<: *global_attr_dual_light
-  - id: attr_light_rl_2_4_both  # 4-gang: relay 2, both groups
-    <<: *global_attr_dual_light
-  - id: attr_light_rl_3_4_both  # 4-gang: relay 3, both groups
-    <<: *global_attr_dual_light
-  - id: attr_light_rl_4_4_both  # 4-gang: relay 4, both groups
-    <<: *global_attr_dual_light
 
 light:
   # These lights are used for the physical relays to be shown as lights
@@ -181,7 +194,7 @@ light:
     internal: true
     disabled_by_default: false
     default_transition_length: ${default_transition_length}
-    restore_mode: ${LIGHT_RELAYS_RESTORE_MODE}
+    restore_mode: ALWAYS_OFF
     segments:
       - id: light_full
         from: 9
@@ -1143,42 +1156,50 @@ script:
           id: sl_relay_4_mode
           index: !lambda return std::min((uint8_t)((id(relay_modes_packed) >> 12) & 0x0F), (uint8_t)2);
 
+      # Light mode restoration - restore to active model's selects only
+      # Restore US light modes
+      - select.set_index:
+          id: sl_relay_1_light_mode_us
+          index: !lambda return std::min((uint8_t)(id(relay_light_modes_packed) & 0x0F), (uint8_t)3);
+      - select.set_index:
+          id: sl_relay_2_light_mode_us
+          index: !lambda return std::min((uint8_t)((id(relay_light_modes_packed) >> 4) & 0x0F), (uint8_t)3);
+      - select.set_index:
+          id: sl_relay_3_light_mode_us
+          index: !lambda return std::min((uint8_t)((id(relay_light_modes_packed) >> 8) & 0x0F), (uint8_t)3);
+      - select.set_index:
+          id: sl_relay_4_light_mode_us
+          index: !lambda return std::min((uint8_t)((id(relay_light_modes_packed) >> 12) & 0x0F), (uint8_t)3);
+      # Restore EU light modes
+      - select.set_index:
+          id: sl_relay_1_light_mode_eu
+          index: !lambda return std::min((uint8_t)(id(relay_light_modes_packed) & 0x0F), (uint8_t)3);
+      - select.set_index:
+          id: sl_relay_2_light_mode_eu
+          index: !lambda return std::min((uint8_t)((id(relay_light_modes_packed) >> 4) & 0x0F), (uint8_t)3);
+      - select.set_index:
+          id: sl_relay_3_light_mode_eu
+          index: !lambda return std::min((uint8_t)((id(relay_light_modes_packed) >> 8) & 0x0F), (uint8_t)3);
+      - select.set_index:
+          id: sl_relay_4_light_mode_eu
+          index: !lambda return std::min((uint8_t)((id(relay_light_modes_packed) >> 12) & 0x0F), (uint8_t)3);
+
       # Switch states
-      - if:
-          condition:
-            lambda: return (id(relay_switches_packed) & 0x01) == 0;
-          then:
-            - switch.turn_off: sw_expose_relays_leds_to_ha
-          else:
-            - switch.turn_on: sw_expose_relays_leds_to_ha
-      - if:
-          condition:
-            lambda: return (id(relay_switches_packed) & 0x02) == 0;
-          then:
-            - switch.turn_off: sw_relay_1
-          else:
-            - switch.turn_on: sw_relay_1
-      - if:
-          condition:
-            lambda: return (id(relay_switches_packed) & 0x04) == 0;
-          then:
-            - switch.turn_off: sw_relay_2
-          else:
-            - switch.turn_on: sw_relay_2
-      - if:
-          condition:
-            lambda: return (id(relay_switches_packed) & 0x08) == 0;
-          then:
-            - switch.turn_off: sw_relay_3
-          else:
-            - switch.turn_on: sw_relay_3
-      - if:
-          condition:
-            lambda: return (id(relay_switches_packed) & 0x10) == 0;
-          then:
-            - switch.turn_off: sw_relay_4
-          else:
-            - switch.turn_on: sw_relay_4
+      - switch.control:
+          id: sw_expose_relays_leds_to_ha
+          state: !lambda return (id(relay_switches_packed) & 0x01);
+      - switch.control:
+          id: sw_relay_1
+          state: !lambda return (id(relay_switches_packed) & 0x02);
+      - switch.control:
+          id: sw_relay_2
+          state: !lambda return (id(relay_switches_packed) & 0x04);
+      - switch.control:
+          id: sw_relay_3
+          state: !lambda return (id(relay_switches_packed) & 0x08);
+      - switch.control:
+          id: sw_relay_4
+          state: !lambda return (id(relay_switches_packed) & 0x10);
 
       # update lights based on new relay statuses (catch up, as this should be done when each relay is updated)
       - script.execute: show_relay_status
@@ -1325,11 +1346,15 @@ select:
       - "${LIGHT_MODE_BOTH_TEXT}"
     initial_option: "${LIGHT_MODE_BOTTOM_TEXT}"
     optimistic: true
-    restore_value: true
+    restore_value: false
     internal: true
     entity_category: config
     disabled_by_default: false
     icon: mdi:dots-square
+    on_value:
+      - lambda: |-
+          id(relay_light_modes_packed) = (id(relay_light_modes_packed) & ~(0x0F << 0)) |
+                                        ((id(sl_relay_1_light_mode_eu).active_index().value_or(1) & 0x0F) << 0);
 
   # US relay light mode template
   - &relay_light_mode_us
@@ -1343,11 +1368,15 @@ select:
       - "${LIGHT_MODE_BOTH_TEXT}"
     initial_option: "${LIGHT_MODE_RIGHT_TEXT}"
     optimistic: true
-    restore_value: true
+    restore_value: false
     internal: true
     entity_category: config
     disabled_by_default: false
     icon: mdi:dots-square
+    on_value:
+      - lambda: |-
+          id(relay_light_modes_packed) = (id(relay_light_modes_packed) & ~(0x0F << 0)) |
+                                        ((id(sl_relay_1_light_mode_us).active_index().value_or(1) & 0x0F) << 0);
 
   - id: sl_relay_1_mode
     name: Relay 1 display mode
@@ -1358,7 +1387,7 @@ select:
       - "${RELAY_MODE_TEXT_NOT_USED}"
     initial_option: "${RELAY_MODE_TEXT_SWITCH}"
     optimistic: true
-    restore_value: true
+    restore_value: false
     internal: true
     entity_category: config
     disabled_by_default: false
@@ -1370,15 +1399,23 @@ select:
             state: true
         - lambda: |-
             id(relay_modes_packed) = (id(relay_modes_packed) & ~(0x0F << 0)) |
-                                      ((id(sl_relay_1_mode).active_index().value_or(1) & 0x0F) << 0);
+                                      ((id(sl_relay_1_mode).active_index().value_or(0) & 0x0F) << 0);
 
   - id: sl_relay_2_light_mode_eu
     name: Relay 2 light mode EU
     <<: *relay_light_mode_eu
+    on_value:
+      - lambda: |-
+          id(relay_light_modes_packed) = (id(relay_light_modes_packed) & ~(0x0F << 4)) |
+                                        ((id(sl_relay_2_light_mode_eu).active_index().value_or(1) & 0x0F) << 4);
 
   - id: sl_relay_2_light_mode_us
     name: Relay 2 light mode US
     <<: *relay_light_mode_us
+    on_value:
+      - lambda: |-
+          id(relay_light_modes_packed) = (id(relay_light_modes_packed) & ~(0x0F << 4)) |
+                                        ((id(sl_relay_2_light_mode_us).active_index().value_or(1) & 0x0F) << 4);
 
   - id: sl_relay_2_mode
     name: Relay 2 display mode
@@ -1389,7 +1426,7 @@ select:
       - "${RELAY_MODE_TEXT_NOT_USED}"
     initial_option: "${RELAY_MODE_TEXT_SWITCH}"
     optimistic: true
-    restore_value: true
+    restore_value: false
     internal: true
     entity_category: config
     disabled_by_default: false
@@ -1401,15 +1438,23 @@ select:
             state: true
         - lambda: |-
             id(relay_modes_packed) = (id(relay_modes_packed) & ~(0x0F << 4)) |
-                                      ((id(sl_relay_2_mode).active_index().value_or(1) & 0x0F) << 4);
+                                      ((id(sl_relay_2_mode).active_index().value_or(0) & 0x0F) << 4);
 
   - id: sl_relay_3_light_mode_eu
     name: Relay 3 light mode EU
     <<: *relay_light_mode_eu
+    on_value:
+      - lambda: |-
+          id(relay_light_modes_packed) = (id(relay_light_modes_packed) & ~(0x0F << 8)) |
+                                        ((id(sl_relay_3_light_mode_eu).active_index().value_or(1) & 0x0F) << 8);
 
   - id: sl_relay_3_light_mode_us
     name: Relay 3 light mode US
     <<: *relay_light_mode_us
+    on_value:
+      - lambda: |-
+          id(relay_light_modes_packed) = (id(relay_light_modes_packed) & ~(0x0F << 8)) |
+                                        ((id(sl_relay_3_light_mode_us).active_index().value_or(1) & 0x0F) << 8);
 
   - id: sl_relay_3_mode
     name: Relay 3 display mode
@@ -1420,7 +1465,7 @@ select:
       - "${RELAY_MODE_TEXT_NOT_USED}"
     initial_option: "${RELAY_MODE_TEXT_SWITCH}"
     optimistic: true
-    restore_value: true
+    restore_value: false
     internal: true
     entity_category: config
     disabled_by_default: false
@@ -1432,15 +1477,23 @@ select:
             state: true
         - lambda: |-
             id(relay_modes_packed) = (id(relay_modes_packed) & ~(0x0F << 8)) |
-                                      ((id(sl_relay_3_mode).active_index().value_or(1) & 0x0F) << 8);
+                                      ((id(sl_relay_3_mode).active_index().value_or(0) & 0x0F) << 8);
 
   - id: sl_relay_4_light_mode_eu
     name: Relay 4 light mode EU
     <<: *relay_light_mode_eu
+    on_value:
+      - lambda: |-
+          id(relay_light_modes_packed) = (id(relay_light_modes_packed) & ~(0x0F << 12)) |
+                                        ((id(sl_relay_4_light_mode_eu).active_index().value_or(1) & 0x0F) << 12);
 
   - id: sl_relay_4_light_mode_us
     name: Relay 4 light mode US
     <<: *relay_light_mode_us
+    on_value:
+      - lambda: |-
+          id(relay_light_modes_packed) = (id(relay_light_modes_packed) & ~(0x0F << 12)) |
+                                        ((id(sl_relay_4_light_mode_eu).active_index().value_or(1) & 0x0F) << 12);
 
   - id: sl_relay_4_mode
     name: Relay 4 display mode
@@ -1451,7 +1504,7 @@ select:
       - "${RELAY_MODE_TEXT_NOT_USED}"
     initial_option: "${RELAY_MODE_TEXT_SWITCH}"
     optimistic: true
-    restore_value: true
+    restore_value: false
     internal: true
     entity_category: config
     disabled_by_default: false
@@ -1463,7 +1516,7 @@ select:
             state: true
         - lambda: |-
             id(relay_modes_packed) = (id(relay_modes_packed) & ~(0x0F << 12)) |
-                                      ((id(sl_relay_4_mode).active_index().value_or(1) & 0x0F) << 12);
+                                      ((id(sl_relay_4_mode).active_index().value_or(0) & 0x0F) << 12);
 
 switch:
   - id: sw_expose_relays_leds_to_ha
