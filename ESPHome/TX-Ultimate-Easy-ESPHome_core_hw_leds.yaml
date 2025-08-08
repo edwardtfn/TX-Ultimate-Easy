@@ -614,6 +614,10 @@ script:
             ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid attributes pointer");
             return;
           }
+          if (group_index != 1 && group_index != 2) {
+            ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid group_index=%d (expected 1 or 2)", group_index);
+            return;
+          }
           auto current = light_ptr->current_values;
           tx_ultimate_easy::LightAttributes new_attrs = {
             .brightness = uint8_t(current.get_brightness() * 100.0f),
