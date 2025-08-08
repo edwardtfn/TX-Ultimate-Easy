@@ -531,6 +531,14 @@ script:
       attr_global_ptr: uint32_t*
     then:
       - lambda: |-
+          if (!light_ptr) {
+            ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid light pointer");
+            return;
+          }
+          if (!attr_global_ptr) {
+            ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid attributes pointer");
+            return;
+          }
           tx_ultimate_easy::LightAttributes attrs = tx_ultimate_easy::unpack_light_attributes(*attr_global_ptr);
           auto call = light_ptr->make_call();
           call.set_brightness(attrs.brightness / 100.0f);
@@ -547,6 +555,14 @@ script:
       group_index: uint8_t  # 1 or 2
     then:
       - lambda: |-
+          if (!light_ptr) {
+            ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid light pointer");
+            return;
+          }
+          if (!attr_global_ptr) {
+            ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid attributes pointer");
+            return;
+          }
           auto attrs_pair = tx_ultimate_easy::unpack_dual_light_attributes(*attr_global_ptr);
           tx_ultimate_easy::LightAttributes attrs = (group_index == 1) ? attrs_pair.first : attrs_pair.second;
 
