@@ -563,6 +563,10 @@ script:
             ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid attributes pointer");
             return;
           }
+          if (group_index != 1 && group_index != 2) {
+            ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid group_index=%d (expected 1 or 2)", group_index);
+            return;
+          }
           auto attrs_pair = tx_ultimate_easy::unpack_dual_light_attributes(*attr_global_ptr);
           tx_ultimate_easy::LightAttributes attrs = (group_index == 1) ? attrs_pair.first : attrs_pair.second;
 
@@ -570,6 +574,8 @@ script:
           call.set_brightness(attrs.brightness / 100.0f);
           call.set_rgb(attrs.red / 255.0f, attrs.green / 255.0f, attrs.blue / 255.0f);
           call.perform();
+          ESP_LOGI("${TAG_CORE_HW_LEDS}", "Restored (group=%d) attributes: brightness=%d%%, RGB=(%d,%d,%d)",
+                                          group_index, attrs.brightness, attrs.red, attrs.green, attrs.blue);
 
   - id: light_attributes_save
     mode: parallel
