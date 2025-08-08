@@ -599,7 +599,7 @@ script:
                                           attrs.brightness, attrs.red, attrs.green, attrs.blue);
 
   - id: light_attributes_save_dual
-    mode: parallel
+    mode: queued  # To prevent two instances trying to change the same global
     parameters:
       light_ptr: light::LightState*
       attr_global_ptr: uint64_t*
