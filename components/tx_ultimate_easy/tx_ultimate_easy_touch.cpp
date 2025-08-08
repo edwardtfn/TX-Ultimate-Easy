@@ -74,8 +74,9 @@ namespace esphome {
             if (this->gang_count_ == 1)
                 return 1;
 
-            // Calculate button number Change to round up instead of truncate (integer division)
-            const uint8_t width = (TOUCH_MAX_POSITION + gang_count_) / this->gang_count_;  // Width of each button region
+            // Calculate button width (rounds up to ensure full coverage)
+            const uint8_t width =
+                (TOUCH_MAX_POSITION + this->gang_count_) / this->gang_count_;  // Width of each button region
             if (width < 1)  // Invalid width - and prevents division by zero 
                 return 0;
             const uint8_t button = std::min(

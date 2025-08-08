@@ -16,7 +16,12 @@ substitutions:
   RELAY_MODE_TEXT_LIGHT: "Light"
   RELAY_MODE_TEXT_NOT_USED: "Not in use"
 
-  LIGHT_RELAYS_RESTORE_MODE: ALWAYS_OFF
+  # You shouldn't change the restore mode as there is a custom restoring engine based on globals.
+  # The reason of a custom engine is to address an issue where NVS space was exceeded causing saving/restoring issues
+  RELAYS_LIGHT_RESTORE_MODE: ALWAYS_OFF
+  RELAYS_LIGHT_PARTITION_RESTORE_MODE: ALWAYS_OFF
+  RELAYS_EXPOSE_LEDS_TO_HA_RESTORE_MODE: ALWAYS_OFF
+  RELAYS_SWITCH_RESTORE_MODE: ALWAYS_OFF
 
   TAG_STD_HW_RELAYS: std.hw.relays
 
@@ -24,11 +29,6 @@ esphome:
   platformio_options:
     build_flags:
       - -D TX_ULTIMATE_EASY_STANDARD_HW_RELAYS
-
-external_components:
-  - source: github://pr#10105  # To-do: remove after this PR is released
-    components: [switch]
-    refresh: 1h
 
 globals:
   - &global_attr_dual_light
@@ -113,7 +113,7 @@ light:
     output: output_relay_1
     platform: binary
     internal: true
-    restore_mode: ${LIGHT_RELAYS_RESTORE_MODE}
+    restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
         - if:
@@ -194,7 +194,7 @@ light:
     internal: true
     disabled_by_default: false
     default_transition_length: ${default_transition_length}
-    restore_mode: ALWAYS_OFF
+    restore_mode: ${RELAYS_LIGHT_PARTITION_RESTORE_MODE}
     segments:
       - id: light_full
         from: 9
@@ -1522,7 +1522,7 @@ switch:
   - id: sw_expose_relays_leds_to_ha
     name: Expose Relay's LEDs to Home Assistant
     platform: template
-    restore_mode: ALWAYS_OFF
+    restore_mode: ${RELAYS_EXPOSE_LEDS_TO_HA_RESTORE_MODE}
     optimistic: true
     internal: false
     entity_category: config
@@ -1545,7 +1545,7 @@ switch:
     name: Relay 1
     output: output_relay_1
     platform: output
-    restore_mode: ALWAYS_OFF
+    restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
     internal: true
     on_turn_on:
       then:
@@ -1571,7 +1571,7 @@ switch:
     name: Relay 2
     output: output_relay_2
     platform: output
-    restore_mode: ALWAYS_OFF
+    restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
     internal: true
     on_turn_on:
       then:
@@ -1597,7 +1597,7 @@ switch:
     name: Relay 3
     output: output_relay_3
     platform: output
-    restore_mode: ALWAYS_OFF
+    restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
     internal: true
     on_turn_on:
       then:
@@ -1623,7 +1623,7 @@ switch:
     name: Relay 4
     output: output_relay_4
     platform: output
-    restore_mode: ALWAYS_OFF
+    restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
     internal: true
     on_turn_on:
       then:

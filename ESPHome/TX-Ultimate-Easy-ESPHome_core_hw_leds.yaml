@@ -29,8 +29,8 @@ substitutions:
   LIGHT_SIDES_RESTORE_MODE: RESTORE_DEFAULT_OFF
   LIGHT_INDIVIDUAL_RESTORE_MODE: RESTORE_DEFAULT_OFF
 
-  LIGHT_ATTRS_DEFAULT: '0x64FFFFFF'  # brightness=100, RGB=255,255,255
-  LIGHT_DUAL_ATTRS_DEFAULT: '0x64FFFFFF64FFFFFF'  # Both lights: brightness=100, RGB=255,255,255
+  LIGHT_ATTRS_DEFAULT: '0x64FFFFFF'                 # brightness=100, RGB=255,255,255
+  LIGHT_DUAL_ATTRS_DEFAULT: '0x0064FFFFFF64FFFFFF'  # Both lights: brightness=100, RGB=255,255,255
 
   TAG_CORE_HW_LEDS: core.hw.leds
 
@@ -562,6 +562,14 @@ script:
       attr_global_ptr: uint32_t*
     then:
       - lambda: |-
+          if (!light_ptr) {
+            ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid light pointer");
+            return;
+          }
+          if (!attr_global_ptr) {
+            ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid attributes pointer");
+            return;
+          }
           auto current = light_ptr->current_values;
           tx_ultimate_easy::LightAttributes attrs = {
             .brightness = uint8_t(current.get_brightness() * 100.0f),
@@ -582,6 +590,14 @@ script:
       group_index: uint8_t  # 1 or 2 (which group within the dual pack)
     then:
       - lambda: |-
+          if (!light_ptr) {
+            ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid light pointer");
+            return;
+          }
+          if (!attr_global_ptr) {
+            ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid attributes pointer");
+            return;
+          }
           auto current = light_ptr->current_values;
           tx_ultimate_easy::LightAttributes new_attrs = {
             .brightness = uint8_t(current.get_brightness() * 100.0f),
