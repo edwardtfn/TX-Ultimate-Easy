@@ -151,20 +151,17 @@ switch:
     pin: GPIO21
     restore_mode: ALWAYS_OFF
     internal: true
-    on_turn_on:
+    on_state:
       then:
         - binary_sensor.template.publish:
             id: bs_vibrating
-            state: ON  # yamllint disable-line rule:truthy
+            state: !lambda return x;
+    on_turn_on:
+      then:
         - delay: ${vibration_max_duration}
         - if:
             condition:
               switch.is_on: sw_vibration_motor
             then:
               - switch.turn_off: sw_vibration_motor
-    on_turn_off:
-      then:
-        - binary_sensor.template.publish:
-            id: bs_vibrating
-            state: OFF  # yamllint disable-line rule:truthy
 ...
