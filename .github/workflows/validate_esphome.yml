@@ -65,6 +65,19 @@ jobs:
           yaml-file: ".test/esphome_ard_core.yaml"
           version: latest
 
+  build_ard_core_dev:
+    name: "🏗️ Arduino Core (dev)"
+    needs: code_scan
+    if: success() && !github.event.inputs.skip_dev
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build Arduino Core - dev
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_ard_core.yaml"
+          version: dev
+
   build_ard_basic:
     name: "📦 Arduino Basic (latest)"
     needs: build_ard_core
@@ -79,7 +92,7 @@ jobs:
 
   build_ard_basic_dev:
     name: "📦 Arduino Basic (dev)"
-    needs: build_ard_core
+    needs: build_ard_core_dev
     if: success() && !github.event.inputs.skip_dev
     runs-on: ubuntu-latest
     steps:
@@ -164,6 +177,19 @@ jobs:
           yaml-file: ".test/esphome_idf_core.yaml"
           version: latest
 
+  build_idf_core_dev:
+    name: "🏗️ IDF Core (dev)"
+    needs: code_scan
+    if: success() && !github.event.inputs.skip_dev
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build IDF Core - dev
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_idf_core.yaml"
+          version: dev
+
   build_idf_basic:
     name: "📦 IDF Basic (latest)"
     needs: build_idf_core
@@ -178,7 +204,7 @@ jobs:
 
   build_idf_basic_dev:
     name: "📦 IDF Basic (dev)"
-    needs: build_idf_core
+    needs: build_idf_core_dev
     if: success() && !github.event.inputs.skip_dev
     runs-on: ubuntu-latest
     steps:
@@ -255,6 +281,7 @@ jobs:
     name: "📊 Arduino Framework"
     needs:
       - build_ard_core
+      - build_ard_core_dev
       - build_ard_basic
       - build_ard_basic_dev
       - build_ard_hw_relays
@@ -281,9 +308,10 @@ jobs:
 
           # Count dev builds (if not skipped)
           if [ "${{ github.event.inputs.skip_dev }}" != "true" ]; then
+            [ "${{ needs.build_ard_core_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             [ "${{ needs.build_ard_basic_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             [ "${{ needs.build_ard_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-            TOTAL=$((TOTAL + 2))
+            TOTAL=$((TOTAL + 3))
           fi
 
           echo "🤖 Arduino Framework: $SUCCESS/$TOTAL builds passed"
@@ -299,6 +327,7 @@ jobs:
     name: "📊 ESP-IDF Framework"
     needs:
       - build_idf_core
+      - build_idf_core_dev
       - build_idf_basic
       - build_idf_basic_dev
       - build_idf_hw_relays
@@ -325,9 +354,10 @@ jobs:
 
           # Count dev builds (if not skipped)
           if [ "${{ github.event.inputs.skip_dev }}" != "true" ]; then
+            [ "${{ needs.build_idf_core_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             [ "${{ needs.build_idf_basic_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             [ "${{ needs.build_idf_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-            TOTAL=$((TOTAL + 2))
+            TOTAL=$((TOTAL + 3))
           fi
 
           echo "🔧 ESP-IDF Framework: $SUCCESS/$TOTAL builds passed"
@@ -390,8 +420,10 @@ jobs:
   summary_dev:
     name: "📊 ESPHome (Dev)"
     needs:
+      - build_ard_core_dev
       - build_ard_basic_dev
       - build_ard_ble_proxy_dev
+      - build_idf_core_dev
       - build_idf_basic_dev
       - build_idf_ble_proxy_dev
     if: always() && !github.event.inputs.skip_dev
@@ -400,13 +432,15 @@ jobs:
       - name: Dev ESPHome Results
         run: |
           SUCCESS=0
-          TOTAL=4
+          TOTAL=6
 
           # Arduino Dev builds
+          [ "${{ needs.build_ard_core_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_basic_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
 
           # ESP-IDF Dev builds
+          [ "${{ needs.build_idf_core_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_basic_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
 
