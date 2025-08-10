@@ -27,7 +27,7 @@ substitutions:
   TX_MODEL_3_GANG_TEXT: "3 Gang"
   TX_MODEL_4_GANG_TEXT: "4 Gang"
 
-  DUMP_CONFIG_CALLER_DELAY: 10s  # Delay to dump config after requested
+  DUMP_CONFIG_CALLER_DELAY: 5s  # Delay to dump config after requested
 
   TAG_CORE_COMMON: core.common
 
@@ -48,11 +48,18 @@ binary_sensor:
     device_class: problem
     on_state:
       then:
-        - lambda: |-
-            if (x)
-              ESP_LOGW("${TAG_CORE_COMMON}", "Pending restart: YES");
-            else
-              ESP_LOGD("${TAG_CORE_COMMON}", "Pending restart: No");
+        - script.execute: dump_config_caller
+
+  - id: bs_boot_completed
+    name: Boot Completed
+    internal: false
+    disabled_by_default: false
+    platform: template
+    entity_category: diagnostic
+    device_class: connectivity
+    icon: mdi:rocket-launch
+    on_state:
+      then:
         - script.execute: dump_config_caller
 
 button:
@@ -80,6 +87,12 @@ esphome:
       - -D TX_ULTIMATE_EASY_CORE_COMMON
 
   on_boot:
+    - priority: 1000  # Very early in boot process
+      then:
+        - binary_sensor.template.publish:
+            id: bs_boot_completed
+            state: OFF  # yamllint disable-line rule:truthy
+
     - priority: 750
       then:
         - script.execute: restore_from_nvs
@@ -106,15 +119,15 @@ external_components:
       - tx_ultimate_easy
 
 globals:
-  - id: is_us_model
-    type: bool
-    restore_value: true
-    initial_value: 'false'
-
   - id: gang_count
     type: uint8_t
     restore_value: true
     initial_value: '0'
+
+  - id: is_us_model
+    type: bool
+    restore_value: true
+    initial_value: 'false'
 
 logger:
   level: DEBUG
@@ -143,9 +156,16 @@ script:
   - id: boot_done
     mode: restart
     then:
+      - script.wait: restore_from_nvs
+      - script.wait: boot_initialize
+      - script.wait: boot_sequence
       - script.execute:
           id: api_send_ha_event_boot
           type: done
+      - script.wait: api_send_ha_event_boot
+      - binary_sensor.template.publish:
+          id: bs_boot_completed
+          state: ON  # yamllint disable-line rule:truthy
 
   - id: boot_initialize
     mode: restart
@@ -207,6 +227,12 @@ script:
                           sl_tx_model_gang->state.c_str());
           ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Gangs (detected): %" PRIu8 "-Gang%s",
                           id(gang_count), id(gang_count) > 1 ? "s" : "");
+
+          // Boot completion status
+          if (bs_boot_completed->state)
+            ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Boot completed: Yes");
+          else
+            ESP_LOGW("${TAG_CORE_COMMON}", "Boot completed: NO");
 
           // System state
           if (bs_pending_restart->state)
