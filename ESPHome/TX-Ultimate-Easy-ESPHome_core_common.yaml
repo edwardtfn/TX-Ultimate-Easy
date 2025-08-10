@@ -283,7 +283,9 @@ script:
           index: !lambda if (id(is_us_model)) return 1; else return 0;
       - select.set_index:
           id: sl_tx_model_gang
-          index: !lambda return (id(gang_count)-1);
+          index: !lambda |-
+            if (id(gang_count) < 1 || id(gang_count) > 4) return 0;  // default to 1-Gang
+            return static_cast<uint8_t>(id(gang_count)) - 1;
 
 select:
   - id: sl_tx_model_format
