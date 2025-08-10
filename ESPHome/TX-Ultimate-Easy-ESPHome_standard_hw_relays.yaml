@@ -1368,15 +1368,13 @@ select:
             return;
           }
 
-          if (previous_mode != "${LIGHT_MODE_DISABLED_TEXT}" && 
-              current_mode == "${LIGHT_MODE_DISABLED_TEXT}") {
+          if (previous_mode != "${LIGHT_MODE_DISABLED_TEXT}" && current_mode == "${LIGHT_MODE_DISABLED_TEXT}") {
             // Transitioning TO Disabled - turn off lights
             ESP_LOGI("${TAG_STD_HW_RELAYS}",
                       "Relay 1 light mode changed to ${LIGHT_MODE_DISABLED_TEXT} - turning off lights");
             id(light_set_state)->execute(1, 0, false);  // Group 1, relay index 0
             id(light_set_state)->execute(2, 0, false);  // Group 2, relay index 0
-          } else if (previous_mode == "${LIGHT_MODE_DISABLED_TEXT}" && 
-                    current_mode != "${LIGHT_MODE_DISABLED_TEXT}") {
+          } else if (previous_mode == "${LIGHT_MODE_DISABLED_TEXT}" && current_mode != "${LIGHT_MODE_DISABLED_TEXT}") {
             // Transitioning FROM Disabled - update lights based on relay state
             ESP_LOGI("${TAG_STD_HW_RELAYS}",
                       "Relay 1 light mode changed from ${LIGHT_MODE_DISABLED_TEXT} - updating lights");
@@ -1425,15 +1423,13 @@ select:
             return;
           }
 
-          if (previous_mode != "${LIGHT_MODE_DISABLED_TEXT}" && 
-              current_mode == "${LIGHT_MODE_DISABLED_TEXT}") {
+          if (previous_mode != "${LIGHT_MODE_DISABLED_TEXT}" && current_mode == "${LIGHT_MODE_DISABLED_TEXT}") {
             // Transitioning TO Disabled - turn off lights
             ESP_LOGI("${TAG_STD_HW_RELAYS}",
                       "Relay 1 light mode changed to ${LIGHT_MODE_DISABLED_TEXT} - turning off lights");
             id(light_set_state)->execute(1, 0, false);  // Group 1, relay index 0
             id(light_set_state)->execute(2, 0, false);  // Group 2, relay index 0
-          } else if (previous_mode == "${LIGHT_MODE_DISABLED_TEXT}" && 
-                    current_mode != "${LIGHT_MODE_DISABLED_TEXT}") {
+          } else if (previous_mode == "${LIGHT_MODE_DISABLED_TEXT}" && current_mode != "${LIGHT_MODE_DISABLED_TEXT}") {
             // Transitioning FROM Disabled - update lights based on relay state
             ESP_LOGI("${TAG_STD_HW_RELAYS}",
                       "Relay 1 light mode changed from ${LIGHT_MODE_DISABLED_TEXT} - updating lights");
@@ -1491,15 +1487,13 @@ select:
             return;
           }
 
-          if (previous_mode != "${LIGHT_MODE_DISABLED_TEXT}" && 
-              current_mode == "${LIGHT_MODE_DISABLED_TEXT}") {
+          if (previous_mode != "${LIGHT_MODE_DISABLED_TEXT}" && current_mode == "${LIGHT_MODE_DISABLED_TEXT}") {
             // Transitioning TO Disabled - turn off lights
             ESP_LOGI("${TAG_STD_HW_RELAYS}",
                       "Relay 2 light mode changed to ${LIGHT_MODE_DISABLED_TEXT} - turning off lights");
             id(light_set_state)->execute(1, 1, false);  // Group 1, relay index 1
             id(light_set_state)->execute(2, 1, false);  // Group 2, relay index 1
-          } else if (previous_mode == "${LIGHT_MODE_DISABLED_TEXT}" && 
-                    current_mode != "${LIGHT_MODE_DISABLED_TEXT}") {
+          } else if (previous_mode == "${LIGHT_MODE_DISABLED_TEXT}" && current_mode != "${LIGHT_MODE_DISABLED_TEXT}") {
             // Transitioning FROM Disabled - update lights based on relay state
             ESP_LOGI("${TAG_STD_HW_RELAYS}",
                       "Relay 2 light mode changed from ${LIGHT_MODE_DISABLED_TEXT} - updating lights");
@@ -1534,15 +1528,13 @@ select:
             return;
           }
 
-          if (previous_mode != "${LIGHT_MODE_DISABLED_TEXT}" && 
-              current_mode == "${LIGHT_MODE_DISABLED_TEXT}") {
+          if (previous_mode != "${LIGHT_MODE_DISABLED_TEXT}" && current_mode == "${LIGHT_MODE_DISABLED_TEXT}") {
             // Transitioning TO Disabled - turn off lights
             ESP_LOGI("${TAG_STD_HW_RELAYS}",
                       "Relay 2 light mode changed to ${LIGHT_MODE_DISABLED_TEXT} - turning off lights");
             id(light_set_state)->execute(1, 1, false);  // Group 1, relay index 1
             id(light_set_state)->execute(2, 1, false);  // Group 2, relay index 1
-          } else if (previous_mode == "${LIGHT_MODE_DISABLED_TEXT}" && 
-                    current_mode != "${LIGHT_MODE_DISABLED_TEXT}") {
+          } else if (previous_mode == "${LIGHT_MODE_DISABLED_TEXT}" && current_mode != "${LIGHT_MODE_DISABLED_TEXT}") {
             // Transitioning FROM Disabled - update lights based on relay state
             ESP_LOGI("${TAG_STD_HW_RELAYS}",
                       "Relay 2 light mode changed from ${LIGHT_MODE_DISABLED_TEXT} - updating lights");
@@ -1600,15 +1592,13 @@ select:
             return;
           }
 
-          if (previous_mode != "${LIGHT_MODE_DISABLED_TEXT}" && 
-              current_mode == "${LIGHT_MODE_DISABLED_TEXT}") {
+          if (previous_mode != "${LIGHT_MODE_DISABLED_TEXT}" && current_mode == "${LIGHT_MODE_DISABLED_TEXT}") {
             // Transitioning TO Disabled - turn off lights
             ESP_LOGI("${TAG_STD_HW_RELAYS}",
                       "Relay 3 light mode changed to ${LIGHT_MODE_DISABLED_TEXT} - turning off lights");
             id(light_set_state)->execute(1, 2, false);  // Group 1, relay index 2
             id(light_set_state)->execute(2, 2, false);  // Group 2, relay index 2
-          } else if (previous_mode == "${LIGHT_MODE_DISABLED_TEXT}" && 
-                    current_mode != "${LIGHT_MODE_DISABLED_TEXT}") {
+          } else if (previous_mode == "${LIGHT_MODE_DISABLED_TEXT}" && current_mode != "${LIGHT_MODE_DISABLED_TEXT}") {
             // Transitioning FROM Disabled - update lights based on relay state
             ESP_LOGI("${TAG_STD_HW_RELAYS}",
                       "Relay 3 light mode changed from ${LIGHT_MODE_DISABLED_TEXT} - updating lights");
@@ -1643,16 +1633,16 @@ select:
             return;
           }
 
-          if (previous_mode != "${LIGHT_MODE_DISABLED_TEXT}" && 
-              current_mode == "${LIGHT_MODE_DISABLED_TEXT}") {
+          if (previous_mode != "${LIGHT_MODE_DISABLED_TEXT}" && current_mode == "${LIGHT_MODE_DISABLED_TEXT}") {
             // Transitioning TO Disabled - turn off lights
-            ESP_LOGI("${TAG_STD_HW_RELAYS}", "Relay 3 light mode changed to ${LIGHT_MODE_DISABLED_TEXT} - turning off lights");
+            ESP_LOGI("${TAG_STD_HW_RELAYS}",
+                      "Relay 3 light mode changed to ${LIGHT_MODE_DISABLED_TEXT} - turning off lights");
             id(light_set_state)->execute(1, 2, false);  // Group 1, relay index 2
             id(light_set_state)->execute(2, 2, false);  // Group 2, relay index 2
-          } else if (previous_mode == "${LIGHT_MODE_DISABLED_TEXT}" && 
-                    current_mode != "${LIGHT_MODE_DISABLED_TEXT}") {
+          } else if (previous_mode == "${LIGHT_MODE_DISABLED_TEXT}" && current_mode != "${LIGHT_MODE_DISABLED_TEXT}") {
             // Transitioning FROM Disabled - update lights based on relay state
-            ESP_LOGI("${TAG_STD_HW_RELAYS}", "Relay 3 light mode changed from ${LIGHT_MODE_DISABLED_TEXT} - updating lights");
+            ESP_LOGI("${TAG_STD_HW_RELAYS}",
+                      "Relay 3 light mode changed from ${LIGHT_MODE_DISABLED_TEXT} - updating lights");
             bool relay_state = id(sw_relay_3).state;
             if (current_mode == "${LIGHT_MODE_LEFT_TEXT}" || current_mode == "${LIGHT_MODE_BOTH_TEXT}") {
               id(light_set_state)->execute(1, 2, relay_state);
@@ -1707,14 +1697,12 @@ select:
             return;
           }
 
-          if (previous_mode != "${LIGHT_MODE_DISABLED_TEXT}" && 
-              current_mode == "${LIGHT_MODE_DISABLED_TEXT}") {
+          if (previous_mode != "${LIGHT_MODE_DISABLED_TEXT}" && current_mode == "${LIGHT_MODE_DISABLED_TEXT}") {
             // Transitioning TO Disabled - turn off lights
             ESP_LOGI("${TAG_STD_HW_RELAYS}", "Relay 4 light mode changed to ${LIGHT_MODE_DISABLED_TEXT} - turning off lights");
             id(light_set_state)->execute(1, 3, false);  // Group 1, relay index 3
             id(light_set_state)->execute(2, 3, false);  // Group 2, relay index 3
-          } else if (previous_mode == "${LIGHT_MODE_DISABLED_TEXT}" && 
-                    current_mode != "${LIGHT_MODE_DISABLED_TEXT}") {
+          } else if (previous_mode == "${LIGHT_MODE_DISABLED_TEXT}" && current_mode != "${LIGHT_MODE_DISABLED_TEXT}") {
             // Transitioning FROM Disabled - update lights based on relay state
             ESP_LOGI("${TAG_STD_HW_RELAYS}", "Relay 4 light mode changed from ${LIGHT_MODE_DISABLED_TEXT} - updating lights");
             bool relay_state = id(sw_relay_4).state;
@@ -1748,14 +1736,12 @@ select:
             return;
           }
 
-          if (previous_mode != "${LIGHT_MODE_DISABLED_TEXT}" && 
-              current_mode == "${LIGHT_MODE_DISABLED_TEXT}") {
+          if (previous_mode != "${LIGHT_MODE_DISABLED_TEXT}" && current_mode == "${LIGHT_MODE_DISABLED_TEXT}") {
             // Transitioning TO Disabled - turn off lights
             ESP_LOGI("${TAG_STD_HW_RELAYS}", "Relay 4 light mode changed to ${LIGHT_MODE_DISABLED_TEXT} - turning off lights");
             id(light_set_state)->execute(1, 3, false);  // Group 1, relay index 3
             id(light_set_state)->execute(2, 3, false);  // Group 2, relay index 3
-          } else if (previous_mode == "${LIGHT_MODE_DISABLED_TEXT}" && 
-                    current_mode != "${LIGHT_MODE_DISABLED_TEXT}") {
+          } else if (previous_mode == "${LIGHT_MODE_DISABLED_TEXT}" && current_mode != "${LIGHT_MODE_DISABLED_TEXT}") {
             // Transitioning FROM Disabled - update lights based on relay state
             ESP_LOGI("${TAG_STD_HW_RELAYS}", "Relay 4 light mode changed from ${LIGHT_MODE_DISABLED_TEXT} - updating lights");
             bool relay_state = id(sw_relay_4).state;
