@@ -92,7 +92,7 @@ jobs:
   build_ard_basic_dev:
     name: "📦 Arduino Basic (dev)"
     needs: build_ard_core_dev
-    if: success() && !github.event.inputs.skip_dev
+    if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -153,7 +153,7 @@ jobs:
   build_ard_ble_proxy_dev:
     name: "⚡ Arduino BLE Proxy (dev)"
     needs: build_ard_basic_dev
-    if: success() && !github.event.inputs.skip_dev
+    if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -179,7 +179,7 @@ jobs:
   build_idf_core_dev:
     name: "🏗️ IDF Core (dev)"
     needs: code_scan
-    if: success() && !github.event.inputs.skip_dev
+    if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -204,7 +204,7 @@ jobs:
   build_idf_basic_dev:
     name: "📦 IDF Basic (dev)"
     needs: build_idf_core_dev
-    if: success() && !github.event.inputs.skip_dev
+    if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -265,7 +265,7 @@ jobs:
   build_idf_ble_proxy_dev:
     name: "⚡ IDF BLE Proxy (dev)"
     needs: build_idf_basic_dev
-    if: success() && !github.event.inputs.skip_dev
+    if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
