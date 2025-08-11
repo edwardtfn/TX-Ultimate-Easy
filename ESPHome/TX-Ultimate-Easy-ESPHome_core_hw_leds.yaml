@@ -792,4 +792,59 @@ script:
 
           ESP_LOGI("${TAG_CORE_HW_LEDS}", "Restored effect: %s (index=%d)",
                     light_ptr->get_effect_name_by_index(effect_index).c_str(), effect_index);
+
+  - id: !extend restore_from_nvs
+    then:
+      # LED restoration
+      - if:
+          condition:
+            lambda: return id(is_us_model);
+          then:
+            # US model restoration
+            - script.execute:
+                id: light_attributes_restore_dual
+                light_ptr: !lambda return id(light_us);
+                attr_global_ptr: !lambda return &id(led_main_packed_attrs);
+                group_index: 2
+            - script.execute:
+                id: light_effect_restore
+                light_ptr: !lambda return id(light_us);
+                effect_global_ptr: !lambda return &id(led_main_packed_effect);
+            - script.execute:
+                id: light_attributes_restore_dual
+                light_ptr: !lambda return id(light_us_left);
+                attr_global_ptr: !lambda return &id(led_sides_packed_attrs);
+                group_index: 1
+            - script.execute:
+                id: light_attributes_restore_dual
+                light_ptr: !lambda return id(light_us_right);
+                attr_global_ptr: !lambda return &id(led_sides_packed_attrs);
+                group_index: 2
+          else:
+            # EU model restoration
+            - script.execute:
+                id: light_attributes_restore_dual
+                light_ptr: !lambda return id(light_eu);
+                attr_global_ptr: !lambda return &id(led_main_packed_attrs);
+                group_index: 1
+            - script.execute:
+                id: light_effect_restore
+                light_ptr: !lambda return id(light_eu);
+                effect_global_ptr: !lambda return &id(led_main_packed_effect);
+            - script.execute:
+                id: light_attributes_restore_dual
+                light_ptr: !lambda return id(light_eu_bottom);
+                attr_global_ptr: !lambda return &id(led_sides_packed_attrs);
+                group_index: 1
+            - script.execute:
+                id: light_attributes_restore_dual
+                light_ptr: !lambda return id(light_eu_top);
+                attr_global_ptr: !lambda return &id(led_sides_packed_attrs);
+                group_index: 2
+
+      # Light full restoration
+      - script.execute:
+          id: light_attributes_restore
+          light_ptr: !lambda return id(light_full);
+          attr_global_ptr: !lambda return &id(led_full_attrs);
 ...
