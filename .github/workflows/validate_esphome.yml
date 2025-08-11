@@ -68,7 +68,7 @@ jobs:
   build_ard_core_dev:
     name: "🏗️ Arduino Core (dev)"
     needs: code_scan
-    if: success() && !github.event.inputs.skip_dev
+    if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -77,7 +77,6 @@ jobs:
         with:
           yaml-file: ".test/esphome_ard_core.yaml"
           version: dev
-
   build_ard_basic:
     name: "📦 Arduino Basic (latest)"
     needs: build_ard_core
