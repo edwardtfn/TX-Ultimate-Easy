@@ -25,9 +25,9 @@ substitutions:
   LIGHT_TRANSITION_TURN_OFF: '0'  # Transition time in msec
   LIGHT_BRIGHTNESS_TURN_ON: '0'   # Brightness (1 to 100%, 0 to not set it)
 
-  LIGHT_FULL_RESTORE_MODE: RESTORE_DEFAULT_OFF
-  LIGHT_SIDES_RESTORE_MODE: RESTORE_DEFAULT_OFF
-  LIGHT_INDIVIDUAL_RESTORE_MODE: RESTORE_DEFAULT_OFF
+  LIGHT_FULL_RESTORE_MODE: ALWAYS_OFF
+  LIGHT_SIDES_RESTORE_MODE: ALWAYS_OFF
+  LIGHT_INDIVIDUAL_RESTORE_MODE: ALWAYS_OFF
 
   LIGHT_ATTRS_DEFAULT: '0x64FFFFFF'               # brightness=100, RGB=255,255,255
   LIGHT_DUAL_ATTRS_DEFAULT: '0x64FFFFFF64FFFFFF'  # Both lights: brightness=100, RGB=255,255,255
@@ -38,6 +38,46 @@ esphome:
   platformio_options:
     build_flags:
       - -D TX_ULTIMATE_EASY_CORE_HW_LEDS
+
+external_components:
+  - source: github://pr#10195  # To-do: Remove this when this PR is merged
+    components: [light]
+    refresh: 1h
+
+globals:
+  # light_full with effect support
+  - id: led_full_attrs
+    type: uint32_t
+    restore_value: true
+    initial_value: '${LIGHT_ATTRS_DEFAULT}'
+    # Basic attributes: brightness + RGB
+
+    # For light_full effects
+  - id: led_full_effect_packed
+    type: uint32_t
+    restore_value: true
+    initial_value: '0x00000000'
+    # Stores: effect_index(16 bits) + effect_speed(8 bits) + reserved(8 bits)
+    # 0 = no effect/solid color, 1-10 = effect indices
+
+  - id: led_main_packed_attrs
+    type: uint64_t
+    restore_value: true
+    initial_value: '${LIGHT_DUAL_ATTRS_DEFAULT}'
+    # light_eu(group1) + light_us(group2) - the main effect lights
+
+  - id: led_main_packed_effect
+    type: uint32_t
+    restore_value: true
+    initial_value: '0x00000000'
+    # Shared between light_eu and light_us
+
+  # Main user-facing LED lights only
+  - id: led_sides_packed_attrs
+    type: uint64_t
+    restore_value: true
+    initial_value: '${LIGHT_DUAL_ATTRS_DEFAULT}'
+    # EU: bottom(group1) + top(group2) OR US: left(group1) + right(group2)
 
 light:
   # These lights are controlling the LEDs on the device
@@ -108,6 +148,17 @@ light:
       - id: light_full
         from: 0
         to: 27
+    on_state:
+      then:
+        - script.execute:
+            id: light_attributes_save_dual
+            light_ptr: !lambda return id(light_eu);
+            attr_global_ptr: !lambda return &id(led_main_packed_attrs);
+            group_index: 1
+        - script.execute:
+            id: light_effect_save
+            light_ptr: !lambda return id(light_eu);
+            effect_global_ptr: !lambda return &id(led_main_packed_effect);
 
   - &light_partition_with_effects_us
     id: light_us
@@ -160,6 +211,17 @@ light:
       - id: light_full
         from: 0
         to: 31
+    on_state:
+      then:
+        - script.execute:
+            id: light_attributes_save_dual
+            light_ptr: !lambda return id(light_us);
+            attr_global_ptr: !lambda return &id(led_main_packed_attrs);
+            group_index: 2
+        - script.execute:
+            id: light_effect_save
+            light_ptr: !lambda return id(light_us);
+            effect_global_ptr: !lambda return &id(led_main_packed_effect);
 
   - &light_partition_no_effects_disabled
     id: light_eu_bottom
@@ -174,6 +236,13 @@ light:
         from: 6
         to: 12
         reversed: true
+    on_state:
+      - script.execute:
+          id: light_attributes_save_dual
+          light_ptr: !lambda return id(light_eu_bottom);
+          attr_global_ptr: !lambda return &id(led_sides_packed_attrs);
+          group_index: 1
+
   - id: light_eu_left
     name: Light - Left EU
     <<: *light_partition_no_effects_disabled
@@ -182,6 +251,12 @@ light:
         from: 13
         to: 19
         reversed: true
+    on_state:
+      - script.execute:
+          id: light_attributes_save_dual
+          light_ptr: !lambda return id(light_eu_left);
+          attr_global_ptr: !lambda return &id(led_sides_packed_attrs);
+          group_index: 1
   - id: light_eu_right
     name: Light - Right EU
     <<: *light_partition_no_effects_disabled
@@ -194,6 +269,12 @@ light:
         from: 0
         to: 5
         reversed: false
+    on_state:
+      - script.execute:
+          id: light_attributes_save_dual
+          light_ptr: !lambda return id(light_eu_right);
+          attr_global_ptr: !lambda return &id(led_sides_packed_attrs);
+          group_index: 2
   - id: light_eu_top
     name: Light - Top EU
     <<: *light_partition_no_effects_disabled
@@ -202,6 +283,12 @@ light:
         from: 20
         to: 26
         reversed: false
+    on_state:
+      - script.execute:
+          id: light_attributes_save_dual
+          light_ptr: !lambda return id(light_eu_top);
+          attr_global_ptr: !lambda return &id(led_sides_packed_attrs);
+          group_index: 2
   - id: light_us_bottom
     name: Light - Bottom US
     <<: *light_partition_no_effects_disabled
@@ -210,6 +297,12 @@ light:
         from: 9
         to: 14
         reversed: true
+    on_state:
+      - script.execute:
+          id: light_attributes_save_dual
+          light_ptr: !lambda return id(light_us_bottom);
+          attr_global_ptr: !lambda return &id(led_sides_packed_attrs);
+          group_index: 1
   - id: light_us_left
     name: Light - Left US
     <<: *light_partition_no_effects_disabled
@@ -218,6 +311,12 @@ light:
         from: 15
         to: 24
         reversed: true
+    on_state:
+      - script.execute:
+          id: light_attributes_save_dual
+          light_ptr: !lambda return id(light_us_left);
+          attr_global_ptr: !lambda return &id(led_sides_packed_attrs);
+          group_index: 1
   - id: light_us_right
     name: Light - Right US
     <<: *light_partition_no_effects_disabled
@@ -230,6 +329,12 @@ light:
         from: 0
         to: 8
         reversed: false
+    on_state:
+      - script.execute:
+          id: light_attributes_save_dual
+          light_ptr: !lambda return id(light_us_right);
+          attr_global_ptr: !lambda return &id(led_sides_packed_attrs);
+          group_index: 2
   - id: light_us_top
     name: Light - Top US
     <<: *light_partition_no_effects_disabled
@@ -238,6 +343,12 @@ light:
         from: 25
         to: 30
         reversed: false
+    on_state:
+      - script.execute:
+          id: light_attributes_save_dual
+          light_ptr: !lambda return id(light_us_top);
+          attr_global_ptr: !lambda return &id(led_sides_packed_attrs);
+          group_index: 2
 
   - &light_partition_individual_led
     id: light_00
@@ -642,4 +753,43 @@ script:
             *attr_global_ptr = tx_ultimate_easy::pack_dual_light_attributes(existing.first, new_attrs);
           }
 
+  - id: light_effect_save
+    mode: queued
+    parameters:
+      light_ptr: light::LightState*
+      effect_global_ptr: uint32_t*
+    then:
+      - lambda: |-
+          if (!light_ptr || !effect_global_ptr) return;
+
+          uint32_t effect_index = light_ptr->get_current_effect_index();
+          // Store effect index (16 bits) + reserved space for future use
+          *effect_global_ptr = effect_index & 0xFFFF;
+
+          ESP_LOGD("${TAG_CORE_HW_LEDS}", "Saved effect index: %d", effect_index);
+
+  - id: light_effect_restore
+    mode: parallel
+    parameters:
+      light_ptr: light::LightState*
+      effect_global_ptr: uint32_t*
+    then:
+      - lambda: |-
+          if (!light_ptr || !effect_global_ptr) return;
+
+          uint32_t effect_index = *effect_global_ptr & 0xFFFF;
+
+          if (effect_index == 0) return; // No effect
+          if (effect_index > light_ptr->get_effect_count()) {
+            ESP_LOGW("${TAG_CORE_HW_LEDS}", "Invalid effect index: %d (max: %d)",
+                      effect_index, light_ptr->get_effect_count());
+            return;
+          }
+
+          auto call = light_ptr->turn_on();
+          call.set_effect(effect_index);
+          call.perform();
+
+          ESP_LOGI("${TAG_CORE_HW_LEDS}", "Restored effect: %s (index=%d)",
+                    light_ptr->get_effect_name_by_index(effect_index).c_str(), effect_index);
 ...

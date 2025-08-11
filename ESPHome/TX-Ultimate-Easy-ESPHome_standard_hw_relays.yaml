@@ -96,7 +96,7 @@ globals:
     type: uint16_t
     restore_value: true
     initial_value: '0'  # Binary: 0000000000000000 = all relay modes set to option 0 (default action - switch)
-    # Bit layout: [unused][relay4(4)][relay3(4)][relay2(4)][relay1(4)]
+    # Bit layout: [relay4(4)][relay3(4)][relay2(4)][relay1(4)]
     # 16-bit value with 4 bits per relay: 0=Switch, 1=Light, 2=Not in use, 3-15=Reserved
 
   # Packed switch states - replaces 5 separate switches
@@ -104,7 +104,7 @@ globals:
     type: uint8_t
     restore_value: true
     initial_value: '0'  # All switches default to OFF
-    # Bit layout: [unused(3)][sw_relay4][sw_relay3][sw_relay2][sw_relay1][sw_expose_leds]
+    # Bit layout: [sw_relay4][sw_relay3][sw_relay2][sw_relay1][sw_expose_leds]
 
 light:
   # These lights are used for the physical relays to be shown as lights
@@ -133,6 +133,7 @@ light:
     output: output_relay_2
     platform: binary
     internal: true
+    restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
         - if:
@@ -152,6 +153,7 @@ light:
     output: output_relay_3
     platform: binary
     internal: true
+    restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
         - if:
@@ -171,6 +173,7 @@ light:
     output: output_relay_4
     platform: binary
     internal: true
+    restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
         - if:
@@ -910,8 +913,8 @@ script:
           // Set indicator (either switch or light) visible on Home Assistant
           auto relay_mode_index = sl_relay_1_mode->active_index();
           if (relay_mode_index.has_value()) {
-            light_output_1->set_internal(false or relay_mode_index.value() != 1);
-            sw_relay_1->set_internal(false or relay_mode_index.value() != 0);
+            light_output_1->set_internal(relay_mode_index.value() != 1);
+            sw_relay_1->set_internal(relay_mode_index.value() != 0);
           }
           relay_mode_index = sl_relay_2_mode->active_index();
           if (relay_mode_index.has_value()) {
@@ -1119,11 +1122,13 @@ script:
               break;
             case 2:
               if (light_index >= id(gb_lights_2).size()) {
-                ESP_LOGE("${TAG_STD_HW_RELAYS}", "Invalid set with %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
+                ESP_LOGE("${TAG_STD_HW_RELAYS}",
+                          "Invalid set with %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
                 return;
               }
               if (state and !id(gb_lights_2)[light_index]->current_values.is_on()) {
-                ESP_LOGI("${TAG_STD_HW_RELAYS}", "Turn-on %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
+                ESP_LOGI("${TAG_STD_HW_RELAYS}",
+                          "Turn-on %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
                 auto call = id(gb_lights_2)[light_index]->turn_on();
                 if (LIGHT_TRANSITION_TURN_ON > 0)
                   call.set_transition_length(LIGHT_TRANSITION_TURN_ON);  // in ms
@@ -1131,12 +1136,16 @@ script:
                   call.set_brightness(LIGHT_BRIGHTNESS_TURN_ON / 100.0f);
                 call.perform();
               } else if (!state and id(gb_lights_2)[light_index]->current_values.is_on()) {
-                ESP_LOGI("${TAG_STD_HW_RELAYS}", "Turn-off %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
+                ESP_LOGI("${TAG_STD_HW_RELAYS}",
+                          "Turn-off %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
                 auto call = id(gb_lights_2)[light_index]->turn_off();
                 if (LIGHT_TRANSITION_TURN_OFF > 0)
                   call.set_transition_length(LIGHT_TRANSITION_TURN_OFF);  // in ms
                 call.perform();
               }
+              break;
+            default:
+              ESP_LOGE("${TAG_STD_HW_RELAYS}", "Invalid light_group=%" PRIu8 " (expected 1 or 2)", light_group);
               break;
           }
 
