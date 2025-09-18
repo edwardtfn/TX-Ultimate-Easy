@@ -39,11 +39,6 @@ esphome:
     build_flags:
       - -D TX_ULTIMATE_EASY_CORE_HW_LEDS
 
-external_components:
-  - source: github://pr#10195  # To-do: Remove this when this PR is merged
-    components: [light]
-    refresh: 1h
-
 globals:
   # light_full with effect support
   - id: led_full_attrs
