@@ -781,7 +781,7 @@ script:
             return;
           }
 
-          auto call = light_ptr->turn_on();
+          auto call = light_ptr->make_call();
           call.set_effect(effect_index);
           call.perform();
 
