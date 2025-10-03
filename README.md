@@ -27,6 +27,9 @@
 [buymeacoffee-shield]: https://img.shields.io/static/v1?label=Buy%20me%20an%20ice%20cream&message=❄&color=blue
 [buymeacoffee]: https://www.buymeacoffee.com/edwardfirmo
 
+> [!WARNING]
+> ESPHome builder v2025.8.0+ is required
+
 ## Framework Migration to ESP-IDF
 
 > [!IMPORTANT]  
@@ -348,7 +351,7 @@ If the device isn't discovered automatically:
    - Button actions
 3. Optional: Configure advanced features
    - LED behaviors
-   - Touch sensitivity
+   - Touch duration
    - Haptic feedback
    - Audio feedback
 4. Test your configuration:
@@ -374,7 +377,7 @@ After installation, you can:
 
 TX Ultimate Easy offers extensive configuration options:
 
-- Touch panel sensitivity and gestures
+- Touch panel gestures
 - LED colors, patterns, and behaviors
 - Relay modes and functions
 - Audio and haptic feedback settings

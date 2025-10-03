@@ -1,6 +1,8 @@
-// tx_ultimate_easy.h
+// tx_ultimate_easy_touch.h
 
 #pragma once
+
+#ifdef TX_ULTIMATE_EASY_CORE_HW_TOUCH
 
 #include "esphome/core/automation.h"
 #include "esphome/core/component.h"
@@ -30,9 +32,6 @@ namespace esphome {
         constexpr int HEADER_BYTE_2 = 0x55;
         constexpr int VALID_DATA_BYTE_2 = 0x01;
         constexpr int VALID_DATA_BYTE_3 = 0x02;
-
-        // Log tag
-        static const char *TAG = "tx_ultimate_easy";
 
         struct TouchPoint {
             uint8_t button = 0;
@@ -84,3 +83,5 @@ namespace esphome {
 
     } // namespace tx_ultimate_easy
 } // namespace esphome
+
+#endif  // TX_ULTIMATE_EASY_CORE_HW_TOUCH

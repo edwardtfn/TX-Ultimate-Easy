@@ -14,6 +14,8 @@
 substitutions:
   SWITCH_AUDIO_AMPLIFIER_RESTORE_MODE: RESTORE_DEFAULT_ON
 
+  TAG_STD_HW_AUDIO: std.hw.audio
+
 esphome:
   platformio_options:
     build_flags:
@@ -30,8 +32,8 @@ script:
       - script.wait: dump_config
       - lambda: |-
           // Check for requirements
-          #if !defined(TX_ULTIMATE_EASY_CORE)
-            #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
+          #if !defined(TX_ULTIMATE_EASY_CORE_COMMON)
+            #error "The package TX-Ultimate-Easy-ESPHome_core_common.yaml is required."
           #endif
 
           // Identify itself

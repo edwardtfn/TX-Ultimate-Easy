@@ -1,12 +1,17 @@
-// tx_ultimate_easy.cpp
+// tx_ultimate_easy_touch.cpp
+
+#ifdef TX_ULTIMATE_EASY_CORE_HW_TOUCH
 
 #include "esphome/core/log.h"
-#include "tx_ultimate_easy.h"
+#include "tx_ultimate_easy_touch.h"
 #include <cinttypes>
 #include <string>
 
 namespace esphome {
     namespace tx_ultimate_easy {
+
+        // Log tag
+        static const char *TAG = "tx_ultimate_easy.touch";
 
         void TxUltimateEasy::setup() {
             ESP_LOGI(TAG, "TX Ultimate Easy is initialized");
@@ -69,8 +74,9 @@ namespace esphome {
             if (this->gang_count_ == 1)
                 return 1;
 
-            // Calculate button number Change to round up instead of truncate (integer division)
-            const uint8_t width = (TOUCH_MAX_POSITION + gang_count_) / this->gang_count_;  // Width of each button region
+            // Calculate button width (rounds up to ensure full coverage)
+            const uint8_t width =
+                (TOUCH_MAX_POSITION + this->gang_count_) / this->gang_count_;  // Width of each button region
             if (width < 1)  // Invalid width - and prevents division by zero 
                 return 0;
             const uint8_t button = std::min(
@@ -225,3 +231,5 @@ namespace esphome {
 
     } // namespace tx_ultimate_easy
 } // namespace esphome
+
+#endif  // TX_ULTIMATE_EASY_CORE_HW_TOUCH

@@ -14,6 +14,8 @@
 substitutions:
   vibration_max_duration: 2s
 
+  TAG_STD_HW_VIBRATION: std.hw.vibration
+
 binary_sensor:
   - id: bs_vibrating
     name: Vibrating
@@ -62,24 +64,24 @@ script:
     then:
       - lambda: |-
           // Configuration
-          ESP_LOGCONFIG("standard_hw_vibration", "Touch - Vibration feedback: %s",
+          ESP_LOGCONFIG("${TAG_STD_HW_VIBRATION}", "Touch - Vibration feedback: %s",
                         sl_touch_vibration_feedback->state.c_str());
-          ESP_LOGCONFIG("standard_hw_vibration", "Vibrate duration: %.0fms", nr_vibrating_duration->state);
-          ESP_LOGCONFIG("standard_hw_vibration", "Vibrate max duration: ${vibration_max_duration}");
+          ESP_LOGCONFIG("${TAG_STD_HW_VIBRATION}", "Vibrate duration: %.0fms", nr_vibrating_duration->state);
+          ESP_LOGCONFIG("${TAG_STD_HW_VIBRATION}", "Vibrate max duration: ${vibration_max_duration}");
 
           // State
           if (bs_vibrating->state)
-            ESP_LOGW("standard_hw_vibration", "Vibrating now: YES");
+            ESP_LOGW("${TAG_STD_HW_VIBRATION}", "Vibrating now: YES");
           else
-            ESP_LOGCONFIG("standard_hw_vibration", "Vibrating now: No");
+            ESP_LOGCONFIG("${TAG_STD_HW_VIBRATION}", "Vibrating now: No");
 
   - id: !extend dump_config_list_packages
     then:
       - script.wait: dump_config
       - lambda: |-
           // Check for requirements
-          #if !defined(TX_ULTIMATE_EASY_CORE)
-            #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
+          #if !defined(TX_ULTIMATE_EASY_CORE_COMMON)
+            #error "The package TX-Ultimate-Easy-ESPHome_core_common.yaml is required."
           #endif
 
           // Identify itself
@@ -149,20 +151,17 @@ switch:
     pin: GPIO21
     restore_mode: ALWAYS_OFF
     internal: true
-    on_turn_on:
+    on_state:
       then:
         - binary_sensor.template.publish:
             id: bs_vibrating
-            state: ON  # yamllint disable-line rule:truthy
+            state: !lambda return x;
+    on_turn_on:
+      then:
         - delay: ${vibration_max_duration}
         - if:
             condition:
               switch.is_on: sw_vibration_motor
             then:
               - switch.turn_off: sw_vibration_motor
-    on_turn_off:
-      then:
-        - binary_sensor.template.publish:
-            id: bs_vibrating
-            state: OFF  # yamllint disable-line rule:truthy
 ...

@@ -11,6 +11,9 @@
 ##### - For normal system use, modifications to this file are NOT required.                    #####
 ####################################################################################################
 ---
+substitutions:
+  TAG_STD_MEDIA_PLAYER: "std.media-player"
+
 packages:
   standard_hw_speaker: !include TX-Ultimate-Easy-ESPHome_standard_hw_speaker.yaml
 
@@ -54,7 +57,8 @@ media_player:
             id(persistent_media_player_volume) = static_cast<uint8_t>(mp_media_player->volume * 100.0f);
             if (id(persistent_media_player_volume) != id(last_media_player_volume)) {
               id(last_media_player_volume) = id(persistent_media_player_volume);
-              ESP_LOGD("media_player_volume", "Media player volume changed to %" PRIu8 "%%, updating number entity", id(persistent_media_player_volume));
+              ESP_LOGD("${TAG_STD_MEDIA_PLAYER}", "Media player volume changed to %" PRIu8 "%%, updating number entity",
+                                                  id(persistent_media_player_volume));
             }
 
 script:
@@ -66,17 +70,18 @@ script:
     then:
       - lambda: |-
           // Volume sync configuration
-          ESP_LOGCONFIG("standard_media_player", "Media Player Volume Sync:");
-          ESP_LOGCONFIG("standard_media_player", "  Persistent volume: %" PRIu8 "%", id(persistent_media_player_volume));
-          ESP_LOGCONFIG("standard_media_player", "  Current volume: %.1f%%", mp_media_player->volume * 100.0f);
+          ESP_LOGCONFIG("${TAG_STD_MEDIA_PLAYER}", "Media Player Volume Sync:");
+          ESP_LOGCONFIG("${TAG_STD_MEDIA_PLAYER}", "  Persistent volume: %" PRIu8 "%",
+                                                    id(persistent_media_player_volume));
+          ESP_LOGCONFIG("${TAG_STD_MEDIA_PLAYER}", "  Current volume: %.1f%%", mp_media_player->volume * 100.0f);
 
   - id: !extend dump_config_list_packages
     then:
       - script.wait: dump_config
       - lambda: |-
           // Check for requirements
-          #if !defined(TX_ULTIMATE_EASY_CORE)
-            #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
+          #if !defined(TX_ULTIMATE_EASY_CORE_COMMON)
+            #error "The package TX-Ultimate-Easy-ESPHome_core_common.yaml is required."
           #endif  // TX_ULTIMATE_EASY_CORE
           #if !defined(TX_ULTIMATE_EASY_STANDARD_HW_SPEAKER)
             #error "The package TX-Ultimate-Easy-ESPHome_standard_hw_speaker.yaml is required."
@@ -94,7 +99,8 @@ script:
           volume: !lambda return id(persistent_media_player_volume) / 100.0f;
       - lambda: |-
           id(last_media_player_volume) = id(persistent_media_player_volume);
-          ESP_LOGI("media_player_volume", "Initial volume sync: %.1f%% (restored from persistence)", id(persistent_media_player_volume));
+          ESP_LOGI("${TAG_STD_MEDIA_PLAYER}", "Initial volume sync: %.1f%% (restored from persistence)",
+                                              id(persistent_media_player_volume));
 
 speaker:
   - platform: mixer

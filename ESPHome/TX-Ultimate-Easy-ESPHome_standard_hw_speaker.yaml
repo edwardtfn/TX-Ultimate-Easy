@@ -16,6 +16,8 @@ substitutions:
   # d=32 (32nd note), o=5 (octave 5), b=100 (tempo 100)
   tone_volume_change: "scale_up:d=32,o=5,b=100:c,c#,d#,e,f#,g#,a#,b"  # Use "none" to disable sound
 
+  TAG_STD_HW_SPEAKER: std.hw.speaker
+
 packages:
   standard_hw_audio: !include TX-Ultimate-Easy-ESPHome_standard_hw_audio.yaml
 
@@ -31,7 +33,7 @@ api:
         - lambda: |-
             rtttl_speaker->stop();
             if (speaker_volume->state > 0) {
-              ESP_LOGI("standard_speaker", "Play tone: '%s'", tone.c_str());
+              ESP_LOGI("${TAG_STD_HW_SPEAKER}", "Play tone: '%s'", tone.c_str());
               rtttl_speaker->play(tone.c_str());
             }
 
@@ -76,8 +78,8 @@ script:
       - script.wait: dump_config
       - lambda: |-
           // Check for requirements
-          #if !defined(TX_ULTIMATE_EASY_CORE)
-            #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
+          #if !defined(TX_ULTIMATE_EASY_CORE_COMMON)
+            #error "The package TX-Ultimate-Easy-ESPHome_core_common.yaml is required."
           #endif
           #if !defined(TX_ULTIMATE_EASY_STANDARD_HW_AUDIO)
             #error "The package TX-Ultimate-Easy-ESPHome_standard_hw_audio.yaml is required."

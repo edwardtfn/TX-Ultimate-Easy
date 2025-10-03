@@ -27,7 +27,9 @@ substitutions:
   TX_MODEL_3_GANG_TEXT: "3 Gang"
   TX_MODEL_4_GANG_TEXT: "4 Gang"
 
-  DUMP_CONFIG_CALLER_DELAY: 10s  # Delay to dump config after requested
+  DUMP_CONFIG_CALLER_DELAY: 5s  # Delay to dump config after requested
+
+  TAG_CORE_COMMON: core.common
 
 api:
   id: api_server
@@ -46,11 +48,18 @@ binary_sensor:
     device_class: problem
     on_state:
       then:
-        - lambda: |-
-            if (x)
-              ESP_LOGW("core", "Pending restart: YES");
-            else
-              ESP_LOGCONFIG("core", "Pending restart: No");
+        - script.execute: dump_config_caller
+
+  - id: bs_boot_completed
+    name: Boot Completed
+    internal: false
+    disabled_by_default: false
+    platform: template
+    entity_category: diagnostic
+    device_class: connectivity
+    icon: mdi:rocket-launch
+    on_state:
+      then:
         - script.execute: dump_config_caller
 
 button:
@@ -69,14 +78,25 @@ esphome:
   name: ${name}
   friendly_name: ${friendly_name}
   comment: TX Ultimate Easy
+  min_version: 2025.8.0
   project:
     name: "edwardtfn.tx_ultimate_easy"
     version: ${version}
   platformio_options:
     build_flags:
-      - -D TX_ULTIMATE_EASY_CORE
+      - -D TX_ULTIMATE_EASY_CORE_COMMON
 
   on_boot:
+    - priority: 1000  # Very early in boot process
+      then:
+        - binary_sensor.template.publish:
+            id: bs_boot_completed
+            state: OFF  # yamllint disable-line rule:truthy
+
+    - priority: 750
+      then:
+        - script.execute: restore_from_nvs
+
     - priority: 700
       then:
         - script.execute: boot_initialize
@@ -89,16 +109,25 @@ esphome:
       then:
         - script.execute: boot_done
 
-globals:
-  - id: is_us_model
-    type: bool
-    restore_value: true
-    initial_value: 'false'
+external_components:
+  - source:
+      type: git
+      url: https://github.com/edwardtfn/TX-Ultimate-Easy
+      ref: v${version}
+    refresh: 1h
+    components:
+      - tx_ultimate_easy
 
+globals:
   - id: gang_count
     type: uint8_t
     restore_value: true
     initial_value: '0'
+
+  - id: is_us_model
+    type: bool
+    restore_value: true
+    initial_value: 'false'
 
 logger:
   level: DEBUG
@@ -127,9 +156,16 @@ script:
   - id: boot_done
     mode: restart
     then:
+      - script.wait: restore_from_nvs
+      - script.wait: boot_initialize
+      - script.wait: boot_sequence
       - script.execute:
           id: api_send_ha_event_boot
           type: done
+      - script.wait: api_send_ha_event_boot
+      - binary_sensor.template.publish:
+          id: bs_boot_completed
+          state: ON  # yamllint disable-line rule:truthy
 
   - id: boot_initialize
     mode: restart
@@ -149,7 +185,7 @@ script:
           id(is_us_model) = (sl_tx_model_format->state == "${TX_MODEL_FORMAT_US_TEXT}");
           id(gang_count) = sl_tx_model_gang->active_index().value() + 1;
           if (id(gang_count) < 1 || id(gang_count) > 4) {
-            ESP_LOGE("core_hw_leds", "Invalid number of gangs: %" PRIu8, id(gang_count));
+            ESP_LOGE("${TAG_CORE_COMMON}", "Invalid number of gangs: %" PRIu8, id(gang_count));
           }
 
   - id: boot_sequence
@@ -166,33 +202,43 @@ script:
       # Extended by all modules
       - lambda: |-
           // Device identification
-          ESP_LOGCONFIG("core", "Device friendly name: ${friendly_name}");
-          ESP_LOGCONFIG("core", "Device name: ${name}");
-          ESP_LOGCONFIG("core", "Device name (HA): %s", tx_device_name->state.c_str());
-          ESP_LOGCONFIG("core", "Device hostname: %s", App.get_name().c_str());
+          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Device friendly name: ${friendly_name}");
+          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Device name: ${name}");
+          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Device name (HA): %s", tx_device_name->state.c_str());
+          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Device hostname: %s", App.get_name().c_str());
 
           dump_config_versions->execute();
 
           // Framework detection
           #ifdef USE_ARDUINO
-          ESP_LOGCONFIG("core", "Framework: Arduino");
+          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Framework: Arduino");
           #elif defined(USE_ESP_IDF)
-          ESP_LOGCONFIG("core", "Framework: ESP-IDF");
+          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Framework: ESP-IDF");
           #else
-          ESP_LOGW("core", "Framework: UNKNOWN");
+          ESP_LOGW("${TAG_CORE_COMMON}", "Framework: UNKNOWN");
           #endif
 
           // Model configuration
-          ESP_LOGCONFIG("core", "Model format (selected): %s", sl_tx_model_format->state.c_str());
-          ESP_LOGCONFIG("core", "Model format (detected): %s", id(is_us_model) ? "US" : "EU");
-          ESP_LOGCONFIG("core", "Gangs (selected): %s", sl_tx_model_gang->state.c_str());
-          ESP_LOGCONFIG("core", "Gangs (detected): %" PRIu8 "-Gang%s", id(gang_count), id(gang_count) > 1 ? "s" : "");
+          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Model format (selected): %s",
+                          sl_tx_model_format->state.c_str());
+          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Model format (detected): %s",
+                          id(is_us_model) ? "US" : "EU");
+          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Gangs (selected): %s",
+                          sl_tx_model_gang->state.c_str());
+          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Gangs (detected): %" PRIu8 "-Gang%s",
+                          id(gang_count), id(gang_count) > 1 ? "s" : "");
+
+          // Boot completion status
+          if (bs_boot_completed->state)
+            ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Boot completed: Yes");
+          else
+            ESP_LOGW("${TAG_CORE_COMMON}", "Boot completed: NO");
 
           // System state
           if (bs_pending_restart->state)
-            ESP_LOGW("core", "Pending restart: YES");
+            ESP_LOGW("${TAG_CORE_COMMON}", "Pending restart: YES");
           else
-            ESP_LOGCONFIG("core", "Pending restart: No");
+            ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Pending restart: No");
 
   - id: dump_config_caller
     mode: restart
@@ -217,10 +263,10 @@ script:
     then:
       - lambda: |-
           // Version information
-          ESP_LOGCONFIG("core", "TX Ultimate firmware version: ${version}");
+          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "TX Ultimate firmware version: ${version}");
           // ESPHome builder information
-          ESP_LOGCONFIG("core", "ESPHome builder: " ESPHOME_VERSION);
-          ESP_LOGCONFIG("core", "ESPHome build timestamp: %s", App.get_compilation_time().c_str());
+          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "ESPHome builder: " ESPHOME_VERSION);
+          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "ESPHome build timestamp: %s", App.get_compilation_time().c_str());
 
   - id: publish_device_info
     mode: restart
@@ -228,6 +274,18 @@ script:
       - lambda: |-
           tx_fw_version->publish_state("${version}");
           tx_device_name->publish_state(App.get_name().c_str());
+
+  - id: restore_from_nvs
+    mode: single
+    then:
+      - select.set_index:
+          id: sl_tx_model_format
+          index: !lambda if (id(is_us_model)) return 1; else return 0;
+      - select.set_index:
+          id: sl_tx_model_gang
+          index: !lambda |-
+            if (id(gang_count) < 1 || id(gang_count) > 4) return 0;  // default to 1-Gang
+            return static_cast<uint8_t>(id(gang_count)) - 1;
 
 select:
   - id: sl_tx_model_format
@@ -238,7 +296,7 @@ select:
       - "${TX_MODEL_FORMAT_US_TEXT}"
     initial_option: "${TX_MODEL_FORMAT_EU_TEXT}"
     optimistic: true
-    restore_value: true
+    restore_value: false
     internal: false
     entity_category: config
     disabled_by_default: false
@@ -250,7 +308,6 @@ select:
             state: true
         - lambda: |-
             id(is_us_model) = (x == "${TX_MODEL_FORMAT_US_TEXT}");
-            ESP_LOGI("core", "New model selected: %s", id(is_us_model) ? "US" : "EU");
 
   - id: sl_tx_model_gang
     name: Model (Gang)
@@ -262,7 +319,7 @@ select:
       - "${TX_MODEL_4_GANG_TEXT}"
     initial_option: "${TX_MODEL_1_GANG_TEXT}"
     optimistic: true
-    restore_value: true
+    restore_value: false
     internal: false
     entity_category: config
     disabled_by_default: false
@@ -274,7 +331,6 @@ select:
             state: true
         - lambda: |-
             id(gang_count) = static_cast<uint8_t>(i) + 1;
-            ESP_LOGI("core", "New model selected: %" PRIu8 "-%s", id(gang_count), id(gang_count) > 1 ? "Gangs" : "Gang");
             tx_ultimate->set_gang_count(id(gang_count));
 
 text_sensor:
@@ -313,6 +369,9 @@ text_sensor:
             }
           }
           return result;
+
+tx_ultimate_easy:
+  id: tx_ultimate
 
 wifi:
   id: wifi_component

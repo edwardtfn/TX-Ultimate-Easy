@@ -36,6 +36,8 @@ substitutions:
   BUTTON_3_ID: '3'
   BUTTON_4_ID: '4'
 
+  TAG_CORE_HW_BUTTONS: core.hw.buttons
+
 binary_sensor:
   - &binary_sensor_button_base
     id: bs_button_2
@@ -63,6 +65,14 @@ esphome:
       - -D TX_ULTIMATE_EASY_CORE_HW_BUTTONS
 
 globals:
+  # Packed button actions - replaces 4 separate selects
+  - id: button_actions_packed
+    type: uint16_t
+    restore_value: true
+    initial_value: '4369'  # Binary: 0001000100010001 = all buttons set to option 1 (default action)
+    # Bit layout: [button4(4)][button3(4)][button2(4)][button1(4)]
+    # Each button uses 4 bits: 0=None, 1=Toggle, 2=Failsafe, 3-15=Reserved for future options
+
   - id: button_press_button
     type: uint8_t
     restore_value: false
@@ -125,7 +135,7 @@ script:
             {"count", std::to_string(count)},
             {"position", std::to_string(id(button_press_position))}
           });
-          ESP_LOGI("core_hw_buttons", "Button %" PRIu8 " action: '%s'", button, action.c_str());
+          ESP_LOGI("${TAG_CORE_HW_BUTTONS}", "Button %" PRIu8 " action: '%s'", button, action.c_str());
           if (action == "click") {
             switch (button) {
               case ${BUTTON_1_ID}:
@@ -211,36 +221,47 @@ script:
       - lambda: |-
           std::string gang_count_plural_suffix = id(gang_count) > 1 ? "s" : "";
           // Button's actions
-          ESP_LOGCONFIG("core_hw_buttons", "Button%s action%s:",
+          ESP_LOGCONFIG("${TAG_CORE_HW_BUTTONS}", "Button%s action%s:",
                         gang_count_plural_suffix.c_str(),
                         gang_count_plural_suffix.c_str());
-          ESP_LOGCONFIG("core_hw_buttons", "  Relay 1: %s", sl_button_1_action->has_state()
-                                                              ? sl_button_1_action->state.c_str()
-                                                              : "Unknown");
+          ESP_LOGCONFIG("${TAG_CORE_HW_BUTTONS}", "  Relay 1: %s", sl_button_1_action->has_state() ?
+                                                                    sl_button_1_action->state.c_str() : "Unknown");
           if (id(gang_count) >= 2)
-            ESP_LOGCONFIG("core_hw_buttons", "  Relay 2: %s", sl_button_2_action->has_state()
-                                                                ? sl_button_2_action->state.c_str()
-                                                                : "Unknown");
+            ESP_LOGCONFIG("${TAG_CORE_HW_BUTTONS}", "  Relay 2: %s", sl_button_2_action->has_state() ?
+                                                                      sl_button_2_action->state.c_str() : "Unknown");
           if (id(gang_count) >= 3)
-            ESP_LOGCONFIG("core_hw_buttons", "  Relay 3: %s", sl_button_3_action->has_state()
-                                                                ? sl_button_3_action->state.c_str()
-                                                                : "Unknown");
+            ESP_LOGCONFIG("${TAG_CORE_HW_BUTTONS}", "  Relay 3: %s", sl_button_3_action->has_state() ?
+                                                                      sl_button_3_action->state.c_str() : "Unknown");
           if (id(gang_count) >= 4)
-            ESP_LOGCONFIG("core_hw_buttons", "  Relay 4: %s", sl_button_4_action->has_state()
-                                                                ? sl_button_4_action->state.c_str()
-                                                                : "Unknown");
+            ESP_LOGCONFIG("${TAG_CORE_HW_BUTTONS}", "  Relay 4: %s", sl_button_4_action->has_state() ?
+                                                                      sl_button_4_action->state.c_str() : "Unknown");
 
   - id: !extend dump_config_list_packages
     then:
       - script.wait: dump_config
       - lambda: |-
           // Check for requirements
-          #if !defined(TX_ULTIMATE_EASY_CORE)
-            #error "The package TX-Ultimate-Easy-ESPHome_core.yaml is required."
+          #if !defined(TX_ULTIMATE_EASY_CORE_COMMON)
+            #error "The package TX-Ultimate-Easy-ESPHome_core_common.yaml is required."
           #endif
 
           // Identify itself
           ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Core - Hardware - Buttons");
+
+  - id: !extend restore_from_nvs
+    then:
+      - select.set_index:
+          id: sl_button_1_action
+          index: !lambda return std::min((uint8_t)(id(button_actions_packed) & 0x0F), (uint8_t)2);
+      - select.set_index:
+          id: sl_button_2_action
+          index: !lambda return std::min((uint8_t)((id(button_actions_packed) >> 4) & 0x0F), (uint8_t)2);
+      - select.set_index:
+          id: sl_button_3_action
+          index: !lambda return std::min((uint8_t)((id(button_actions_packed) >> 8) & 0x0F), (uint8_t)2);
+      - select.set_index:
+          id: sl_button_4_action
+          index: !lambda return std::min((uint8_t)((id(button_actions_packed) >> 12) & 0x0F), (uint8_t)2);
 
   - id: !extend touch_on_multi_touch_release
     then:
@@ -294,19 +315,20 @@ script:
               id(button_press_start_time) < current_time) {
             uint32_t press_duration  = current_time - id(button_press_start_time);
             // Handle overflow (optional, since it's unlikely to happen here)
-            ESP_LOGI("core_hw_buttons", "Button press duration: %" PRIu32 " ms", press_duration);
+            ESP_LOGI("${TAG_CORE_HW_BUTTONS}", "Button press duration: %" PRIu32 " ms", press_duration);
             if (press_duration < ${BUTTON_CLICK_MIN_LENGTH}) {
-              ESP_LOGW("core_hw_buttons", "Ignoring button press (too short)");
+              ESP_LOGW("${TAG_CORE_HW_BUTTONS}", "Ignoring button press (too short)");
             } else if (press_duration >= ${BUTTON_CLICK_MIN_LENGTH} and
                         press_duration <= ${BUTTON_CLICK_MAX_LENGTH}) { // Short/normal click
               button_click_event->execute(id(button_press_button), id(click_counter));
             } else if (press_duration >= ${BUTTON_LONG_PRESS_DELAY} and press_duration <= ${BUTTON_PRESS_TIMEOUT}) {
               button_action->execute(id(button_press_button), "long_press", 1);
             } else if (press_duration > ${BUTTON_PRESS_TIMEOUT}) { // Timeout or invalid
-              ESP_LOGW("core_hw_buttons", "Button press cancelled or timed out after ${BUTTON_PRESS_TIMEOUT} ms");
+              ESP_LOGW("${TAG_CORE_HW_BUTTONS}",
+                        "Button press cancelled or timed out after ${BUTTON_PRESS_TIMEOUT} ms");
             }
           } else {
-            ESP_LOGW("core_hw_buttons", "Press event timestamp not recorded yet");
+            ESP_LOGW("${TAG_CORE_HW_BUTTONS}", "Press event timestamp not recorded yet");
           }
           id(button_press_start_time) = 0;
 
@@ -329,11 +351,16 @@ select:
       - "${BUTTON_1_ACTION_FAILSAFE_TEXT}"
     initial_option: "${BUTTON_1_ACTION_TEXT}"
     optimistic: true
-    restore_value: true
+    restore_value: false
     internal: true
     entity_category: config
     disabled_by_default: false
     icon: mdi:dip-switch
+    on_value:
+      then:
+        - lambda: |-
+            id(button_actions_packed) = (id(button_actions_packed) & ~(0x0F << 0)) |
+                                        ((id(sl_button_1_action).active_index().value_or(1) & 0x0F) << 0);
 
   - id: sl_button_2_action
     name: Button 2 action
@@ -344,6 +371,11 @@ select:
       - "${BUTTON_2_ACTION_FAILSAFE_TEXT}"
     initial_option: "${BUTTON_2_ACTION_TEXT}"
     <<: *button_select_action_base
+    on_value:
+      then:
+        - lambda: |-
+            id(button_actions_packed) = (id(button_actions_packed) & ~(0x0F << 4)) |
+                                        ((id(sl_button_2_action).active_index().value_or(1) & 0x0F) << 4);
 
   - id: sl_button_3_action
     name: Button 3 action
@@ -354,6 +386,11 @@ select:
       - "${BUTTON_3_ACTION_FAILSAFE_TEXT}"
     initial_option: "${BUTTON_3_ACTION_TEXT}"
     <<: *button_select_action_base
+    on_value:
+      then:
+        - lambda: |-
+            id(button_actions_packed) = (id(button_actions_packed) & ~(0x0F << 8)) |
+                                        ((id(sl_button_3_action).active_index().value_or(1) & 0x0F) << 8);
 
   - id: sl_button_4_action
     name: Button 4 action
@@ -364,4 +401,9 @@ select:
       - "${BUTTON_4_ACTION_FAILSAFE_TEXT}"
     initial_option: "${BUTTON_4_ACTION_TEXT}"
     <<: *button_select_action_base
+    on_value:
+      then:
+        - lambda: |-
+            id(button_actions_packed) = (id(button_actions_packed) & ~(0x0F << 12)) |
+                                        ((id(sl_button_4_action).active_index().value_or(1) & 0x0F) << 12);
 ...
