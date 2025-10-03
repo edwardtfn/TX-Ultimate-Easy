@@ -425,7 +425,7 @@ jobs:
       - build_idf_core_dev
       - build_idf_basic_dev
       - build_idf_ble_proxy_dev
-    if: always() && !github.event.inputs.skip_dev
+    if: ${{ always() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
       - name: Dev ESPHome Results
