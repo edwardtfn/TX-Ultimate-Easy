@@ -1,0 +1,111 @@
+####################################################################################################
+#####                              TX Ultimate Easy for ESPHome                                #####
+#####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
+####################################################################################################
+##### Purpose: LED Effects Definitions (Optional Component)                                    #####
+####################################################################################################
+##### This file contains LED effect definitions that can be optionally included.               #####
+##### Effects consume additional memory (~10-15KB). Include this file only if:                 #####
+##### - You have sufficient memory available                                                   #####
+##### - You want animated LED effects (Rainbow, Pulse, Fireworks, etc.)                        #####
+##### - You're not experiencing memory constraints                                             #####
+####################################################################################################
+---
+# This file is conditionally included by the main LED configuration
+# based on the ENABLE_LED_EFFECTS substitution value.
+#
+# Available effects:
+# - addressable_rainbow (2 variants: normal and fast)
+# - pulse (2 variants: normal and slow)
+# - addressable_scan
+# - addressable_twinkle
+# - addressable_random_twinkle
+# - addressable_fireworks
+# - addressable_flicker
+# - random
+
+# Effect definitions for EU model (28 LEDs)
+addressable_effects_eu: &addressable_effects_eu
+  effects:
+    - addressable_rainbow:
+        name: "Rainbow"
+        width: 28
+    - addressable_rainbow:
+        name: "Rainbow - Fast"
+        width: 28
+        speed: 50
+    - pulse:
+        name: "Pulse"
+        transition_length: 1s
+        update_interval: 1s
+    - pulse:
+        name: "Pulse - Slow"
+        transition_length: 2s
+        update_interval: 2s
+    - addressable_scan:
+        name: "Scan"
+        move_interval: 100ms
+        scan_width: 3
+    - addressable_twinkle:
+        name: "Twinkle"
+        twinkle_probability: 5%
+        progress_interval: 4ms
+    - addressable_random_twinkle:
+        name: "Random Twinkle"
+        twinkle_probability: 20%
+        progress_interval: 32ms
+    - addressable_fireworks:
+        name: "Fireworks"
+        update_interval: 32ms
+        spark_probability: 10%
+        use_random_color: false
+        fade_out_rate: 120
+    - addressable_flicker:
+        name: "Flicker"
+        update_interval: 16ms
+        intensity: 5%
+    - random:
+        name: "Random"
+
+# Effect definitions for US model (32 LEDs)
+addressable_effects_us: &addressable_effects_us
+  effects:
+    - addressable_rainbow:
+        name: "Rainbow"
+        width: 32
+    - addressable_rainbow:
+        name: "Rainbow - Fast"
+        width: 32
+        speed: 50
+    - pulse:
+        name: "Pulse"
+        transition_length: 1s
+        update_interval: 1s
+    - pulse:
+        name: "Pulse - Slow"
+        transition_length: 2s
+        update_interval: 2s
+    - addressable_scan:
+        name: "Scan"
+        move_interval: 100ms
+        scan_width: 3
+    - addressable_twinkle:
+        name: "Twinkle"
+        twinkle_probability: 5%
+        progress_interval: 4ms
+    - addressable_random_twinkle:
+        name: "Random Twinkle"
+        twinkle_probability: 20%
+        progress_interval: 32ms
+    - addressable_fireworks:
+        name: "Fireworks"
+        update_interval: 32ms
+        spark_probability: 10%
+        use_random_color: false
+        fade_out_rate: 120
+    - addressable_flicker:
+        name: "Flicker"
+        update_interval: 16ms
+        intensity: 5%
+    - random:
+        name: "Random"

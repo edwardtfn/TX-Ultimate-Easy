@@ -1,0 +1,36 @@
+# Example configuration for testing ESPHome 2025.11.0-DEV with full LED effects
+# Use this as a reference when testing the memory improvements
+
+substitutions:
+  name: tx-ultimate-test
+  friendly_name: TX Ultimate Test - Full Effects
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+packages:
+  remote_package:
+    url: https://github.com/edwardtfn/TX-Ultimate-Easy
+    ref: main
+    refresh: 5min
+    files:
+      - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
+      - ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml
+      # EXPERIMENTAL: Add full effects support
+      - ESPHome/TX-Ultimate-Easy-ESPHome_addon_led_effects_full.yaml
+
+# Monitor memory usage
+logger:
+  level: INFO
+  logs:
+    component: DEBUG  # Shows component initialization and memory usage
+
+# Optional: Test with BLE proxy (monitor stability)
+# bluetooth_proxy:
+#   active: true
+
+# Note: Monitor the logs during boot for:
+# - "Free heap: XXXXX bytes" messages
+# - Any memory allocation warnings
+# - Stability during operation

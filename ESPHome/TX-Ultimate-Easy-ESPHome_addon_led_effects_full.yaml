@@ -1,0 +1,182 @@
+####################################################################################################
+#####                              TX Ultimate Easy for ESPHome                                #####
+#####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
+####################################################################################################
+##### Purpose: ESPHome Add-on - LED Effects (Full) - EXPERIMENTAL                             #####
+####################################################################################################
+##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
+####################################################################################################
+##### NOTE:                                                                                    #####
+##### - This package is EXPERIMENTAL and requires ESPHome 2025.11.0+ for optimal performance   #####
+##### - Adds LED effects to side lights (bottom/top/left/right)                                #####
+##### - Significantly increases memory usage - monitor device stability                        #####
+##### - NOT recommended when using BLE proxy + media player simultaneously                     #####
+##### - Use this package only if you have tested and confirmed sufficient memory availability  #####
+####################################################################################################
+---
+# This package extends side lights with effects support
+# Override the no-effects configurations with effect-enabled versions
+
+light:
+  # EU Model - Side lights with effects
+  - id: !extend light_eu_bottom
+    effects:
+      - addressable_rainbow:
+          name: "Rainbow"
+          width: 7
+      - pulse:
+          name: "Pulse"
+          transition_length: 1s
+          update_interval: 1s
+      - addressable_scan:
+          name: "Scan"
+          move_interval: 100ms
+          scan_width: 2
+      - addressable_twinkle:
+          name: "Twinkle"
+          twinkle_probability: 5%
+          progress_interval: 4ms
+      - random:
+          name: "Random"
+
+  - id: !extend light_eu_top
+    effects:
+      - addressable_rainbow:
+          name: "Rainbow"
+          width: 7
+      - pulse:
+          name: "Pulse"
+          transition_length: 1s
+          update_interval: 1s
+      - addressable_scan:
+          name: "Scan"
+          move_interval: 100ms
+          scan_width: 2
+      - addressable_twinkle:
+          name: "Twinkle"
+          twinkle_probability: 5%
+          progress_interval: 4ms
+      - random:
+          name: "Random"
+
+  - id: !extend light_eu_left
+    effects:
+      - addressable_rainbow:
+          name: "Rainbow"
+          width: 7
+      - pulse:
+          name: "Pulse"
+          transition_length: 1s
+          update_interval: 1s
+      - addressable_scan:
+          name: "Scan"
+          move_interval: 100ms
+          scan_width: 2
+      - addressable_twinkle:
+          name: "Twinkle"
+          twinkle_probability: 5%
+          progress_interval: 4ms
+      - random:
+          name: "Random"
+
+  - id: !extend light_eu_right
+    effects:
+      - addressable_rainbow:
+          name: "Rainbow"
+          width: 7
+      - pulse:
+          name: "Pulse"
+          transition_length: 1s
+          update_interval: 1s
+      - addressable_scan:
+          name: "Scan"
+          move_interval: 100ms
+          scan_width: 2
+      - addressable_twinkle:
+          name: "Twinkle"
+          twinkle_probability: 5%
+          progress_interval: 4ms
+      - random:
+          name: "Random"
+
+  # US Model - Side lights with effects
+  - id: !extend light_us_bottom
+    effects:
+      - addressable_rainbow:
+          name: "Rainbow"
+          width: 6
+      - pulse:
+          name: "Pulse"
+          transition_length: 1s
+          update_interval: 1s
+      - addressable_scan:
+          name: "Scan"
+          move_interval: 100ms
+          scan_width: 2
+      - addressable_twinkle:
+          name: "Twinkle"
+          twinkle_probability: 5%
+          progress_interval: 4ms
+      - random:
+          name: "Random"
+
+  - id: !extend light_us_top
+    effects:
+      - addressable_rainbow:
+          name: "Rainbow"
+          width: 6
+      - pulse:
+          name: "Pulse"
+          transition_length: 1s
+          update_interval: 1s
+      - addressable_scan:
+          name: "Scan"
+          move_interval: 100ms
+          scan_width: 2
+      - addressable_twinkle:
+          name: "Twinkle"
+          twinkle_probability: 5%
+          progress_interval: 4ms
+      - random:
+          name: "Random"
+
+  - id: !extend light_us_left
+    effects:
+      - addressable_rainbow:
+          name: "Rainbow"
+          width: 10
+      - pulse:
+          name: "Pulse"
+          transition_length: 1s
+          update_interval: 1s
+      - addressable_scan:
+          name: "Scan"
+          move_interval: 100ms
+          scan_width: 2
+      - addressable_twinkle:
+          name: "Twinkle"
+          twinkle_probability: 5%
+          progress_interval: 4ms
+      - random:
+          name: "Random"
+
+  - id: !extend light_us_right
+    effects:
+      - addressable_rainbow:
+          name: "Rainbow"
+          width: 9
+      - pulse:
+          name: "Pulse"
+          transition_length: 1s
+          update_interval: 1s
+      - addressable_scan:
+          name: "Scan"
+          move_interval: 100ms
+          scan_width: 2
+      - addressable_twinkle:
+          name: "Twinkle"
+          twinkle_probability: 5%
+          progress_interval: 4ms
+      - random:
+          name: "Random"
+...

@@ -1,15 +1,3 @@
-####################################################################################################
-#####                              TX Ultimate Easy for ESPHome                                #####
-#####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
-####################################################################################################
-##### Purpose: ESPHome Core - Hardware - LEDs                                                  #####
-####################################################################################################
-##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
-####################################################################################################
-##### NOTE:                                                                                    #####
-##### - Make changes ONLY if absolutely necessary and you have the required knowledge.         #####
-##### - For normal system use, modifications to this file are NOT required.                    #####
-####################################################################################################
 ---
 substitutions:
   default_transition_length: 500ms
@@ -24,6 +12,11 @@ substitutions:
   LIGHT_TRANSITION_TURN_ON: '0'   # Transition time in msec
   LIGHT_TRANSITION_TURN_OFF: '0'  # Transition time in msec
   LIGHT_BRIGHTNESS_TURN_ON: '0'   # Brightness (1 to 100%, 0 to not set it)
+  # LED Effects Configuration
+  # Set to 'false' to disable effects and save memory (useful for memory-constrained setups)
+  # Effects add approximately 10-15KB to memory usage
+  ENABLE_LED_EFFECTS: 'true'  # Default: effects enabled
+
 
   LIGHT_FULL_RESTORE_MODE: ALWAYS_OFF
   LIGHT_SIDES_RESTORE_MODE: ALWAYS_OFF
@@ -82,6 +75,13 @@ light:
     num_leds: 32
     pin: GPIO13
     restore_mode: ${LIGHT_FULL_RESTORE_MODE}
+  # These lights are controlling the LEDs on the device
+  - id: light_full
+    name: Light - All
+    internal: true
+    num_leds: 32
+    pin: GPIO13
+    restore_mode: ${LIGHT_FULL_RESTORE_MODE}
     platform: esp32_rmt_led_strip
     rgb_order: GRB
     chipset: ws2812
@@ -91,7 +91,50 @@ light:
     # type: GRB
     # variant: WS2811
 
-  # Those lights are available based on the model selections
+# Conditional LED effects package
+# This package is included only when ENABLE_LED_EFFECTS is set to 'true'
+packages:
+  led_effects:
+    url: https://github.com/edwardtfn/TX-Ultimate-Easy
+    ref: main
+    files:
+      - ESPHome/TX-Ultimate-Easy-ESPHome_core_hw_leds_effects.yaml
+    refresh: 5min
+
+
+  # ==================================================================================
+  # LED EFFECTS CONFIGURATION
+  # ==================================================================================
+  # The following light definitions include optional LED effects based on the
+  # ENABLE_LED_EFFECTS substitution. Effects are enabled by default but can be
+  # disabled to save memory if needed.
+  #
+  # Memory Impact:
+  # - WITH effects: ~10-15KB additional memory usage
+  # - WITHOUT effects: Minimal memory footprint, basic on/off/color control only
+  #
+  # When to disable effects:
+  # - Running out of memory during compilation
+  # - Using memory-intensive features (BLE proxy + media player + voice assistant)
+  # - Device experiencing crashes or instability
+  # - You don't need animated lighting effects
+  #
+  # To disable effects, add this to your local configuration:
+  #   substitutions:
+  #     ENABLE_LED_EFFECTS: 'false'
+  # ==================================================================================
+
+  # Memory optimization strategies:
+  # - Side lights (bottom/top/left/right) intentionally exclude effects to save memory
+  # - PSRAM is enabled globally but disabled for LED strip (`use_psram: false`)
+  # - Effects may need to be reduced or removed if memory issues occur
+  #
+  # Future considerations:
+  # - ESPHome 2025.11.0-DEV is expected to bring memory optimizations
+  # - If memory constraints become critical, consider using the advanced configuration
+  #   template to selectively exclude components
+  # - Monitor device memory usage through ESPHome logs during boot
+  #
   - &light_partition_with_effects_eu
     id: light_eu
     name: Light EU

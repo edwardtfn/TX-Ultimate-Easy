@@ -67,7 +67,7 @@ esp32:
 ```
 
 > [!WARNING]  
-> **Migration via OTA:** When switching frameworks via OTA, the partition table may not update correctly. Flash twice in succession to ensure both firmware partitions contain the latest firmware and prevent boot failures.
+> **Migration via OTA:** When switching frameworks via OTA, the partition table may not update correctly. Flash twice consecutively to ensure both firmware partitions contain the latest firmware and prevent boot failures.
 
 ## Integration with Home Assistant
 
@@ -214,6 +214,7 @@ bluetooth_proxy:
 > Bluetooth proxy functionality is provided by ESPHome's native component.
 > TX Ultimate Easy ensures compatibility but does not include it by default to maintain optimal memory usage.
 
+> For detailed memory optimization strategies and troubleshooting, see our [Memory Optimization Guide](docs/MEMORY_OPTIMIZATION.md).
 ### Advanced Settings
 For more granular control over components,
 you can use our [advanced configuration template](TX-Ultimate-Easy-ESPHome_advanced.yaml).
@@ -417,7 +418,7 @@ Note: For proper tracking and resolution:
 
 ## Acknowledgments
 
-This project builds upon the work of several amazing projects and contributors:
+This project builds upon the work of several outstanding projects and contributors:
 
 <!-- markdownlint-disable MD013 -->
 - [SmartHome yourself - SONOFF TX Ultimate for ESPHome](https://github.com/SmartHome-yourself/sonoff-tx-ultimate-for-esphome)
@@ -425,7 +426,7 @@ This project builds upon the work of several amazing projects and contributors:
 - [@PxPert](https://github.com/PxPert) - [Sonoff TX Ultimate and Voice Assistant](https://community.home-assistant.io/t/sonoff-tx-ultimate-and-voice-assistant/682214?u=edwardtfn)
 <!-- markdownlint-enable MD013 -->
 
-Special thanks to all contributors and community members who help make this project better.
+Special thanks to all contributors and community members who help improve this project.
 
 ## License
 
