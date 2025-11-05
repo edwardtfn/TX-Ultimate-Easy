@@ -91,6 +91,28 @@ light:
     # type: GRB
     # variant: WS2811
 
+  # LED Effect Configuration Notes:
+  # ================================
+  # LED effects have been subject to memory constraints on ESP32 devices.
+  # Current implementation includes effects on main lights (light_eu/light_us)
+  # but may be adjusted based on available memory.
+  #
+  # Future considerations (ESPHome 2025.11.0-DEV+):
+  # - Memory optimizations in upcoming ESPHome releases may allow more effects
+  # - Individual light segments (bottom/left/right/top) currently exclude effects
+  #   to conserve memory resources
+  # - If memory becomes available, effects could be added to individual segments
+  #
+  # Effect Types Available (when enabled):
+  # - addressable_rainbow: Rainbow animations with configurable width/speed
+  # - pulse: Smooth pulsing transitions
+  # - addressable_scan: Knight Rider style scanning effect
+  # - addressable_twinkle: Random twinkling LEDs
+  # - addressable_random_twinkle: More intense random twinkling
+  # - addressable_fireworks: Firework-like burst effects
+  # - addressable_flicker: Candle-like flickering
+  # - random: Random color changes
+
   # Those lights are available based on the model selections
   - &light_partition_with_effects_eu
     id: light_eu
@@ -218,7 +240,9 @@ light:
             light_ptr: !lambda return id(light_us);
             effect_global_ptr: !lambda return &id(led_main_packed_effect);
 
-  - &light_partition_no_effects_disabled
+
+  # Light partitions without effects (memory optimization)
+  # Individual LED segments disabled by default to conserve resources
     id: light_eu_bottom
     name: Light - Bottom EU
     platform: partition

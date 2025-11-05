@@ -67,7 +67,7 @@ esp32:
 ```
 
 > [!WARNING]  
-> **Migration via OTA:** When switching frameworks via OTA, the partition table may not update correctly. Flash twice in succession to ensure both firmware partitions contain the latest firmware and prevent boot failures.
+> **Migration via OTA:** When switching frameworks via OTA, the partition table may not update correctly. Flash twice consecutively to ensure both firmware partitions contain the latest firmware and prevent boot failures.
 
 ## Integration with Home Assistant
 
@@ -116,6 +116,25 @@ All device behaviors can be customized through Home Assistant automations withou
 - **Audio Feedback**: Built-in speaker support for audible feedback
 - **Haptic Feedback**: Vibration motor support for tactile feedback
 - **ESP-IDF Framework**: Enhanced performance and stability with ESP-IDF support
+
+
+## Documentation
+
+### LED Effects Configuration
+
+TX Ultimate Easy supports various LED effects for visual feedback and ambiance. Due to memory constraints on ESP32 devices, effects are carefully managed:
+
+- **Main light groups** (EU/US) have full effect support with 10 different effects
+- **Individual LED segments** have effects disabled by default to conserve memory
+- Future ESPHome releases (2025.11.0-DEV+) may enable more effects through memory optimizations
+
+For detailed information about LED effects, memory considerations, and future roadmap, see:
+- [LED Effects Configuration Guide](docs/LED_EFFECTS.md)
+
+### Event System
+
+For information about the event system and automation capabilities, see:
+- [Event Engine Documentation](docs/events.md)
 
 ## Hardware Support
 
@@ -417,7 +436,7 @@ Note: For proper tracking and resolution:
 
 ## Acknowledgments
 
-This project builds upon the work of several amazing projects and contributors:
+This project builds upon the work of several outstanding projects and contributors:
 
 <!-- markdownlint-disable MD013 -->
 - [SmartHome yourself - SONOFF TX Ultimate for ESPHome](https://github.com/SmartHome-yourself/sonoff-tx-ultimate-for-esphome)
@@ -425,7 +444,7 @@ This project builds upon the work of several amazing projects and contributors:
 - [@PxPert](https://github.com/PxPert) - [Sonoff TX Ultimate and Voice Assistant](https://community.home-assistant.io/t/sonoff-tx-ultimate-and-voice-assistant/682214?u=edwardtfn)
 <!-- markdownlint-enable MD013 -->
 
-Special thanks to all contributors and community members who help make this project better.
+Special thanks to all contributors and community members who help improve this project.
 
 ## License
 

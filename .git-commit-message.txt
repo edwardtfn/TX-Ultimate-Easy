@@ -1,0 +1,35 @@
+docs: Add comprehensive LED effects documentation and inline comments
+
+This commit addresses LED effects configuration and memory management
+considerations in the TX Ultimate Easy firmware.
+
+Changes:
+1. ESPHome/TX-Ultimate-Easy-ESPHome_core_hw_leds.yaml
+   - Added detailed inline documentation about LED effects
+   - Explained memory constraints and optimization strategies
+   - Documented the difference between effects-enabled and no-effects partitions
+   - Referenced future ESPHome 2025.11.0-DEV memory optimizations
+
+2. docs/LED_EFFECTS.md (NEW)
+   - Comprehensive guide to LED effects configuration
+   - Detailed table of all 10 available effect types
+   - Memory considerations and optimization strategies
+   - Future roadmap for effect re-enablement
+   - Developer notes with examples
+   - Testing checklist for modifications
+   - Implementation details and file references
+
+3. README.md
+   - Added "Documentation" section after Key Features
+   - Links to LED Effects guide and Event System documentation
+   - Clear explanation of current limitations and plans
+
+Context:
+LED effects were previously subject to memory constraints on ESP32 devices.
+Current implementation provides full effects on main light groups (light_eu/light_us)
+while individual LED segments have effects disabled to conserve memory.
+
+Future ESPHome releases (2025.11.0-DEV+) are expected to bring memory
+optimizations that may allow re-enabling effects on more partitions.
+
+Related: Memory optimization discussion and ESPHome 2025.11.0-DEV plans
