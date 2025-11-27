@@ -37,7 +37,6 @@ api:
   on_client_connected:
     then:
       - script.execute: dump_config_caller
-      - script.execute: publish_device_info
 
 binary_sensor:
   - id: bs_pending_restart
@@ -147,13 +146,7 @@ script:
     then:
       - lambda: |-
           // Send event to Home Assistant
-          esphome::api::CustomAPIDevice ha_event;
-          ha_event.fire_homeassistant_event("${EVENT_NAME}", {
-            {"device_name", id(tx_device_name).state.c_str()},
-            {"firmware", "${version}"},
-            {"domain", "boot"},
-            {"type", type.c_str()}
-          });
+          esphome::tx_ultimate_easy::fire_ha_event("boot", type.c_str(), {});
 
   - id: boot_done
     mode: restart
@@ -193,7 +186,6 @@ script:
   - id: boot_sequence
     mode: restart
     then:
-      - script.execute: publish_device_info
       - binary_sensor.template.publish:
           id: bs_pending_restart
           state: false
@@ -206,7 +198,7 @@ script:
           // Device identification
           ESP_LOGCONFIG("${TAG_COMMON}", "Device friendly name: ${friendly_name}");
           ESP_LOGCONFIG("${TAG_COMMON}", "Device name: ${name}");
-          ESP_LOGCONFIG("${TAG_COMMON}", "Device name (HA): %s", tx_device_name->state.c_str());
+          ESP_LOGCONFIG("${TAG_COMMON}", "Device name (HA): %s", esphome::tx_ultimate_easy::cached_device_name.c_str());
           ESP_LOGCONFIG("${TAG_COMMON}", "Device hostname: %s", App.get_name().c_str());
 
           dump_config_versions->execute();
@@ -269,13 +261,6 @@ script:
           // ESPHome builder information
           ESP_LOGCONFIG("${TAG_COMMON}", "ESPHome builder: " ESPHOME_VERSION);
           ESP_LOGCONFIG("${TAG_COMMON}", "ESPHome build timestamp: %s", App.get_compilation_time().c_str());
-
-  - id: publish_device_info
-    mode: restart
-    then:
-      - lambda: |-
-          tx_fw_version->publish_state("${version}");
-          tx_device_name->publish_state(App.get_name().c_str());
 
   - id: restore_from_nvs
     mode: single
@@ -366,6 +351,7 @@ wifi:
   on_connect:
     then:
       - lambda: |-
+          tx_fw_version->publish_state("${version}");
           if (esphome::tx_ultimate_easy::cached_device_name.empty()) {
             bool last_was_underscore = false;
             for (const char& c : App.get_name()) {
