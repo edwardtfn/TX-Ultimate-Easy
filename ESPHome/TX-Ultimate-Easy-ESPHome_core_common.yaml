@@ -29,10 +29,11 @@ substitutions:
 
   DUMP_CONFIG_CALLER_DELAY: 5s  # Delay to dump config after requested
 
-  TAG_CORE_COMMON: core.common
+  TAG_CORE_COMMON: tx_ultimate_easy.core.common
 
 api:
   id: api_server
+  homeassistant_services: true
   on_client_connected:
     then:
       - script.execute: dump_config_caller
@@ -85,6 +86,7 @@ esphome:
   platformio_options:
     build_flags:
       - -D TX_ULTIMATE_EASY_CORE_COMMON
+      - -D TX_ULTIMATE_EASY_FIRMWARE_VERSION="${version}"
 
   on_boot:
     - priority: 1000  # Very early in boot process
@@ -353,26 +355,29 @@ text_sensor:
     disabled_by_default: false
     update_interval: never
     lambda: |-
-      return {"${name}"};
-    filters:
-      - lambda: |-
-          const std::string raw_name = x;
-          std::string result;
-          bool last_was_underscore = false;
-          for (const char& c : raw_name) {
-            if (isalnum(c)) {
-              result += tolower(c);  // Add alphanumeric characters as lowercase
-              last_was_underscore = false;
-            } else if (!last_was_underscore) {  // Replace non-alphanumeric with '_' but avoid consecutive '_'
-              result += '_';
-              last_was_underscore = true;
-            }
-          }
-          return result;
+      return { esphome::tx_ultimate_easy::cached_device_name };
 
 tx_ultimate_easy:
   id: tx_ultimate
 
 wifi:
   id: wifi_component
+
+  on_connect:
+    then:
+      - lambda: |-
+          if (esphome::tx_ultimate_easy::cached_device_name.empty()) {
+            bool last_was_underscore = false;
+            for (const char& c : App.get_name()) {
+              if (isalnum(c)) {
+                esphome::tx_ultimate_easy::cached_device_name += tolower(c);  // Add alphanumeric characters as lowercase
+                last_was_underscore = false;
+              } else if (!last_was_underscore) {  // Replace non-alphanumeric with '_' but avoid consecutive '_'
+                esphome::tx_ultimate_easy::cached_device_name += '_';
+                last_was_underscore = true;
+              }
+            }
+            ESP_LOGI("${TAG_CORE_COMMON}", "Device name: %s", esphome::tx_ultimate_easy::cached_device_name.c_str());
+            tx_device_name->publish_state(esphome::tx_ultimate_easy::cached_device_name.c_str());
+          }
 ...
