@@ -79,7 +79,7 @@ esphome:
   name: ${name}
   friendly_name: ${friendly_name}
   comment: TX Ultimate Easy
-  min_version: 2025.8.0
+  min_version: 2025.11.0
   project:
     name: "edwardtfn.tx_ultimate_easy"
     version: ${version}
@@ -184,7 +184,7 @@ script:
             - lambda: return sl_tx_model_format->active_index().has_value();
             - lambda: return sl_tx_model_gang->active_index().has_value();
       - lambda: |-
-          id(is_us_model) = (sl_tx_model_format->state == "${TX_MODEL_FORMAT_US_TEXT}");
+          id(is_us_model) = strcmp(sl_tx_model_format->current_option(), "${TX_MODEL_FORMAT_US_TEXT}") == 0;
           id(gang_count) = sl_tx_model_gang->active_index().value() + 1;
           if (id(gang_count) < 1 || id(gang_count) > 4) {
             ESP_LOGE("${TAG_COMMON}", "Invalid number of gangs: %" PRIu8, id(gang_count));
@@ -222,11 +222,11 @@ script:
 
           // Model configuration
           ESP_LOGCONFIG("${TAG_COMMON}", "Model format (selected): %s",
-                          sl_tx_model_format->state.c_str());
+                          sl_tx_model_format->current_option());
           ESP_LOGCONFIG("${TAG_COMMON}", "Model format (detected): %s",
                           id(is_us_model) ? "US" : "EU");
           ESP_LOGCONFIG("${TAG_COMMON}", "Gangs (selected): %s",
-                          sl_tx_model_gang->state.c_str());
+                          sl_tx_model_gang->current_option());
           ESP_LOGCONFIG("${TAG_COMMON}", "Gangs (detected): %" PRIu8 "-Gang%s",
                           id(gang_count), id(gang_count) > 1 ? "s" : "");
 

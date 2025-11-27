@@ -131,8 +131,9 @@ script:
     mode: restart
     then:
       - lambda: |-
-          if (sl_touch_speaker_feedback->state != "Disabled")
+          if (strcmp(sl_touch_speaker_feedback->current_option(), "Disabled") != 0) {
             speaker_play_click->execute();
+          }
 
   - id: !extend touch_on_press
     then:
@@ -142,8 +143,10 @@ script:
     mode: restart
     then:
       - lambda: |-
-          if (sl_touch_speaker_feedback->state == "On press" or sl_touch_speaker_feedback->state == "Always")
+          if (strcmp(sl_touch_speaker_feedback->current_option(), "On press") == 0 or
+              strcmp(sl_touch_speaker_feedback->current_option(), "Always") == 0) {
             speaker_play_click->execute();
+          }
 
   - id: !extend touch_on_release
     then:
@@ -153,8 +156,10 @@ script:
     mode: restart
     then:
       - lambda: |-
-          if (sl_touch_speaker_feedback->state == "On release" or sl_touch_speaker_feedback->state == "Always")
+          if (strcmp(sl_touch_speaker_feedback->current_option(), "On release") == 0 or
+              strcmp(sl_touch_speaker_feedback->current_option(), "Always") == 0) {
             speaker_play_click->execute();
+          }
 
 select:
   - id: sl_touch_speaker_feedback

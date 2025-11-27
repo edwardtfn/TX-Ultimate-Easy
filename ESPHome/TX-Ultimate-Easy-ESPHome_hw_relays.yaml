@@ -966,28 +966,28 @@ script:
           }
           switch (button) {
             case ${BUTTON_1_ID}:
-              select_state = sl_button_1_action->state;
+              select_state = sl_button_1_action->current_option();
               toggle_relay = (select_state == "${BUTTON_1_ACTION_TEXT}" or
                               (api_disconnected and select_state == "${BUTTON_1_ACTION_FAILSAFE_TEXT}"));
               if (toggle_relay)
                 sw_relay_1->toggle();
               break;
             case ${BUTTON_2_ID}:
-              select_state = sl_button_2_action->state;
+              select_state = sl_button_2_action->current_option();
               toggle_relay = (select_state == "${BUTTON_2_ACTION_TEXT}" or
                               (api_disconnected and select_state == "${BUTTON_2_ACTION_FAILSAFE_TEXT}"));
               if (toggle_relay)
                 sw_relay_2->toggle();
               break;
             case ${BUTTON_3_ID}:
-              select_state = sl_button_3_action->state;
+              select_state = sl_button_3_action->current_option();
               toggle_relay = (select_state == "${BUTTON_3_ACTION_TEXT}" or
                               (api_disconnected and select_state == "${BUTTON_3_ACTION_FAILSAFE_TEXT}"));
               if (toggle_relay)
                 sw_relay_3->toggle();
               break;
             case ${BUTTON_4_ID}:
-              select_state = sl_button_4_action->state;
+              select_state = sl_button_4_action->current_option();
               toggle_relay = (select_state == "${BUTTON_4_ACTION_TEXT}" or
                               (api_disconnected and select_state == "${BUTTON_4_ACTION_FAILSAFE_TEXT}"));
               if (toggle_relay)
@@ -1011,16 +1011,16 @@ script:
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Relay%s mode%s:", gang_count_plural_suffix.c_str(),
                                                                   gang_count_plural_suffix.c_str());
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 1: %s", sl_relay_1_mode->has_state() ?
-                                              sl_relay_1_mode->state.c_str() : "Unknown");
+                                              sl_relay_1_mode->current_option() : "Unknown");
           if (id(gang_count) >= 2)
             ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 2: %s", sl_relay_2_mode->has_state() ?
-                                                sl_relay_2_mode->state.c_str() : "Unknown");
+                                                sl_relay_2_mode->current_option() : "Unknown");
           if (id(gang_count) >= 3)
             ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 3: %s", sl_relay_3_mode->has_state() ?
-                                                sl_relay_3_mode->state.c_str() : "Unknown");
+                                                sl_relay_3_mode->current_option() : "Unknown");
           if (id(gang_count) >= 4)
             ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 4: %s", sl_relay_4_mode->has_state() ?
-                                                sl_relay_4_mode->state.c_str() : "Unknown");
+                                                sl_relay_4_mode->current_option() : "Unknown");
 
           // Relay's states
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Relay%s state%s:", gang_count_plural_suffix.c_str(),
@@ -1048,20 +1048,20 @@ script:
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Relay%s LEDs mode%s:", gang_count_plural_suffix.c_str(),
                                                                         gang_count_plural_suffix.c_str());
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 1: %s", id(is_us_model) ?
-                                                                  sl_relay_1_light_mode_us->state.c_str() :
-                                                                  sl_relay_1_light_mode_eu->state.c_str());
+                                                                  sl_relay_1_light_mode_us->current_option() :
+                                                                  sl_relay_1_light_mode_eu->current_option());
           if (id(gang_count) >= 2)
             ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 2: %s", id(is_us_model) ?
-                                                                  sl_relay_2_light_mode_us->state.c_str() :
-                                                                  sl_relay_2_light_mode_eu->state.c_str());
+                                                                  sl_relay_2_light_mode_us->current_option() :
+                                                                  sl_relay_2_light_mode_eu->current_option());
           if (id(gang_count) >= 3)
             ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 3: %s", id(is_us_model) ?
-                                                                  sl_relay_3_light_mode_us->state.c_str() :
-                                                                  sl_relay_3_light_mode_eu->state.c_str());
+                                                                  sl_relay_3_light_mode_us->current_option() :
+                                                                  sl_relay_3_light_mode_eu->current_option());
           if (id(gang_count) >= 4)
             ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 4: %s", id(is_us_model) ?
-                                                                  sl_relay_4_light_mode_us->state.c_str() :
-                                                                  sl_relay_4_light_mode_eu->state.c_str());
+                                                                  sl_relay_4_light_mode_us->current_option() :
+                                                                  sl_relay_4_light_mode_eu->current_option());
 
   - id: !extend dump_config_list_packages
     then:
@@ -1305,26 +1305,26 @@ script:
               case 0:
                 relay_state = id(sw_relay_1).state;
                 light_mode = id(is_us_model)
-                              ? id(sl_relay_1_light_mode_us)->state
-                              : id(sl_relay_1_light_mode_eu)->state;
+                              ? sl_relay_1_light_mode_us->current_option()
+                              : sl_relay_1_light_mode_eu->current_option();
                 break;
               case 1:
                 relay_state = id(sw_relay_2).state;
                 light_mode = id(is_us_model)
-                              ? id(sl_relay_2_light_mode_us)->state
-                              : id(sl_relay_2_light_mode_eu)->state;
+                              ? sl_relay_2_light_mode_us->current_option()
+                              : sl_relay_2_light_mode_eu->current_option();
                 break;
               case 2:
                 relay_state = id(sw_relay_3).state;
                 light_mode = id(is_us_model)
-                              ? id(sl_relay_3_light_mode_us)->state
-                              : id(sl_relay_3_light_mode_eu)->state;
+                              ? sl_relay_3_light_mode_us->current_option()
+                              : sl_relay_3_light_mode_eu->current_option();
                 break;
               case 3:
                 relay_state = id(sw_relay_4).state;
                 light_mode = id(is_us_model)
-                              ? id(sl_relay_4_light_mode_us)->state
-                              : id(sl_relay_4_light_mode_eu)->state;
+                              ? sl_relay_4_light_mode_us->current_option()
+                              : sl_relay_4_light_mode_eu->current_option();
                 break;
             }
 

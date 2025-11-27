@@ -65,7 +65,7 @@ script:
       - lambda: |-
           // Configuration
           ESP_LOGCONFIG("${TAG_HW_VIBRATION}", "Touch - Vibration feedback: %s",
-                        sl_touch_vibration_feedback->state.c_str());
+                                              sl_touch_vibration_feedback->current_option());
           ESP_LOGCONFIG("${TAG_HW_VIBRATION}", "Vibrate duration: %.0fms", nr_vibrating_duration->state);
           ESP_LOGCONFIG("${TAG_HW_VIBRATION}", "Vibrate max duration: ${vibration_max_duration}");
 
@@ -95,8 +95,9 @@ script:
     mode: restart
     then:
       - lambda: |-
-          if (sl_touch_vibration_feedback->state != "Disabled")
+          if (strcmp(sl_touch_vibration_feedback->current_option(), "Disabled") != 0) {
             vibrate->execute();
+          }
 
   - id: !extend touch_on_press
     then:
@@ -106,8 +107,10 @@ script:
     mode: restart
     then:
       - lambda: |-
-          if (sl_touch_vibration_feedback->state == "On press" or sl_touch_vibration_feedback->state == "Always")
+          if (strcmp(sl_touch_vibration_feedback->current_option(), "On press") == 0 or
+              strcmp(sl_touch_vibration_feedback->current_option(), "Always") == 0) {
             vibrate->execute();
+          }
 
   - id: !extend touch_on_release
     then:
@@ -117,8 +120,10 @@ script:
     mode: restart
     then:
       - lambda: |-
-          if (sl_touch_vibration_feedback->state == "On release" or sl_touch_vibration_feedback->state == "Always")
+          if (strcmp(sl_touch_vibration_feedback->current_option(), "On release") == 0 or
+              strcmp(sl_touch_vibration_feedback->current_option(), "Always") == 0) {
             vibrate->execute();
+          }
 
   - id: vibrate
     mode: restart

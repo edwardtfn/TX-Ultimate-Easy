@@ -407,7 +407,8 @@ tx_ultimate_easy:
   on_swipe_left:
     then:
       - lambda: |-
-          const char *direction = (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}") ? "left" : "down";
+          const char *direction = (sl_tx_model_format->current_option() == "${TX_MODEL_FORMAT_EU_TEXT}") ?
+                                  "left" : "down";
           esphome::tx_ultimate_easy::fire_ha_event("touch", "swipe", {
             {"action", direction},
             {"swipe-direction", direction},
@@ -419,7 +420,8 @@ tx_ultimate_easy:
   on_swipe_right:
     then:
       - lambda: |-
-          const char *direction = (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}") ? "right" : "up";
+          const char *direction = (sl_tx_model_format->current_option() == "${TX_MODEL_FORMAT_EU_TEXT}") ?
+                                  "right" : "up";
           esphome::tx_ultimate_easy::fire_ha_event("touch", "swipe", {
             {"action", direction},
             {"swipe-direction", direction},
