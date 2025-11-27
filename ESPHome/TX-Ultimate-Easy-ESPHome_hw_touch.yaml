@@ -296,12 +296,12 @@ script:
       - script.wait: dump_config
       - lambda: |-
           // Check for requirements
-          #if !defined(TX_ULTIMATE_EASY_CORE_COMMON)
-            #error "The package TX-Ultimate-Easy-ESPHome_core_common.yaml is required."
+          #if !defined(TX_ULTIMATE_EASY_COMMON)
+            #error "The package TX-Ultimate-Easy-ESPHome_common.yaml is required."
           #endif
 
           // Identify itself
-          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Core - Hardware - Touchpad");
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Hardware - Touchpad");
 
   - id: touch_on_multi_touch_release
     mode: restart

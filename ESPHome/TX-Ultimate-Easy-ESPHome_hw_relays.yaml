@@ -1068,16 +1068,16 @@ script:
       - script.wait: dump_config
       - lambda: |-
           // Check for requirements
-          #if !defined(TX_ULTIMATE_EASY_CORE_COMMON)
-            #error "The package TX-Ultimate-Easy-ESPHome_core_common.yaml is required."
+          #if !defined(TX_ULTIMATE_EASY_COMMON)
+            #error "The package TX-Ultimate-Easy-ESPHome_common.yaml is required."
           #endif
-          #if !defined(TX_ULTIMATE_EASY_CORE_HW_LEDS)
-            #error "The package TX-Ultimate-Easy-ESPHome_core_hw_leds.yaml is required."
-          #endif  // TX_ULTIMATE_EASY_CORE_HW_LEDS
+          #if !defined(TX_ULTIMATE_EASY_HW_LEDS)
+            #error "The package TX-Ultimate-Easy-ESPHome_hw_leds.yaml is required."
+          #endif  // TX_ULTIMATE_EASY_HW_LEDS
 
 
           // Identify itself
-          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Standard - Hardware - Relays");
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Hardware - Relays");
 
   - id: light_set_state
     mode: parallel

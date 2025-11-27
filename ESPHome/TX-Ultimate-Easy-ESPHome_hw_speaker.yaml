@@ -78,15 +78,15 @@ script:
       - script.wait: dump_config
       - lambda: |-
           // Check for requirements
-          #if !defined(TX_ULTIMATE_EASY_CORE_COMMON)
-            #error "The package TX-Ultimate-Easy-ESPHome_core_common.yaml is required."
+          #if !defined(TX_ULTIMATE_EASY_COMMON)
+            #error "The package TX-Ultimate-Easy-ESPHome_common.yaml is required."
           #endif
-          #if !defined(TX_ULTIMATE_EASY_STANDARD_HW_AUDIO)
-            #error "The package TX-Ultimate-Easy-ESPHome_standard_hw_audio.yaml is required."
+          #if !defined(TX_ULTIMATE_EASY_HW_AUDIO)
+            #error "The package TX-Ultimate-Easy-ESPHome_hw_audio.yaml is required."
           #endif
 
           // Identify itself
-          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Standard - Hardware - Speaker");
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Hardware - Speaker");
 
   - id: speaker_play_click
     then:
