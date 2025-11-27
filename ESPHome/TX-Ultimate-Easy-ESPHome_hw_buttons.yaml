@@ -124,12 +124,7 @@ script:
     then:
       - lambda: |-
           // Send event to Home Assistant
-          esphome::api::CustomAPIDevice ha_event;
-          ha_event.fire_homeassistant_event("${EVENT_NAME}", {
-            {"device_name", id(tx_device_name).state.c_str()},
-            {"firmware", "${version}"},
-            {"domain", "touch"},
-            {"type", "button"},
+          esphome::tx_ultimate_easy::fire_ha_event("touch", "button", {
             {"action", action.c_str()},
             {"button_id", std::to_string(button)},
             {"count", std::to_string(count)},
