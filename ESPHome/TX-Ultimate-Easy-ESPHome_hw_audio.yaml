@@ -14,12 +14,12 @@
 substitutions:
   SWITCH_AUDIO_AMPLIFIER_RESTORE_MODE: RESTORE_DEFAULT_ON
 
-  TAG_STD_HW_AUDIO: std.hw.audio
+  TAG_HW_AUDIO: tx_ultimate_easy.hw.audio
 
 esphome:
   platformio_options:
     build_flags:
-      - -D TX_ULTIMATE_EASY_STANDARD_HW_AUDIO
+      - -D TX_ULTIMATE_EASY_HW_AUDIO
 
 i2s_audio:
   - id: if_i2s_audio

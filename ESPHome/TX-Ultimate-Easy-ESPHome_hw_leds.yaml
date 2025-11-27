@@ -32,12 +32,12 @@ substitutions:
   LIGHT_ATTRS_DEFAULT: '0x64FFFFFF'               # brightness=100, RGB=255,255,255
   LIGHT_DUAL_ATTRS_DEFAULT: '0x64FFFFFF64FFFFFF'  # Both lights: brightness=100, RGB=255,255,255
 
-  TAG_CORE_HW_LEDS: core.hw.leds
+  TAG_HW_LEDS: tx_ultimate_easy.hw.leds
 
 esphome:
   platformio_options:
     build_flags:
-      - -D TX_ULTIMATE_EASY_CORE_HW_LEDS
+      - -D TX_ULTIMATE_EASY_HW_LEDS
 
 globals:
   # light_full with effect support
@@ -601,22 +601,22 @@ script:
     then:
       - lambda: |-
           // Transition times
-          ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "Transition times:");
-          ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "  Default:     ${default_transition_length}");
+          ESP_LOGCONFIG("${TAG_HW_LEDS}", "Transition times:");
+          ESP_LOGCONFIG("${TAG_HW_LEDS}", "  Default:     ${default_transition_length}");
           if (${LIGHT_TRANSITION_TURN_ON} > 0)
-            ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "  Turning on:  ${LIGHT_TRANSITION_TURN_ON}ms");
+            ESP_LOGCONFIG("${TAG_HW_LEDS}", "  Turning on:  ${LIGHT_TRANSITION_TURN_ON}ms");
           else
-            ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "  Turning on:  Disabled");
+            ESP_LOGCONFIG("${TAG_HW_LEDS}", "  Turning on:  Disabled");
           if (${LIGHT_TRANSITION_TURN_OFF} > 0)
-            ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "  Turning off: ${LIGHT_TRANSITION_TURN_OFF}ms");
+            ESP_LOGCONFIG("${TAG_HW_LEDS}", "  Turning off: ${LIGHT_TRANSITION_TURN_OFF}ms");
           else
-            ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "  Turning off: Disabled");
+            ESP_LOGCONFIG("${TAG_HW_LEDS}", "  Turning off: Disabled");
 
           // Restore modes
-          ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "LED restore modes:");
-          ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "  Light - All: ${LIGHT_FULL_RESTORE_MODE}");
-          ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "  Sides:       ${LIGHT_SIDES_RESTORE_MODE}");
-          ESP_LOGCONFIG("${TAG_CORE_HW_LEDS}", "  Individual:  ${LIGHT_INDIVIDUAL_RESTORE_MODE}");
+          ESP_LOGCONFIG("${TAG_HW_LEDS}", "LED restore modes:");
+          ESP_LOGCONFIG("${TAG_HW_LEDS}", "  Light - All: ${LIGHT_FULL_RESTORE_MODE}");
+          ESP_LOGCONFIG("${TAG_HW_LEDS}", "  Sides:       ${LIGHT_SIDES_RESTORE_MODE}");
+          ESP_LOGCONFIG("${TAG_HW_LEDS}", "  Individual:  ${LIGHT_INDIVIDUAL_RESTORE_MODE}");
 
   - id: !extend dump_config_list_packages
     then:
@@ -638,11 +638,11 @@ script:
     then:
       - lambda: |-
           if (!light_ptr) {
-            ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid light pointer");
+            ESP_LOGE("${TAG_HW_LEDS}", "Invalid light pointer");
             return;
           }
           if (!attr_global_ptr) {
-            ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid attributes pointer");
+            ESP_LOGE("${TAG_HW_LEDS}", "Invalid attributes pointer");
             return;
           }
           tx_ultimate_easy::LightAttributes attrs = tx_ultimate_easy::unpack_light_attributes(*attr_global_ptr);
@@ -650,7 +650,7 @@ script:
           call.set_brightness(attrs.brightness / 100.0f);
           call.set_rgb(attrs.red / 255.0f, attrs.green / 255.0f, attrs.blue / 255.0f);
           call.perform();
-          ESP_LOGI("${TAG_CORE_HW_LEDS}", "Restored light attributes: brightness=%d%%, RGB=(%d,%d,%d)",
+          ESP_LOGI("${TAG_HW_LEDS}", "Restored light attributes: brightness=%d%%, RGB=(%d,%d,%d)",
                                           attrs.brightness, attrs.red, attrs.green, attrs.blue);
 
   - id: light_attributes_restore_dual
@@ -662,15 +662,15 @@ script:
     then:
       - lambda: |-
           if (!light_ptr) {
-            ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid light pointer");
+            ESP_LOGE("${TAG_HW_LEDS}", "Invalid light pointer");
             return;
           }
           if (!attr_global_ptr) {
-            ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid attributes pointer");
+            ESP_LOGE("${TAG_HW_LEDS}", "Invalid attributes pointer");
             return;
           }
           if (group_index != 1 && group_index != 2) {
-            ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid group_index=%d (expected 1 or 2)", group_index);
+            ESP_LOGE("${TAG_HW_LEDS}", "Invalid group_index=%d (expected 1 or 2)", group_index);
             return;
           }
           auto attrs_pair = tx_ultimate_easy::unpack_dual_light_attributes(*attr_global_ptr);
@@ -680,7 +680,7 @@ script:
           call.set_brightness(attrs.brightness / 100.0f);
           call.set_rgb(attrs.red / 255.0f, attrs.green / 255.0f, attrs.blue / 255.0f);
           call.perform();
-          ESP_LOGI("${TAG_CORE_HW_LEDS}", "Restored (group=%d) attributes: brightness=%d%%, RGB=(%d,%d,%d)",
+          ESP_LOGI("${TAG_HW_LEDS}", "Restored (group=%d) attributes: brightness=%d%%, RGB=(%d,%d,%d)",
                                           group_index, attrs.brightness, attrs.red, attrs.green, attrs.blue);
 
   - id: light_attributes_save
@@ -691,11 +691,11 @@ script:
     then:
       - lambda: |-
           if (!light_ptr) {
-            ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid light pointer");
+            ESP_LOGE("${TAG_HW_LEDS}", "Invalid light pointer");
             return;
           }
           if (!attr_global_ptr) {
-            ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid attributes pointer");
+            ESP_LOGE("${TAG_HW_LEDS}", "Invalid attributes pointer");
             return;
           }
           auto current = light_ptr->current_values;
@@ -707,7 +707,7 @@ script:
           };
 
           *attr_global_ptr = tx_ultimate_easy::pack_light_attributes(attrs);
-          ESP_LOGD("${TAG_CORE_HW_LEDS}", "Saved light attributes: brightness=%d%%, RGB=(%d,%d,%d)",
+          ESP_LOGD("${TAG_HW_LEDS}", "Saved light attributes: brightness=%d%%, RGB=(%d,%d,%d)",
                                           attrs.brightness, attrs.red, attrs.green, attrs.blue);
 
   - id: light_attributes_save_dual
@@ -719,15 +719,15 @@ script:
     then:
       - lambda: |-
           if (!light_ptr) {
-            ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid light pointer");
+            ESP_LOGE("${TAG_HW_LEDS}", "Invalid light pointer");
             return;
           }
           if (!attr_global_ptr) {
-            ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid attributes pointer");
+            ESP_LOGE("${TAG_HW_LEDS}", "Invalid attributes pointer");
             return;
           }
           if (group_index != 1 && group_index != 2) {
-            ESP_LOGE("${TAG_CORE_HW_LEDS}", "Invalid group_index=%d (expected 1 or 2)", group_index);
+            ESP_LOGE("${TAG_HW_LEDS}", "Invalid group_index=%d (expected 1 or 2)", group_index);
             return;
           }
           auto current = light_ptr->current_values;
@@ -761,7 +761,7 @@ script:
           // Store effect index (16 bits) + reserved space for future use
           *effect_global_ptr = effect_index & 0xFFFF;
 
-          ESP_LOGD("${TAG_CORE_HW_LEDS}", "Saved effect index: %d", effect_index);
+          ESP_LOGD("${TAG_HW_LEDS}", "Saved effect index: %d", effect_index);
 
   - id: light_effect_restore
     mode: parallel
@@ -776,7 +776,7 @@ script:
 
           if (effect_index == 0) return; // No effect
           if (effect_index > light_ptr->get_effect_count()) {
-            ESP_LOGW("${TAG_CORE_HW_LEDS}", "Invalid effect index: %d (max: %d)",
+            ESP_LOGW("${TAG_HW_LEDS}", "Invalid effect index: %d (max: %d)",
                       effect_index, light_ptr->get_effect_count());
             return;
           }
@@ -785,7 +785,7 @@ script:
           call.set_effect(effect_index);
           call.perform();
 
-          ESP_LOGI("${TAG_CORE_HW_LEDS}", "Restored effect: %s (index=%d)",
+          ESP_LOGI("${TAG_HW_LEDS}", "Restored effect: %s (index=%d)",
                     light_ptr->get_effect_name_by_index(effect_index).c_str(), effect_index);
 
   - id: !extend restore_from_nvs

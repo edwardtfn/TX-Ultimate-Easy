@@ -29,7 +29,7 @@ substitutions:
 
   DUMP_CONFIG_CALLER_DELAY: 5s  # Delay to dump config after requested
 
-  TAG_CORE_COMMON: tx_ultimate_easy.core.common
+  TAG_COMMON: tx_ultimate_easy.common
 
 api:
   id: api_server
@@ -85,7 +85,7 @@ esphome:
     version: ${version}
   platformio_options:
     build_flags:
-      - -D TX_ULTIMATE_EASY_CORE_COMMON
+      - -D TX_ULTIMATE_EASY_COMMON
       - -D TX_ULTIMATE_EASY_FIRMWARE_VERSION="${version}"
 
   on_boot:
@@ -187,7 +187,7 @@ script:
           id(is_us_model) = (sl_tx_model_format->state == "${TX_MODEL_FORMAT_US_TEXT}");
           id(gang_count) = sl_tx_model_gang->active_index().value() + 1;
           if (id(gang_count) < 1 || id(gang_count) > 4) {
-            ESP_LOGE("${TAG_CORE_COMMON}", "Invalid number of gangs: %" PRIu8, id(gang_count));
+            ESP_LOGE("${TAG_COMMON}", "Invalid number of gangs: %" PRIu8, id(gang_count));
           }
 
   - id: boot_sequence
@@ -204,43 +204,43 @@ script:
       # Extended by all modules
       - lambda: |-
           // Device identification
-          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Device friendly name: ${friendly_name}");
-          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Device name: ${name}");
-          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Device name (HA): %s", tx_device_name->state.c_str());
-          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Device hostname: %s", App.get_name().c_str());
+          ESP_LOGCONFIG("${TAG_COMMON}", "Device friendly name: ${friendly_name}");
+          ESP_LOGCONFIG("${TAG_COMMON}", "Device name: ${name}");
+          ESP_LOGCONFIG("${TAG_COMMON}", "Device name (HA): %s", tx_device_name->state.c_str());
+          ESP_LOGCONFIG("${TAG_COMMON}", "Device hostname: %s", App.get_name().c_str());
 
           dump_config_versions->execute();
 
           // Framework detection
           #ifdef USE_ARDUINO
-          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Framework: Arduino");
+          ESP_LOGCONFIG("${TAG_COMMON}", "Framework: Arduino");
           #elif defined(USE_ESP_IDF)
-          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Framework: ESP-IDF");
+          ESP_LOGCONFIG("${TAG_COMMON}", "Framework: ESP-IDF");
           #else
-          ESP_LOGW("${TAG_CORE_COMMON}", "Framework: UNKNOWN");
+          ESP_LOGW("${TAG_COMMON}", "Framework: UNKNOWN");
           #endif
 
           // Model configuration
-          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Model format (selected): %s",
+          ESP_LOGCONFIG("${TAG_COMMON}", "Model format (selected): %s",
                           sl_tx_model_format->state.c_str());
-          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Model format (detected): %s",
+          ESP_LOGCONFIG("${TAG_COMMON}", "Model format (detected): %s",
                           id(is_us_model) ? "US" : "EU");
-          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Gangs (selected): %s",
+          ESP_LOGCONFIG("${TAG_COMMON}", "Gangs (selected): %s",
                           sl_tx_model_gang->state.c_str());
-          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Gangs (detected): %" PRIu8 "-Gang%s",
+          ESP_LOGCONFIG("${TAG_COMMON}", "Gangs (detected): %" PRIu8 "-Gang%s",
                           id(gang_count), id(gang_count) > 1 ? "s" : "");
 
           // Boot completion status
           if (bs_boot_completed->state)
-            ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Boot completed: Yes");
+            ESP_LOGCONFIG("${TAG_COMMON}", "Boot completed: Yes");
           else
-            ESP_LOGW("${TAG_CORE_COMMON}", "Boot completed: NO");
+            ESP_LOGW("${TAG_COMMON}", "Boot completed: NO");
 
           // System state
           if (bs_pending_restart->state)
-            ESP_LOGW("${TAG_CORE_COMMON}", "Pending restart: YES");
+            ESP_LOGW("${TAG_COMMON}", "Pending restart: YES");
           else
-            ESP_LOGCONFIG("${TAG_CORE_COMMON}", "Pending restart: No");
+            ESP_LOGCONFIG("${TAG_COMMON}", "Pending restart: No");
 
   - id: dump_config_caller
     mode: restart
@@ -265,10 +265,10 @@ script:
     then:
       - lambda: |-
           // Version information
-          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "TX Ultimate firmware version: ${version}");
+          ESP_LOGCONFIG("${TAG_COMMON}", "TX Ultimate firmware version: ${version}");
           // ESPHome builder information
-          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "ESPHome builder: " ESPHOME_VERSION);
-          ESP_LOGCONFIG("${TAG_CORE_COMMON}", "ESPHome build timestamp: %s", App.get_compilation_time().c_str());
+          ESP_LOGCONFIG("${TAG_COMMON}", "ESPHome builder: " ESPHOME_VERSION);
+          ESP_LOGCONFIG("${TAG_COMMON}", "ESPHome build timestamp: %s", App.get_compilation_time().c_str());
 
   - id: publish_device_info
     mode: restart
@@ -377,7 +377,7 @@ wifi:
                 last_was_underscore = true;
               }
             }
-            ESP_LOGI("${TAG_CORE_COMMON}", "Device name: %s", esphome::tx_ultimate_easy::cached_device_name.c_str());
+            ESP_LOGI("${TAG_COMMON}", "Device name: %s", esphome::tx_ultimate_easy::cached_device_name.c_str());
             tx_device_name->publish_state(esphome::tx_ultimate_easy::cached_device_name.c_str());
           }
 ...

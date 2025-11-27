@@ -14,7 +14,7 @@
 substitutions:
   TOUCH_POSITION_MAX_VALUE: '10'  # Maximum touch position value returned by the touch pad via uart
 
-  TAG_CORE_HW_TOUCH: core.hw.touch
+  TAG_HW_TOUCH: tx_ultimate_easy.hw.touch
 
 binary_sensor:
   - &bs_button_event_template
@@ -203,7 +203,7 @@ binary_sensor:
 esphome:
   platformio_options:
     build_flags:
-      - -D TX_ULTIMATE_EASY_CORE_HW_TOUCH
+      - -D TX_ULTIMATE_EASY_HW_TOUCH
 
 number:
   - id: nr_touch_duration
@@ -286,10 +286,10 @@ script:
       - lambda: |-
           // Touch panel's state
           if (sw_touch_panel_power->state)
-            ESP_LOGCONFIG("${TAG_CORE_HW_TOUCH}", "Touch panel - Power: On");
+            ESP_LOGCONFIG("${TAG_HW_TOUCH}", "Touch panel - Power: On");
           else
-            ESP_LOGW("${TAG_CORE_HW_TOUCH}", "Touch panel - Power: OFF");
-          ESP_LOGCONFIG("${TAG_CORE_HW_TOUCH}", "Touch event duration: %.0fms", nr_touch_duration->state);
+            ESP_LOGW("${TAG_HW_TOUCH}", "Touch panel - Power: OFF");
+          ESP_LOGCONFIG("${TAG_HW_TOUCH}", "Touch event duration: %.0fms", nr_touch_duration->state);
 
   - id: !extend dump_config_list_packages
     then:
@@ -372,9 +372,9 @@ tx_ultimate_easy:
     - lambda: |-
         const uint8_t touch_position = static_cast<uint8_t>(touch.x);
         if (touch_position > ${TOUCH_POSITION_MAX_VALUE}) {  // Check for valid range
-          ESP_LOGE("${TAG_CORE_HW_TOUCH}", "Invalid long-touch position: %" PRIu8, touch_position);
+          ESP_LOGE("${TAG_HW_TOUCH}", "Invalid long-touch position: %" PRIu8, touch_position);
         } else {
-          ESP_LOGI("${TAG_CORE_HW_TOUCH}", "Long-touch released at position %" PRIu8, touch_position);
+          ESP_LOGI("${TAG_HW_TOUCH}", "Long-touch released at position %" PRIu8, touch_position);
         }
 
   on_multi_touch_release:
@@ -384,7 +384,7 @@ tx_ultimate_easy:
             {"action", "release"},
             {"position", std::to_string(touch.x)}
           });
-          ESP_LOGI("${TAG_CORE_HW_TOUCH}", "Multi-touch released");
+          ESP_LOGI("${TAG_HW_TOUCH}", "Multi-touch released");
           touch_on_multi_touch_release->execute();
 
   on_press:
@@ -392,16 +392,16 @@ tx_ultimate_easy:
       - lambda: |-
           const uint8_t position = static_cast<uint8_t>(touch.x);
           if (position > ${TOUCH_POSITION_MAX_VALUE}) {  // Check for valid range
-            ESP_LOGE("${TAG_CORE_HW_TOUCH}", "Invalid touch position: %" PRIu8, position);
+            ESP_LOGE("${TAG_HW_TOUCH}", "Invalid touch position: %" PRIu8, position);
           } else {
-            ESP_LOGI("${TAG_CORE_HW_TOUCH}", "Pressed at position %" PRIu8, position);
+            ESP_LOGI("${TAG_HW_TOUCH}", "Pressed at position %" PRIu8, position);
             touch_on_press->execute(static_cast<uint8_t>(touch.button), position);
           }
 
   on_release:
     then:
       - lambda: |-
-          ESP_LOGI("${TAG_CORE_HW_TOUCH}", "Released");
+          ESP_LOGI("${TAG_HW_TOUCH}", "Released");
       - script.execute: touch_on_release
 
   on_swipe_left:
@@ -413,7 +413,7 @@ tx_ultimate_easy:
             {"swipe-direction", direction},
             {"position", std::to_string(touch.x)}
           });
-          ESP_LOGI("${TAG_CORE_HW_TOUCH}", "Swipe %s", direction);
+          ESP_LOGI("${TAG_HW_TOUCH}", "Swipe %s", direction);
           touch_swipe_left->execute();
 
   on_swipe_right:
@@ -425,14 +425,14 @@ tx_ultimate_easy:
             {"swipe-direction", direction},
             {"position", std::to_string(touch.x)}
           });
-          ESP_LOGI("${TAG_CORE_HW_TOUCH}", "Swipe %s", direction);
+          ESP_LOGI("${TAG_HW_TOUCH}", "Swipe %s", direction);
           touch_swipe_right->execute();
 
   on_touch_event:
     - lambda: |-
-        ESP_LOGD("${TAG_CORE_HW_TOUCH}", "Touch event:");
-        ESP_LOGD("${TAG_CORE_HW_TOUCH}", "  State:    %i (%s)", touch.state, touch.state_str.c_str());
-        ESP_LOGD("${TAG_CORE_HW_TOUCH}", "  Position: %i", touch.x);
+        ESP_LOGD("${TAG_HW_TOUCH}", "Touch event:");
+        ESP_LOGD("${TAG_HW_TOUCH}", "  State:    %i (%s)", touch.state, touch.state_str.c_str());
+        ESP_LOGD("${TAG_HW_TOUCH}", "  Position: %i", touch.x);
 
 uart:
   - id: uart_touch

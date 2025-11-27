@@ -14,7 +14,7 @@
 substitutions:
   vibration_max_duration: 2s
 
-  TAG_STD_HW_VIBRATION: std.hw.vibration
+  TAG_HW_VIBRATION: tx_ultimate_easy.vibration
 
 binary_sensor:
   - id: bs_vibrating
@@ -37,7 +37,7 @@ button:
 esphome:
   platformio_options:
     build_flags:
-      - -D TX_ULTIMATE_EASY_STANDARD_HW_VIBRATION
+      - -D TX_ULTIMATE_EASY_HW_VIBRATION
 
 number:
   - id: nr_vibrating_duration
@@ -64,16 +64,16 @@ script:
     then:
       - lambda: |-
           // Configuration
-          ESP_LOGCONFIG("${TAG_STD_HW_VIBRATION}", "Touch - Vibration feedback: %s",
+          ESP_LOGCONFIG("${TAG_HW_VIBRATION}", "Touch - Vibration feedback: %s",
                         sl_touch_vibration_feedback->state.c_str());
-          ESP_LOGCONFIG("${TAG_STD_HW_VIBRATION}", "Vibrate duration: %.0fms", nr_vibrating_duration->state);
-          ESP_LOGCONFIG("${TAG_STD_HW_VIBRATION}", "Vibrate max duration: ${vibration_max_duration}");
+          ESP_LOGCONFIG("${TAG_HW_VIBRATION}", "Vibrate duration: %.0fms", nr_vibrating_duration->state);
+          ESP_LOGCONFIG("${TAG_HW_VIBRATION}", "Vibrate max duration: ${vibration_max_duration}");
 
           // State
           if (bs_vibrating->state)
-            ESP_LOGW("${TAG_STD_HW_VIBRATION}", "Vibrating now: YES");
+            ESP_LOGW("${TAG_HW_VIBRATION}", "Vibrating now: YES");
           else
-            ESP_LOGCONFIG("${TAG_STD_HW_VIBRATION}", "Vibrating now: No");
+            ESP_LOGCONFIG("${TAG_HW_VIBRATION}", "Vibrating now: No");
 
   - id: !extend dump_config_list_packages
     then:
