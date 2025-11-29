@@ -290,10 +290,8 @@ select:
     icon: mdi:tablet-cellphone
     on_value:
       then:
-        - binary_sensor.template.publish:
-            id: bs_pending_restart
-            state: true
         - lambda: |-
+            bs_pending_restart->publish_state(true);
             id(is_us_model) = (x == "${TX_MODEL_FORMAT_US_TEXT}");
 
   - id: sl_tx_model_gang
@@ -313,10 +311,8 @@ select:
     icon: mdi:dip-switch
     on_value:
       then:
-        - binary_sensor.template.publish:
-            id: bs_pending_restart
-            state: true
         - lambda: |-
+            bs_pending_restart->publish_state(true);
             id(gang_count) = static_cast<uint8_t>(i) + 1;
             tx_ultimate->set_gang_count(id(gang_count));
 
@@ -347,6 +343,7 @@ tx_ultimate_easy:
 
 wifi:
   id: wifi_component
+  use_psram: true
 
   on_connect:
     then:

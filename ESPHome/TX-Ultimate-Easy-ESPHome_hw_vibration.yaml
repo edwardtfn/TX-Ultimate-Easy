@@ -158,15 +158,9 @@ switch:
     internal: true
     on_state:
       then:
-        - binary_sensor.template.publish:
-            id: bs_vibrating
-            state: !lambda return x;
+        - lambda: bs_vibrating->publish_state(x);
     on_turn_on:
       then:
         - delay: ${vibration_max_duration}
-        - if:
-            condition:
-              switch.is_on: sw_vibration_motor
-            then:
-              - switch.turn_off: sw_vibration_motor
+        - lambda: if (sw_vibration_motor->state) sw_vibration_motor->turn_off();
 ...

@@ -229,8 +229,9 @@ script:
   - id: boot_initialize_touch
     mode: restart
     then:
-      - script.execute: boot_initialize_touch_format
-      - script.execute: boot_initialize_touch_gang
+      - lambda: |-
+          boot_initialize_touch_format->execute();
+          boot_initialize_touch_gang->execute();
 
   - id: boot_initialize_touch_format
     mode: restart
@@ -335,24 +336,18 @@ script:
     then:
       # Extended by:
       #   - HW Buttons
-      - binary_sensor.template.publish:
-          id: bs_swipe_left
-          state: ON  # yamllint disable-line rule:truthy
-      - binary_sensor.template.publish:
-          id: bs_swipe_down
-          state: ON  # yamllint disable-line rule:truthy
+      - lambda: |-
+          bs_swipe_left->publish_state(true);
+          bs_swipe_down->publish_state(true);
 
   - id: touch_swipe_right
     mode: restart
     then:
       # Extended by:
       #   - HW Buttons
-      - binary_sensor.template.publish:
-          id: bs_swipe_right
-          state: ON  # yamllint disable-line rule:truthy
-      - binary_sensor.template.publish:
-          id: bs_swipe_up
-          state: ON  # yamllint disable-line rule:truthy
+      - lambda: |-
+          bs_swipe_right->publish_state(true);
+          bs_swipe_up->publish_state(true);
 
 switch:
   - id: sw_touch_panel_power
@@ -402,7 +397,7 @@ tx_ultimate_easy:
     then:
       - lambda: |-
           ESP_LOGI("${TAG_HW_TOUCH}", "Released");
-      - script.execute: touch_on_release
+          touch_on_release->execute();
 
   on_swipe_left:
     then:
