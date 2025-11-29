@@ -73,6 +73,8 @@ esp32:
   flash_size: 8MB
   framework:
     type: esp-idf
+    advanced:
+      loop_task_stack_size: 16384
 
 esphome:
   name: ${name}
