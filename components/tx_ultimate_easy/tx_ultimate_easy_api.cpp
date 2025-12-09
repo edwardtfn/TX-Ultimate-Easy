@@ -14,7 +14,7 @@ namespace esphome {
     void fire_ha_event(const std::string &domain, const std::string &type, std::map<std::string, std::string> data) {
       // Add device name and type to the event data
       data["device_name"] = cached_device_name;
-      data["firmware"] = "TX_ULTIMATE_EASY_FIRMWARE_VERSION";
+      data["firmware"] = TX_ULTIMATE_EASY_FIRMWARE_VERSION;
       data["domain"] = domain;
       data["type"] = type;
 

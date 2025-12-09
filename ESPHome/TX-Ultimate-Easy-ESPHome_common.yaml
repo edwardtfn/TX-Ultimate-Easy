@@ -173,6 +173,7 @@ script:
       #   - HW Buttons
       #   - HW Relays
       #   - HW Touch
+      - script.execute: update_device_name
       - script.execute:
           id: api_send_ha_event_boot
           type: start
@@ -278,6 +279,25 @@ script:
             if (id(gang_count) < 1 || id(gang_count) > 4) return 0;  // default to 1-Gang
             return static_cast<uint8_t>(id(gang_count)) - 1;
 
+  - id: update_device_name
+    mode: single
+    then:
+      - lambda: |-
+          if (esphome::tx_ultimate_easy::cached_device_name.empty()) {
+            bool last_was_underscore = false;
+            for (const char& c : App.get_name()) {
+              if (isalnum(c)) {
+                esphome::tx_ultimate_easy::cached_device_name += tolower(c);  // Add alphanumeric characters as lowercase
+                last_was_underscore = false;
+              } else if (!last_was_underscore) {  // Replace non-alphanumeric with '_' but avoid consecutive '_'
+                esphome::tx_ultimate_easy::cached_device_name += '_';
+                last_was_underscore = true;
+              }
+            }
+            ESP_LOGI("${TAG_COMMON}", "Device name: %s", esphome::tx_ultimate_easy::cached_device_name.c_str());
+            tx_device_name->publish_state(esphome::tx_ultimate_easy::cached_device_name.c_str());
+          }
+
 select:
   - id: sl_tx_model_format
     name: Model (Format)
@@ -353,18 +373,5 @@ wifi:
     then:
       - lambda: |-
           tx_fw_version->publish_state("${version}");
-          if (esphome::tx_ultimate_easy::cached_device_name.empty()) {
-            bool last_was_underscore = false;
-            for (const char& c : App.get_name()) {
-              if (isalnum(c)) {
-                esphome::tx_ultimate_easy::cached_device_name += tolower(c);  // Add alphanumeric characters as lowercase
-                last_was_underscore = false;
-              } else if (!last_was_underscore) {  // Replace non-alphanumeric with '_' but avoid consecutive '_'
-                esphome::tx_ultimate_easy::cached_device_name += '_';
-                last_was_underscore = true;
-              }
-            }
-            ESP_LOGI("${TAG_COMMON}", "Device name: %s", esphome::tx_ultimate_easy::cached_device_name.c_str());
-            tx_device_name->publish_state(esphome::tx_ultimate_easy::cached_device_name.c_str());
-          }
+          update_device_name->execute();
 ...

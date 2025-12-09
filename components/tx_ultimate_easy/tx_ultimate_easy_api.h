@@ -6,6 +6,8 @@
 #include "esphome/core/hal.h"          // For delay()
 #include "esphome/core/log.h"
 #include <cstdint>
+#include <map>
+#include <string>
 
 #ifndef TX_ULTIMATE_EASY_FIRMWARE_VERSION
 #define TX_ULTIMATE_EASY_FIRMWARE_VERSION "unknown"
@@ -49,25 +51,21 @@ namespace esphome {
       esphome::App.feed_wdt();  // Reset the watchdog timer
     }
 
-    // Cached device name to avoid repeated lookups and string copies
-    extern std::string cached_device_name;
-
     /**
     * @brief Fire a Home Assistant event for TX Ultimate Easy
     *
-    * Automatically adds device_name and type to the event data.
+    * Automatically adds device_name, firmware, domain and type to the event data.
     *
-    * @param domain Event domain (e.g., "touch", "audio", "relay")
-    * @param type Event type (e.g., "button_click", "page_changed", "boot")
-    * @param data Additional event data (device_name and type added automatically)
+    * @param domain Event domain (e.g., "touch", "audio", "relay").
+    * @param type   Event type   (e.g., "multi_touch", "swipe", "boot").
+    * @param data   Additional event data; core fields are injected automatically.
     *
-    * @note The event name is automatically set to "esphome.tx_ultimate_easy"
-    * @note Call init_device_name_cache() during boot before using this function
+    * @note The event name is fixed to "esphome.tx_ultimate_easy".
     *
     * @code
-    * fire_ha_event("button_click", {
-    *   {"page", "home"},
-    *   {"component", "bt_left"}
+    * fire_ha_event("touch", "swipe", {
+    *   {"swipe-direction", "left"},
+    *   {"position", "3"}
     * });
     * @endcode
     */
