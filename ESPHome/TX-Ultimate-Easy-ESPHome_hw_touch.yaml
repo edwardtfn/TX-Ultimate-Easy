@@ -338,7 +338,7 @@ script:
       #   - HW Buttons
       - lambda: |-
           bs_swipe_left->publish_state(true);
-          bs_swipe_down->publish_state(true);
+          bs_swipe_up->publish_state(true);
 
   - id: touch_swipe_right
     mode: restart
@@ -347,7 +347,7 @@ script:
       #   - HW Buttons
       - lambda: |-
           bs_swipe_right->publish_state(true);
-          bs_swipe_up->publish_state(true);
+          bs_swipe_down->publish_state(true);
 
 switch:
   - id: sw_touch_panel_power
@@ -403,7 +403,7 @@ tx_ultimate_easy:
     then:
       - lambda: |-
           const char *direction = (sl_tx_model_format->current_option() == "${TX_MODEL_FORMAT_EU_TEXT}") ?
-                                  "left" : "down";
+                                  "left" : "up";
           esphome::tx_ultimate_easy::fire_ha_event("touch", "swipe", {
             {"action", direction},
             {"swipe-direction", direction},
@@ -416,7 +416,7 @@ tx_ultimate_easy:
     then:
       - lambda: |-
           const char *direction = (sl_tx_model_format->current_option() == "${TX_MODEL_FORMAT_EU_TEXT}") ?
-                                  "right" : "up";
+                                  "right" : "down";
           esphome::tx_ultimate_easy::fire_ha_event("touch", "swipe", {
             {"action", direction},
             {"swipe-direction", direction},
