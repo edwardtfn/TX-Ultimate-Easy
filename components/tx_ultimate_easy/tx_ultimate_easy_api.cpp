@@ -19,8 +19,8 @@ namespace esphome {
 
       bool last_was_underscore = false;
       for (const char& c : raw_name) {
-        if (isalnum(c)) {
-          cached_device_name += tolower(c);
+        if (std::isalnum(static_cast<unsigned char>(c))) {
+          cached_device_name += static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
           last_was_underscore = false;
         } else if (!last_was_underscore) {
           cached_device_name += '_';
