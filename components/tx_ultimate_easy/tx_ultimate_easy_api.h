@@ -19,6 +19,25 @@ namespace esphome {
     // Cached device name to avoid repeated lookups and string copies
     extern std::string cached_device_name;
 
+    /**
+    * @brief Initialize the cached device name from a raw name string.
+    * 
+    * Sanitizes the raw device name by converting it to lowercase alphanumeric
+    * characters with underscores replacing non-alphanumeric characters. Consecutive
+    * underscores are avoided. This function should be called early in the boot
+    * process (e.g., on WiFi connect) to populate the cached_device_name.
+    * 
+    * If cached_device_name is already populated (non-empty), this function does
+    * nothing to avoid overwriting an existing value.
+    * 
+    * @param raw_name The raw device name (typically from App.get_name()) to sanitize
+    * 
+    * Example:
+    *   Raw name: "TX-Ultimate Easy!"
+    *   Result:   "tx_ultimate_easy"
+    */
+    void initialize_cached_device_name(const std::string &raw_name);
+
     /// @brief Feed the watchdog timer with an optional delay
     ///
     /// This utility function combines a delay with a watchdog timer feed operation.

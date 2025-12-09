@@ -284,18 +284,9 @@ script:
     then:
       - lambda: |-
           if (esphome::tx_ultimate_easy::cached_device_name.empty()) {
-            bool last_was_underscore = false;
-            for (const char& c : App.get_name()) {
-              if (isalnum(c)) {
-                esphome::tx_ultimate_easy::cached_device_name += tolower(c);  // Add alphanumeric characters as lowercase
-                last_was_underscore = false;
-              } else if (!last_was_underscore) {  // Replace non-alphanumeric with '_' but avoid consecutive '_'
-                esphome::tx_ultimate_easy::cached_device_name += '_';
-                last_was_underscore = true;
-              }
-            }
+            esphome::tx_ultimate_easy::initialize_cached_device_name(App.get_name());
             ESP_LOGI("${TAG_COMMON}", "Device name: %s", esphome::tx_ultimate_easy::cached_device_name.c_str());
-            tx_device_name->publish_state(esphome::tx_ultimate_easy::cached_device_name.c_str());
+            tx_device_name->publish_state(esphome::tx_ultimate_easy::cached_device_name);
           }
 
 select:

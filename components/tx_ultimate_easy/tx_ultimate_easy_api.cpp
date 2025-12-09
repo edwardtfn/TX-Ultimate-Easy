@@ -2,6 +2,10 @@
 #include "tx_ultimate_easy_api.h"
 #include "esphome/core/application.h"
 
+// Macro stringification helpers
+#define STRINGIFY_IMPL(x) #x
+#define STRINGIFY(x) STRINGIFY_IMPL(x)
+
 namespace esphome {
   namespace tx_ultimate_easy {
 
@@ -10,11 +14,26 @@ namespace esphome {
     // Cached strings to avoid repeated lookups and string copies
     std::string cached_device_name;
 
+    void initialize_cached_device_name(const std::string& raw_name) {
+      if (!cached_device_name.empty()) return;  // Already initialized
+
+      bool last_was_underscore = false;
+      for (const char& c : raw_name) {
+        if (isalnum(c)) {
+          cached_device_name += tolower(c);
+          last_was_underscore = false;
+        } else if (!last_was_underscore) {
+          cached_device_name += '_';
+          last_was_underscore = true;
+        }
+      }
+    }
+
     // Fire a Home Assistant event for TX Ultimate Easy
     void fire_ha_event(const std::string &domain, const std::string &type, std::map<std::string, std::string> data) {
       // Add device name and type to the event data
       data["device_name"] = cached_device_name;
-      data["firmware"] = TX_ULTIMATE_EASY_FIRMWARE_VERSION;
+      data["firmware"] = STRINGIFY(TX_ULTIMATE_EASY_FIRMWARE_VERSION);
       data["domain"] = domain;
       data["type"] = type;
 
