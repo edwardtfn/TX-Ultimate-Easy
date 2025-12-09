@@ -35,6 +35,11 @@ namespace esphome {
 
     // Fire a Home Assistant event for TX Ultimate Easy
     void fire_ha_event(const std::string &domain, const std::string &type, std::map<std::string, std::string> data) {
+      // Add guard for uninitialized device name
+      if (cached_device_name.empty()) {
+        ESP_LOGW(TAG_COMPONENT_BASE, "Device name not initialized; HA event may have empty device_name field");
+      }
+
       // Add device name and type to the event data
       data["device_name"] = cached_device_name;
       data["firmware"] = STRINGIFY(TX_ULTIMATE_EASY_FIRMWARE_VERSION);
