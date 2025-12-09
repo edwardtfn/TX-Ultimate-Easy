@@ -2,7 +2,7 @@
 #####                              TX Ultimate Easy for ESPHome                                #####
 #####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
 ####################################################################################################
-##### Purpose: ESPHome Core - Hardware - Buttons                                               #####
+##### Purpose: ESPHome - Hardware - Buttons                                                    #####
 ####################################################################################################
 ##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
 ####################################################################################################
@@ -124,12 +124,7 @@ script:
     then:
       - lambda: |-
           // Send event to Home Assistant
-          esphome::api::CustomAPIDevice ha_event;
-          ha_event.fire_homeassistant_event("${EVENT_NAME}", {
-            {"device_name", id(tx_device_name).state.c_str()},
-            {"firmware", "${version}"},
-            {"domain", "touch"},
-            {"type", "button"},
+          esphome::tx_ultimate_easy::fire_ha_event("touch", "button", {
             {"action", action.c_str()},
             {"button_id", std::to_string(button)},
             {"count", std::to_string(count)},
@@ -225,16 +220,16 @@ script:
                         gang_count_plural_suffix.c_str(),
                         gang_count_plural_suffix.c_str());
           ESP_LOGCONFIG("${TAG_HW_BUTTONS}", "  Relay 1: %s", sl_button_1_action->has_state() ?
-                                                                    sl_button_1_action->state.c_str() : "Unknown");
+                                                                    sl_button_1_action->current_option() : "Unknown");
           if (id(gang_count) >= 2)
             ESP_LOGCONFIG("${TAG_HW_BUTTONS}", "  Relay 2: %s", sl_button_2_action->has_state() ?
-                                                                      sl_button_2_action->state.c_str() : "Unknown");
+                                                                      sl_button_2_action->current_option() : "Unknown");
           if (id(gang_count) >= 3)
             ESP_LOGCONFIG("${TAG_HW_BUTTONS}", "  Relay 3: %s", sl_button_3_action->has_state() ?
-                                                                      sl_button_3_action->state.c_str() : "Unknown");
+                                                                      sl_button_3_action->current_option() : "Unknown");
           if (id(gang_count) >= 4)
             ESP_LOGCONFIG("${TAG_HW_BUTTONS}", "  Relay 4: %s", sl_button_4_action->has_state() ?
-                                                                      sl_button_4_action->state.c_str() : "Unknown");
+                                                                      sl_button_4_action->current_option() : "Unknown");
 
   - id: !extend dump_config_list_packages
     then:

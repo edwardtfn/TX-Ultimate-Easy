@@ -2,7 +2,7 @@
 #####                              TX Ultimate Easy for ESPHome                                #####
 #####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
 ####################################################################################################
-##### Purpose: ESPHome - Standard - Hardware - Speaker                                         #####
+##### Purpose: ESPHome - Hardware - Speaker                                                    #####
 ####################################################################################################
 ##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
 ####################################################################################################
@@ -59,10 +59,8 @@ number:
     optimistic: true
     set_action:
       then:
-        - speaker.volume_set:
-            id: speaker_embedded
-            volume: !lambda return x/100.0f;
         - lambda: |-
+            speaker_embedded->set_volume(x/100.0f);
             static const std::string tone_volume_change = "${tone_volume_change}";
             // Play sound if tone_volume_change is not "none"
             if (x > 0 and !tone_volume_change.empty() and tone_volume_change != "none")
@@ -131,8 +129,9 @@ script:
     mode: restart
     then:
       - lambda: |-
-          if (sl_touch_speaker_feedback->state != "Disabled")
+          if (strcmp(sl_touch_speaker_feedback->current_option(), "Disabled") != 0) {
             speaker_play_click->execute();
+          }
 
   - id: !extend touch_on_press
     then:
@@ -142,8 +141,10 @@ script:
     mode: restart
     then:
       - lambda: |-
-          if (sl_touch_speaker_feedback->state == "On press" or sl_touch_speaker_feedback->state == "Always")
+          if (strcmp(sl_touch_speaker_feedback->current_option(), "On press") == 0 or
+              strcmp(sl_touch_speaker_feedback->current_option(), "Always") == 0) {
             speaker_play_click->execute();
+          }
 
   - id: !extend touch_on_release
     then:
@@ -153,8 +154,10 @@ script:
     mode: restart
     then:
       - lambda: |-
-          if (sl_touch_speaker_feedback->state == "On release" or sl_touch_speaker_feedback->state == "Always")
+          if (strcmp(sl_touch_speaker_feedback->current_option(), "On release") == 0 or
+              strcmp(sl_touch_speaker_feedback->current_option(), "Always") == 0) {
             speaker_play_click->execute();
+          }
 
 select:
   - id: sl_touch_speaker_feedback

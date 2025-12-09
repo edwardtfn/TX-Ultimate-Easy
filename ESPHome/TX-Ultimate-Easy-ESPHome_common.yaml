@@ -2,7 +2,7 @@
 #####                              TX Ultimate Easy for ESPHome                                #####
 #####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
 ####################################################################################################
-##### Purpose: ESPHome Core - Common                                                           #####
+##### Purpose: ESPHome - Common                                                                #####
 ####################################################################################################
 ##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
 ####################################################################################################
@@ -37,7 +37,6 @@ api:
   on_client_connected:
     then:
       - script.execute: dump_config_caller
-      - script.execute: publish_device_info
 
 binary_sensor:
   - id: bs_pending_restart
@@ -74,12 +73,16 @@ esp32:
   flash_size: 8MB
   framework:
     type: esp-idf
+    advanced:
+      loop_task_stack_size: 16384
+    sdkconfig_options:
+      CONFIG_ESP32_REV_MIN_3: y
 
 esphome:
   name: ${name}
   friendly_name: ${friendly_name}
   comment: TX Ultimate Easy
-  min_version: 2025.8.0
+  min_version: 2025.11.0
   project:
     name: "edwardtfn.tx_ultimate_easy"
     version: ${version}
@@ -147,13 +150,7 @@ script:
     then:
       - lambda: |-
           // Send event to Home Assistant
-          esphome::api::CustomAPIDevice ha_event;
-          ha_event.fire_homeassistant_event("${EVENT_NAME}", {
-            {"device_name", id(tx_device_name).state.c_str()},
-            {"firmware", "${version}"},
-            {"domain", "boot"},
-            {"type", type.c_str()}
-          });
+          esphome::tx_ultimate_easy::fire_ha_event("boot", type.c_str(), {});
 
   - id: boot_done
     mode: restart
@@ -176,6 +173,7 @@ script:
       #   - HW Buttons
       #   - HW Relays
       #   - HW Touch
+      - script.execute: update_device_name
       - script.execute:
           id: api_send_ha_event_boot
           type: start
@@ -184,7 +182,7 @@ script:
             - lambda: return sl_tx_model_format->active_index().has_value();
             - lambda: return sl_tx_model_gang->active_index().has_value();
       - lambda: |-
-          id(is_us_model) = (sl_tx_model_format->state == "${TX_MODEL_FORMAT_US_TEXT}");
+          id(is_us_model) = strcmp(sl_tx_model_format->current_option(), "${TX_MODEL_FORMAT_US_TEXT}") == 0;
           id(gang_count) = sl_tx_model_gang->active_index().value() + 1;
           if (id(gang_count) < 1 || id(gang_count) > 4) {
             ESP_LOGE("${TAG_COMMON}", "Invalid number of gangs: %" PRIu8, id(gang_count));
@@ -193,7 +191,6 @@ script:
   - id: boot_sequence
     mode: restart
     then:
-      - script.execute: publish_device_info
       - binary_sensor.template.publish:
           id: bs_pending_restart
           state: false
@@ -206,7 +203,7 @@ script:
           // Device identification
           ESP_LOGCONFIG("${TAG_COMMON}", "Device friendly name: ${friendly_name}");
           ESP_LOGCONFIG("${TAG_COMMON}", "Device name: ${name}");
-          ESP_LOGCONFIG("${TAG_COMMON}", "Device name (HA): %s", tx_device_name->state.c_str());
+          ESP_LOGCONFIG("${TAG_COMMON}", "Device name (HA): %s", esphome::tx_ultimate_easy::cached_device_name.c_str());
           ESP_LOGCONFIG("${TAG_COMMON}", "Device hostname: %s", App.get_name().c_str());
 
           dump_config_versions->execute();
@@ -222,11 +219,11 @@ script:
 
           // Model configuration
           ESP_LOGCONFIG("${TAG_COMMON}", "Model format (selected): %s",
-                          sl_tx_model_format->state.c_str());
+                          sl_tx_model_format->current_option());
           ESP_LOGCONFIG("${TAG_COMMON}", "Model format (detected): %s",
                           id(is_us_model) ? "US" : "EU");
           ESP_LOGCONFIG("${TAG_COMMON}", "Gangs (selected): %s",
-                          sl_tx_model_gang->state.c_str());
+                          sl_tx_model_gang->current_option());
           ESP_LOGCONFIG("${TAG_COMMON}", "Gangs (detected): %" PRIu8 "-Gang%s",
                           id(gang_count), id(gang_count) > 1 ? "s" : "");
 
@@ -270,13 +267,6 @@ script:
           ESP_LOGCONFIG("${TAG_COMMON}", "ESPHome builder: " ESPHOME_VERSION);
           ESP_LOGCONFIG("${TAG_COMMON}", "ESPHome build timestamp: %s", App.get_compilation_time().c_str());
 
-  - id: publish_device_info
-    mode: restart
-    then:
-      - lambda: |-
-          tx_fw_version->publish_state("${version}");
-          tx_device_name->publish_state(App.get_name().c_str());
-
   - id: restore_from_nvs
     mode: single
     then:
@@ -288,6 +278,16 @@ script:
           index: !lambda |-
             if (id(gang_count) < 1 || id(gang_count) > 4) return 0;  // default to 1-Gang
             return static_cast<uint8_t>(id(gang_count)) - 1;
+
+  - id: update_device_name
+    mode: single
+    then:
+      - lambda: |-
+          if (esphome::tx_ultimate_easy::cached_device_name.empty()) {
+            esphome::tx_ultimate_easy::initialize_cached_device_name(App.get_name());
+            ESP_LOGI("${TAG_COMMON}", "Device name: %s", esphome::tx_ultimate_easy::cached_device_name.c_str());
+            tx_device_name->publish_state(esphome::tx_ultimate_easy::cached_device_name);
+          }
 
 select:
   - id: sl_tx_model_format
@@ -305,10 +305,8 @@ select:
     icon: mdi:tablet-cellphone
     on_value:
       then:
-        - binary_sensor.template.publish:
-            id: bs_pending_restart
-            state: true
         - lambda: |-
+            bs_pending_restart->publish_state(true);
             id(is_us_model) = (x == "${TX_MODEL_FORMAT_US_TEXT}");
 
   - id: sl_tx_model_gang
@@ -328,10 +326,8 @@ select:
     icon: mdi:dip-switch
     on_value:
       then:
-        - binary_sensor.template.publish:
-            id: bs_pending_restart
-            state: true
         - lambda: |-
+            bs_pending_restart->publish_state(true);
             id(gang_count) = static_cast<uint8_t>(i) + 1;
             tx_ultimate->set_gang_count(id(gang_count));
 
@@ -362,22 +358,11 @@ tx_ultimate_easy:
 
 wifi:
   id: wifi_component
+  use_psram: true
 
   on_connect:
     then:
       - lambda: |-
-          if (esphome::tx_ultimate_easy::cached_device_name.empty()) {
-            bool last_was_underscore = false;
-            for (const char& c : App.get_name()) {
-              if (isalnum(c)) {
-                esphome::tx_ultimate_easy::cached_device_name += tolower(c);  // Add alphanumeric characters as lowercase
-                last_was_underscore = false;
-              } else if (!last_was_underscore) {  // Replace non-alphanumeric with '_' but avoid consecutive '_'
-                esphome::tx_ultimate_easy::cached_device_name += '_';
-                last_was_underscore = true;
-              }
-            }
-            ESP_LOGI("${TAG_COMMON}", "Device name: %s", esphome::tx_ultimate_easy::cached_device_name.c_str());
-            tx_device_name->publish_state(esphome::tx_ultimate_easy::cached_device_name.c_str());
-          }
+          tx_fw_version->publish_state("${version}");
+          update_device_name->execute();
 ...
