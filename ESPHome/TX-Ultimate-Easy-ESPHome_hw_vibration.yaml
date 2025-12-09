@@ -2,7 +2,7 @@
 #####                              TX Ultimate Easy for ESPHome                                #####
 #####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
 ####################################################################################################
-##### Purpose: ESPHome - Standard - Hardware - Vibration system                                #####
+##### Purpose: ESPHome - Hardware - Vibration system                                           #####
 ####################################################################################################
 ##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
 ####################################################################################################
@@ -14,7 +14,7 @@
 substitutions:
   vibration_max_duration: 2s
 
-  TAG_STD_HW_VIBRATION: std.hw.vibration
+  TAG_HW_VIBRATION: tx_ultimate_easy.vibration
 
 binary_sensor:
   - id: bs_vibrating
@@ -37,7 +37,7 @@ button:
 esphome:
   platformio_options:
     build_flags:
-      - -D TX_ULTIMATE_EASY_STANDARD_HW_VIBRATION
+      - -D TX_ULTIMATE_EASY_HW_VIBRATION
 
 number:
   - id: nr_vibrating_duration
@@ -64,28 +64,28 @@ script:
     then:
       - lambda: |-
           // Configuration
-          ESP_LOGCONFIG("${TAG_STD_HW_VIBRATION}", "Touch - Vibration feedback: %s",
-                        sl_touch_vibration_feedback->state.c_str());
-          ESP_LOGCONFIG("${TAG_STD_HW_VIBRATION}", "Vibrate duration: %.0fms", nr_vibrating_duration->state);
-          ESP_LOGCONFIG("${TAG_STD_HW_VIBRATION}", "Vibrate max duration: ${vibration_max_duration}");
+          ESP_LOGCONFIG("${TAG_HW_VIBRATION}", "Touch - Vibration feedback: %s",
+                                              sl_touch_vibration_feedback->current_option());
+          ESP_LOGCONFIG("${TAG_HW_VIBRATION}", "Vibrate duration: %.0fms", nr_vibrating_duration->state);
+          ESP_LOGCONFIG("${TAG_HW_VIBRATION}", "Vibrate max duration: ${vibration_max_duration}");
 
           // State
           if (bs_vibrating->state)
-            ESP_LOGW("${TAG_STD_HW_VIBRATION}", "Vibrating now: YES");
+            ESP_LOGW("${TAG_HW_VIBRATION}", "Vibrating now: YES");
           else
-            ESP_LOGCONFIG("${TAG_STD_HW_VIBRATION}", "Vibrating now: No");
+            ESP_LOGCONFIG("${TAG_HW_VIBRATION}", "Vibrating now: No");
 
   - id: !extend dump_config_list_packages
     then:
       - script.wait: dump_config
       - lambda: |-
           // Check for requirements
-          #if !defined(TX_ULTIMATE_EASY_CORE_COMMON)
-            #error "The package TX-Ultimate-Easy-ESPHome_core_common.yaml is required."
+          #if !defined(TX_ULTIMATE_EASY_COMMON)
+            #error "The package TX-Ultimate-Easy-ESPHome_common.yaml is required."
           #endif
 
           // Identify itself
-          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Standard - Hardware - Vibration");
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Hardware - Vibration");
 
   - id: !extend touch_on_multi_touch_release
     then:
@@ -95,8 +95,9 @@ script:
     mode: restart
     then:
       - lambda: |-
-          if (sl_touch_vibration_feedback->state != "Disabled")
+          if (strcmp(sl_touch_vibration_feedback->current_option(), "Disabled") != 0) {
             vibrate->execute();
+          }
 
   - id: !extend touch_on_press
     then:
@@ -106,8 +107,10 @@ script:
     mode: restart
     then:
       - lambda: |-
-          if (sl_touch_vibration_feedback->state == "On press" or sl_touch_vibration_feedback->state == "Always")
+          if (strcmp(sl_touch_vibration_feedback->current_option(), "On press") == 0 or
+              strcmp(sl_touch_vibration_feedback->current_option(), "Always") == 0) {
             vibrate->execute();
+          }
 
   - id: !extend touch_on_release
     then:
@@ -117,8 +120,10 @@ script:
     mode: restart
     then:
       - lambda: |-
-          if (sl_touch_vibration_feedback->state == "On release" or sl_touch_vibration_feedback->state == "Always")
+          if (strcmp(sl_touch_vibration_feedback->current_option(), "On release") == 0 or
+              strcmp(sl_touch_vibration_feedback->current_option(), "Always") == 0) {
             vibrate->execute();
+          }
 
   - id: vibrate
     mode: restart
@@ -153,15 +158,9 @@ switch:
     internal: true
     on_state:
       then:
-        - binary_sensor.template.publish:
-            id: bs_vibrating
-            state: !lambda return x;
+        - lambda: bs_vibrating->publish_state(x);
     on_turn_on:
       then:
         - delay: ${vibration_max_duration}
-        - if:
-            condition:
-              switch.is_on: sw_vibration_motor
-            then:
-              - switch.turn_off: sw_vibration_motor
+        - lambda: if (sw_vibration_motor->state) sw_vibration_motor->turn_off();
 ...

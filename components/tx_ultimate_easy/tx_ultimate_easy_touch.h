@@ -2,7 +2,7 @@
 
 #pragma once
 
-#ifdef TX_ULTIMATE_EASY_CORE_HW_TOUCH
+#ifdef TX_ULTIMATE_EASY_HW_TOUCH
 
 #include "esphome/core/automation.h"
 #include "esphome/core/component.h"
@@ -84,4 +84,4 @@ namespace esphome {
     } // namespace tx_ultimate_easy
 } // namespace esphome
 
-#endif  // TX_ULTIMATE_EASY_CORE_HW_TOUCH
+#endif  // TX_ULTIMATE_EASY_HW_TOUCH

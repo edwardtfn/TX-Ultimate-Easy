@@ -2,7 +2,7 @@
 #####                              TX Ultimate Easy for ESPHome                                #####
 #####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
 ####################################################################################################
-##### Purpose: ESPHome - Standard - I2S Audio                                                  #####
+##### Purpose: ESPHome - Hardward - I2S Audio                                                  #####
 ####################################################################################################
 ##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
 ####################################################################################################
@@ -14,12 +14,12 @@
 substitutions:
   SWITCH_AUDIO_AMPLIFIER_RESTORE_MODE: RESTORE_DEFAULT_ON
 
-  TAG_STD_HW_AUDIO: std.hw.audio
+  TAG_HW_AUDIO: tx_ultimate_easy.hw.audio
 
 esphome:
   platformio_options:
     build_flags:
-      - -D TX_ULTIMATE_EASY_STANDARD_HW_AUDIO
+      - -D TX_ULTIMATE_EASY_HW_AUDIO
 
 i2s_audio:
   - id: if_i2s_audio
@@ -32,12 +32,12 @@ script:
       - script.wait: dump_config
       - lambda: |-
           // Check for requirements
-          #if !defined(TX_ULTIMATE_EASY_CORE_COMMON)
-            #error "The package TX-Ultimate-Easy-ESPHome_core_common.yaml is required."
+          #if !defined(TX_ULTIMATE_EASY_COMMON)
+            #error "The package TX-Ultimate-Easy-ESPHome_common.yaml is required."
           #endif
 
           // Identify itself
-          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Standard - Hardware - Audio");
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Hardware - Audio");
 
 switch:
   - id: sw_audio_amplifier

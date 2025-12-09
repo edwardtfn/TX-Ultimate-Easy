@@ -2,7 +2,7 @@
 #####                              TX Ultimate Easy for ESPHome                                #####
 #####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
 ####################################################################################################
-##### Purpose: ESPHome Core - Hardware - Touch panel                                           #####
+##### Purpose: ESPHome - Hardware - Touch panel                                                #####
 ####################################################################################################
 ##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
 ####################################################################################################
@@ -14,7 +14,7 @@
 substitutions:
   TOUCH_POSITION_MAX_VALUE: '10'  # Maximum touch position value returned by the touch pad via uart
 
-  TAG_CORE_HW_TOUCH: core.hw.touch
+  TAG_HW_TOUCH: tx_ultimate_easy.hw.touch
 
 binary_sensor:
   - &bs_button_event_template
@@ -203,7 +203,7 @@ binary_sensor:
 esphome:
   platformio_options:
     build_flags:
-      - -D TX_ULTIMATE_EASY_CORE_HW_TOUCH
+      - -D TX_ULTIMATE_EASY_HW_TOUCH
 
 number:
   - id: nr_touch_duration
@@ -229,8 +229,9 @@ script:
   - id: boot_initialize_touch
     mode: restart
     then:
-      - script.execute: boot_initialize_touch_format
-      - script.execute: boot_initialize_touch_gang
+      - lambda: |-
+          boot_initialize_touch_format->execute();
+          boot_initialize_touch_gang->execute();
 
   - id: boot_initialize_touch_format
     mode: restart
@@ -286,22 +287,22 @@ script:
       - lambda: |-
           // Touch panel's state
           if (sw_touch_panel_power->state)
-            ESP_LOGCONFIG("${TAG_CORE_HW_TOUCH}", "Touch panel - Power: On");
+            ESP_LOGCONFIG("${TAG_HW_TOUCH}", "Touch panel - Power: On");
           else
-            ESP_LOGW("${TAG_CORE_HW_TOUCH}", "Touch panel - Power: OFF");
-          ESP_LOGCONFIG("${TAG_CORE_HW_TOUCH}", "Touch event duration: %.0fms", nr_touch_duration->state);
+            ESP_LOGW("${TAG_HW_TOUCH}", "Touch panel - Power: OFF");
+          ESP_LOGCONFIG("${TAG_HW_TOUCH}", "Touch event duration: %.0fms", nr_touch_duration->state);
 
   - id: !extend dump_config_list_packages
     then:
       - script.wait: dump_config
       - lambda: |-
           // Check for requirements
-          #if !defined(TX_ULTIMATE_EASY_CORE_COMMON)
-            #error "The package TX-Ultimate-Easy-ESPHome_core_common.yaml is required."
+          #if !defined(TX_ULTIMATE_EASY_COMMON)
+            #error "The package TX-Ultimate-Easy-ESPHome_common.yaml is required."
           #endif
 
           // Identify itself
-          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Core - Hardware - Touchpad");
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Hardware - Touchpad");
 
   - id: touch_on_multi_touch_release
     mode: restart
@@ -335,24 +336,18 @@ script:
     then:
       # Extended by:
       #   - HW Buttons
-      - binary_sensor.template.publish:
-          id: bs_swipe_left
-          state: ON  # yamllint disable-line rule:truthy
-      - binary_sensor.template.publish:
-          id: bs_swipe_down
-          state: ON  # yamllint disable-line rule:truthy
+      - lambda: |-
+          bs_swipe_left->publish_state(true);
+          bs_swipe_up->publish_state(true);
 
   - id: touch_swipe_right
     mode: restart
     then:
       # Extended by:
       #   - HW Buttons
-      - binary_sensor.template.publish:
-          id: bs_swipe_right
-          state: ON  # yamllint disable-line rule:truthy
-      - binary_sensor.template.publish:
-          id: bs_swipe_up
-          state: ON  # yamllint disable-line rule:truthy
+      - lambda: |-
+          bs_swipe_right->publish_state(true);
+          bs_swipe_down->publish_state(true);
 
 switch:
   - id: sw_touch_panel_power
@@ -372,24 +367,19 @@ tx_ultimate_easy:
     - lambda: |-
         const uint8_t touch_position = static_cast<uint8_t>(touch.x);
         if (touch_position > ${TOUCH_POSITION_MAX_VALUE}) {  // Check for valid range
-          ESP_LOGE("${TAG_CORE_HW_TOUCH}", "Invalid long-touch position: %" PRIu8, touch_position);
+          ESP_LOGE("${TAG_HW_TOUCH}", "Invalid long-touch position: %" PRIu8, touch_position);
         } else {
-          ESP_LOGI("${TAG_CORE_HW_TOUCH}", "Long-touch released at position %" PRIu8, touch_position);
+          ESP_LOGI("${TAG_HW_TOUCH}", "Long-touch released at position %" PRIu8, touch_position);
         }
 
   on_multi_touch_release:
     then:
-      - homeassistant.event:
-          event: ${EVENT_NAME}
-          data:
-            device_name: !lambda return id(tx_device_name).state.c_str();
-            firmware: ${version}
-            domain: touch
-            type: multi_touch
-            action: release
-            position: !lambda return std::to_string(touch.x);
       - lambda: |-
-          ESP_LOGI("${TAG_CORE_HW_TOUCH}", "Multi-touch released");
+          esphome::tx_ultimate_easy::fire_ha_event("touch", "multi_touch", {
+            {"action", "release"},
+            {"position", std::to_string(touch.x)}
+          });
+          ESP_LOGI("${TAG_HW_TOUCH}", "Multi-touch released");
           touch_on_multi_touch_release->execute();
 
   on_press:
@@ -397,73 +387,49 @@ tx_ultimate_easy:
       - lambda: |-
           const uint8_t position = static_cast<uint8_t>(touch.x);
           if (position > ${TOUCH_POSITION_MAX_VALUE}) {  // Check for valid range
-            ESP_LOGE("${TAG_CORE_HW_TOUCH}", "Invalid touch position: %" PRIu8, position);
+            ESP_LOGE("${TAG_HW_TOUCH}", "Invalid touch position: %" PRIu8, position);
           } else {
-            ESP_LOGI("${TAG_CORE_HW_TOUCH}", "Pressed at position %" PRIu8, position);
+            ESP_LOGI("${TAG_HW_TOUCH}", "Pressed at position %" PRIu8, position);
             touch_on_press->execute(static_cast<uint8_t>(touch.button), position);
           }
 
   on_release:
     then:
       - lambda: |-
-          ESP_LOGI("${TAG_CORE_HW_TOUCH}", "Released");
-      - script.execute: touch_on_release
+          ESP_LOGI("${TAG_HW_TOUCH}", "Released");
+          touch_on_release->execute();
 
   on_swipe_left:
     then:
-      - homeassistant.event:
-          event: ${EVENT_NAME}
-          data:
-            device_name: !lambda return id(tx_device_name).state.c_str();
-            firmware: ${version}
-            domain: touch
-            type: swipe
-            action: !lambda |-
-              if (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}")
-                return "left";
-              else
-                return "down";
-            swipe-direction: !lambda |-
-              if (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}")
-                return "left";
-              else
-                return "down";
-            position: !lambda return std::to_string(touch.x);
       - lambda: |-
-          ESP_LOGI("${TAG_CORE_HW_TOUCH}", "Swipe %s",
-                    (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}") ? "left" : "down");
+          const char *direction = (sl_tx_model_format->current_option() == "${TX_MODEL_FORMAT_EU_TEXT}") ?
+                                  "left" : "up";
+          esphome::tx_ultimate_easy::fire_ha_event("touch", "swipe", {
+            {"action", direction},
+            {"swipe-direction", direction},
+            {"position", std::to_string(touch.x)}
+          });
+          ESP_LOGI("${TAG_HW_TOUCH}", "Swipe %s", direction);
           touch_swipe_left->execute();
 
   on_swipe_right:
     then:
-      - homeassistant.event:
-          event: ${EVENT_NAME}
-          data:
-            device_name: !lambda return id(tx_device_name).state.c_str();
-            firmware: ${version}
-            domain: touch
-            type: swipe
-            action: !lambda |-
-              if (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}")
-                return "right";
-              else
-                return "up";
-            swipe-direction: !lambda |-
-              if (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}")
-                return "right";
-              else
-                return "up";
-            position: !lambda return std::to_string(touch.x);
       - lambda: |-
-          ESP_LOGI("${TAG_CORE_HW_TOUCH}", "Swipe %s",
-                    (sl_tx_model_format->state == "${TX_MODEL_FORMAT_EU_TEXT}") ? "right" : "up");
+          const char *direction = (sl_tx_model_format->current_option() == "${TX_MODEL_FORMAT_EU_TEXT}") ?
+                                  "right" : "down";
+          esphome::tx_ultimate_easy::fire_ha_event("touch", "swipe", {
+            {"action", direction},
+            {"swipe-direction", direction},
+            {"position", std::to_string(touch.x)}
+          });
+          ESP_LOGI("${TAG_HW_TOUCH}", "Swipe %s", direction);
           touch_swipe_right->execute();
 
   on_touch_event:
     - lambda: |-
-        ESP_LOGD("${TAG_CORE_HW_TOUCH}", "Touch event:");
-        ESP_LOGD("${TAG_CORE_HW_TOUCH}", "  State:    %i (%s)", touch.state, touch.state_str.c_str());
-        ESP_LOGD("${TAG_CORE_HW_TOUCH}", "  Position: %i", touch.x);
+        ESP_LOGD("${TAG_HW_TOUCH}", "Touch event:");
+        ESP_LOGD("${TAG_HW_TOUCH}", "  State:    %i (%s)", touch.state, touch.state_str.c_str());
+        ESP_LOGD("${TAG_HW_TOUCH}", "  Position: %i", touch.x);
 
 uart:
   - id: uart_touch

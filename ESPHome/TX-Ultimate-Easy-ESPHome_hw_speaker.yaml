@@ -2,7 +2,7 @@
 #####                              TX Ultimate Easy for ESPHome                                #####
 #####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
 ####################################################################################################
-##### Purpose: ESPHome - Standard - Hardware - Speaker                                         #####
+##### Purpose: ESPHome - Hardware - Speaker                                                    #####
 ####################################################################################################
 ##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
 ####################################################################################################
@@ -16,10 +16,10 @@ substitutions:
   # d=32 (32nd note), o=5 (octave 5), b=100 (tempo 100)
   tone_volume_change: "scale_up:d=32,o=5,b=100:c,c#,d#,e,f#,g#,a#,b"  # Use "none" to disable sound
 
-  TAG_STD_HW_SPEAKER: std.hw.speaker
+  TAG_HW_SPEAKER: tx_ultimate_easy.hw.speaker
 
 packages:
-  standard_hw_audio: !include TX-Ultimate-Easy-ESPHome_standard_hw_audio.yaml
+  hw_audio: !include TX-Ultimate-Easy-ESPHome_hw_audio.yaml
 
 api:
   actions:
@@ -33,14 +33,14 @@ api:
         - lambda: |-
             rtttl_speaker->stop();
             if (speaker_volume->state > 0) {
-              ESP_LOGI("${TAG_STD_HW_SPEAKER}", "Play tone: '%s'", tone.c_str());
+              ESP_LOGI("${TAG_HW_SPEAKER}", "Play tone: '%s'", tone.c_str());
               rtttl_speaker->play(tone.c_str());
             }
 
 esphome:
   platformio_options:
     build_flags:
-      - -D TX_ULTIMATE_EASY_STANDARD_HW_SPEAKER
+      - -D TX_ULTIMATE_EASY_HW_SPEAKER
 
 number:
   - id: speaker_volume
@@ -59,10 +59,8 @@ number:
     optimistic: true
     set_action:
       then:
-        - speaker.volume_set:
-            id: speaker_embedded
-            volume: !lambda return x/100.0f;
         - lambda: |-
+            speaker_embedded->set_volume(x/100.0f);
             static const std::string tone_volume_change = "${tone_volume_change}";
             // Play sound if tone_volume_change is not "none"
             if (x > 0 and !tone_volume_change.empty() and tone_volume_change != "none")
@@ -78,15 +76,15 @@ script:
       - script.wait: dump_config
       - lambda: |-
           // Check for requirements
-          #if !defined(TX_ULTIMATE_EASY_CORE_COMMON)
-            #error "The package TX-Ultimate-Easy-ESPHome_core_common.yaml is required."
+          #if !defined(TX_ULTIMATE_EASY_COMMON)
+            #error "The package TX-Ultimate-Easy-ESPHome_common.yaml is required."
           #endif
-          #if !defined(TX_ULTIMATE_EASY_STANDARD_HW_AUDIO)
-            #error "The package TX-Ultimate-Easy-ESPHome_standard_hw_audio.yaml is required."
+          #if !defined(TX_ULTIMATE_EASY_HW_AUDIO)
+            #error "The package TX-Ultimate-Easy-ESPHome_hw_audio.yaml is required."
           #endif
 
           // Identify itself
-          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Standard - Hardware - Speaker");
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Hardware - Speaker");
 
   - id: speaker_play_click
     then:
@@ -131,8 +129,9 @@ script:
     mode: restart
     then:
       - lambda: |-
-          if (sl_touch_speaker_feedback->state != "Disabled")
+          if (strcmp(sl_touch_speaker_feedback->current_option(), "Disabled") != 0) {
             speaker_play_click->execute();
+          }
 
   - id: !extend touch_on_press
     then:
@@ -142,8 +141,10 @@ script:
     mode: restart
     then:
       - lambda: |-
-          if (sl_touch_speaker_feedback->state == "On press" or sl_touch_speaker_feedback->state == "Always")
+          if (strcmp(sl_touch_speaker_feedback->current_option(), "On press") == 0 or
+              strcmp(sl_touch_speaker_feedback->current_option(), "Always") == 0) {
             speaker_play_click->execute();
+          }
 
   - id: !extend touch_on_release
     then:
@@ -153,8 +154,10 @@ script:
     mode: restart
     then:
       - lambda: |-
-          if (sl_touch_speaker_feedback->state == "On release" or sl_touch_speaker_feedback->state == "Always")
+          if (strcmp(sl_touch_speaker_feedback->current_option(), "On release") == 0 or
+              strcmp(sl_touch_speaker_feedback->current_option(), "Always") == 0) {
             speaker_play_click->execute();
+          }
 
 select:
   - id: sl_touch_speaker_feedback

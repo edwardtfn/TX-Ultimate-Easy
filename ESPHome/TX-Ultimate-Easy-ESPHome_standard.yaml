@@ -13,8 +13,8 @@
 ---
 packages:
   # yamllint disable rule:colons
-  standard_hw_relays:    !include TX-Ultimate-Easy-ESPHome_standard_hw_relays.yaml
-  standard_hw_vibration: !include TX-Ultimate-Easy-ESPHome_standard_hw_vibration.yaml
-  standard_media_player: !include TX-Ultimate-Easy-ESPHome_standard_media_player.yaml
+  hw_relays:    !include TX-Ultimate-Easy-ESPHome_hw_relays.yaml
+  hw_vibration: !include TX-Ultimate-Easy-ESPHome_hw_vibration.yaml
+  media_player: !include TX-Ultimate-Easy-ESPHome_media_player.yaml
   # yamllint enable rule:colons
 ...

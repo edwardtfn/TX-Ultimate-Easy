@@ -1,6 +1,6 @@
 // tx_ultimate_easy_light.cpp
 
-#ifdef TX_ULTIMATE_EASY_CORE_HW_LEDS
+#ifdef TX_ULTIMATE_EASY_HW_LEDS
 
 #include "esphome/core/log.h"
 #include "tx_ultimate_easy_light.h"
@@ -55,4 +55,4 @@ namespace esphome {
     } // namespace tx_ultimate_easy
 } // namespace esphome
 
-#endif  // TX_ULTIMATE_EASY_CORE_HW_LEDS
+#endif  // TX_ULTIMATE_EASY_HW_LEDS

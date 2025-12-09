@@ -1,6 +1,6 @@
 // tx_ultimate_easy_touch.cpp
 
-#ifdef TX_ULTIMATE_EASY_CORE_HW_TOUCH
+#ifdef TX_ULTIMATE_EASY_HW_TOUCH
 
 #include "esphome/core/log.h"
 #include "tx_ultimate_easy_touch.h"
@@ -232,4 +232,4 @@ namespace esphome {
     } // namespace tx_ultimate_easy
 } // namespace esphome
 
-#endif  // TX_ULTIMATE_EASY_CORE_HW_TOUCH
+#endif  // TX_ULTIMATE_EASY_HW_TOUCH

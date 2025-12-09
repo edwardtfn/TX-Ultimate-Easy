@@ -13,9 +13,9 @@
 ---
 packages:
   # yamllint disable rule:colons
-  core_common:     !include TX-Ultimate-Easy-ESPHome_core_common.yaml
-  core_hw_buttons: !include TX-Ultimate-Easy-ESPHome_core_hw_buttons.yaml
-  core_hw_leds:    !include TX-Ultimate-Easy-ESPHome_core_hw_leds.yaml
-  core_hw_touch:   !include TX-Ultimate-Easy-ESPHome_core_hw_touch.yaml
+  common:     !include TX-Ultimate-Easy-ESPHome_common.yaml
+  hw_buttons: !include TX-Ultimate-Easy-ESPHome_hw_buttons.yaml
+  hw_leds:    !include TX-Ultimate-Easy-ESPHome_hw_leds.yaml
+  hw_touch:   !include TX-Ultimate-Easy-ESPHome_hw_touch.yaml
   # yamllint enable rule:colons
 ...
