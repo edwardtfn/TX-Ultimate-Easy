@@ -1,4 +1,4 @@
-// tx_ultimate_easy_api.h - Generic flag system for TX Ultimate Easy
+// tx_ultimate_easy_api.h - Public API for TX Ultimate Easy component
 #pragma once
 
 #include "esphome/components/api/custom_api_device.h"  // For API HA event call

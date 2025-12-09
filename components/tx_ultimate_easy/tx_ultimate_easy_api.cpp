@@ -27,6 +27,10 @@ namespace esphome {
           last_was_underscore = true;
         }
       }
+      // Remove trailing underscore if present
+      if (!cached_device_name.empty() && cached_device_name.back() == '_') {
+        cached_device_name.pop_back();
+      }
     }
 
     // Fire a Home Assistant event for TX Ultimate Easy
