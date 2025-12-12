@@ -71,7 +71,7 @@ namespace esphome {
         * - Blue: 255 (full intensity)
         * Result: Pure white color at full brightness
         */
-        extern const LightAttributes LIGHT_ATTRS_DEFAULT;
+        extern const LightAttributes LIGHT_ATTRS_DEFAULTX;
 
         /**
         * @brief Pre-packed version of DEFAULT_LIGHT_ATTRS for convenience.
@@ -81,7 +81,7 @@ namespace esphome {
         * 
         * Value: 0x64FFFFFF (brightness=100, RGB=255,255,255)
         */
-        extern const uint32_t LIGHT_ATTRS_DEFAULT_PACKED;
+        extern const uint32_t LIGHT_ATTRS_DEFAULT_PACKEDX;
 
         /**
         * @brief Packs two LightAttributes into a single uint64_t for dual light storage.
@@ -108,7 +108,7 @@ namespace esphome {
         * 
         * Value: 0x64FFFFFF64FFFFFF (both lights: brightness=100, RGB=255,255,255)
         */
-        extern const uint64_t DEFAULT_DUAL_LIGHT_ATTRS_PACKED;
+        extern const uint64_t DEFAULT_DUAL_LIGHT_ATTRS_PACKEDX;
 
     } // namespace tx_ultimate_easy
 } // namespace esphome

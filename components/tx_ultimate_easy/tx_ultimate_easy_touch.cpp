@@ -54,15 +54,7 @@ namespace esphome {
 
         void TxUltimateEasy::dump_config() {
             ESP_LOGCONFIG(TAG, "TX Ultimate Easy");
-            ESP_LOGCONFIG(TAG, "  Gang count: %" PRIu8, this->gang_count_);
-        }
-
-        bool TxUltimateEasy::set_gang_count(const uint8_t gang_count) {
-            // Hardware supports maximum of 4 touch-sensitive buttons
-            if (gang_count < 1 or gang_count > 4)
-                return false;
-            this->gang_count_ = gang_count;
-            return true;
+            ESP_LOGCONFIG(TAG, "  Gang count: %" PRIu8, TX_ULTIMATE_EASY_GANGS);
         }
 
         uint8_t TxUltimateEasy::get_button_from_position(const uint8_t position) {
@@ -70,18 +62,18 @@ namespace esphome {
             if (position > TOUCH_MAX_POSITION)
                 return 0;
 
-            // Special case for single gang (only one button exists)
-            if (this->gang_count_ == 1)
+            // Special case for single gang (only one button exists) or no selection
+            if (TX_ULTIMATE_EASY_GANGS <= 1)
                 return 1;
 
             // Calculate button width (rounds up to ensure full coverage)
             const uint8_t width =
-                (TOUCH_MAX_POSITION + this->gang_count_) / this->gang_count_;  // Width of each button region
+                (TOUCH_MAX_POSITION + TX_ULTIMATE_EASY_GANGS) / TX_ULTIMATE_EASY_GANGS;  // Width of each button region
             if (width < 1)  // Invalid width - and prevents division by zero 
                 return 0;
             const uint8_t button = std::min(
-                static_cast<uint8_t>((position / width) + 1), // Convert position to button index
-                this->gang_count_ // Clamp to max gang count
+                static_cast<uint8_t>((position / width) + 1),  // Convert position to button index
+                static_cast<uint8_t>(TX_ULTIMATE_EASY_GANGS)   // Clamp to max gang count
             );
             return button;
         }

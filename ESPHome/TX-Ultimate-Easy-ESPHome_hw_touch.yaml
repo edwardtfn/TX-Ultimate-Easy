@@ -251,7 +251,6 @@ script:
     mode: restart
     then:
       - lambda: |-
-          tx_ultimate->set_gang_count(${gangs});
           bs_button_1_click_event->publish_state(false);
           bs_button_2_click_event->publish_state(false);
           bs_button_3_click_event->publish_state(false);

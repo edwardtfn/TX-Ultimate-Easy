@@ -14,8 +14,8 @@
 substitutions:
   name: tx-ultimate-easy
   friendly_name: TX Ultimate Easy
-  model: EU  # Could be either `EU` or `US`
-  gangs: 0   # Number of relays and buttons: `1`, `2`, `3` or `4`
+  model: XX  # Could be either `EU` or `US`
+  gangs: -1  # Number of relays and buttons: `1`, `2`, `3` or `4`
 
   IS_EU_MODEL: ${'true' if model == "EU" else 'false'}
   IS_US_MODEL: ${'true' if model == "US" else 'false'}
@@ -87,6 +87,10 @@ esphome:
     build_flags:
       - -D TX_ULTIMATE_EASY_COMMON
       - -D TX_ULTIMATE_EASY_FIRMWARE_VERSION="${version}"
+      - -D TX_ULTIMATE_EASY_MODEL="${model}"
+      - -D TX_ULTIMATE_EASY_GANGS=${gangs}
+      - -D TX_ULTIMATE_EASY_IS_EU_MODEL=${1 if model == "EU" else 0}
+      - -D TX_ULTIMATE_EASY_IS_US_MODEL=${1 if model == "US" else 0}
 
   on_boot:
     - priority: 1000  # Very early in boot process
@@ -211,6 +215,33 @@ script:
           else
             ESP_LOGCONFIG("${TAG_COMMON}", "Pending restart: No");
 
+          // =============================================================================
+          // Compile-time validation of required configuration parameters
+          // =============================================================================
+
+          // Validate 'gangs' substitution exists
+          #ifndef TX_ULTIMATE_EASY_GANGS
+            #error "CONFIGURATION ERROR: Missing required 'gangs' substitution. Update your YAML adding 'gangs: 1' to your substitutions (valid values: 1, 2, 3, or 4)"
+          #endif  // !TX_ULTIMATE_EASY_GANGS
+
+          // Validate 'gangs' value is in valid range (1-4)
+          #if defined(TX_ULTIMATE_EASY_GANGS) && (TX_ULTIMATE_EASY_GANGS < 1 || TX_ULTIMATE_EASY_GANGS > 4)
+            #error "CONFIGURATION ERROR: Invalid 'gangs' value. Must be between 1 and 4. Update your YAML changing 'gangs' in your substitutions to a valid value (1, 2, 3, or 4)"
+          #endif  // TX_ULTIMATE_EASY_GANGS range validation
+
+          // Validate 'model' substitution exists (check for model flags)
+          #if !defined(TX_ULTIMATE_EASY_IS_EU_MODEL) || !defined(TX_ULTIMATE_EASY_IS_US_MODEL)
+            #error "CONFIGURATION ERROR: Missing required 'model' substitution. Update your YAML adding 'model: EU' or 'model: US' to your substitutions"
+          #endif  // Model flags existence check
+
+          // Validate 'model' value is either 'EU' or 'US' (exactly one flag should be true)
+          #if (TX_ULTIMATE_EASY_IS_EU_MODEL && TX_ULTIMATE_EASY_IS_US_MODEL) || \
+              (!TX_ULTIMATE_EASY_IS_EU_MODEL && !TX_ULTIMATE_EASY_IS_US_MODEL)
+            #error "CONFIGURATION ERROR: Invalid 'model' value. Must be either 'EU' or 'US' (case-sensitive). Update your YAML adding 'model: EU' or 'model: US' to your substitutions"
+          #endif  // Model value validation
+
+          // =============================================================================
+
   - id: dump_config_caller
     mode: restart
     then:
@@ -277,7 +308,6 @@ text_sensor:
 
 tx_ultimate_easy:
   id: tx_ultimate
-  gang_count: ${gangs}
 
 wifi:
   id: wifi_component

@@ -14,9 +14,9 @@ namespace esphome {
         static const char *TAG = "tx_ultimate_easy.light";
 
         // Constant definitions
-        const LightAttributes LIGHT_ATTRS_DEFAULT = {100, 255, 255, 255};
-        const uint32_t LIGHT_ATTRS_DEFAULT_PACKED = 0x64FFFFFF;
-        const uint64_t DEFAULT_DUAL_LIGHT_ATTRS_PACKED = 0x64FFFFFF64FFFFFF;
+        const LightAttributes LIGHT_ATTRS_DEFAULTX = {100, 255, 255, 255};
+        const uint32_t LIGHT_ATTRS_DEFAULT_PACKEDX = 0x64FFFFFF;
+        const uint64_t DEFAULT_DUAL_LIGHT_ATTRS_PACKEDX = 0x64FFFFFF64FFFFFF;
 
         // Function implementations
         uint32_t pack_light_attributes(const LightAttributes& attr) {

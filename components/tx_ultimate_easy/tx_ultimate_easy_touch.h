@@ -56,8 +56,6 @@ namespace esphome {
             void loop() override;
             void dump_config() override;
 
-            uint8_t get_gang_count() { return this->gang_count_; }
-            bool set_gang_count(const uint8_t gang_count);
             uint8_t get_button_from_position(const uint8_t position);
 
         protected:
@@ -76,8 +74,6 @@ namespace esphome {
             Trigger<TouchPoint> trigger_swipe_right_;
             Trigger<TouchPoint> trigger_multi_touch_release_;
             Trigger<TouchPoint> trigger_long_touch_release_;
-
-            uint8_t gang_count_ = 1;
 
         }; // class TxUltimateEasy
 

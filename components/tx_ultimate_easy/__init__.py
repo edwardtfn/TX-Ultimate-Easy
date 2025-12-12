@@ -14,7 +14,6 @@ DEPENDENCIES = ['uart']
 CONF_TX_ULTIMATE_EASY = "tx_ultimate_easy"
 
 CONF_UART = "uart"
-CONF_GANG_COUNT = "gang_count"
 
 CONF_ON_TOUCH_EVENT = "on_touch_event"
 CONF_ON_PRESS = "on_press"
@@ -35,7 +34,6 @@ CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(TxUltimateTouch),
 
     cv.Required(CONF_UART): cv.use_id(uart),
-    cv.Optional(CONF_GANG_COUNT, default=1): cv.int_range(min=1, max=4),
 
     cv.Optional(CONF_ON_TOUCH_EVENT): automation.validate_automation(single=True),
     cv.Optional(CONF_ON_PRESS): automation.validate_automation(single=True),
@@ -51,9 +49,6 @@ CONFIG_SCHEMA = cv.Schema({
 async def register_tx_ultimate_easy(var, config):
     uart_component = await cg.get_variable(config[CONF_UART])
     cg.add(var.set_uart_component(uart_component))
-
-    if CONF_GANG_COUNT in config:
-        cg.add(var.set_gang_count(config[CONF_GANG_COUNT]))
 
     if CONF_ON_TOUCH_EVENT in config:
         await automation.build_automation(
