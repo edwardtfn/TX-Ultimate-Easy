@@ -1,8 +1,4 @@
 ---
-substitutions:
-  model: US
-  gangs: 4
-
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password

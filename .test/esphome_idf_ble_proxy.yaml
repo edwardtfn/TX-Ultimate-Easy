@@ -1,4 +1,8 @@
 ---
+substitutions:
+  model: US
+  gangs: 4
+
 packages:
   common: !include common.yaml
   core_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
