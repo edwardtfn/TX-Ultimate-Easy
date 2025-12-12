@@ -26,7 +26,7 @@ binary_sensor:
 
   - id: bs_button_1_click_event
     name: Button 1 - Click event
-    internal: false
+    internal: ${'true' if gangs < 1 else 'false'}
     <<: *bs_button_event_template
     on_press:
       then:
@@ -36,7 +36,7 @@ binary_sensor:
             state: OFF  # yamllint disable-line rule:truthy
   - id: bs_button_2_click_event
     name: Button 2 - Click event
-    internal: false
+    internal: ${'true' if gangs < 2 else 'false'}
     <<: *bs_button_event_template
     on_press:
       then:
@@ -46,7 +46,7 @@ binary_sensor:
             state: OFF  # yamllint disable-line rule:truthy
   - id: bs_button_3_click_event
     name: Button 3 - Click event
-    internal: false
+    internal: ${'true' if gangs < 3 else 'false'}
     <<: *bs_button_event_template
     on_press:
       then:
@@ -56,7 +56,7 @@ binary_sensor:
             state: OFF  # yamllint disable-line rule:truthy
   - id: bs_button_4_click_event
     name: Button 4 - Click event
-    internal: false
+    internal: ${'true' if gangs < 4 else 'false'}
     <<: *bs_button_event_template
     on_press:
       then:
@@ -67,7 +67,7 @@ binary_sensor:
 
   - id: bs_button_1_double_click_event
     name: Button 1 - Double-click event
-    internal: false
+    internal: ${'true' if gangs < 1 else 'false'}
     <<: *bs_button_event_template
     on_press:
       then:
@@ -77,7 +77,7 @@ binary_sensor:
             state: OFF  # yamllint disable-line rule:truthy
   - id: bs_button_2_double_click_event
     name: Button 2 - Double-click event
-    internal: false
+    internal: ${'true' if gangs < 2 else 'false'}
     <<: *bs_button_event_template
     on_press:
       then:
@@ -87,7 +87,7 @@ binary_sensor:
             state: OFF  # yamllint disable-line rule:truthy
   - id: bs_button_3_double_click_event
     name: Button 3 - Double-click event
-    internal: false
+    internal: ${'true' if gangs < 3 else 'false'}
     <<: *bs_button_event_template
     on_press:
       then:
@@ -97,7 +97,7 @@ binary_sensor:
             state: OFF  # yamllint disable-line rule:truthy
   - id: bs_button_4_double_click_event
     name: Button 4 - Double-click event
-    internal: false
+    internal: ${'true' if gangs < 4 else 'false'}
     <<: *bs_button_event_template
     on_press:
       then:
@@ -108,7 +108,7 @@ binary_sensor:
 
   - id: bs_button_1_long_press_event
     name: Button 1 - Long-press event
-    internal: false
+    internal: ${'true' if gangs < 1 else 'false'}
     <<: *bs_button_event_template
     on_press:
       then:
@@ -118,7 +118,7 @@ binary_sensor:
             state: OFF  # yamllint disable-line rule:truthy
   - id: bs_button_2_long_press_event
     name: Button 2 - Long-press event
-    internal: false
+    internal: ${'true' if gangs < 2 else 'false'}
     <<: *bs_button_event_template
     on_press:
       then:
@@ -128,7 +128,7 @@ binary_sensor:
             state: OFF  # yamllint disable-line rule:truthy
   - id: bs_button_3_long_press_event
     name: Button 3 - Long-press event
-    internal: false
+    internal: ${'true' if gangs < 3 else 'false'}
     <<: *bs_button_event_template
     on_press:
       then:
@@ -138,7 +138,7 @@ binary_sensor:
             state: OFF  # yamllint disable-line rule:truthy
   - id: bs_button_4_long_press_event
     name: Button 4 - Long-press event
-    internal: false
+    internal: ${'true' if gangs < 4 else 'false'}
     <<: *bs_button_event_template
     on_press:
       then:
@@ -162,6 +162,7 @@ binary_sensor:
   - id: bs_swipe_left
     name: Swipe left event
     icon: mdi:gesture-swipe-left
+    internal: ${IS_US_MODEL}
     <<: *bs_button_event_template
     on_press:
       then:
@@ -172,6 +173,7 @@ binary_sensor:
   - id: bs_swipe_right
     name: Swipe right event
     icon: mdi:gesture-swipe-right
+    internal: ${IS_US_MODEL}
     <<: *bs_button_event_template
     on_press:
       then:
@@ -182,6 +184,7 @@ binary_sensor:
   - id: bs_swipe_up
     name: Swipe up event
     icon: mdi:gesture-swipe-up
+    internal: ${IS_EU_MODEL}
     <<: *bs_button_event_template
     on_press:
       then:
@@ -192,6 +195,7 @@ binary_sensor:
   - id: bs_swipe_down
     name: Swipe down event
     icon: mdi:gesture-swipe-down
+    internal: ${IS_EU_MODEL}
     <<: *bs_button_event_template
     on_press:
       then:
@@ -236,21 +240,12 @@ script:
   - id: boot_initialize_touch_format
     mode: restart
     then:
-      - wait_until:
-          condition:
-            - lambda: return sl_tx_model_format->active_index().has_value();
       - lambda: |-
-          const bool is_model_us = sl_tx_model_format->active_index().has_value() and
-                                    sl_tx_model_format->active_index().value() == 1;
           bs_multi_touch->publish_state(false);
           bs_swipe_down->publish_state(false);
-          bs_swipe_down->set_internal(!is_model_us);
           bs_swipe_left->publish_state(false);
-          bs_swipe_left->set_internal(is_model_us);
           bs_swipe_right->publish_state(false);
-          bs_swipe_right->set_internal(is_model_us);
           bs_swipe_up->publish_state(false);
-          bs_swipe_up->set_internal(!is_model_us);
 
   - id: boot_initialize_touch_gang
     mode: restart
@@ -269,18 +264,6 @@ script:
           bs_button_2_long_press_event->publish_state(false);
           bs_button_3_long_press_event->publish_state(false);
           bs_button_4_long_press_event->publish_state(false);
-          bs_button_1_click_event->set_internal(${gangs} < 1);
-          bs_button_2_click_event->set_internal(${gangs} < 2);
-          bs_button_3_click_event->set_internal(${gangs} < 3);
-          bs_button_4_click_event->set_internal(${gangs} < 4);
-          bs_button_1_double_click_event->set_internal(${gangs} < 1);
-          bs_button_2_double_click_event->set_internal(${gangs} < 2);
-          bs_button_3_double_click_event->set_internal(${gangs} < 3);
-          bs_button_4_double_click_event->set_internal(${gangs} < 4);
-          bs_button_1_long_press_event->set_internal(${gangs} < 1);
-          bs_button_2_long_press_event->set_internal(${gangs} < 2);
-          bs_button_3_long_press_event->set_internal(${gangs} < 3);
-          bs_button_4_long_press_event->set_internal(${gangs} < 4);
 
   - id: !extend dump_config
     then:
@@ -402,8 +385,7 @@ tx_ultimate_easy:
   on_swipe_left:
     then:
       - lambda: |-
-          const char *direction = (sl_tx_model_format->current_option() == "${TX_MODEL_FORMAT_EU_TEXT}") ?
-                                  "left" : "up";
+          const char *direction = ${IS_EU_MODEL} ? "left" : "up";
           esphome::tx_ultimate_easy::fire_ha_event("touch", "swipe", {
             {"action", direction},
             {"swipe-direction", direction},
@@ -415,8 +397,7 @@ tx_ultimate_easy:
   on_swipe_right:
     then:
       - lambda: |-
-          const char *direction = (sl_tx_model_format->current_option() == "${TX_MODEL_FORMAT_EU_TEXT}") ?
-                                  "right" : "down";
+          const char *direction = ${IS_EU_MODEL} ? "right" : "down";
           esphome::tx_ultimate_easy::fire_ha_event("touch", "swipe", {
             {"action", direction},
             {"swipe-direction", direction},

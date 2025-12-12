@@ -36,6 +36,17 @@ api:
       - script.execute: dump_config_caller
 
 binary_sensor:
+  - id: bs_pending_restart
+    name: Pending Restart Status
+    internal: false
+    disabled_by_default: false
+    platform: template
+    entity_category: diagnostic
+    device_class: problem
+    on_state:
+      then:
+        - script.execute: dump_config_caller
+
   - id: bs_boot_completed
     name: Boot Completed
     internal: false
@@ -146,14 +157,6 @@ script:
       - script.execute:
           id: api_send_ha_event_boot
           type: start
-      - wait_until:
-          condition:
-            - lambda: return sl_tx_model_gang->active_index().has_value();
-      - lambda: |-
-          ${gangs} = sl_tx_model_gang->active_index().value() + 1;
-          if (${gangs} < 1 || ${gangs} > 4) {
-            ESP_LOGE("${TAG_COMMON}", "Invalid number of gangs: %" PRIu8, ${gangs});
-          }
 
   - id: boot_sequence
     mode: restart
@@ -186,6 +189,9 @@ script:
 
           // Model configuration
           ESP_LOGCONFIG("${TAG_COMMON}", "Model: ${model}-${gangs}G");
+          if (${gangs} < 1 || ${gangs} > 4) {
+            ESP_LOGE("${TAG_COMMON}", "Invalid number of gangs: ${gangs}");
+          }
 
           // Boot completion status
           if (bs_boot_completed->state)
@@ -265,6 +271,7 @@ text_sensor:
 
 tx_ultimate_easy:
   id: tx_ultimate
+  gang_count: ${gangs}
 
 wifi:
   id: wifi_component
