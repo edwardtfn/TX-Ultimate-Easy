@@ -582,20 +582,20 @@ script:
   - id: !extend boot_initialize
     then:
       - lambda: |-
-          light_28->set_internal(!id(is_us_model));
-          light_29->set_internal(!id(is_us_model));
-          light_30->set_internal(!id(is_us_model));
-          light_31->set_internal(!id(is_us_model));
-          light_eu->set_internal(id(is_us_model));
-          light_eu_bottom->set_internal(id(is_us_model));
-          light_eu_left->set_internal(id(is_us_model));
-          light_eu_right->set_internal(id(is_us_model));
-          light_eu_top->set_internal(id(is_us_model));
-          light_us->set_internal(!id(is_us_model));
-          light_us_bottom->set_internal(!id(is_us_model));
-          light_us_left->set_internal(!id(is_us_model));
-          light_us_right->set_internal(!id(is_us_model));
-          light_us_top->set_internal(!id(is_us_model));
+          light_28->set_internal(${IS_EU_MODEL});
+          light_29->set_internal(${IS_EU_MODEL});
+          light_30->set_internal(${IS_EU_MODEL});
+          light_31->set_internal(${IS_EU_MODEL});
+          light_eu->set_internal(${IS_US_MODEL});
+          light_eu_bottom->set_internal(${IS_US_MODEL});
+          light_eu_left->set_internal(${IS_US_MODEL});
+          light_eu_right->set_internal(${IS_US_MODEL});
+          light_eu_top->set_internal(${IS_US_MODEL});
+          light_us->set_internal(${IS_EU_MODEL});
+          light_us_bottom->set_internal(${IS_EU_MODEL});
+          light_us_left->set_internal(${IS_EU_MODEL});
+          light_us_right->set_internal(${IS_EU_MODEL});
+          light_us_top->set_internal(${IS_EU_MODEL});
 
   - id: !extend dump_config
     then:
@@ -793,7 +793,7 @@ script:
       # LED restoration
       - if:
           condition:
-            lambda: return id(is_us_model);
+            lambda: return ${IS_US_MODEL};
           then:
             # US model restoration
             - script.execute:

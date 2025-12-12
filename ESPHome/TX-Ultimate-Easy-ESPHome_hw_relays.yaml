@@ -12,6 +12,8 @@
 ####################################################################################################
 ---
 substitutions:
+  expose_relays_leds_to_ha: false
+
   RELAY_MODE_TEXT_SWITCH: "Switch"
   RELAY_MODE_TEXT_LIGHT: "Light"
   RELAY_MODE_TEXT_NOT_USED: "Not in use"
@@ -757,9 +759,9 @@ script:
           // - For US model: gb_lights_1 = left side LEDs, gb_lights_2 = right side LEDs
           // - For EU model: gb_lights_1 = bottom LEDs, gb_lights_2 = top LEDs
           // Gang configurations determine which LED segments are active
-          switch (id(gang_count)) {
+          switch (${gangs}) {
             case 1:  // 1 Gang
-              if (id(is_us_model)) {
+              if (${IS_US_MODEL}) {
                 id(gb_lights_1) = { light_us_rl_1_1_left };
                 id(gb_lights_2) = { light_us_rl_1_1_right };
               } else {
@@ -768,7 +770,7 @@ script:
               }
               break;
             case 2:  // 2 Gang
-              if (id(is_us_model)) {
+              if (${IS_US_MODEL}) {
                 id(gb_lights_1) = { light_us_rl_1_2_left, light_us_rl_2_2_left };
                 id(gb_lights_2) = { light_us_rl_1_2_right, light_us_rl_2_2_right };
               } else {
@@ -777,7 +779,7 @@ script:
               }
               break;
             case 3:  // 3 Gang
-              if (id(is_us_model)) {
+              if (${IS_US_MODEL}) {
                 id(gb_lights_1) = { light_us_rl_1_3_left, light_us_rl_2_3_left, light_us_rl_3_3_left };
                 id(gb_lights_2) = { light_us_rl_1_3_right, light_us_rl_2_3_right, light_us_rl_3_3_right };
               } else {
@@ -786,7 +788,7 @@ script:
               }
               break;
             case 4:  // 4 Gang
-              if (id(is_us_model)) {
+              if (${IS_US_MODEL}) {
                 id(gb_lights_1) = { light_us_rl_1_4_left, light_us_rl_2_4_left,
                                     light_us_rl_3_4_left, light_us_rl_4_4_left };
                 id(gb_lights_2) = { light_us_rl_1_4_right, light_us_rl_2_4_right,
@@ -799,7 +801,7 @@ script:
               }
               break;
             default:
-              ESP_LOGE("${TAG_HW_RELAYS}", "Invalid gang count: %" PRIu8, id(gang_count));
+              ESP_LOGE("${TAG_HW_RELAYS}", "Invalid gang count: %" PRIu8, ${gangs});
               break;
           }
           id(boot_initialization_relays_group_assignments) = true;
@@ -809,16 +811,16 @@ script:
     then:
       - lambda: |-
           // EU light modes
-          sl_relay_1_light_mode_eu->set_internal(id(is_us_model) or id(gang_count) < 1);
-          sl_relay_2_light_mode_eu->set_internal(id(is_us_model) or id(gang_count) < 2);
-          sl_relay_3_light_mode_eu->set_internal(id(is_us_model) or id(gang_count) < 3);
-          sl_relay_4_light_mode_eu->set_internal(id(is_us_model) or id(gang_count) < 4);
+          sl_relay_1_light_mode_eu->set_internal(${IS_US_MODEL} or ${gangs} < 1);
+          sl_relay_2_light_mode_eu->set_internal(${IS_US_MODEL} or ${gangs} < 2);
+          sl_relay_3_light_mode_eu->set_internal(${IS_US_MODEL} or ${gangs} < 3);
+          sl_relay_4_light_mode_eu->set_internal(${IS_US_MODEL} or ${gangs} < 4);
 
           // US light modes
-          sl_relay_1_light_mode_us->set_internal(!id(is_us_model) or id(gang_count) < 1);
-          sl_relay_2_light_mode_us->set_internal(!id(is_us_model) or id(gang_count) < 2);
-          sl_relay_3_light_mode_us->set_internal(!id(is_us_model) or id(gang_count) < 3);
-          sl_relay_4_light_mode_us->set_internal(!id(is_us_model) or id(gang_count) < 4);
+          sl_relay_1_light_mode_us->set_internal(${IS_EU_MODEL} or ${gangs} < 1);
+          sl_relay_2_light_mode_us->set_internal(${IS_EU_MODEL} or ${gangs} < 2);
+          sl_relay_3_light_mode_us->set_internal(${IS_EU_MODEL} or ${gangs} < 3);
+          sl_relay_4_light_mode_us->set_internal(${IS_EU_MODEL} or ${gangs} < 4);
 
           // Set this section of initialization as completed
           id(boot_initialization_relays_light_modes) = true;
@@ -831,55 +833,55 @@ script:
 
           // EU model LEDs
           // EU model - 1 Gang
-          light_eu_rl_1_1_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 1);
-          light_eu_rl_1_1_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 1);
+          light_eu_rl_1_1_bottom->set_internal(set_internal or ${IS_US_MODEL} or ${gangs} != 1);
+          light_eu_rl_1_1_top->set_internal(set_internal or ${IS_US_MODEL} or ${gangs} != 1);
           // EU model - 2 Gang
-          light_eu_rl_1_2_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 2);
-          light_eu_rl_1_2_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 2);
-          light_eu_rl_2_2_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 2);
-          light_eu_rl_2_2_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 2);
+          light_eu_rl_1_2_bottom->set_internal(set_internal or ${IS_US_MODEL} or ${gangs} != 2);
+          light_eu_rl_1_2_top->set_internal(set_internal or ${IS_US_MODEL} or ${gangs} != 2);
+          light_eu_rl_2_2_bottom->set_internal(set_internal or ${IS_US_MODEL} or ${gangs} != 2);
+          light_eu_rl_2_2_top->set_internal(set_internal or ${IS_US_MODEL} or ${gangs} != 2);
           // EU model - 3 Gang
-          light_eu_rl_1_3_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 3);
-          light_eu_rl_1_3_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 3);
-          light_eu_rl_2_3_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 3);
-          light_eu_rl_2_3_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 3);
-          light_eu_rl_3_3_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 3);
-          light_eu_rl_3_3_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 3);
+          light_eu_rl_1_3_bottom->set_internal(set_internal or ${IS_US_MODEL} or ${gangs} != 3);
+          light_eu_rl_1_3_top->set_internal(set_internal or ${IS_US_MODEL} or ${gangs} != 3);
+          light_eu_rl_2_3_bottom->set_internal(set_internal or ${IS_US_MODEL} or ${gangs} != 3);
+          light_eu_rl_2_3_top->set_internal(set_internal or ${IS_US_MODEL} or ${gangs} != 3);
+          light_eu_rl_3_3_bottom->set_internal(set_internal or ${IS_US_MODEL} or ${gangs} != 3);
+          light_eu_rl_3_3_top->set_internal(set_internal or ${IS_US_MODEL} or ${gangs} != 3);
           // EU model - 4 Gang
-          light_eu_rl_1_4_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
-          light_eu_rl_1_4_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
-          light_eu_rl_2_4_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
-          light_eu_rl_2_4_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
-          light_eu_rl_3_4_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
-          light_eu_rl_3_4_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
-          light_eu_rl_4_4_bottom->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
-          light_eu_rl_4_4_top->set_internal(set_internal or id(is_us_model) or id(gang_count) != 4);
+          light_eu_rl_1_4_bottom->set_internal(set_internal or ${IS_US_MODEL} or ${gangs} != 4);
+          light_eu_rl_1_4_top->set_internal(set_internal or ${IS_US_MODEL} or ${gangs} != 4);
+          light_eu_rl_2_4_bottom->set_internal(set_internal or ${IS_US_MODEL} or ${gangs} != 4);
+          light_eu_rl_2_4_top->set_internal(set_internal or ${IS_US_MODEL} or ${gangs} != 4);
+          light_eu_rl_3_4_bottom->set_internal(set_internal or ${IS_US_MODEL} or ${gangs} != 4);
+          light_eu_rl_3_4_top->set_internal(set_internal or ${IS_US_MODEL} or ${gangs} != 4);
+          light_eu_rl_4_4_bottom->set_internal(set_internal or ${IS_US_MODEL} or ${gangs} != 4);
+          light_eu_rl_4_4_top->set_internal(set_internal or ${IS_US_MODEL} or ${gangs} != 4);
 
           // US model LEDs
           // US model - 1 Gang
-          light_us_rl_1_1_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 1);
-          light_us_rl_1_1_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 1);
+          light_us_rl_1_1_left->set_internal(set_internal or ${IS_EU_MODEL} or ${gangs} != 1);
+          light_us_rl_1_1_right->set_internal(set_internal or ${IS_EU_MODEL} or ${gangs} != 1);
           // US model - 2 Gang
-          light_us_rl_1_2_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 2);
-          light_us_rl_1_2_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 2);
-          light_us_rl_2_2_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 2);
-          light_us_rl_2_2_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 2);
+          light_us_rl_1_2_left->set_internal(set_internal or ${IS_EU_MODEL} or ${gangs} != 2);
+          light_us_rl_1_2_right->set_internal(set_internal or ${IS_EU_MODEL} or ${gangs} != 2);
+          light_us_rl_2_2_left->set_internal(set_internal or ${IS_EU_MODEL} or ${gangs} != 2);
+          light_us_rl_2_2_right->set_internal(set_internal or ${IS_EU_MODEL} or ${gangs} != 2);
           // US model - 3 Gang
-          light_us_rl_1_3_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 3);
-          light_us_rl_1_3_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 3);
-          light_us_rl_2_3_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 3);
-          light_us_rl_2_3_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 3);
-          light_us_rl_3_3_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 3);
-          light_us_rl_3_3_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 3);
+          light_us_rl_1_3_left->set_internal(set_internal or ${IS_EU_MODEL} or ${gangs} != 3);
+          light_us_rl_1_3_right->set_internal(set_internal or ${IS_EU_MODEL} or ${gangs} != 3);
+          light_us_rl_2_3_left->set_internal(set_internal or ${IS_EU_MODEL} or ${gangs} != 3);
+          light_us_rl_2_3_right->set_internal(set_internal or ${IS_EU_MODEL} or ${gangs} != 3);
+          light_us_rl_3_3_left->set_internal(set_internal or ${IS_EU_MODEL} or ${gangs} != 3);
+          light_us_rl_3_3_right->set_internal(set_internal or ${IS_EU_MODEL} or ${gangs} != 3);
           // US model - 4 Gang
-          light_us_rl_1_4_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
-          light_us_rl_1_4_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
-          light_us_rl_2_4_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
-          light_us_rl_2_4_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
-          light_us_rl_3_4_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
-          light_us_rl_3_4_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
-          light_us_rl_4_4_left->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
-          light_us_rl_4_4_right->set_internal(set_internal or !id(is_us_model) or id(gang_count) != 4);
+          light_us_rl_1_4_left->set_internal(set_internal or ${IS_EU_MODEL} or ${gangs} != 4);
+          light_us_rl_1_4_right->set_internal(set_internal or ${IS_EU_MODEL} or ${gangs} != 4);
+          light_us_rl_2_4_left->set_internal(set_internal or ${IS_EU_MODEL} or ${gangs} != 4);
+          light_us_rl_2_4_right->set_internal(set_internal or ${IS_EU_MODEL} or ${gangs} != 4);
+          light_us_rl_3_4_left->set_internal(set_internal or ${IS_EU_MODEL} or ${gangs} != 4);
+          light_us_rl_3_4_right->set_internal(set_internal or ${IS_EU_MODEL} or ${gangs} != 4);
+          light_us_rl_4_4_left->set_internal(set_internal or ${IS_EU_MODEL} or ${gangs} != 4);
+          light_us_rl_4_4_right->set_internal(set_internal or ${IS_EU_MODEL} or ${gangs} != 4);
 
           // Set this section of initialization as completed
           id(boot_initialization_relays_relay_leds) = true;
@@ -889,10 +891,10 @@ script:
     then:
       - lambda: |-
           // Set selector internal based on the model (num of relays)
-          sl_relay_1_mode->set_internal(id(gang_count) < 1);
-          sl_relay_2_mode->set_internal(id(gang_count) < 2);
-          sl_relay_3_mode->set_internal(id(gang_count) < 3);
-          sl_relay_4_mode->set_internal(id(gang_count) < 4);
+          sl_relay_1_mode->set_internal(${gangs} < 1);
+          sl_relay_2_mode->set_internal(${gangs} < 2);
+          sl_relay_3_mode->set_internal(${gangs} < 3);
+          sl_relay_4_mode->set_internal(${gangs} < 4);
 
           // Set indicator (either switch or light) visible on Home Assistant
           auto relay_mode_index = sl_relay_1_mode->active_index();
@@ -902,18 +904,18 @@ script:
           }
           relay_mode_index = sl_relay_2_mode->active_index();
           if (relay_mode_index.has_value()) {
-            light_output_2->set_internal(id(gang_count) < 2 or relay_mode_index.value() != 1);
-            sw_relay_2->set_internal(id(gang_count) < 2 or relay_mode_index.value() != 0);
+            light_output_2->set_internal(${gangs} < 2 or relay_mode_index.value() != 1);
+            sw_relay_2->set_internal(${gangs} < 2 or relay_mode_index.value() != 0);
           }
           relay_mode_index = sl_relay_3_mode->active_index();
           if (relay_mode_index.has_value()) {
-            light_output_3->set_internal(id(gang_count) < 3 or relay_mode_index.value() != 1);
-            sw_relay_3->set_internal(id(gang_count) < 3 or relay_mode_index.value() != 0);
+            light_output_3->set_internal(${gangs} < 3 or relay_mode_index.value() != 1);
+            sw_relay_3->set_internal(${gangs} < 3 or relay_mode_index.value() != 0);
           }
           relay_mode_index = sl_relay_4_mode->active_index();
           if (relay_mode_index.has_value()) {
-            light_output_4->set_internal(id(gang_count) < 4 or relay_mode_index.value() != 1);
-            sw_relay_4->set_internal(id(gang_count) < 4 or relay_mode_index.value() != 0);
+            light_output_4->set_internal(${gangs} < 4 or relay_mode_index.value() != 1);
+            sw_relay_4->set_internal(${gangs} < 4 or relay_mode_index.value() != 0);
           }
 
           // Set this section of initialization as completed
@@ -990,19 +992,19 @@ script:
   - id: !extend dump_config
     then:
       - lambda: |-
-          std::string gang_count_plural_suffix = id(gang_count) > 1 ? "s" : "";
+          std::string gang_count_plural_suffix = ${gangs} > 1 ? "s" : "";
           // Relay's modes
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Relay%s mode%s:", gang_count_plural_suffix.c_str(),
                                                                   gang_count_plural_suffix.c_str());
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 1: %s", sl_relay_1_mode->has_state() ?
                                               sl_relay_1_mode->current_option() : "Unknown");
-          if (id(gang_count) >= 2)
+          if (${gangs} >= 2)
             ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 2: %s", sl_relay_2_mode->has_state() ?
                                                 sl_relay_2_mode->current_option() : "Unknown");
-          if (id(gang_count) >= 3)
+          if (${gangs} >= 3)
             ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 3: %s", sl_relay_3_mode->has_state() ?
                                                 sl_relay_3_mode->current_option() : "Unknown");
-          if (id(gang_count) >= 4)
+          if (${gangs} >= 4)
             ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 4: %s", sl_relay_4_mode->has_state() ?
                                                 sl_relay_4_mode->current_option() : "Unknown");
 
@@ -1010,11 +1012,11 @@ script:
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Relay%s state%s:", gang_count_plural_suffix.c_str(),
                                                                     gang_count_plural_suffix.c_str());
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 1: %s", sw_relay_1->state ? "ON" : "OFF");
-          if (id(gang_count) >= 2)
+          if (${gangs} >= 2)
             ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 2: %s", sw_relay_2->state ? "ON" : "OFF");
-          if (id(gang_count) >= 3)
+          if (${gangs} >= 3)
             ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 3: %s", sw_relay_3->state ? "ON" : "OFF");
-          if (id(gang_count) >= 4)
+          if (${gangs} >= 4)
             ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 4: %s", sw_relay_4->state ? "ON" : "OFF");
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Expose Relay's LEDs to Home Assistant: %s",
                                                 YESNO(sw_expose_relays_leds_to_ha->state));
@@ -1031,19 +1033,19 @@ script:
           // Relay's LEDs modes
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Relay%s LEDs mode%s:", gang_count_plural_suffix.c_str(),
                                                                         gang_count_plural_suffix.c_str());
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 1: %s", id(is_us_model) ?
+          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 1: %s", ${IS_US_MODEL} ?
                                                                   sl_relay_1_light_mode_us->current_option() :
                                                                   sl_relay_1_light_mode_eu->current_option());
-          if (id(gang_count) >= 2)
-            ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 2: %s", id(is_us_model) ?
+          if (${gangs} >= 2)
+            ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 2: %s", ${IS_US_MODEL} ?
                                                                   sl_relay_2_light_mode_us->current_option() :
                                                                   sl_relay_2_light_mode_eu->current_option());
-          if (id(gang_count) >= 3)
-            ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 3: %s", id(is_us_model) ?
+          if (${gangs} >= 3)
+            ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 3: %s", ${IS_US_MODEL} ?
                                                                   sl_relay_3_light_mode_us->current_option() :
                                                                   sl_relay_3_light_mode_eu->current_option());
-          if (id(gang_count) >= 4)
-            ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 4: %s", id(is_us_model) ?
+          if (${gangs} >= 4)
+            ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 4: %s", ${IS_US_MODEL} ?
                                                                   sl_relay_4_light_mode_us->current_option() :
                                                                   sl_relay_4_light_mode_eu->current_option());
 
@@ -1074,10 +1076,10 @@ script:
           static const uint32_t LIGHT_TRANSITION_TURN_OFF = ${LIGHT_TRANSITION_TURN_OFF};
           static const uint8_t LIGHT_BRIGHTNESS_TURN_ON = ${LIGHT_BRIGHTNESS_TURN_ON};
 
-          const std::string light_mode_group_1 = id(is_us_model)
+          const std::string light_mode_group_1 = ${IS_US_MODEL}
                                                   ? "${LIGHT_MODE_LEFT_TEXT}"
                                                   : "${LIGHT_MODE_BOTTOM_TEXT}";
-          const std::string light_mode_group_2 = id(is_us_model)
+          const std::string light_mode_group_2 = ${IS_US_MODEL}
                                                   ? "${LIGHT_MODE_RIGHT_TEXT}"
                                                   : "${LIGHT_MODE_TOP_TEXT}";
 
@@ -1188,9 +1190,9 @@ script:
           show_relay_status->execute();
 
           // Restore all light attributes based on current model and gang count
-          switch (id(gang_count)) {
+          switch (${gangs}) {
             case 1:  // 1-Gang
-              if (id(is_us_model)) {
+              if (${IS_US_MODEL}) {
                 light_attributes_restore_dual->execute(id(light_us_rl_1_1_left), &id(attr_light_rl_1_1_both), 1);
                 light_attributes_restore_dual->execute(id(light_us_rl_1_1_right), &id(attr_light_rl_1_1_both), 2);
               } else {
@@ -1199,7 +1201,7 @@ script:
               }
               break;
             case 2:  // 2-Gang
-              if (id(is_us_model)) {
+              if (${IS_US_MODEL}) {
                 light_attributes_restore_dual->execute(id(light_us_rl_1_2_left), &id(attr_light_rl_1_2_both), 1);
                 light_attributes_restore_dual->execute(id(light_us_rl_1_2_right), &id(attr_light_rl_1_2_both), 2);
                 light_attributes_restore_dual->execute(id(light_us_rl_2_2_left), &id(attr_light_rl_2_2_both), 1);
@@ -1212,7 +1214,7 @@ script:
               }
               break;
             case 3:  // 3-Gang
-              if (id(is_us_model)) {
+              if (${IS_US_MODEL}) {
                 light_attributes_restore_dual->execute(id(light_us_rl_1_3_left), &id(attr_light_rl_1_3_both), 1);
                 light_attributes_restore_dual->execute(id(light_us_rl_1_3_right), &id(attr_light_rl_1_3_both), 2);
                 light_attributes_restore_dual->execute(id(light_us_rl_2_3_left), &id(attr_light_rl_2_3_both), 1);
@@ -1229,7 +1231,7 @@ script:
               }
               break;
             case 4:  // 4-Gang
-              if (id(is_us_model)) {
+              if (${IS_US_MODEL}) {
                 light_attributes_restore_dual->execute(id(light_us_rl_1_4_left), &id(attr_light_rl_1_4_both), 1);
                 light_attributes_restore_dual->execute(id(light_us_rl_1_4_right), &id(attr_light_rl_1_4_both), 2);
                 light_attributes_restore_dual->execute(id(light_us_rl_2_4_left), &id(attr_light_rl_2_4_both), 1);
@@ -1262,13 +1264,13 @@ script:
               boot_initialize_relays->execute();
             return;
           }
-          for (uint8_t i = 0; i < id(gang_count); i++) {
+          for (uint8_t i = 0; i < ${gangs}; i++) {
             bool relay_state = false;
             std::string light_mode;
-            const std::string light_mode_group_1 = id(is_us_model)
+            const std::string light_mode_group_1 = ${IS_US_MODEL}
                                                     ? "${LIGHT_MODE_LEFT_TEXT}"
                                                     : "${LIGHT_MODE_BOTTOM_TEXT}";
-            const std::string light_mode_group_2 = id(is_us_model)
+            const std::string light_mode_group_2 = ${IS_US_MODEL}
                                                     ? "${LIGHT_MODE_RIGHT_TEXT}"
                                                     : "${LIGHT_MODE_TOP_TEXT}";
 
@@ -1276,25 +1278,25 @@ script:
             switch (i) {
               case 0:
                 relay_state = id(sw_relay_1).state;
-                light_mode = id(is_us_model)
+                light_mode = ${IS_US_MODEL}
                               ? sl_relay_1_light_mode_us->current_option()
                               : sl_relay_1_light_mode_eu->current_option();
                 break;
               case 1:
                 relay_state = id(sw_relay_2).state;
-                light_mode = id(is_us_model)
+                light_mode = ${IS_US_MODEL}
                               ? sl_relay_2_light_mode_us->current_option()
                               : sl_relay_2_light_mode_eu->current_option();
                 break;
               case 2:
                 relay_state = id(sw_relay_3).state;
-                light_mode = id(is_us_model)
+                light_mode = ${IS_US_MODEL}
                               ? sl_relay_3_light_mode_us->current_option()
                               : sl_relay_3_light_mode_eu->current_option();
                 break;
               case 3:
                 relay_state = id(sw_relay_4).state;
-                light_mode = id(is_us_model)
+                light_mode = ${IS_US_MODEL}
                               ? sl_relay_4_light_mode_us->current_option()
                               : sl_relay_4_light_mode_eu->current_option();
                 break;
