@@ -143,9 +143,9 @@ light:
       - random:
           name: "Random"
     segments:
-    - id: light_full
-      from: 0
-      to: ${LIGHT_MAX_ADDR}
+      - id: light_full
+        from: 0
+        to: ${LIGHT_MAX_ADDR}
 
   - &light_partition_sides
     id: light_bottom

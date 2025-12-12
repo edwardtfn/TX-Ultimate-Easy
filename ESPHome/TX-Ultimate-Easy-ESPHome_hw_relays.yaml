@@ -20,10 +20,10 @@ substitutions:
 
   # You shouldn't change the restore mode as there is a custom restoring engine based on globals.
   # The reason of a custom engine is to address an issue where NVS space was exceeded causing saving/restoring issues
-  RELAYS_LIGHT_RESTORE_MODE: RESTORE_DEFAULT_OFF 
-  RELAYS_LIGHT_PARTITION_RESTORE_MODE: RESTORE_DEFAULT_OFF 
-  RELAYS_EXPOSE_LEDS_TO_HA_RESTORE_MODE: RESTORE_DEFAULT_OFF 
-  RELAYS_SWITCH_RESTORE_MODE: RESTORE_DEFAULT_OFF 
+  RELAYS_LIGHT_RESTORE_MODE: RESTORE_DEFAULT_OFF
+  RELAYS_LIGHT_PARTITION_RESTORE_MODE: RESTORE_DEFAULT_OFF
+  RELAYS_EXPOSE_LEDS_TO_HA_RESTORE_MODE: RESTORE_DEFAULT_OFF
+  RELAYS_SWITCH_RESTORE_MODE: RESTORE_DEFAULT_OFF
 
   TAG_HW_RELAYS: tx_ultimate_easy.hw.relays
 
