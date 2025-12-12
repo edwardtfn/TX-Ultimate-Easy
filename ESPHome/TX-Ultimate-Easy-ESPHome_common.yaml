@@ -226,7 +226,7 @@ script:
 
           // Validate 'gangs' value is in valid range (1-4)
           #if defined(TX_ULTIMATE_EASY_GANGS) && (TX_ULTIMATE_EASY_GANGS < 1 || TX_ULTIMATE_EASY_GANGS > 4)
-            #error "CONFIGURATION ERROR: Invalid 'gangs' value. Must be between 1 and 4. Update your YAML changing 'gangs' in your substitutions to a valid value (1, 2, 3, or 4)"
+            #error "CONFIGURATION ERROR: Invalid 'gangs' value (${gangs}). Must be between 1 and 4. Update your YAML changing 'gangs' in your substitutions to a valid value (1, 2, 3, or 4)"
           #endif  // TX_ULTIMATE_EASY_GANGS range validation
 
           // Validate 'model' substitution exists (check for model flags)
@@ -237,7 +237,7 @@ script:
           // Validate 'model' value is either 'EU' or 'US' (exactly one flag should be true)
           #if (TX_ULTIMATE_EASY_IS_EU_MODEL && TX_ULTIMATE_EASY_IS_US_MODEL) || \
               (!TX_ULTIMATE_EASY_IS_EU_MODEL && !TX_ULTIMATE_EASY_IS_US_MODEL)
-            #error "CONFIGURATION ERROR: Invalid 'model' value. Must be either 'EU' or 'US' (case-sensitive). Update your YAML adding 'model: EU' or 'model: US' to your substitutions"
+            #error "CONFIGURATION ERROR: Invalid 'model' value (${model}). Must be either 'EU' or 'US' (case-sensitive). Update your YAML adding 'model: EU' or 'model: US' to your substitutions"
           #endif  // Model value validation
 
           // =============================================================================
