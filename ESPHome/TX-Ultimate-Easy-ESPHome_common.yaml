@@ -59,6 +59,12 @@ binary_sensor:
       then:
         - script.execute: dump_config_caller
 
+button:
+  - id: bt_restart
+    name: Restart
+    internal: false
+    platform: restart
+
 esp32:
   board: esp32dev
   flash_size: 8MB
