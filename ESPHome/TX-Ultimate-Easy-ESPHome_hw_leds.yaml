@@ -32,6 +32,9 @@ substitutions:
   LIGHT_ATTRS_DEFAULT: '0x64FFFFFF'               # brightness=100, RGB=255,255,255
   LIGHT_DUAL_ATTRS_DEFAULT: '0x64FFFFFF64FFFFFF'  # Both lights: brightness=100, RGB=255,255,255
 
+  LIGHT_LED_COUNT: ${28 if IS_EU_MODEL else 32}
+  LIGHT_MAX_ADDR: ${27 if IS_EU_MODEL else 31}
+
   TAG_HW_LEDS: tx_ultimate_easy.hw.leds
 
 esphome:
@@ -92,20 +95,20 @@ light:
     # variant: WS2811
 
   # Those lights are available based on the model selections
-  - &light_partition_with_effects_eu
+  - &light_partition_with_effects
     id: lights_all
-    name: Light EU
+    name: Lights (all)
     platform: partition
     default_transition_length: ${default_transition_length}
-    internal: true
+    internal: false
     restore_mode: ${LIGHT_SIDES_RESTORE_MODE}
     effects:
       - addressable_rainbow:
           name: "Rainbow"
-          width: 28
+          width: ${LIGHT_LED_COUNT}
       - addressable_rainbow:
           name: "Rainbow - Fast"
-          width: 28
+          width: ${LIGHT_LED_COUNT}
           speed: 50
       - pulse:
           name: "Pulse"
@@ -140,139 +143,51 @@ light:
       - random:
           name: "Random"
     segments:
-      - id: light_full
-        from: 0
-        to: 27
+    - id: light_full
+      from: 0
+      to: ${LIGHT_MAX_ADDR}
 
-  - &light_partition_with_effects_us
-    id: light_us
-    name: Light US
-    platform: partition
-    default_transition_length: ${default_transition_length}
-    internal: true
-    restore_mode: ${LIGHT_SIDES_RESTORE_MODE}
-    effects:
-      - addressable_rainbow:
-          name: "Rainbow"
-          width: 32
-      - addressable_rainbow:
-          name: "Rainbow - Fast"
-          width: 32
-          speed: 50
-      - pulse:
-          name: "Pulse"
-          transition_length: 1s
-          update_interval: 1s
-      - pulse:
-          name: "Pulse - Slow"
-          transition_length: 2s
-          update_interval: 2s
-      - addressable_scan:
-          name: "Scan"
-          move_interval: 100ms
-          scan_width: 3
-      - addressable_twinkle:
-          name: "Twinkle"
-          twinkle_probability: 5%
-          progress_interval: 4ms
-      - addressable_random_twinkle:
-          name: "Random Twinkle"
-          twinkle_probability: 20%
-          progress_interval: 32ms
-      - addressable_fireworks:
-          name: "Fireworks"
-          update_interval: 32ms
-          spark_probability: 10%
-          use_random_color: false
-          fade_out_rate: 120
-      - addressable_flicker:
-          name: "Flicker"
-          update_interval: 16ms
-          intensity: 5%
-      - random:
-          name: "Random"
-    segments:
-      - id: light_full
-        from: 0
-        to: 31
-
-  - &light_partition_no_effects_disabled
-    id: light_eu_bottom
-    name: Light - Bottom EU
+  - &light_partition_sides
+    id: light_bottom
+    name: Light - Bottom
     platform: partition
     disabled_by_default: true
     default_transition_length: ${default_transition_length}
     restore_mode: ${LIGHT_SIDES_RESTORE_MODE}
-    internal: true
+    internal: false
     segments:
       - id: light_full
-        from: 6
-        to: 12
+        from: ${6 if IS_EU_MODEL else 9}
+        to: ${12 if IS_EU_MODEL else 14}
         reversed: true
 
-  - id: light_eu_left
-    name: Light - Left EU
-    <<: *light_partition_no_effects_disabled
+  - id: light_left
+    name: Light - Left
+    <<: *light_partition_sides
     segments:
       - id: light_full
-        from: 13
-        to: 19
+        from: ${13 if IS_EU_MODEL else 15}
+        to: ${19 if IS_EU_MODEL else 24}
         reversed: true
-  - id: light_eu_right
-    name: Light - Right EU
-    <<: *light_partition_no_effects_disabled
+  - id: light_right
+    name: Light - Right
+    <<: *light_partition_sides
     segments:
       - id: light_full
-        from: 27
-        to: 27
+        from: ${27 if IS_EU_MODEL else 31}
+        to: ${27 if IS_EU_MODEL else 31}
         reversed: false
       - id: light_full
         from: 0
-        to: 5
+        to: ${5 if IS_EU_MODEL else 8}
         reversed: false
-  - id: light_eu_top
-    name: Light - Top EU
-    <<: *light_partition_no_effects_disabled
+  - id: light_top
+    name: Light - Top
+    <<: *light_partition_sides
     segments:
       - id: light_full
-        from: 20
-        to: 26
-        reversed: false
-  - id: light_us_bottom
-    name: Light - Bottom US
-    <<: *light_partition_no_effects_disabled
-    segments:
-      - id: light_full
-        from: 9
-        to: 14
-        reversed: true
-  - id: light_us_left
-    name: Light - Left US
-    <<: *light_partition_no_effects_disabled
-    segments:
-      - id: light_full
-        from: 15
-        to: 24
-        reversed: true
-  - id: light_us_right
-    name: Light - Right US
-    <<: *light_partition_no_effects_disabled
-    segments:
-      - id: light_full
-        from: 31
-        to: 31
-        reversed: false
-      - id: light_full
-        from: 0
-        to: 8
-        reversed: false
-  - id: light_us_top
-    name: Light - Top US
-    <<: *light_partition_no_effects_disabled
-    segments:
-      - id: light_full
-        from: 25
-        to: 30
+        from: ${20 if IS_EU_MODEL else 25}
+        to: ${26 if IS_EU_MODEL else 30}
         reversed: false
 
   - &light_partition_individual_led
@@ -509,25 +424,12 @@ light:
         to: 31
 
 script:
-  - id: !extend boot_initialize
-    then:
-      - lambda: |-
-          light_eu_bottom->set_internal(${IS_US_MODEL});
-          light_eu_left->set_internal(${IS_US_MODEL});
-          light_eu_right->set_internal(${IS_US_MODEL});
-          light_eu_top->set_internal(${IS_US_MODEL});
-          light_us->set_internal(${IS_EU_MODEL});
-          light_us_bottom->set_internal(${IS_EU_MODEL});
-          light_us_left->set_internal(${IS_EU_MODEL});
-          light_us_right->set_internal(${IS_EU_MODEL});
-          light_us_top->set_internal(${IS_EU_MODEL});
-
   - id: !extend dump_config
     then:
       - lambda: |-
           // Transition times
-          ESP_LOGCONFIG("${TAG_HW_LEDS}", "Transition times:");
-          ESP_LOGCONFIG("${TAG_HW_LEDS}", "  Default:     ${default_transition_length}");
+          ESP_LOGCONFIG("${TAG_HW_LEDS}", "Transition times:n"
+                                          "  Default:     ${default_transition_length}");
           if (${LIGHT_TRANSITION_TURN_ON} > 0)
             ESP_LOGCONFIG("${TAG_HW_LEDS}", "  Turning on:  ${LIGHT_TRANSITION_TURN_ON}ms");
           else
@@ -538,10 +440,10 @@ script:
             ESP_LOGCONFIG("${TAG_HW_LEDS}", "  Turning off: Disabled");
 
           // Restore modes
-          ESP_LOGCONFIG("${TAG_HW_LEDS}", "LED restore modes:");
-          ESP_LOGCONFIG("${TAG_HW_LEDS}", "  Light - All: ${LIGHT_FULL_RESTORE_MODE}");
-          ESP_LOGCONFIG("${TAG_HW_LEDS}", "  Sides:       ${LIGHT_SIDES_RESTORE_MODE}");
-          ESP_LOGCONFIG("${TAG_HW_LEDS}", "  Individual:  ${LIGHT_INDIVIDUAL_RESTORE_MODE}");
+          ESP_LOGCONFIG("${TAG_HW_LEDS}", "LED restore modes:\n"
+                                          "  Light - All: ${LIGHT_FULL_RESTORE_MODE}\n"
+                                          "  Sides:       ${LIGHT_SIDES_RESTORE_MODE}\n"
+                                          "  Individual:  ${LIGHT_INDIVIDUAL_RESTORE_MODE}");
 
   - id: !extend dump_config_list_packages
     then:
