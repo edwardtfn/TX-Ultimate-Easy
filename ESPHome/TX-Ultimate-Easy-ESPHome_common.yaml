@@ -230,7 +230,7 @@ script:
           #endif  // TX_ULTIMATE_EASY_GANGS range validation
 
           // Validate 'model' substitution exists (check for model flags)
-          #ifndef TX_ULTIMATE_EASY_IS_EU_MODEL) || !defined(TX_ULTIMATE_EASY_IS_US_MODEL)
+          #if !defined(TX_ULTIMATE_EASY_IS_EU_MODEL) || !defined(TX_ULTIMATE_EASY_IS_US_MODEL)
             #error "CONFIGURATION ERROR: Missing required 'model' substitution. Update your YAML adding 'model: EU' or 'model: US' to your substitutions"
           #endif  // Model flags existence check
 

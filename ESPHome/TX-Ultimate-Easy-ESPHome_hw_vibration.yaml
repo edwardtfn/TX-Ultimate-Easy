@@ -80,7 +80,7 @@ script:
       - script.wait: dump_config
       - lambda: |-
           // Check for requirements
-          #ifndef TX_ULTIMATE_EASY_COMMON)
+          #ifndef TX_ULTIMATE_EASY_COMMON
             #error "The package TX-Ultimate-Easy-ESPHome_common.yaml is required."
           #endif
 

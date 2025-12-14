@@ -352,13 +352,8 @@ script:
           // Gang configurations determine which LED segments are active
           switch (${gangs}) {
             case 1:  // 1 Gang
-              if (${IS_US_MODEL}) {
-                id(gb_lights_1) = { light_us_rl_1_1_left };
-                id(gb_lights_2) = { light_us_rl_1_1_right };
-              } else {
-                id(gb_lights_1) = { light_rl_1_1_${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT} };
-                id(gb_lights_2) = { light_rl_1_1_${LIGHT_MODE_TOP_OR_RIGHT_TEXT} };
-              }
+              id(gb_lights_1) = { light_rl_1_1_${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT} };
+              id(gb_lights_2) = { light_rl_1_1_${LIGHT_MODE_TOP_OR_RIGHT_TEXT} };
               break;
             case 2:  // 2 Gang
               id(gb_lights_1) = { light_rl_1_2_${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}, light_rl_2_2_${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT} };
@@ -519,8 +514,7 @@ script:
             ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 3: %s", sw_relay_3->state ? "ON" : "OFF");
           if (${gangs} >= 4)
             ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 4: %s", sw_relay_4->state ? "ON" : "OFF");
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Expose Relay's LEDs to Home Assistant: %s",
-                                                YESNO(sw_expose_relays_leds_to_ha->state));
+          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Expose Relay's LEDs to Home Assistant: ${sw_expose_relays_leds_to_ha}");
 
           // Boot initialization statuses
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Boot initialization flags:");
@@ -546,10 +540,10 @@ script:
       - script.wait: dump_config
       - lambda: |-
           // Check for requirements
-          #ifndef TX_ULTIMATE_EASY_COMMON)
+          #ifndef TX_ULTIMATE_EASY_COMMON
             #error "The package TX-Ultimate-Easy-ESPHome_common.yaml is required."
           #endif
-          #ifndef TX_ULTIMATE_EASY_HW_LEDS)
+          #ifndef TX_ULTIMATE_EASY_HW_LEDS
             #error "The package TX-Ultimate-Easy-ESPHome_hw_leds.yaml is required."
           #endif  // TX_ULTIMATE_EASY_HW_LEDS
 
