@@ -12,7 +12,7 @@
 ####################################################################################################
 ---
 substitutions:
-  expose_relays_leds_to_ha: False
+  expose_relays_leds_to_ha: false
 
   RELAY_MODE_TEXT_SWITCH: "Switch"
   RELAY_MODE_TEXT_LIGHT: "Light"
@@ -131,6 +131,7 @@ light:
             if (sw_relay_4->state)
               sw_relay_4->turn_off();
 
+  # These lights are used to indicate relay's statuses
   - &light_partition_relays
     id: light_rl_1_1_${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}
     name: Light - Relay 1 of 1 (${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT})
@@ -679,7 +680,6 @@ select:
     initial_option: "${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}"
     optimistic: true
     restore_value: false
-  # These lights are used to indicate relay's statuses
     internal: ${gangs < 1}
     entity_category: config
     disabled_by_default: false
