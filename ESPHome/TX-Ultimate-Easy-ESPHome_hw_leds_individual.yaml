@@ -255,7 +255,6 @@ light:
         to: 31
 
 script:
-script:
   - id: !extend dump_config
     then:
       - lambda: |-
