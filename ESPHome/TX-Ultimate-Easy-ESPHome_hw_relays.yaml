@@ -488,11 +488,9 @@ script:
   - id: !extend dump_config
     then:
       - lambda: |-
-          std::string gang_count_plural_suffix = ${gangs} > 1 ? "s" : "";
           // Relay's modes
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Relay%s mode%s:", gang_count_plural_suffix.c_str(),
-                                                                  gang_count_plural_suffix.c_str());
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 1: %s", sl_relay_1_mode->has_state() ?
+          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Relay${'s' if gangs > 1 else ''} mode${'s' if gangs > 1 else ''}:\n"
+                                            "  Relay 1: %s", sl_relay_1_mode->has_state() ?
                                               sl_relay_1_mode->current_option() : "Unknown");
           if (${gangs} >= 2)
             ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 2: %s", sl_relay_2_mode->has_state() ?
@@ -505,29 +503,30 @@ script:
                                                 sl_relay_4_mode->current_option() : "Unknown");
 
           // Relay's states
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Relay%s state%s:", gang_count_plural_suffix.c_str(),
-                                                                    gang_count_plural_suffix.c_str());
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 1: %s", sw_relay_1->state ? "ON" : "OFF");
+          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Relay${'s' if gangs > 1 else ''} state${'s' if gangs > 1 else ''}:\n"
+                                            "  Relay 1: %s", sw_relay_1->state ? "ON" : "OFF");
           if (${gangs} >= 2)
             ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 2: %s", sw_relay_2->state ? "ON" : "OFF");
           if (${gangs} >= 3)
             ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 3: %s", sw_relay_3->state ? "ON" : "OFF");
           if (${gangs} >= 4)
             ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 4: %s", sw_relay_4->state ? "ON" : "OFF");
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Expose Relay's LEDs to Home Assistant: ${sw_expose_relays_leds_to_ha}");
+          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Expose Relay's LEDs to Home Assistant: ${expose_relays_leds_to_ha}");
 
           // Boot initialization statuses
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Boot initialization flags:");
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Overall:     %s", YESNO(id(boot_initialization_relays)));
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Groups:      %s",
-                                                YESNO(id(boot_initialization_relays_group_assignments)));
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Light modes: %s", YESNO(id(boot_initialization_relays_light_modes)));
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay modes: %s", YESNO(id(boot_initialization_relays_relay_modes)));
+          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Boot initialization flags:\n"
+                                            "  Overall:     %s\n"
+                                            "  Groups:      %s\n"
+                                            "  Light modes: %s\n"
+                                            "  Relay modes: %s",
+                                            YESNO(id(boot_initialization_relays)),
+                                            YESNO(id(boot_initialization_relays_group_assignments)),
+                                            YESNO(id(boot_initialization_relays_light_modes)),
+                                            YESNO(id(boot_initialization_relays_relay_modes)));
 
           // Relay's LEDs modes
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Relay%s LEDs mode%s:", gang_count_plural_suffix.c_str(),
-                                                                        gang_count_plural_suffix.c_str());
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 1: %s", sl_relay_1_light_mode->current_option());
+          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Relay${'s' if gangs > 1 else ''} LEDs mode${'s' if gangs > 1 else ''}:\n"
+                                            "  Relay 1: %s", sl_relay_1_light_mode->current_option());
           if (${gangs} >= 2)
             ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 2: %s", sl_relay_2_light_mode->current_option());
           if (${gangs} >= 3)

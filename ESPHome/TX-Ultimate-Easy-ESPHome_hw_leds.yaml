@@ -23,15 +23,12 @@ substitutions:
   LIGHT_MODE_BOTTOM_OR_LEFT_TEXT: ${LIGHT_MODE_BOTTOM_TEXT if IS_EU_MODEL else LIGHT_MODE_LEFT_TEXT}
   LIGHT_MODE_TOP_OR_RIGHT_TEXT: ${LIGHT_MODE_TOP_TEXT if IS_EU_MODEL else LIGHT_MODE_RIGHT_TEXT}
 
-  LIGHT_TRANSITION_TURN_ON: '0'   # Transition time in msec
-  LIGHT_TRANSITION_TURN_OFF: '0'  # Transition time in msec
-  LIGHT_BRIGHTNESS_TURN_ON: '0'   # Brightness (1 to 100%, 0 to not set it)
+  LIGHT_TRANSITION_TURN_ON: 0   # Transition time in msec
+  LIGHT_TRANSITION_TURN_OFF: 0  # Transition time in msec
+  LIGHT_BRIGHTNESS_TURN_ON: 0   # Brightness (1 to 100%, 0 to not set it)
 
   LIGHT_FULL_RESTORE_MODE: RESTORE_DEFAULT_OFF
   LIGHT_SIDES_RESTORE_MODE: RESTORE_DEFAULT_OFF
-
-  LIGHT_ATTRS_DEFAULT: '0x64FFFFFF'               # brightness=100, RGB=255,255,255
-  LIGHT_DUAL_ATTRS_DEFAULT: '0x64FFFFFF64FFFFFF'  # Both lights: brightness=100, RGB=255,255,255
 
   LIGHT_LED_COUNT: ${28 if IS_EU_MODEL else 32}
   LIGHT_MAX_ADDR: ${27 if IS_EU_MODEL else 31}
@@ -159,20 +156,11 @@ script:
   - id: !extend dump_config
     then:
       - lambda: |-
-          // Transition times
           ESP_LOGCONFIG("${TAG_HW_LEDS}", "Transition times:n"
-                                          "  Default:     ${default_transition_length}");
-          if (${LIGHT_TRANSITION_TURN_ON} > 0)
-            ESP_LOGCONFIG("${TAG_HW_LEDS}", "  Turning on:  ${LIGHT_TRANSITION_TURN_ON}ms");
-          else
-            ESP_LOGCONFIG("${TAG_HW_LEDS}", "  Turning on:  Disabled");
-          if (${LIGHT_TRANSITION_TURN_OFF} > 0)
-            ESP_LOGCONFIG("${TAG_HW_LEDS}", "  Turning off: ${LIGHT_TRANSITION_TURN_OFF}ms");
-          else
-            ESP_LOGCONFIG("${TAG_HW_LEDS}", "  Turning off: Disabled");
-
-          // Restore modes
-          ESP_LOGCONFIG("${TAG_HW_LEDS}", "LED restore modes:\n"
+                                          "  Default:     ${default_transition_length}\n"
+                                          "  Turning on:  ${LIGHT_TRANSITION_TURN_ON ~ 'ms' if LIGHT_TRANSITION_TURN_ON > 0 else 'Disabled'}\n"
+                                          "  Turning on:  ${LIGHT_TRANSITION_TURN_OFF ~ 'ms' if LIGHT_TRANSITION_TURN_OFF > 0 else 'Disabled'}\n"
+                                          "LED restore modes:\n"
                                           "  Light - All: ${LIGHT_FULL_RESTORE_MODE}\n"
                                           "  Sides:       ${LIGHT_SIDES_RESTORE_MODE}");
 
