@@ -76,10 +76,10 @@ script:
       - script.wait: dump_config
       - lambda: |-
           // Check for requirements
-          #if !defined(TX_ULTIMATE_EASY_COMMON)
+          #ifndef TX_ULTIMATE_EASY_COMMON)
             #error "The package TX-Ultimate-Easy-ESPHome_common.yaml is required."
           #endif
-          #if !defined(TX_ULTIMATE_EASY_HW_AUDIO)
+          #ifndef TX_ULTIMATE_EASY_HW_AUDIO)
             #error "The package TX-Ultimate-Easy-ESPHome_hw_audio.yaml is required."
           #endif
 

@@ -20,6 +20,8 @@ substitutions:
   LIGHT_MODE_RIGHT_TEXT: "Right"
   LIGHT_MODE_BOTTOM_TEXT: "Bottom"
   LIGHT_MODE_TOP_TEXT: "Top"
+  LIGHT_MODE_BOTTOM_OR_LEFT_TEXT: ${LIGHT_MODE_BOTTOM_TEXT if IS_EU_MODEL else LIGHT_MODE_LEFT_TEXT}
+  LIGHT_MODE_TOP_OR_RIGHT_TEXT: ${LIGHT_MODE_TOP_TEXT if IS_EU_MODEL else LIGHT_MODE_RIGHT_TEXT}
 
   LIGHT_TRANSITION_TURN_ON: '0'   # Transition time in msec
   LIGHT_TRANSITION_TURN_OFF: '0'  # Transition time in msec
@@ -27,7 +29,6 @@ substitutions:
 
   LIGHT_FULL_RESTORE_MODE: RESTORE_DEFAULT_OFF
   LIGHT_SIDES_RESTORE_MODE: RESTORE_DEFAULT_OFF
-  LIGHT_INDIVIDUAL_RESTORE_MODE: RESTORE_DEFAULT_OFF
 
   LIGHT_ATTRS_DEFAULT: '0x64FFFFFF'               # brightness=100, RGB=255,255,255
   LIGHT_DUAL_ATTRS_DEFAULT: '0x64FFFFFF64FFFFFF'  # Both lights: brightness=100, RGB=255,255,255
@@ -41,41 +42,6 @@ esphome:
   platformio_options:
     build_flags:
       - -D TX_ULTIMATE_EASY_HW_LEDS
-
-globals:
-  # light_full with effect support
-  - id: led_full_attrs
-    type: uint32_t
-    restore_value: true
-    initial_value: '${LIGHT_ATTRS_DEFAULT}'
-    # Basic attributes: brightness + RGB
-
-    # For light_full effects
-  - id: led_full_effect_packed
-    type: uint32_t
-    restore_value: true
-    initial_value: '0x00000000'
-    # Stores: effect_index(16 bits) + effect_speed(8 bits) + reserved(8 bits)
-    # 0 = no effect/solid color, 1-10 = effect indices
-
-  - id: led_main_packed_attrs
-    type: uint64_t
-    restore_value: true
-    initial_value: '${LIGHT_DUAL_ATTRS_DEFAULT}'
-    # light_eu(group1) + light_us(group2) - the main effect lights
-
-  - id: led_main_packed_effect
-    type: uint32_t
-    restore_value: true
-    initial_value: '0x00000000'
-    # Shared between light_eu and light_us
-
-  # Main user-facing LED lights only
-  - id: led_sides_packed_attrs
-    type: uint64_t
-    restore_value: true
-    initial_value: '${LIGHT_DUAL_ATTRS_DEFAULT}'
-    # EU: bottom(group1) + top(group2) OR US: left(group1) + right(group2)
 
 light:
   # These lights are controlling the LEDs on the device
@@ -160,7 +126,6 @@ light:
         from: ${6 if IS_EU_MODEL else 9}
         to: ${12 if IS_EU_MODEL else 14}
         reversed: true
-
   - id: light_left
     name: Light - Left
     <<: *light_partition_sides
@@ -190,239 +155,6 @@ light:
         to: ${26 if IS_EU_MODEL else 30}
         reversed: false
 
-  - &light_partition_individual_led
-    id: light_00
-    name: Light - LED 00
-    platform: partition
-    disabled_by_default: true
-    default_transition_length: ${default_transition_length}
-    restore_mode: ${LIGHT_INDIVIDUAL_RESTORE_MODE}
-    segments:
-      - id: light_full
-        from: 0
-        to: 0
-  - id: light_01
-    name: Light - LED 01
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 1
-        to: 1
-  - id: light_02
-    name: Light - LED 02
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 2
-        to: 2
-  - id: light_03
-    name: Light - LED 03
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 3
-        to: 3
-  - id: light_04
-    name: Light - LED 04
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 4
-        to: 4
-  - id: light_05
-    name: Light - LED 05
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 5
-        to: 5
-  - id: light_06
-    name: Light - LED 06
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 6
-        to: 6
-  - id: light_07
-    name: Light - LED 07
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 7
-        to: 7
-  - id: light_08
-    name: Light - LED 08
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 8
-        to: 8
-  - id: light_09
-    name: Light - LED 09
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 9
-        to: 9
-  - id: light_10
-    name: Light - LED 10
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 10
-        to: 10
-  - id: light_11
-    name: Light - LED 11
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 11
-        to: 11
-  - id: light_12
-    name: Light - LED 12
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 12
-        to: 12
-  - id: light_13
-    name: Light - LED 13
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 13
-        to: 13
-  - id: light_14
-    name: Light - LED 14
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 14
-        to: 14
-  - id: light_15
-    name: Light - LED 15
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 15
-        to: 15
-  - id: light_16
-    name: Light - LED 16
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 16
-        to: 16
-  - id: light_17
-    name: Light - LED 17
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 17
-        to: 17
-  - id: light_18
-    name: Light - LED 18
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 18
-        to: 18
-  - id: light_19
-    name: Light - LED 19
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 19
-        to: 19
-  - id: light_20
-    name: Light - LED 20
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 20
-        to: 20
-  - id: light_21
-    name: Light - LED 21
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 21
-        to: 21
-  - id: light_22
-    name: Light - LED 22
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 22
-        to: 22
-  - id: light_23
-    name: Light - LED 23
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 23
-        to: 23
-  - id: light_24
-    name: Light - LED 24
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 24
-        to: 24
-  - id: light_25
-    name: Light - LED 25
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 25
-        to: 25
-  - id: light_26
-    name: Light - LED 26
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 26
-        to: 26
-  - id: light_27
-    name: Light - LED 27
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 27
-        to: 27
-  - id: light_28  # US Model only
-    name: Light - LED 28
-    internal: ${'false' if IS_US_MODEL else 'true'}
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 28
-        to: 28
-  - id: light_29  # US Model only
-    name: Light - LED 29
-    internal: ${'false' if IS_US_MODEL else 'true'}
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 29
-        to: 29
-  - id: light_30  # US Model only
-    name: Light - LED 30
-    internal: ${'false' if IS_US_MODEL else 'true'}
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 30
-        to: 30
-  - id: light_31  # US Model only
-    name: Light - LED 31
-    internal: ${'false' if IS_US_MODEL else 'true'}
-    <<: *light_partition_individual_led
-    segments:
-      - id: light_full
-        from: 31
-        to: 31
-
 script:
   - id: !extend dump_config
     then:
@@ -442,15 +174,14 @@ script:
           // Restore modes
           ESP_LOGCONFIG("${TAG_HW_LEDS}", "LED restore modes:\n"
                                           "  Light - All: ${LIGHT_FULL_RESTORE_MODE}\n"
-                                          "  Sides:       ${LIGHT_SIDES_RESTORE_MODE}\n"
-                                          "  Individual:  ${LIGHT_INDIVIDUAL_RESTORE_MODE}");
+                                          "  Sides:       ${LIGHT_SIDES_RESTORE_MODE}");
 
   - id: !extend dump_config_list_packages
     then:
       - script.wait: dump_config
       - lambda: |-
           // Check for requirements
-          #if !defined(TX_ULTIMATE_EASY_COMMON)
+          #ifndef TX_ULTIMATE_EASY_COMMON
             #error "The package TX-Ultimate-Easy-ESPHome_common.yaml is required."
           #endif
 
