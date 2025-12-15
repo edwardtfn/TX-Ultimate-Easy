@@ -27,8 +27,59 @@
 [buymeacoffee-shield]: https://img.shields.io/static/v1?label=Buy%20me%20an%20ice%20cream&message=❄&color=blue
 [buymeacoffee]: https://www.buymeacoffee.com/edwardfirmo
 
+## ⚠️ Breaking Changes in Version 2025.12.2
+
+**Action Required**: Existing users must update their YAML configuration to include new required substitutions.
+
+Starting with version `2025.12.2`, device configuration has moved from UI selectors to YAML substitutions for improved stability and reliability. This change simplifies the firmware logic and resolves several existing bugs related to device initialization and state management.
+
+### Requirements
+
+- **ESPHome 2025.11.0 or later** (older versions will not compile)
+- Updated YAML configuration with required substitutions (see below)
+
+### Required Changes
+
+Add these **new** substitutions to your existing YAML configuration (keep your existing `name` and `friendly_name` as they are):
+
+```yaml
+substitutions:
+  name: your-device-name                    # Keep your existing name
+  friendly_name: Your device friendly name  # Keep your existing friendly name
+  model: EU   # NEW - Required: 'EU' or 'US' (case-sensitive, uppercase only)
+  gangs: 3    # NEW - Required: Number of relays/buttons (1, 2, 3, or 4)
+  expose_relays_leds_to_ha: false  # NEW - Optional: Expose relay LEDs to Home Assistant (defaults to false)
+```
+
+**Note**: Only the last three substitutions (`model`, `gangs`, and optionally `expose_relays_leds_to_ha`) are new. Do not change your existing device name and friendly name.
+
+### Why This Change?
+
+While this moves slightly away from our "Easy" philosophy of pure UI configuration, these changes bring significant benefits:
+
+- **Improved Stability**: Eliminates race conditions during device initialization
+- **Bug Fixes**: Resolves multiple reported issues with gang count and model detection
+- **Better Performance**: Compile-time validation instead of runtime checks
+- **Advanced Features**: Potentially enables bluetooth_proxy and other advanced customizations (experimental, not officially supported)
+
+### Migration Guide
+
+1. **Update ESPHome** (if needed):
+   - Ensure you're running ESPHome 2025.11.0 or later
+   - Update via Home Assistant: Settings → Add-ons → ESPHome → Update
+2. Open your ESPHome configuration file
+3. Add the **new** substitutions to your **existing** `substitutions:` section:
+   - `model: EU` or `model: US` (required)
+   - `gangs: 1` through `gangs: 4` (required)
+   - Keep your existing `name` and `friendly_name` unchanged
+4. Optionally add `expose_relays_leds_to_ha: false` if you need this feature
+5. Save and recompile your firmware
+6. Remove the old Model and Gang selectors from Home Assistant (they're no longer used)
+
+The compiler will provide clear error messages if required substitutions are missing or invalid.
+
 > [!WARNING]
-> ESPHome builder v2025.8.0+ is required
+> ESPHome builder v2025.11.0+ is required
 
 ## Framework Migration to ESP-IDF
 
@@ -130,7 +181,7 @@ Before getting started, ensure you have:
 
 1. A Sonoff TX Ultimate device
 2. Home Assistant installation
-3. ESPHome add-on installed in Home Assistant
+3. ESPHome (could be as an add-on to Home Assistant - version 2025.11.0 or later required)
 4. Basic knowledge of Home Assistant
 
 ## Installation
@@ -156,6 +207,8 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
    substitutions:
      name: tx-ultimate-easy
      friendly_name: TX Ultimate Easy
+     model: EU   # Required: 'EU' or 'US' (case-sensitive, uppercase only)
+     gangs: 1    # Required: Number of relays/buttons (1, 2, 3, or 4)
 
    wifi:
      ssid: !secret wifi_ssid
@@ -164,11 +217,12 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
    packages:
      remote_package:
        url: https://github.com/edwardtfn/TX-Ultimate-Easy
-       ref: main  # Or you can specify a version, like `ref: v2024.12.6` or `ref: latest`
+       ref: main  # Or you can specify a version tag for controlled updates, like `ref: v2024.12.2`
        refresh: 5min
        files:
-         - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml      # Core (essential) packages
-         - ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml  # Non-essential, but recommended packages
+         - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml                  # Core (essential) packages
+         - ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml              # Non-essential, but recommended packages
+         # - ESPHome/TX-Ultimate-Easy-ESPHome_addon_ble_proxy.yaml     # Adds BLE proxy support
    ```
    You can also use a specific version tag for better control over updates:
    ```yaml
@@ -214,6 +268,11 @@ bluetooth_proxy:
 > Bluetooth proxy functionality is provided by ESPHome's native component.
 > TX Ultimate Easy ensures compatibility but does not include it by default to maintain optimal memory usage.
 
+> [!WARNING]
+> Bluetooth proxy with TX Ultimate Easy is considered experimental and not fully tested.
+> While the compile-time configuration changes (model and gangs as substitutions) may enable better compatibility,
+> we continue to consider this as a non-officially-supported customization. Use at your own risk.
+
 ### Advanced Settings
 For more granular control over components,
 you can use our [advanced configuration template](TX-Ultimate-Easy-ESPHome_advanced.yaml).
@@ -225,17 +284,23 @@ This template allows you to selectively include specific packages, which can be 
 
 Here's an example of the advanced configuration:
 ```yaml
+substitutions:
+  name: tx-ultimate-easy
+  friendly_name: TX Ultimate Easy
+  model: EU   # Required: 'EU' or 'US' (case-sensitive, uppercase only)
+  gangs: 1    # Required: Number of relays/buttons (1, 2, 3, or 4)
+
 packages:
   remote_package:
     url: https://github.com/edwardtfn/TX-Ultimate-Easy
-    ref: main  # Or you can specify a version, like `ref: v2024.12.6` or `ref: latest`
+    ref: main  # Or you can specify a version tag for controlled updates, like `ref: v2024.12.2`
     refresh: 5min
     files:
       # Core (essential) packages
-      - ESPHome/TX-Ultimate-Easy-ESPHome_core_common.yaml            # Basic shared settings
-      - ESPHome/TX-Ultimate-Easy-ESPHome_core_hw_buttons.yaml        # Button logic
-      - ESPHome/TX-Ultimate-Easy-ESPHome_core_hw_leds.yaml           # LED configuration
-      - ESPHome/TX-Ultimate-Easy-ESPHome_core_hw_touch.yaml          # Touch panel support
+      - ESPHome/TX-Ultimate-Easy-ESPHome_core_common.yaml      # Basic shared settings
+      - ESPHome/TX-Ultimate-Easy-ESPHome_core_hw_buttons.yaml  # Button logic
+      - ESPHome/TX-Ultimate-Easy-ESPHome_core_hw_leds.yaml     # LED configuration
+      - ESPHome/TX-Ultimate-Easy-ESPHome_core_hw_touch.yaml    # Touch panel support
 
       # Optional but recommended packages
       - ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_relays.yaml     # Relay control
@@ -244,9 +309,6 @@ packages:
       # Audio options (use none or choose only one - using both will fail)
       - ESPHome/TX-Ultimate-Easy-ESPHome_standard_media_player.yaml  # Media player (Recommended for most users)
       # - ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_speaker.yaml  # Basic speaker
-
-# Optional: Add Bluetooth proxy support
-bluetooth_proxy:
 ```
 
 > [!NOTE]
@@ -341,19 +403,20 @@ If the device isn't discovered automatically:
 
 ### Initial Configuration
 
-1. In Home Assistant, navigate to:
+1. Verify your YAML configuration includes the required substitutions:
+   - `model`: EU or US
+   - `gangs`: 1, 2, 3, or 4
+   - Optional: `expose_relays_leds_to_ha`
+2. In Home Assistant, navigate to:
    - Settings → Devices & Services → ESPHome
    - Click on your device to access its configuration page
-2. Set basic device parameters:
-   - Model format (EU/US)
-   - Number of gangs (1-4)
+3. Configure device parameters through Home Assistant UI:
    - Relay modes (switch/light)
    - Button actions
-3. Optional: Configure advanced features
    - LED behaviors
-   - Touch duration
-   - Haptic feedback
-   - Audio feedback
+   - Touch event duration (for differentiating clicks vs long-press)
+   - Haptic feedback settings
+   - Audio feedback settings
 4. Test your configuration:
    - Verify each relay responds to controls
    - Test configured button actions
@@ -361,7 +424,7 @@ If the device isn't discovered automatically:
    - Check haptic/audio feedback if enabled
 
 > [!NOTE]  
-> Some changes may require a device restart
+> Model format and gang count are now configured in YAML and require firmware recompilation to change. Other settings can be adjusted through the Home Assistant UI without recompiling.
 
 ## Usage
 
