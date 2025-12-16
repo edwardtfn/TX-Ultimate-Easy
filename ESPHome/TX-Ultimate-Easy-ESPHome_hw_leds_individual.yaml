@@ -223,7 +223,7 @@ light:
         to: 27
   - id: light_28  # US Model only
     name: Light - LED 28
-    internal: ${not IS_US_MODEL}
+    internal: ${IS_EU_MODEL}
     <<: *light_partition_individual_led
     segments:
       - id: light_full
@@ -231,7 +231,7 @@ light:
         to: 28
   - id: light_29  # US Model only
     name: Light - LED 29
-    internal: ${not IS_US_MODEL}
+    internal: ${IS_EU_MODEL}
     <<: *light_partition_individual_led
     segments:
       - id: light_full
@@ -239,7 +239,7 @@ light:
         to: 29
   - id: light_30  # US Model only
     name: Light - LED 30
-    internal: ${not IS_US_MODEL}
+    internal: ${IS_EU_MODEL}
     <<: *light_partition_individual_led
     segments:
       - id: light_full
@@ -247,7 +247,7 @@ light:
         to: 30
   - id: light_31  # US Model only
     name: Light - LED 31
-    internal: ${not IS_US_MODEL}
+    internal: ${IS_EU_MODEL}
     <<: *light_partition_individual_led
     segments:
       - id: light_full
