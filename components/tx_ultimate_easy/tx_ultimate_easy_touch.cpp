@@ -52,11 +52,26 @@ namespace esphome {
             }
         }
 
+        /**
+         * @brief Log the component configuration for TX Ultimate Easy.
+         *
+         * Logs the component identifier and the configured gang count constant.
+         */
         void TxUltimateEasy::dump_config() {
             ESP_LOGCONFIG(TAG, "TX Ultimate Easy");
             ESP_LOGCONFIG(TAG, "  Gang count: %" PRIu8, TX_ULTIMATE_EASY_GANGS);
         }
 
+        /**
+         * @brief Maps a touch position to a 1-based button index.
+         *
+         * Maps a touch sensor position into one of the configured button (gang) regions and returns
+         * the corresponding 1-based button index. If the position is out of range or cannot be
+         * mapped, returns 0.
+         *
+         * @param position Touch position from the sensor.
+         * @return uint8_t `1`..`TX_ULTIMATE_EASY_GANGS` for a mapped button, `0` if the position is invalid or unmapped.
+         */
         uint8_t TxUltimateEasy::get_button_from_position(const uint8_t position) {
             // Validate position bounds
             if (position > TOUCH_MAX_POSITION)
