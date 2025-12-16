@@ -739,7 +739,7 @@ select:
 
   - id: sl_relay_2_light_mode
     name: Relay 2 light mode
-    internal: ${gangs < 1}
+    internal: ${gangs < 2}
     <<: *relay_light_mode
     on_value:
       - lambda: |-
