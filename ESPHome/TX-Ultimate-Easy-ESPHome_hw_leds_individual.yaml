@@ -267,7 +267,7 @@ script:
       - script.wait: dump_config
       - lambda: |-
           // Check for requirements
-          #ifndef TX_ULTIMATE_EASY_HW_LEDS_INDIVIDUAL
+          #ifndef TX_ULTIMATE_EASY_HW_LEDS
             #error "The package TX-Ultimate-Easy-ESPHome_hw_leds.yaml is required."
           #endif
 
