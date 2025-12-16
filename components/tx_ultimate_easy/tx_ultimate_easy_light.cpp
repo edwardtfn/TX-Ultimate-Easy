@@ -18,7 +18,15 @@ namespace esphome {
         const uint32_t LIGHT_ATTRS_DEFAULT_PACKEDX = 0x64FFFFFF;
         const uint64_t DEFAULT_DUAL_LIGHT_ATTRS_PACKEDX = 0x64FFFFFF64FFFFFF;
 
-        // Function implementations
+        /**
+         * @brief Pack a LightAttributes struct into a 32-bit value.
+         *
+         * @param attr Light attributes; brightness and RGB channel values to encode.
+         *              Brightness is interpreted in the range 0–100 and RGB channels in 0–255.
+         * @return uint32_t 32-bit packed representation formatted as:
+         *                  [brightness (bits 24-31) | red (bits 16-23) | green (bits 8-15) | blue (bits 0-7)].
+         *                  Brightness is capped to a maximum of 100 before packing.
+         */
         uint32_t pack_light_attributes(const LightAttributes& attr) {
             return (uint32_t(std::min(attr.brightness, uint8_t(100))) << 24) |
                 (uint32_t(attr.red) << 16) |

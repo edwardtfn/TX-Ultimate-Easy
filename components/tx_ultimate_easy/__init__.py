@@ -47,6 +47,15 @@ CONFIG_SCHEMA = cv.Schema({
 
 
 async def register_tx_ultimate_easy(var, config):
+    """
+    Register the TxUltimateEasy component with its UART device and wire configured automations.
+    
+    For the given component instance, attach the configured UART component and build any automations present in the config for touch events, presses, releases, swipes, multi-touch releases, and long-touch releases. Each automation receives a payload field named "touch" of type `TouchPoint`.
+    
+    Parameters:
+        var: The TxUltimateTouch component instance to configure.
+        config (dict): Parsed configuration mapping containing `CONF_UART` and optional automation keys.
+    """
     uart_component = await cg.get_variable(config[CONF_UART])
     cg.add(var.set_uart_component(uart_component))
 
@@ -101,6 +110,14 @@ async def register_tx_ultimate_easy(var, config):
 
 
 async def to_code(config):
+    """
+    Create and register a TxUltimateTouch component and its UART device from the provided configuration.
+    
+    This registers the component with ESPHome, registers it as a UART device, applies additional TxUltimateEasy setup, and defines the USE_TX_ULTIMATE_EASY build macro.
+    
+    Parameters:
+        config (dict): Parsed component configuration from YAML used to create and wire the component.
+    """
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
     await uart.register_uart_device(var, config)

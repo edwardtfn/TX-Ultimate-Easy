@@ -13,6 +13,83 @@
 #include "esphome/components/light/addressable_light.h"
 #include <array>
 
+/**
+ * Return the trigger that fires for any touch-related event with a TouchPoint payload.
+ * @returns Pointer to the trigger invoked for all touch events.
+ */
+/**
+ * Return the trigger that fires when a touch press is detected.
+ * @returns Pointer to the trigger invoked on touch press.
+ */
+/**
+ * Return the trigger that fires when a touch release is detected.
+ * @returns Pointer to the trigger invoked on touch release.
+ */
+/**
+ * Return the trigger that fires when a swipe-left gesture is detected.
+ * @returns Pointer to the trigger invoked on swipe-left.
+ */
+/**
+ * Return the trigger that fires when a swipe-right gesture is detected.
+ * @returns Pointer to the trigger invoked on swipe-right.
+ */
+/**
+ * Return the trigger that fires when a multi-touch release is detected.
+ * @returns Pointer to the trigger invoked on multi-touch release.
+ */
+/**
+ * Return the trigger that fires when a long-touch release is detected.
+ * @returns Pointer to the trigger invoked on long-touch release.
+ */
+/**
+ * Bind a parent UARTComponent instance to this device.
+ * @param uart_component Pointer to the UARTComponent to use as the UART parent.
+ */
+/**
+ * Perform component setup tasks executed once at startup.
+ */
+/**
+ * Perform periodic processing; called frequently by the main loop.
+ */
+/**
+ * Dump component configuration and state to the logger.
+ */
+/**
+ * Map a touch position index to a button index on the device.
+ * Positions outside the valid range are clamped to the nearest valid button.
+ * @param position Touch position index (1-based from device).
+ * @returns Button index corresponding to the provided position.
+ */
+/**
+ * Send a TouchPoint event into the component's internal handling flow (and triggers).
+ * @param tp TouchPoint to send.
+ */
+/**
+ * Process a raw UART packet of size UART_RECEIVED_BYTES_SIZE and dispatch corresponding touch events.
+ * Invalid or non-touch packets are ignored.
+ * @param bytes Array containing the raw received bytes.
+ */
+/**
+ * Parse a raw UART packet and construct the corresponding TouchPoint.
+ * @param bytes Array containing the raw received bytes.
+ * @returns Constructed TouchPoint representing the parsed packet.
+ */
+/**
+ * Validate that a received UART packet contains a well-formed touch data message.
+ * Validation checks include header bytes and expected marker bytes.
+ * @param bytes Array containing the raw received bytes.
+ * @returns `true` if the packet is a valid touch data message, `false` otherwise.
+ */
+/**
+ * Extract the horizontal touch position (x) from a raw UART packet.
+ * @param bytes Array containing the raw received bytes.
+ * @returns X position in device-specific coordinates, or -1 if not present/valid.
+ */
+/**
+ * Extract the touch state code from a raw UART packet.
+ * @param bytes Array containing the raw received bytes.
+ * @returns Numeric touch state code corresponding to the TOUCH_STATE_* constants, or -1 if not present/valid.
+ */
 namespace esphome {
     namespace tx_ultimate_easy {
         // Touch Max Position
