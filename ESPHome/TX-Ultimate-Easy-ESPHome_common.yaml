@@ -199,9 +199,6 @@ script:
 
           // Model configuration
           ESP_LOGCONFIG("${TAG_COMMON}", "Model: ${model}-${gangs}G");
-          if (${gangs} < 1 || ${gangs} > 4) {
-            ESP_LOGE("${TAG_COMMON}", "Invalid number of gangs: ${gangs}");
-          }
 
           // Boot completion status
           if (bs_boot_completed->state)
