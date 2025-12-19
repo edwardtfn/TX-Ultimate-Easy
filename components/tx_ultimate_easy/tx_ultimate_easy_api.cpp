@@ -1,6 +1,7 @@
 // tx_ultimate_easy_api.cpp
 #include "tx_ultimate_easy_api.h"
 #include "esphome/core/application.h"
+#include <cctype>
 
 // Macro stringification helpers
 #define STRINGIFY_IMPL(x) #x

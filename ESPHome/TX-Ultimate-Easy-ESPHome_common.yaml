@@ -70,10 +70,10 @@ esp32:
   flash_size: 8MB
   framework:
     type: esp-idf
-    advanced:
-      loop_task_stack_size: 16384
-    sdkconfig_options:
-      CONFIG_ESP32_REV_MIN_3: y  # Require ESP32 revision 3 or newer
+    #advanced:
+    #  loop_task_stack_size: 16384
+    #sdkconfig_options:
+    #  CONFIG_ESP32_REV_MIN_3: y  # Require ESP32 revision 3 or newer
 
 esphome:
   name: ${name}
