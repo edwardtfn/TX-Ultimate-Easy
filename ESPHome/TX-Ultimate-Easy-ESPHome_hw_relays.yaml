@@ -387,17 +387,11 @@ script:
     mode: restart
     then:
       - lambda: |-
-          // Set selector internal based on the model (num of relays)
-          sl_relay_1_mode->set_internal(${gangs} < 1);
-          sl_relay_2_mode->set_internal(${gangs} < 2);
-          sl_relay_3_mode->set_internal(${gangs} < 3);
-          sl_relay_4_mode->set_internal(${gangs} < 4);
-
           // Set indicator (either switch or light) visible on Home Assistant
           auto relay_mode_index = sl_relay_1_mode->active_index();
           if (relay_mode_index.has_value()) {
-            light_output_1->set_internal(relay_mode_index.value() != 1);
-            sw_relay_1->set_internal(relay_mode_index.value() != 0);
+            light_output_1->set_internal(${gangs} < 1 or relay_mode_index.value() != 1);
+            sw_relay_1->set_internal(${gangs} < 1 or relay_mode_index.value() != 0);
           }
           relay_mode_index = sl_relay_2_mode->active_index();
           if (relay_mode_index.has_value()) {
@@ -562,11 +556,9 @@ script:
           static const uint32_t LIGHT_TRANSITION_TURN_OFF = ${LIGHT_TRANSITION_TURN_OFF};
           static const uint8_t LIGHT_BRIGHTNESS_TURN_ON = ${LIGHT_BRIGHTNESS_TURN_ON};
 
-          const std::string light_mode_group_1 = "${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}";
-          const std::string light_mode_group_2 = "${LIGHT_MODE_TOP_OR_RIGHT_TEXT}";
-
           switch (light_group) {
             case 1:
+              const std::string light_mode_group_1 = "${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}";
               if (light_index >= id(gb_lights_1).size()) {
                 ESP_LOGE("${TAG_HW_RELAYS}", "Invalid set with %s light for Relay %" PRIu8, light_mode_group_1.c_str(), light_index+1);
                 return;
@@ -588,6 +580,7 @@ script:
               }
               break;
             case 2:
+              const std::string light_mode_group_2 = "${LIGHT_MODE_TOP_OR_RIGHT_TEXT}";
               if (light_index >= id(gb_lights_2).size()) {
                 ESP_LOGE("${TAG_HW_RELAYS}",
                           "Invalid set with %s light for Relay %" PRIu8, light_mode_group_2.c_str(), light_index+1);
@@ -727,7 +720,7 @@ select:
       - "${RELAY_MODE_TEXT_NOT_USED}"
     initial_option: "${RELAY_MODE_TEXT_SWITCH}"
     optimistic: true
-    restore_value: false
+    restore_value: true
     internal: ${gangs < 1}
     entity_category: config
     disabled_by_default: false
@@ -784,7 +777,7 @@ select:
       - "${RELAY_MODE_TEXT_NOT_USED}"
     initial_option: "${RELAY_MODE_TEXT_SWITCH}"
     optimistic: true
-    restore_value: false
+    restore_value: true
     internal: ${gangs < 2}
     entity_category: config
     disabled_by_default: false
@@ -841,7 +834,7 @@ select:
       - "${RELAY_MODE_TEXT_NOT_USED}"
     initial_option: "${RELAY_MODE_TEXT_SWITCH}"
     optimistic: true
-    restore_value: false
+    restore_value: true
     internal: ${gangs < 3}
     entity_category: config
     disabled_by_default: false
@@ -896,7 +889,7 @@ select:
       - "${RELAY_MODE_TEXT_NOT_USED}"
     initial_option: "${RELAY_MODE_TEXT_SWITCH}"
     optimistic: true
-    restore_value: false
+    restore_value: true
     internal: ${gangs < 4}
     entity_category: config
     disabled_by_default: false
