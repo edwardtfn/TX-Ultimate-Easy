@@ -91,8 +91,8 @@ CONFIG_SCHEMA = cv.Schema({
 
     cv.Required(CONF_UART): cv.use_id(uart),
 
-    cv.Required(CONF_GANG_COUNT): validate_gang_count,
-    cv.Required(CONF_DEVICE_FORMAT): validate_device_format,
+    cv.Optional(CONF_GANG_COUNT): validate_gang_count,
+    cv.Optional(CONF_DEVICE_FORMAT): validate_device_format,
 
     cv.Optional(CONF_ON_TOUCH_EVENT): automation.validate_automation(single=True),
     cv.Optional(CONF_ON_PRESS): automation.validate_automation(single=True),
