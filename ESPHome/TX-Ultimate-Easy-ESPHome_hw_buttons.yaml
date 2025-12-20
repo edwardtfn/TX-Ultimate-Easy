@@ -327,11 +327,11 @@ script:
           }
           id(button_press_start_time) = 0;
 
-  - id: !extend touch_swipe_left
+  - id: !extend touch_swipe_${ID_SWIPE_LEFT_OR_UP_TEXT}
     then:
       - script.execute: buttons_release
 
-  - id: !extend touch_swipe_right
+  - id: !extend touch_swipe_${ID_SWIPE_RIGHT_OR_DOWN_TEXT}
     then:
       - script.execute: buttons_release
 

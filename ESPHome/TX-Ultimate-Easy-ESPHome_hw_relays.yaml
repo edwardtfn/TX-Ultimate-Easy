@@ -426,15 +426,13 @@ script:
 
           // Ignore if other touch events are active
           if (bs_multi_touch->state ||
-              bs_swipe_up->state ||
-              bs_swipe_left->state ||
-              bs_swipe_down->state ||
-              bs_swipe_right->state) {
+              bs_swipe_${ID_SWIPE_LEFT_OR_UP_TEXT}->state) {
+              bs_swipe_${ID_SWIPE_RIGHT_OR_DOWN_TEXT}->state ||
             ESP_LOGV("${TAG_HW_RELAYS}", "Multi-touch: %s", YESNO(bs_multi_touch->state));
-            ESP_LOGV("${TAG_HW_RELAYS}", "Swipe up:    %s", YESNO(bs_swipe_up->state));
-            ESP_LOGV("${TAG_HW_RELAYS}", "Swipe left:  %s", YESNO(bs_swipe_left->state));
-            ESP_LOGV("${TAG_HW_RELAYS}", "Swipe down:  %s", YESNO(bs_swipe_down->state));
-            ESP_LOGV("${TAG_HW_RELAYS}", "Swipe right: %s", YESNO(bs_swipe_right->state));
+            ESP_LOGV("${TAG_HW_RELAYS}", "Swipe ${ID_SWIPE_LEFT_OR_UP_TEXT}: %s",
+                                          YESNO(bs_swipe_${ID_SWIPE_LEFT_OR_UP_TEXT}->state));
+            ESP_LOGV("${TAG_HW_RELAYS}", "Swipe ${ID_SWIPE_RIGHT_OR_DOWN_TEXT}: %s",
+                                          YESNO(bs_swipe_${ID_SWIPE_RIGHT_OR_DOWN_TEXT}->state));
             return;
           }
 
