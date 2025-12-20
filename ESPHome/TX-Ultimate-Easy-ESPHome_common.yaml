@@ -14,11 +14,11 @@
 substitutions:
   name: tx-ultimate-easy
   friendly_name: TX Ultimate Easy
-  model: XX  # Could be either `EU` or `US`
-  gangs: -1  # Number of relays and buttons: `1`, `2`, `3` or `4`
+  device_format: XX  # Could be either `EU` or `US`
+  gang_count: -1  # Number of relays and buttons: `1`, `2`, `3` or `4`
 
-  IS_EU_MODEL: ${'true' if model == "EU" else 'false'}
-  IS_US_MODEL: ${'true' if model == "US" else 'false'}
+  IS_EU_MODEL: ${'true' if device_format == "EU" else 'false'}
+  IS_US_MODEL: ${'true' if device_format == "US" else 'false'}
 
   <<: !include ../versioning/VERSION_YAML
 
@@ -87,10 +87,10 @@ esphome:
     build_flags:
       - -D TX_ULTIMATE_EASY_COMMON
       - -D TX_ULTIMATE_EASY_FIRMWARE_VERSION="${version}"
-      - -D TX_ULTIMATE_EASY_MODEL="${model}"
-      - -D TX_ULTIMATE_EASY_GANGS=${gangs}
-      - -D TX_ULTIMATE_EASY_IS_EU_MODEL=${1 if model == "EU" else 0}
-      - -D TX_ULTIMATE_EASY_IS_US_MODEL=${1 if model == "US" else 0}
+      - -D TX_ULTIMATE_EASY_DEVICE_FORMAT="${device_format}"
+      - -D TX_ULTIMATE_EASY_GANG_COUNT=${gang_count}
+      - -D TX_ULTIMATE_EASY_IS_EU_MODEL=${1 if device_format == "EU" else 0}
+      - -D TX_ULTIMATE_EASY_IS_US_MODEL=${1 if device_format == "US" else 0}
 
   on_boot:
     - priority: 1000  # Very early in boot process
@@ -197,8 +197,8 @@ script:
           ESP_LOGW("${TAG_COMMON}", "Framework: UNKNOWN");
           #endif
 
-          // Model configuration
-          ESP_LOGCONFIG("${TAG_COMMON}", "Model: ${model}-${gangs}G");
+          // Device model configuration
+          ESP_LOGCONFIG("${TAG_COMMON}", "Device model: ${device_format}-${gang_count}G");
 
           // Boot completion status
           if (bs_boot_completed->state)
@@ -216,26 +216,26 @@ script:
           // Compile-time validation of required configuration parameters
           // =============================================================================
 
-          // Validate 'gangs' substitution exists
-          #ifndef TX_ULTIMATE_EASY_GANGS
-            #error "CONFIGURATION ERROR: Missing required 'gangs' substitution. Update your YAML adding 'gangs: 1' to your substitutions (valid values: 1, 2, 3, or 4)"
-          #endif  // !TX_ULTIMATE_EASY_GANGS
+          // Validate 'gang_count' substitution exists
+          #ifndef TX_ULTIMATE_EASY_GANG_COUNT
+            #error "CONFIGURATION ERROR: Missing required 'gang_count' substitution. Update your YAML adding 'gang_count: 1' to your substitutions (valid values: 1, 2, 3, or 4)"
+          #endif  // !TX_ULTIMATE_EASY_GANG_COUNT
 
-          // Validate 'gangs' value is in valid range (1-4)
-          #if defined(TX_ULTIMATE_EASY_GANGS) && (TX_ULTIMATE_EASY_GANGS < 1 || TX_ULTIMATE_EASY_GANGS > 4)
-            #error "CONFIGURATION ERROR: Invalid 'gangs' value (${gangs}). Must be between 1 and 4. Update your YAML changing 'gangs' in your substitutions to a valid value (1, 2, 3, or 4)"
-          #endif  // TX_ULTIMATE_EASY_GANGS range validation
+          // Validate 'gang_count' value is in valid range (1-4)
+          #if defined(TX_ULTIMATE_EASY_GANG_COUNT) && (TX_ULTIMATE_EASY_GANG_COUNT < 1 || TX_ULTIMATE_EASY_GANG_COUNT > 4)
+            #error "CONFIGURATION ERROR: Invalid 'gang_count' value (${gang_count}). Must be between 1 and 4. Update your YAML changing 'gang_count' in your substitutions to a valid value (1, 2, 3, or 4)"
+          #endif  // TX_ULTIMATE_EASY_GANG_COUNT range validation
 
-          // Validate 'model' substitution exists (check for model flags)
+          // Validate 'device_format' substitution exists (check for device_format flags)
           #if !defined(TX_ULTIMATE_EASY_IS_EU_MODEL) || !defined(TX_ULTIMATE_EASY_IS_US_MODEL)
-            #error "CONFIGURATION ERROR: Missing required 'model' substitution. Update your YAML adding 'model: EU' or 'model: US' to your substitutions"
-          #endif  // Model flags existence check
+            #error "CONFIGURATION ERROR: Missing required 'device_format' substitution. Update your YAML adding 'device_format: EU' or 'device_format: US' to your substitutions"
+          #endif  // device_format flags existence check
 
-          // Validate 'model' value is either 'EU' or 'US' (exactly one flag should be true)
+          // Validate 'device_format' value is either 'EU' or 'US' (exactly one flag should be true)
           #if (TX_ULTIMATE_EASY_IS_EU_MODEL && TX_ULTIMATE_EASY_IS_US_MODEL) || \
               (!TX_ULTIMATE_EASY_IS_EU_MODEL && !TX_ULTIMATE_EASY_IS_US_MODEL)
-            #error "CONFIGURATION ERROR: Invalid 'model' value (${model}). Must be either 'EU' or 'US' (case-sensitive). Update your YAML adding 'model: EU' or 'model: US' to your substitutions"
-          #endif  // Model value validation
+            #error "CONFIGURATION ERROR: Invalid 'device_format' value (${device_format}). Must be either 'EU' or 'US' (case-sensitive). Update your YAML adding 'device_format: EU' or 'device_format: US' to your substitutions"
+          #endif  // device_format value validation
 
           // =============================================================================
 

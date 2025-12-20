@@ -27,7 +27,7 @@ binary_sensor:
   - id: bs_button_1_click_event
     name: Button 1 - Click event
     icon: mdi:gesture-tap-box
-    internal: ${gangs < 1}
+    internal: ${gang_count < 1}
     disabled_by_default: true
     platform: template
     on_press:
@@ -39,7 +39,7 @@ binary_sensor:
   - id: bs_button_2_click_event
     name: Button 2 - Click event
     icon: mdi:gesture-tap-box
-    internal: ${gangs < 2}
+    internal: ${gang_count < 2}
     disabled_by_default: true
     platform: template
     on_press:
@@ -51,7 +51,7 @@ binary_sensor:
   - id: bs_button_3_click_event
     name: Button 3 - Click event
     icon: mdi:gesture-tap-box
-    internal: ${gangs < 3}
+    internal: ${gang_count < 3}
     disabled_by_default: true
     platform: template
     on_press:
@@ -63,7 +63,7 @@ binary_sensor:
   - id: bs_button_4_click_event
     name: Button 4 - Click event
     icon: mdi:gesture-tap-box
-    internal: ${gangs < 4}
+    internal: ${gang_count < 4}
     disabled_by_default: true
     platform: template
     on_press:
@@ -76,7 +76,7 @@ binary_sensor:
   - id: bs_button_1_double_click_event
     name: Button 1 - Double-click event
     icon: mdi:gesture-tap-box
-    internal: ${gangs < 1}
+    internal: ${gang_count < 1}
     disabled_by_default: true
     platform: template
     on_press:
@@ -88,7 +88,7 @@ binary_sensor:
   - id: bs_button_2_double_click_event
     name: Button 2 - Double-click event
     icon: mdi:gesture-tap-box
-    internal: ${gangs < 2}
+    internal: ${gang_count < 2}
     disabled_by_default: true
     platform: template
     on_press:
@@ -100,7 +100,7 @@ binary_sensor:
   - id: bs_button_3_double_click_event
     name: Button 3 - Double-click event
     icon: mdi:gesture-tap-box
-    internal: ${gangs < 3}
+    internal: ${gang_count < 3}
     disabled_by_default: true
     platform: template
     on_press:
@@ -112,7 +112,7 @@ binary_sensor:
   - id: bs_button_4_double_click_event
     icon: mdi:gesture-tap-box
     name: Button 4 - Double-click event
-    internal: ${gangs < 4}
+    internal: ${gang_count < 4}
     disabled_by_default: true
     platform: template
     on_press:
@@ -125,7 +125,7 @@ binary_sensor:
   - id: bs_button_1_long_press_event
     name: Button 1 - Long-press event
     icon: mdi:gesture-tap-box
-    internal: ${gangs < 1}
+    internal: ${gang_count < 1}
     disabled_by_default: true
     platform: template
     on_press:
@@ -137,7 +137,7 @@ binary_sensor:
   - id: bs_button_2_long_press_event
     name: Button 2 - Long-press event
     icon: mdi:gesture-tap-box
-    internal: ${gangs < 2}
+    internal: ${gang_count < 2}
     disabled_by_default: true
     platform: template
     on_press:
@@ -149,7 +149,7 @@ binary_sensor:
   - id: bs_button_3_long_press_event
     name: Button 3 - Long-press event
     icon: mdi:gesture-tap-box
-    internal: ${gangs < 3}
+    internal: ${gang_count < 3}
     disabled_by_default: true
     platform: template
     on_press:
@@ -161,7 +161,7 @@ binary_sensor:
   - id: bs_button_4_long_press_event
     name: Button 4 - Long-press event
     icon: mdi:gesture-tap-box
-    internal: ${gangs < 4}
+    internal: ${gang_count < 4}
     disabled_by_default: true
     platform: template
     on_press:

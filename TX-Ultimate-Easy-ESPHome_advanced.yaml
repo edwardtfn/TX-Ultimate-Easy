@@ -11,6 +11,8 @@
 substitutions:
   name: tx-ultimate-easy-adv
   friendly_name: TX Ultimate Easy Advanced
+  device_format: EU  # REQUIRED: 'EU' or 'US' (case-sensitive, uppercase only)
+  gang_count: 1      # REQUIRED: Number of relays/buttons (1, 2, 3, or 4)
 
 wifi:
   ssid: !secret wifi_ssid

@@ -46,12 +46,12 @@ Add these **new** substitutions to your existing YAML configuration (keep your e
 substitutions:
   name: your-device-name                    # Keep your existing name
   friendly_name: Your device friendly name  # Keep your existing friendly name
-  model: EU   # NEW - Required: 'EU' or 'US' (case-sensitive, uppercase only)
-  gangs: 3    # NEW - Required: Number of relays/buttons (1, 2, 3, or 4)
+  device_format: EU  # NEW - Required: 'EU' or 'US' (case-sensitive, uppercase only)
+  gang_count: 3      # NEW - Required: Number of relays/buttons (1, 2, 3, or 4)
   expose_relays_leds_to_ha: false  # NEW - Optional: Expose relay LEDs to Home Assistant (defaults to false)
 ```
 
-**Note**: Only the last three substitutions (`model`, `gangs`, and optionally `expose_relays_leds_to_ha`) are new. Do not change your existing device name and friendly name.
+**Note**: Only the last three substitutions (`device_format`, `gang_count`, and optionally `expose_relays_leds_to_ha`) are new. Do not change your existing device name and friendly name.
 
 ### Why This Change?
 
@@ -69,8 +69,8 @@ While this moves slightly away from our "Easy" philosophy of pure UI configurati
    - Update via Home Assistant: Settings → Add-ons → ESPHome → Update
 2. Open your ESPHome configuration file
 3. Add the **new** substitutions to your **existing** `substitutions:` section:
-   - `model: EU` or `model: US` (required)
-   - `gangs: 1` through `gangs: 4` (required)
+   - `device_format: EU` or `model: US` (required)
+   - `gang_count: 1` through `gang_count: 4` (required)
    - Keep your existing `name` and `friendly_name` unchanged
 4. Optionally add `expose_relays_leds_to_ha: false` if you need this feature
 5. Save and recompile your firmware
@@ -207,8 +207,8 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
    substitutions:
      name: tx-ultimate-easy
      friendly_name: TX Ultimate Easy
-     model: EU   # Required: 'EU' or 'US' (case-sensitive, uppercase only)
-     gangs: 1    # Required: Number of relays/buttons (1, 2, 3, or 4)
+     device_format: EU  # Required: 'EU' or 'US' (case-sensitive, uppercase only)
+     gang_count: 1      # Required: Number of relays/buttons (1, 2, 3, or 4)
 
    wifi:
      ssid: !secret wifi_ssid
@@ -270,7 +270,7 @@ bluetooth_proxy:
 
 > [!WARNING]
 > Bluetooth proxy with TX Ultimate Easy is considered experimental and not fully tested.
-> While the compile-time configuration changes (model and gangs as substitutions) may enable better compatibility,
+> While the compile-time configuration changes (device format and gang count as substitutions) may enable better compatibility,
 > we continue to consider this as a non-officially-supported customization. Use at your own risk.
 
 ### Advanced Settings
@@ -287,8 +287,8 @@ Here's an example of the advanced configuration:
 substitutions:
   name: tx-ultimate-easy
   friendly_name: TX Ultimate Easy
-  model: EU   # Required: 'EU' or 'US' (case-sensitive, uppercase only)
-  gangs: 1    # Required: Number of relays/buttons (1, 2, 3, or 4)
+  device_format: EU  # Required: 'EU' or 'US' (case-sensitive, uppercase only)
+  gang_count: 1      # Required: Number of relays/buttons (1, 2, 3, or 4)
 
 packages:
   remote_package:
@@ -404,8 +404,8 @@ If the device isn't discovered automatically:
 ### Initial Configuration
 
 1. Verify your YAML configuration includes the required substitutions:
-   - `model`: EU or US
-   - `gangs`: 1, 2, 3, or 4
+   - `device_format`: EU or US
+   - `gang_count`: 1, 2, 3, or 4
    - Optional: `expose_relays_leds_to_ha`
 2. In Home Assistant, navigate to:
    - Settings → Devices & Services → ESPHome

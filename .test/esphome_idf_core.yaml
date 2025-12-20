@@ -1,7 +1,7 @@
 ---
 substitutions:
-  model: US
-  gangs: 4
+  device_format: ${ ["EU", "US"] | random }
+  gang_count: ${ [1, 2, 3, 4] | random }
 
 packages:
   common_idf: !include common_idf.yaml

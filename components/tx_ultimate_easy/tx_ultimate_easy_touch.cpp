@@ -59,7 +59,7 @@ namespace esphome {
          */
         void TxUltimateEasy::dump_config() {
             ESP_LOGCONFIG(TAG, "TX Ultimate Easy");
-            ESP_LOGCONFIG(TAG, "  Gang count: %" PRIu8, TX_ULTIMATE_EASY_GANGS);
+            ESP_LOGCONFIG(TAG, "  Gang count: %" PRIu8, TX_ULTIMATE_EASY_GANG_COUNT);
         }
 
         /**
@@ -70,7 +70,7 @@ namespace esphome {
          * mapped, returns 0.
          *
          * @param position Touch position from the sensor.
-         * @return uint8_t `1`..`TX_ULTIMATE_EASY_GANGS` for a mapped button, `0` if the position is invalid or unmapped.
+         * @return uint8_t `1`..`TX_ULTIMATE_EASY_GANG_COUNT` for a mapped button, `0` if the position is invalid or unmapped.
          */
         uint8_t TxUltimateEasy::get_button_from_position(const uint8_t position) {
             // Validate position bounds
@@ -78,17 +78,17 @@ namespace esphome {
                 return 0;
 
             // Special case for single gang (only one button exists) or no selection
-            if (TX_ULTIMATE_EASY_GANGS <= 1)
+            if (TX_ULTIMATE_EASY_GANG_COUNT <= 1)
                 return 1;
 
             // Calculate button width (rounds up to ensure full coverage)
             const uint8_t width =
-                (TOUCH_MAX_POSITION + TX_ULTIMATE_EASY_GANGS) / TX_ULTIMATE_EASY_GANGS;  // Width of each button region
+                (TOUCH_MAX_POSITION + TX_ULTIMATE_EASY_GANG_COUNT) / TX_ULTIMATE_EASY_GANG_COUNT;  // Width of each button region
             if (width < 1)  // Invalid width - and prevents division by zero 
                 return 0;
             const uint8_t button = std::min(
-                static_cast<uint8_t>((position / width) + 1),  // Convert position to button index
-                static_cast<uint8_t>(TX_ULTIMATE_EASY_GANGS)   // Clamp to max gang count
+                static_cast<uint8_t>((position / width) + 1),      // Convert position to button index
+                static_cast<uint8_t>(TX_ULTIMATE_EASY_GANG_COUNT)  // Clamp to max gang count
             );
             return button;
         }
