@@ -67,14 +67,10 @@ light:
     restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
-        - lambda: |-
-            if (not sw_relay_1->state)
-              sw_relay_1->turn_on();
+        - script.execute: show_relay_status
     on_turn_off:
       then:
-        - lambda: |-
-            if (sw_relay_1->state)
-              sw_relay_1->turn_off();
+        - script.execute: show_relay_status
   - id: light_output_2
     name: Light output 2
     output: output_relay_2
@@ -83,14 +79,10 @@ light:
     restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
-        - lambda: |-
-            if (not sw_relay_2->state)
-              sw_relay_2->turn_on();
+        - script.execute: show_relay_status
     on_turn_off:
       then:
-        - lambda: |-
-            if (sw_relay_2->state)
-              sw_relay_2->turn_off();
+        - script.execute: show_relay_status
   - id: light_output_3
     name: Light output 3
     output: output_relay_3
@@ -99,14 +91,10 @@ light:
     restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
-        - lambda: |-
-            if (not sw_relay_3->state)
-              sw_relay_3->turn_on();
+        - script.execute: show_relay_status
     on_turn_off:
       then:
-        - lambda: |-
-            if (sw_relay_3->state)
-              sw_relay_3->turn_off();
+        - script.execute: show_relay_status
   - id: light_output_4
     name: Light output 4
     output: output_relay_4
@@ -115,14 +103,10 @@ light:
     restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
-        - lambda: |-
-            if (not sw_relay_4->state)
-              sw_relay_4->turn_on();
+        - script.execute: show_relay_status
     on_turn_off:
       then:
-        - lambda: |-
-            if (sw_relay_4->state)
-              sw_relay_4->turn_off();
+        - script.execute: show_relay_status
 
   # These lights are used to indicate relay's statuses
   - &light_partition_relays
@@ -912,50 +896,45 @@ select:
 switch:
   - id: sw_relay_1
     name: Relay 1
-    output: output_relay_1
-    platform: output
-    restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
     internal: ${gangs < 1}
-    on_state:
-      then:
-        - lambda: |-
-            show_relay_status->execute();
-            if (light_output_1->current_values.is_on() != x)
-              light_output_1->toggle();
+    platform: template
+    lambda: |-
+      return light_output_1->current_values.is_on();
+    turn_on_action:
+      - light.turn_on: light_output_1
+    turn_off_action:
+      - light.turn_off: light_output_1
+
   - id: sw_relay_2
     name: Relay 2
-    output: output_relay_2
-    platform: output
-    restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
     internal: ${gangs < 2}
-    on_state:
-      then:
-        - lambda: |-
-            show_relay_status->execute();
-            if (light_output_2->current_values.is_on() != x)
-              light_output_2->toggle();
+    platform: template
+    lambda: |-
+      return light_output_2->current_values.is_on();
+    turn_on_action:
+      - light.turn_on: light_output_2
+    turn_off_action:
+      - light.turn_off: light_output_2
+
   - id: sw_relay_3
     name: Relay 3
-    output: output_relay_3
-    platform: output
-    restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
     internal: ${gangs < 3}
-    on_state:
-      then:
-        - lambda: |-
-            show_relay_status->execute();
-            if (light_output_3->current_values.is_on() != x)
-              light_output_3->toggle();
+    platform: template
+    lambda: |-
+      return light_output_3->current_values.is_on();
+    turn_on_action:
+      - light.turn_on: light_output_3
+    turn_off_action:
+      - light.turn_off: light_output_3
+
   - id: sw_relay_4
     name: Relay 4
-    output: output_relay_4
-    platform: output
-    restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
     internal: ${gangs < 4}
-    on_state:
-      then:
-        - lambda: |-
-            show_relay_status->execute();
-            if (light_output_4->current_values.is_on() != x)
-              light_output_4->toggle();
+    platform: template
+    lambda: |-
+      return light_output_4->current_values.is_on();
+    turn_on_action:
+      - light.turn_on: light_output_4
+    turn_off_action:
+      - light.turn_off: light_output_4
 ...
