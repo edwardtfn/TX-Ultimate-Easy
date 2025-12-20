@@ -218,23 +218,29 @@ script:
 
           // Validate 'gang_count' substitution exists
           #ifndef TX_ULTIMATE_EASY_GANG_COUNT
-            #error "CONFIGURATION ERROR: Missing required 'gang_count' substitution. Update your YAML adding 'gang_count: 1' to your substitutions (valid values: 1, 2, 3, or 4)"
+            #error "CONFIGURATION ERROR: Missing required 'gang_count' substitution. \
+                    Update your YAML adding 'gang_count: 1' to your substitutions (valid values: 1, 2, 3, or 4)"
           #endif  // !TX_ULTIMATE_EASY_GANG_COUNT
 
           // Validate 'gang_count' value is in valid range (1-4)
           #if defined(TX_ULTIMATE_EASY_GANG_COUNT) && (TX_ULTIMATE_EASY_GANG_COUNT < 1 || TX_ULTIMATE_EASY_GANG_COUNT > 4)
-            #error "CONFIGURATION ERROR: Invalid 'gang_count' value (${gang_count}). Must be between 1 and 4. Update your YAML changing 'gang_count' in your substitutions to a valid value (1, 2, 3, or 4)"
+            #error "CONFIGURATION ERROR: Invalid 'gang_count' value (${gang_count}). \
+                    Must be between 1 and 4. \
+                    Update your YAML changing 'gang_count' in your substitutions to a valid value (1, 2, 3, or 4)"
           #endif  // TX_ULTIMATE_EASY_GANG_COUNT range validation
 
           // Validate 'device_format' substitution exists (check for device_format flags)
           #if !defined(TX_ULTIMATE_EASY_IS_EU_MODEL) || !defined(TX_ULTIMATE_EASY_IS_US_MODEL)
-            #error "CONFIGURATION ERROR: Missing required 'device_format' substitution. Update your YAML adding 'device_format: EU' or 'device_format: US' to your substitutions"
+            #error "CONFIGURATION ERROR: Missing required 'device_format' substitution. \
+                    Update your YAML adding 'device_format: EU' or 'device_format: US' to your substitutions"
           #endif  // device_format flags existence check
 
           // Validate 'device_format' value is either 'EU' or 'US' (exactly one flag should be true)
           #if (TX_ULTIMATE_EASY_IS_EU_MODEL && TX_ULTIMATE_EASY_IS_US_MODEL) || \
               (!TX_ULTIMATE_EASY_IS_EU_MODEL && !TX_ULTIMATE_EASY_IS_US_MODEL)
-            #error "CONFIGURATION ERROR: Invalid 'device_format' value (${device_format}). Must be either 'EU' or 'US' (case-sensitive). Update your YAML adding 'device_format: EU' or 'device_format: US' to your substitutions"
+            #error "CONFIGURATION ERROR: Invalid 'device_format' value (${device_format}). \
+                    Must be either 'EU' or 'US' (case-sensitive). \
+                    Update your YAML adding 'device_format: EU' or 'device_format: US' to your substitutions"
           #endif  // device_format value validation
 
           // =============================================================================
@@ -305,6 +311,8 @@ text_sensor:
 
 tx_ultimate_easy:
   id: tx_ultimate
+  device_format: ${device_format}
+  gang_count: ${gang_count}
 
 wifi:
   id: wifi_component
