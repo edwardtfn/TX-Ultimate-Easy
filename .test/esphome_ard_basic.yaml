@@ -3,6 +3,13 @@ substitutions:
   device_format: ${ ["EU", "US"] | random }
   gang_count: ${ [1, 2, 3, 4] | random }
 
+external_components:
+  - source:
+      type: local
+      path: ../components
+    components:
+      - tx_ultimate_easy
+
 packages:
   common_arduino: !include common_ard.yaml
   core_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
