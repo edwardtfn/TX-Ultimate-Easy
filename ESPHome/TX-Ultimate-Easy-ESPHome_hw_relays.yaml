@@ -419,14 +419,22 @@ script:
     then:
       - lambda: |-
           // Handle only single clicks
-          if (click_count != 1)
+          if (click_count != 1) {
+            ESP_LOGV("${TAG_HW_RELAYS}", "Clicks: %" PRIu8, click_count);
             return;
+          }
 
           // Ignore if other touch events are active
           if (bs_multi_touch->state ||
+              bs_swipe_up->state ||
               bs_swipe_left->state ||
               bs_swipe_down->state ||
               bs_swipe_right->state) {
+            ESP_LOGV("${TAG_HW_RELAYS}", "Multi-touch: %s", YESNO(bs_multi_touch->state));
+            ESP_LOGV("${TAG_HW_RELAYS}", "Swipe up:    %s", YESNO(bs_swipe_up->state));
+            ESP_LOGV("${TAG_HW_RELAYS}", "Swipe left:  %s", YESNO(bs_swipe_left->state));
+            ESP_LOGV("${TAG_HW_RELAYS}", "Swipe down:  %s", YESNO(bs_swipe_down->state));
+            ESP_LOGV("${TAG_HW_RELAYS}", "Swipe right: %s", YESNO(bs_swipe_right->state));
             return;
           }
 
