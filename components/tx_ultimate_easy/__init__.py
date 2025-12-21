@@ -172,13 +172,13 @@ async def register_tx_ultimate_easy(var, config):
 
     if CONF_DEVICE_FORMAT in config:
         _LOGGER.info(
-            "Ultimate TX Easy - Device format: %s",
+            "TX Ultimate Easy - Device format: %s",
             config[CONF_DEVICE_FORMAT],
         )
 
     if CONF_GANG_COUNT in config:
         _LOGGER.info(
-            "Ultimate TX Easy - Gang number: %s",
+            "TX Ultimate Easy - Gang number: %s",
             config[CONF_GANG_COUNT],
         )
 
