@@ -17,8 +17,8 @@ substitutions:
   device_format: XX  # Could be either `EU` or `US`
   gang_count: -1  # Number of relays and buttons: `1`, `2`, `3` or `4`
 
-  IS_EU_MODEL: ${'true' if device_format == "EU" else 'false'}
-  IS_US_MODEL: ${'true' if device_format == "US" else 'false'}
+  IS_EU_MODEL: ${ device_format | upper == "EU" }
+  IS_US_MODEL: ${ device_format | upper == "US" }
 
   <<: !include ../versioning/VERSION_YAML
 
@@ -89,8 +89,8 @@ esphome:
       - -D TX_ULTIMATE_EASY_FIRMWARE_VERSION="${version}"
       - -D TX_ULTIMATE_EASY_DEVICE_FORMAT="${device_format}"
       - -D TX_ULTIMATE_EASY_GANG_COUNT=${gang_count}
-      - -D TX_ULTIMATE_EASY_IS_EU_MODEL=${1 if device_format == "EU" else 0}
-      - -D TX_ULTIMATE_EASY_IS_US_MODEL=${1 if device_format == "US" else 0}
+      - -D TX_ULTIMATE_EASY_IS_EU_MODEL=${1 if IS_EU_MODEL else 0}
+      - -D TX_ULTIMATE_EASY_IS_US_MODEL=${1 if IS_US_MODEL else 0}
 
   on_boot:
     - priority: 1000  # Very early in boot process

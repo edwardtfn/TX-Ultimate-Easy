@@ -6,6 +6,7 @@ from esphome.const import (
     CONF_ID,
 )
 from esphome.core import CORE
+import logging
 
 CODEOWNERS = ["@edwardtfn"]
 DEPENDENCIES = ['uart']
@@ -28,6 +29,8 @@ CONF_ON_LONG_TOUCH_RELEASE = "on_long_touch_release"
 # Device format options
 DEVICE_FORMAT_EU = "EU"
 DEVICE_FORMAT_US = "US"
+
+_LOGGER = logging.getLogger(__name__)
 
 tx_ultimate_easy_ns = cg.esphome_ns.namespace('tx_ultimate_easy')
 TouchPoint = tx_ultimate_easy_ns.struct("TouchPoint")
@@ -91,8 +94,8 @@ CONFIG_SCHEMA = cv.Schema({
 
     cv.Required(CONF_UART): cv.use_id(uart),
 
-    cv.Optional(CONF_GANG_COUNT): validate_gang_count,
     cv.Optional(CONF_DEVICE_FORMAT): validate_device_format,
+    cv.Optional(CONF_GANG_COUNT): validate_gang_count,
 
     cv.Optional(CONF_ON_TOUCH_EVENT): automation.validate_automation(single=True),
     cv.Optional(CONF_ON_PRESS): automation.validate_automation(single=True),
@@ -167,6 +170,17 @@ async def register_tx_ultimate_easy(var, config):
             config[CONF_ON_LONG_TOUCH_RELEASE],
         )
 
+    if CONF_DEVICE_FORMAT in config:
+        _LOGGER.info(
+            "Ultimate TX Easy - Device format: %s",
+            config[CONF_DEVICE_FORMAT],
+        )
+
+    if CONF_GANG_COUNT in config:
+        _LOGGER.info(
+            "Ultimate TX Easy - Gang number: %s",
+            config[CONF_GANG_COUNT],
+        )
 
 async def to_code(config):
     """
