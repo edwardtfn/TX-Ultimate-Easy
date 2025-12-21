@@ -11,6 +11,7 @@ external_components:
       - tx_ultimate_easy
 
 packages:
-  common_arduino: !include common_ard.yaml
+  common_idf: !include common_idf.yaml
   core_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
+  hw_leds_individual_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_hw_leds_individual.yaml
 ...

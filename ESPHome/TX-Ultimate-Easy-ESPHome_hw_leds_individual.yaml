@@ -1,0 +1,276 @@
+####################################################################################################
+#####                              TX Ultimate Easy for ESPHome                                #####
+#####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
+####################################################################################################
+##### Purpose: ESPHome - Hardware - LEDs - Individual                                          #####
+####################################################################################################
+##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
+####################################################################################################
+##### NOTE:                                                                                    #####
+##### - Make changes ONLY if absolutely necessary and you have the required knowledge.         #####
+##### - For normal system use, modifications to this file are NOT required.                    #####
+####################################################################################################
+---
+substitutions:
+  LIGHT_INDIVIDUAL_RESTORE_MODE: RESTORE_DEFAULT_OFF
+  TAG_HW_LEDS_INDIVIDUAL: tx_ultimate_easy.hw.leds.individual
+
+esphome:
+  platformio_options:
+    build_flags:
+      - -D TX_ULTIMATE_EASY_HW_LEDS_INDIVIDUAL
+
+light:
+  - &light_partition_individual_led
+    id: light_00
+    name: Light - LED 00
+    platform: partition
+    disabled_by_default: true
+    default_transition_length: ${default_transition_length}
+    restore_mode: ${LIGHT_INDIVIDUAL_RESTORE_MODE}
+    segments:
+      - id: light_full
+        from: 0
+        to: 0
+  - id: light_01
+    name: Light - LED 01
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 1
+        to: 1
+  - id: light_02
+    name: Light - LED 02
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 2
+        to: 2
+  - id: light_03
+    name: Light - LED 03
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 3
+        to: 3
+  - id: light_04
+    name: Light - LED 04
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 4
+        to: 4
+  - id: light_05
+    name: Light - LED 05
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 5
+        to: 5
+  - id: light_06
+    name: Light - LED 06
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 6
+        to: 6
+  - id: light_07
+    name: Light - LED 07
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 7
+        to: 7
+  - id: light_08
+    name: Light - LED 08
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 8
+        to: 8
+  - id: light_09
+    name: Light - LED 09
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 9
+        to: 9
+  - id: light_10
+    name: Light - LED 10
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 10
+        to: 10
+  - id: light_11
+    name: Light - LED 11
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 11
+        to: 11
+  - id: light_12
+    name: Light - LED 12
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 12
+        to: 12
+  - id: light_13
+    name: Light - LED 13
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 13
+        to: 13
+  - id: light_14
+    name: Light - LED 14
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 14
+        to: 14
+  - id: light_15
+    name: Light - LED 15
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 15
+        to: 15
+  - id: light_16
+    name: Light - LED 16
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 16
+        to: 16
+  - id: light_17
+    name: Light - LED 17
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 17
+        to: 17
+  - id: light_18
+    name: Light - LED 18
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 18
+        to: 18
+  - id: light_19
+    name: Light - LED 19
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 19
+        to: 19
+  - id: light_20
+    name: Light - LED 20
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 20
+        to: 20
+  - id: light_21
+    name: Light - LED 21
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 21
+        to: 21
+  - id: light_22
+    name: Light - LED 22
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 22
+        to: 22
+  - id: light_23
+    name: Light - LED 23
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 23
+        to: 23
+  - id: light_24
+    name: Light - LED 24
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 24
+        to: 24
+  - id: light_25
+    name: Light - LED 25
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 25
+        to: 25
+  - id: light_26
+    name: Light - LED 26
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 26
+        to: 26
+  - id: light_27
+    name: Light - LED 27
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 27
+        to: 27
+  - id: light_28  # US Model only
+    name: Light - LED 28
+    internal: ${IS_EU_MODEL}
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 28
+        to: 28
+  - id: light_29  # US Model only
+    name: Light - LED 29
+    internal: ${IS_EU_MODEL}
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 29
+        to: 29
+  - id: light_30  # US Model only
+    name: Light - LED 30
+    internal: ${IS_EU_MODEL}
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 30
+        to: 30
+  - id: light_31  # US Model only
+    name: Light - LED 31
+    internal: ${IS_EU_MODEL}
+    <<: *light_partition_individual_led
+    segments:
+      - id: light_full
+        from: 31
+        to: 31
+
+script:
+  - id: !extend dump_config
+    then:
+      - lambda: |-
+          // Restore modes
+          ESP_LOGCONFIG("${TAG_HW_LEDS_INDIVIDUAL}", "LED restore modes:\n"
+                                                    "  Individual:  ${LIGHT_INDIVIDUAL_RESTORE_MODE}");
+
+  - id: !extend dump_config_list_packages
+    then:
+      - script.wait: dump_config
+      - lambda: |-
+          // Check for requirements
+          #ifndef TX_ULTIMATE_EASY_HW_LEDS
+            #error "The package TX-Ultimate-Easy-ESPHome_hw_leds.yaml is required."
+          #endif
+
+          // Identify itself
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Hardware - LEDs - Individual");
+...
