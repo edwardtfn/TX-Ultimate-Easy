@@ -536,15 +536,31 @@ script:
           #else
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Relay LEDs mode:");
           #endif  // TX_ULTIMATE_EASY_GANG_COUNT > 1
+          #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
+          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 1: %s", sl_relay_1_light_mode->current_option().c_str());
+          #else
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 1: %s", sl_relay_1_light_mode->current_option());
+          #endif
           #if TX_ULTIMATE_EASY_GANG_COUNT >= 2
+          #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
+          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 2: %s", sl_relay_2_light_mode->current_option().c_str());
+          #else
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 2: %s", sl_relay_2_light_mode->current_option());
+          #endif
           #endif  // TX_ULTIMATE_EASY_GANG_COUNT >= 2
           #if TX_ULTIMATE_EASY_GANG_COUNT >= 3
+          #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
+          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 3: %s", sl_relay_3_light_mode->current_option().c_str());
+          #else
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 3: %s", sl_relay_3_light_mode->current_option());
+          #endif
           #endif  // TX_ULTIMATE_EASY_GANG_COUNT >= 3
           #if TX_ULTIMATE_EASY_GANG_COUNT >= 4
+          #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
+          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 4: %s", sl_relay_4_light_mode->current_option().c_str());
+          #else
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 4: %s", sl_relay_4_light_mode->current_option());
+          #endif
           #endif  // TX_ULTIMATE_EASY_GANG_COUNT >= 4
 
   - id: !extend dump_config_list_packages
