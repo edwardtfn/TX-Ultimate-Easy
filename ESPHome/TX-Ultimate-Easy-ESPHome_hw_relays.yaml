@@ -57,6 +57,19 @@ globals:
     type: std::vector<light::LightState*>
     restore_value: false
 
+  - id: relay_1_state
+    type: bool
+    initial_value: 'false'
+  - id: relay_2_state
+    type: bool
+    initial_value: 'false'
+  - id: relay_3_state
+    type: bool
+    initial_value: 'false'
+  - id: relay_4_state
+    type: bool
+    initial_value: 'false'
+
 light:
   # These lights are used for the physical relays to be shown as lights
   - id: light_output_1
@@ -586,6 +599,11 @@ script:
       state: bool
     then:
       - lambda: |-
+          ESP_LOGV("${TAG_HW_RELAYS}", "script: light_set_state");
+          ESP_LOGV("${TAG_HW_RELAYS}", "  light_group: %" PRIu8, light_group);
+          ESP_LOGV("${TAG_HW_RELAYS}", "  light_index: %" PRIu8, light_index);
+          ESP_LOGV("${TAG_HW_RELAYS}", "  state: %s", ONOFF(state));
+
           static const uint32_t LIGHT_TRANSITION_TURN_ON = ${LIGHT_TRANSITION_TURN_ON};
           static const uint32_t LIGHT_TRANSITION_TURN_OFF = ${LIGHT_TRANSITION_TURN_OFF};
           static const uint8_t LIGHT_BRIGHTNESS_TURN_ON = ${LIGHT_BRIGHTNESS_TURN_ON};
@@ -658,25 +676,23 @@ script:
           for (uint8_t i = 0; i < ${gang_count}; i++) {
             bool relay_state = false;
             std::string light_mode;
-            const std::string light_mode_group_1 = "${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}";
-            const std::string light_mode_group_2 = "${LIGHT_MODE_TOP_OR_RIGHT_TEXT}";
 
             // Determine relay state and light mode
             switch (i) {
               case 0:
-                relay_state = id(sw_relay_1).state;
+                relay_state = id(relay_1_state);
                 light_mode = sl_relay_1_light_mode->current_option();
                 break;
               case 1:
-                relay_state = id(sw_relay_2).state;
+                relay_state = id(relay_2_state);
                 light_mode = sl_relay_2_light_mode->current_option();
                 break;
               case 2:
-                relay_state = id(sw_relay_3).state;
+                relay_state = id(relay_3_state);
                 light_mode = sl_relay_3_light_mode->current_option();
                 break;
               case 3:
-                relay_state = id(sw_relay_4).state;
+                relay_state = id(relay_4_state);
                 light_mode = sl_relay_4_light_mode->current_option();
                 break;
             }
@@ -686,10 +702,10 @@ script:
 
             // Use light_set_state for light updates
             if (light_mode != "${LIGHT_MODE_DISABLED_TEXT}") {
-              if (light_mode == light_mode_group_1 || light_mode == "${LIGHT_MODE_BOTH_TEXT}") {
+              if (light_mode == "${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}" || light_mode == "${LIGHT_MODE_BOTH_TEXT}") {
                 light_set_state->execute(1, i, relay_state);  // Left/bottom light
               }
-              if (light_mode == light_mode_group_2 || light_mode == "${LIGHT_MODE_BOTH_TEXT}") {
+              if (light_mode == "${LIGHT_MODE_TOP_OR_RIGHT_TEXT}" || light_mode == "${LIGHT_MODE_BOTH_TEXT}") {
                 light_set_state->execute(2, i, relay_state);  // Right/top light
               }
             }
@@ -940,10 +956,12 @@ switch:
     internal: ${gang_count < 1}
     platform: template
     lambda: |-
-      return light_output_1->current_values.is_on();
+      return id(relay_1_state);
     turn_on_action:
+      - lambda: id(relay_1_state) = true;
       - light.turn_on: light_output_1
     turn_off_action:
+      - lambda: id(relay_1_state) = false;
       - light.turn_off: light_output_1
 
   - id: sw_relay_2
@@ -951,10 +969,12 @@ switch:
     internal: ${gang_count < 2}
     platform: template
     lambda: |-
-      return light_output_2->current_values.is_on();
+      return id(relay_2_state);
     turn_on_action:
+      - lambda: id(relay_2_state) = true;
       - light.turn_on: light_output_2
     turn_off_action:
+      - lambda: id(relay_2_state) = false;
       - light.turn_off: light_output_2
 
   - id: sw_relay_3
@@ -962,10 +982,12 @@ switch:
     internal: ${gang_count < 3}
     platform: template
     lambda: |-
-      return light_output_3->current_values.is_on();
+      return id(relay_3_state);
     turn_on_action:
+      - lambda: id(relay_3_state) = true;
       - light.turn_on: light_output_3
     turn_off_action:
+      - lambda: id(relay_3_state) = false;
       - light.turn_off: light_output_3
 
   - id: sw_relay_4
@@ -973,9 +995,11 @@ switch:
     internal: ${gang_count < 4}
     platform: template
     lambda: |-
-      return light_output_4->current_values.is_on();
+      return id(relay_4_state);
     turn_on_action:
+      - lambda: id(relay_4_state) = true;
       - light.turn_on: light_output_4
     turn_off_action:
+      - lambda: id(relay_4_state) = false;
       - light.turn_off: light_output_4
 ...
