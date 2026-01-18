@@ -189,8 +189,7 @@ script:
       button: uint8_t
       click_count: uint8_t
     then:
-      - delay:
-          milliseconds: ${BUTTON_MULTI_CLICK_DELAY}
+      - delay: !lambda return nr_button_multi_click_delay->state;
       - lambda: |-
           std::string event_name;
           if (click_count == 1) event_name = "click";
