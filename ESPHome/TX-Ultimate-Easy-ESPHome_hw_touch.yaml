@@ -13,6 +13,7 @@
 ---
 substitutions:
   TOUCH_POSITION_MAX_VALUE: '10'  # Maximum touch position value returned by the touch pad via uart
+  BUTTON_MULTI_CLICK_DELAY: '250'  # The time to wait for another click, in msec
 
   ID_SWIPE_LEFT_TEXT: "left"
   ID_SWIPE_RIGHT_TEXT: "right"
@@ -227,6 +228,21 @@ number:
     max_value: 1500
     step: 1
     initial_value: 250
+    optimistic: true
+    restore_value: true
+
+  - id: nr_button_multi_click_delay
+    name: Button multi-click delay
+    icon: mdi:timer-outline
+    unit_of_measurement: ms
+    mode: box
+    internal: false
+    entity_category: config
+    platform: template
+    min_value: 0
+    max_value: 2000
+    step: 10
+    initial_value: ${BUTTON_MULTI_CLICK_DELAY}
     optimistic: true
     restore_value: true
 
