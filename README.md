@@ -297,18 +297,18 @@ packages:
     refresh: 5min
     files:
       # Core (essential) packages
-      - ESPHome/TX-Ultimate-Easy-ESPHome_core_common.yaml      # Basic shared settings
-      - ESPHome/TX-Ultimate-Easy-ESPHome_core_hw_buttons.yaml  # Button logic
-      - ESPHome/TX-Ultimate-Easy-ESPHome_core_hw_leds.yaml     # LED configuration
-      - ESPHome/TX-Ultimate-Easy-ESPHome_core_hw_touch.yaml    # Touch panel support
+      - ESPHome/TX-Ultimate-Easy-ESPHome_common.yaml      # Basic shared settings
+      - ESPHome/TX-Ultimate-Easy-ESPHome_hw_buttons.yaml  # Button logic
+      - ESPHome/TX-Ultimate-Easy-ESPHome_hw_leds.yaml     # LED configuration
+      - ESPHome/TX-Ultimate-Easy-ESPHome_hw_touch.yaml    # Touch panel support
 
       # Optional but recommended packages
-      - ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_relays.yaml     # Relay control
-      - ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_vibration.yaml  # Haptic feedback
+      - ESPHome/TX-Ultimate-Easy-ESPHome_hw_relays.yaml     # Relay control
+      - ESPHome/TX-Ultimate-Easy-ESPHome_hw_vibration.yaml  # Haptic feedback
 
       # Audio options (use none or choose only one - using both will fail)
-      - ESPHome/TX-Ultimate-Easy-ESPHome_standard_media_player.yaml  # Media player (Recommended for most users)
-      # - ESPHome/TX-Ultimate-Easy-ESPHome_standard_hw_speaker.yaml  # Basic speaker
+      - ESPHome/TX-Ultimate-Easy-ESPHome_media_player.yaml  # Media player (Recommended for most users)
+      # - ESPHome/TX-Ultimate-Easy-ESPHome_hw_speaker.yaml  # Basic speaker
 ```
 
 > [!NOTE]
