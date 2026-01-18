@@ -220,16 +220,32 @@ script:
                         gang_count_plural_suffix.c_str(),
                         gang_count_plural_suffix.c_str());
           ESP_LOGCONFIG("${TAG_HW_BUTTONS}", "  Relay 1: %s", sl_button_1_action->has_state() ?
-                                                                    sl_button_1_action->current_option() : "Unknown");
+          #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
+                                                              sl_button_1_action->current_option().c_str() : "Unknown");
+          #else
+                                                              sl_button_1_action->current_option() : "Unknown");
+          #endif
           if (${gang_count} >= 2)
             ESP_LOGCONFIG("${TAG_HW_BUTTONS}", "  Relay 2: %s", sl_button_2_action->has_state() ?
-                                                                      sl_button_2_action->current_option() : "Unknown");
+            #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
+                                                                sl_button_2_action->current_option().c_str() : "Unknown");
+            #else
+                                                                sl_button_2_action->current_option() : "Unknown");
+            #endif
           if (${gang_count} >= 3)
             ESP_LOGCONFIG("${TAG_HW_BUTTONS}", "  Relay 3: %s", sl_button_3_action->has_state() ?
-                                                                      sl_button_3_action->current_option() : "Unknown");
+            #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
+                                                                sl_button_3_action->current_option().c_str() : "Unknown");
+            #else
+                                                                sl_button_3_action->current_option() : "Unknown");
+            #endif
           if (${gang_count} >= 4)
             ESP_LOGCONFIG("${TAG_HW_BUTTONS}", "  Relay 4: %s", sl_button_4_action->has_state() ?
-                                                                      sl_button_4_action->current_option() : "Unknown");
+            #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
+                                                                sl_button_4_action->current_option().c_str() : "Unknown");
+            #else
+                                                                sl_button_4_action->current_option() : "Unknown");
+            #endif
 
   - id: !extend dump_config_list_packages
     then:

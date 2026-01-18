@@ -271,7 +271,6 @@ script:
           ESP_LOGCONFIG("${TAG_COMMON}", "TX Ultimate firmware version: ${version}");
           // ESPHome builder information
           ESP_LOGCONFIG("${TAG_COMMON}", "ESPHome builder: " ESPHOME_VERSION);
-          ESP_LOGCONFIG("${TAG_COMMON}", "ESPHome build timestamp: %s", App.get_compilation_time().c_str());
 
   - id: restore_from_nvs
     mode: single
