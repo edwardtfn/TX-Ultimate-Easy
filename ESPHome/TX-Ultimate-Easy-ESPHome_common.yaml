@@ -14,18 +14,15 @@
 substitutions:
   name: tx-ultimate-easy
   friendly_name: TX Ultimate Easy
+  device_format: XX  # Could be either `EU` or `US`
+  gang_count: -1  # Number of relays and buttons: `1`, `2`, `3` or `4`
+
+  IS_EU_MODEL: ${ device_format | upper == "EU" }
+  IS_US_MODEL: ${ device_format | upper == "US" }
 
   <<: !include ../versioning/VERSION_YAML
 
   EVENT_NAME: esphome.tx_ultimate_easy
-
-  TX_MODEL_FORMAT_EU_TEXT: "EU (Square, T5-xC-86)"
-  TX_MODEL_FORMAT_US_TEXT: "US (Rectangle, T5-xC-120)"
-
-  TX_MODEL_1_GANG_TEXT: "1 Gang"
-  TX_MODEL_2_GANG_TEXT: "2 Gang"
-  TX_MODEL_3_GANG_TEXT: "3 Gang"
-  TX_MODEL_4_GANG_TEXT: "4 Gang"
 
   DUMP_CONFIG_CALLER_DELAY: 5s  # Delay to dump config after requested
 
@@ -76,7 +73,7 @@ esp32:
     advanced:
       loop_task_stack_size: 16384
     sdkconfig_options:
-      CONFIG_ESP32_REV_MIN_3: y
+      CONFIG_ESP32_REV_MIN_3: y  # Require ESP32 revision 3 or newer
 
 esphome:
   name: ${name}
@@ -90,6 +87,10 @@ esphome:
     build_flags:
       - -D TX_ULTIMATE_EASY_COMMON
       - -D TX_ULTIMATE_EASY_FIRMWARE_VERSION="${version}"
+      - -D TX_ULTIMATE_EASY_DEVICE_FORMAT="${device_format}"
+      - -D TX_ULTIMATE_EASY_GANG_COUNT=${gang_count}
+      - -D TX_ULTIMATE_EASY_IS_EU_MODEL=${1 if IS_EU_MODEL else 0}
+      - -D TX_ULTIMATE_EASY_IS_US_MODEL=${1 if IS_US_MODEL else 0}
 
   on_boot:
     - priority: 1000  # Very early in boot process
@@ -122,17 +123,6 @@ external_components:
     refresh: 1h
     components:
       - tx_ultimate_easy
-
-globals:
-  - id: gang_count
-    type: uint8_t
-    restore_value: true
-    initial_value: '0'
-
-  - id: is_us_model
-    type: bool
-    restore_value: true
-    initial_value: 'false'
 
 logger:
   level: DEBUG
@@ -177,16 +167,6 @@ script:
       - script.execute:
           id: api_send_ha_event_boot
           type: start
-      - wait_until:
-          condition:
-            - lambda: return sl_tx_model_format->active_index().has_value();
-            - lambda: return sl_tx_model_gang->active_index().has_value();
-      - lambda: |-
-          id(is_us_model) = strcmp(sl_tx_model_format->current_option(), "${TX_MODEL_FORMAT_US_TEXT}") == 0;
-          id(gang_count) = sl_tx_model_gang->active_index().value() + 1;
-          if (id(gang_count) < 1 || id(gang_count) > 4) {
-            ESP_LOGE("${TAG_COMMON}", "Invalid number of gangs: %" PRIu8, id(gang_count));
-          }
 
   - id: boot_sequence
     mode: restart
@@ -217,15 +197,8 @@ script:
           ESP_LOGW("${TAG_COMMON}", "Framework: UNKNOWN");
           #endif
 
-          // Model configuration
-          ESP_LOGCONFIG("${TAG_COMMON}", "Model format (selected): %s",
-                          sl_tx_model_format->current_option());
-          ESP_LOGCONFIG("${TAG_COMMON}", "Model format (detected): %s",
-                          id(is_us_model) ? "US" : "EU");
-          ESP_LOGCONFIG("${TAG_COMMON}", "Gangs (selected): %s",
-                          sl_tx_model_gang->current_option());
-          ESP_LOGCONFIG("${TAG_COMMON}", "Gangs (detected): %" PRIu8 "-Gang%s",
-                          id(gang_count), id(gang_count) > 1 ? "s" : "");
+          // Device model configuration
+          ESP_LOGCONFIG("${TAG_COMMON}", "Device model: ${device_format}-${gang_count}G");
 
           // Boot completion status
           if (bs_boot_completed->state)
@@ -238,6 +211,39 @@ script:
             ESP_LOGW("${TAG_COMMON}", "Pending restart: YES");
           else
             ESP_LOGCONFIG("${TAG_COMMON}", "Pending restart: No");
+
+          // =============================================================================
+          // Compile-time validation of required configuration parameters
+          // =============================================================================
+
+          // Validate 'gang_count' substitution exists
+          #ifndef TX_ULTIMATE_EASY_GANG_COUNT
+            #error "CONFIGURATION ERROR: Missing required 'gang_count' substitution. \
+                    Update your YAML adding 'gang_count: 1' to your substitutions (valid values: 1, 2, 3, or 4)"
+          #endif  // !TX_ULTIMATE_EASY_GANG_COUNT
+
+          // Validate 'gang_count' value is in valid range (1-4)
+          #if defined(TX_ULTIMATE_EASY_GANG_COUNT) && (TX_ULTIMATE_EASY_GANG_COUNT < 1 || TX_ULTIMATE_EASY_GANG_COUNT > 4)
+            #error "CONFIGURATION ERROR: Invalid 'gang_count' value (${gang_count}). \
+                    Must be between 1 and 4. \
+                    Update your YAML changing 'gang_count' in your substitutions to a valid value (1, 2, 3, or 4)"
+          #endif  // TX_ULTIMATE_EASY_GANG_COUNT range validation
+
+          // Validate 'device_format' substitution exists (check for device_format flags)
+          #if !defined(TX_ULTIMATE_EASY_IS_EU_MODEL) || !defined(TX_ULTIMATE_EASY_IS_US_MODEL)
+            #error "CONFIGURATION ERROR: Missing required 'device_format' substitution. \
+                    Update your YAML adding 'device_format: EU' or 'device_format: US' to your substitutions"
+          #endif  // device_format flags existence check
+
+          // Validate 'device_format' value is either 'EU' or 'US' (exactly one flag should be true)
+          #if (TX_ULTIMATE_EASY_IS_EU_MODEL && TX_ULTIMATE_EASY_IS_US_MODEL) || \
+              (!TX_ULTIMATE_EASY_IS_EU_MODEL && !TX_ULTIMATE_EASY_IS_US_MODEL)
+            #error "CONFIGURATION ERROR: Invalid 'device_format' value (${device_format}). \
+                    Must be either 'EU' or 'US' (case-sensitive). \
+                    Update your YAML adding 'device_format: EU' or 'device_format: US' to your substitutions"
+          #endif  // device_format value validation
+
+          // =============================================================================
 
   - id: dump_config_caller
     mode: restart
@@ -265,19 +271,10 @@ script:
           ESP_LOGCONFIG("${TAG_COMMON}", "TX Ultimate firmware version: ${version}");
           // ESPHome builder information
           ESP_LOGCONFIG("${TAG_COMMON}", "ESPHome builder: " ESPHOME_VERSION);
-          ESP_LOGCONFIG("${TAG_COMMON}", "ESPHome build timestamp: %s", App.get_compilation_time().c_str());
 
   - id: restore_from_nvs
     mode: single
     then:
-      - select.set_index:
-          id: sl_tx_model_format
-          index: !lambda if (id(is_us_model)) return 1; else return 0;
-      - select.set_index:
-          id: sl_tx_model_gang
-          index: !lambda |-
-            if (id(gang_count) < 1 || id(gang_count) > 4) return 0;  // default to 1-Gang
-            return static_cast<uint8_t>(id(gang_count)) - 1;
 
   - id: update_device_name
     mode: single
@@ -288,48 +285,6 @@ script:
             ESP_LOGI("${TAG_COMMON}", "Device name: %s", esphome::tx_ultimate_easy::cached_device_name.c_str());
             tx_device_name->publish_state(esphome::tx_ultimate_easy::cached_device_name);
           }
-
-select:
-  - id: sl_tx_model_format
-    name: Model (Format)
-    platform: template
-    options:
-      - "${TX_MODEL_FORMAT_EU_TEXT}"
-      - "${TX_MODEL_FORMAT_US_TEXT}"
-    initial_option: "${TX_MODEL_FORMAT_EU_TEXT}"
-    optimistic: true
-    restore_value: false
-    internal: false
-    entity_category: config
-    disabled_by_default: false
-    icon: mdi:tablet-cellphone
-    on_value:
-      then:
-        - lambda: |-
-            bs_pending_restart->publish_state(true);
-            id(is_us_model) = (x == "${TX_MODEL_FORMAT_US_TEXT}");
-
-  - id: sl_tx_model_gang
-    name: Model (Gang)
-    platform: template
-    options:
-      - "${TX_MODEL_1_GANG_TEXT}"
-      - "${TX_MODEL_2_GANG_TEXT}"
-      - "${TX_MODEL_3_GANG_TEXT}"
-      - "${TX_MODEL_4_GANG_TEXT}"
-    initial_option: "${TX_MODEL_1_GANG_TEXT}"
-    optimistic: true
-    restore_value: false
-    internal: false
-    entity_category: config
-    disabled_by_default: false
-    icon: mdi:dip-switch
-    on_value:
-      then:
-        - lambda: |-
-            bs_pending_restart->publish_state(true);
-            id(gang_count) = static_cast<uint8_t>(i) + 1;
-            tx_ultimate->set_gang_count(id(gang_count));
 
 text_sensor:
   - id: tx_fw_version
@@ -355,6 +310,8 @@ text_sensor:
 
 tx_ultimate_easy:
   id: tx_ultimate
+  device_format: ${device_format}
+  gang_count: ${gang_count}
 
 wifi:
   id: wifi_component

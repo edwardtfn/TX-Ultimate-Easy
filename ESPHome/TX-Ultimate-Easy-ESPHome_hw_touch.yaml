@@ -15,20 +15,22 @@ substitutions:
   TOUCH_POSITION_MAX_VALUE: '10'  # Maximum touch position value returned by the touch pad via uart
   BUTTON_MULTI_CLICK_DELAY: '250'  # The time to wait for another click, in msec
 
+  ID_SWIPE_LEFT_TEXT: "left"
+  ID_SWIPE_RIGHT_TEXT: "right"
+  ID_SWIPE_DOWN_TEXT: "down"
+  ID_SWIPE_UP_TEXT: "up"
+  ID_SWIPE_RIGHT_OR_DOWN_TEXT: ${ID_SWIPE_DOWN_TEXT if IS_US_MODEL else ID_SWIPE_RIGHT_TEXT}
+  ID_SWIPE_LEFT_OR_UP_TEXT: ${ID_SWIPE_UP_TEXT if IS_US_MODEL else ID_SWIPE_LEFT_TEXT}
+
   TAG_HW_TOUCH: tx_ultimate_easy.hw.touch
 
 binary_sensor:
-  - &bs_button_event_template
-    id: bs_button_event_template
-    icon: mdi:gesture-tap-box
-    internal: true
-    disabled_by_default: true
-    platform: template
-
   - id: bs_button_1_click_event
     name: Button 1 - Click event
-    internal: false
-    <<: *bs_button_event_template
+    icon: mdi:gesture-tap-box
+    internal: ${gang_count < 1}
+    disabled_by_default: true
+    platform: template
     on_press:
       then:
         - delay: !lambda return nr_touch_duration->state;
@@ -37,8 +39,10 @@ binary_sensor:
             state: OFF  # yamllint disable-line rule:truthy
   - id: bs_button_2_click_event
     name: Button 2 - Click event
-    internal: false
-    <<: *bs_button_event_template
+    icon: mdi:gesture-tap-box
+    internal: ${gang_count < 2}
+    disabled_by_default: true
+    platform: template
     on_press:
       then:
         - delay: !lambda return nr_touch_duration->state;
@@ -47,8 +51,10 @@ binary_sensor:
             state: OFF  # yamllint disable-line rule:truthy
   - id: bs_button_3_click_event
     name: Button 3 - Click event
-    internal: false
-    <<: *bs_button_event_template
+    icon: mdi:gesture-tap-box
+    internal: ${gang_count < 3}
+    disabled_by_default: true
+    platform: template
     on_press:
       then:
         - delay: !lambda return nr_touch_duration->state;
@@ -57,8 +63,10 @@ binary_sensor:
             state: OFF  # yamllint disable-line rule:truthy
   - id: bs_button_4_click_event
     name: Button 4 - Click event
-    internal: false
-    <<: *bs_button_event_template
+    icon: mdi:gesture-tap-box
+    internal: ${gang_count < 4}
+    disabled_by_default: true
+    platform: template
     on_press:
       then:
         - delay: !lambda return nr_touch_duration->state;
@@ -68,8 +76,10 @@ binary_sensor:
 
   - id: bs_button_1_double_click_event
     name: Button 1 - Double-click event
-    internal: false
-    <<: *bs_button_event_template
+    icon: mdi:gesture-tap-box
+    internal: ${gang_count < 1}
+    disabled_by_default: true
+    platform: template
     on_press:
       then:
         - delay: !lambda return nr_touch_duration->state;
@@ -78,8 +88,10 @@ binary_sensor:
             state: OFF  # yamllint disable-line rule:truthy
   - id: bs_button_2_double_click_event
     name: Button 2 - Double-click event
-    internal: false
-    <<: *bs_button_event_template
+    icon: mdi:gesture-tap-box
+    internal: ${gang_count < 2}
+    disabled_by_default: true
+    platform: template
     on_press:
       then:
         - delay: !lambda return nr_touch_duration->state;
@@ -88,8 +100,10 @@ binary_sensor:
             state: OFF  # yamllint disable-line rule:truthy
   - id: bs_button_3_double_click_event
     name: Button 3 - Double-click event
-    internal: false
-    <<: *bs_button_event_template
+    icon: mdi:gesture-tap-box
+    internal: ${gang_count < 3}
+    disabled_by_default: true
+    platform: template
     on_press:
       then:
         - delay: !lambda return nr_touch_duration->state;
@@ -97,9 +111,11 @@ binary_sensor:
             id: bs_button_3_double_click_event
             state: OFF  # yamllint disable-line rule:truthy
   - id: bs_button_4_double_click_event
+    icon: mdi:gesture-tap-box
     name: Button 4 - Double-click event
-    internal: false
-    <<: *bs_button_event_template
+    internal: ${gang_count < 4}
+    disabled_by_default: true
+    platform: template
     on_press:
       then:
         - delay: !lambda return nr_touch_duration->state;
@@ -109,8 +125,10 @@ binary_sensor:
 
   - id: bs_button_1_long_press_event
     name: Button 1 - Long-press event
-    internal: false
-    <<: *bs_button_event_template
+    icon: mdi:gesture-tap-box
+    internal: ${gang_count < 1}
+    disabled_by_default: true
+    platform: template
     on_press:
       then:
         - delay: !lambda return nr_touch_duration->state;
@@ -119,8 +137,10 @@ binary_sensor:
             state: OFF  # yamllint disable-line rule:truthy
   - id: bs_button_2_long_press_event
     name: Button 2 - Long-press event
-    internal: false
-    <<: *bs_button_event_template
+    icon: mdi:gesture-tap-box
+    internal: ${gang_count < 2}
+    disabled_by_default: true
+    platform: template
     on_press:
       then:
         - delay: !lambda return nr_touch_duration->state;
@@ -129,8 +149,10 @@ binary_sensor:
             state: OFF  # yamllint disable-line rule:truthy
   - id: bs_button_3_long_press_event
     name: Button 3 - Long-press event
-    internal: false
-    <<: *bs_button_event_template
+    icon: mdi:gesture-tap-box
+    internal: ${gang_count < 3}
+    disabled_by_default: true
+    platform: template
     on_press:
       then:
         - delay: !lambda return nr_touch_duration->state;
@@ -139,8 +161,10 @@ binary_sensor:
             state: OFF  # yamllint disable-line rule:truthy
   - id: bs_button_4_long_press_event
     name: Button 4 - Long-press event
-    internal: false
-    <<: *bs_button_event_template
+    icon: mdi:gesture-tap-box
+    internal: ${gang_count < 4}
+    disabled_by_default: true
+    platform: template
     on_press:
       then:
         - delay: !lambda return nr_touch_duration->state;
@@ -152,7 +176,8 @@ binary_sensor:
     name: Multi-touch event
     icon: mdi:gesture-two-tap
     internal: false
-    <<: *bs_button_event_template
+    disabled_by_default: true
+    platform: template
     on_press:
       then:
         - delay: !lambda return nr_touch_duration->state;
@@ -160,45 +185,29 @@ binary_sensor:
             id: bs_multi_touch
             state: OFF  # yamllint disable-line rule:truthy
 
-  - id: bs_swipe_left
-    name: Swipe left event
-    icon: mdi:gesture-swipe-left
-    <<: *bs_button_event_template
+  - id: bs_swipe_${ID_SWIPE_RIGHT_OR_DOWN_TEXT}
+    name: Swipe-${ID_SWIPE_RIGHT_OR_DOWN_TEXT} event
+    icon: mdi:gesture-swipe-${ID_SWIPE_RIGHT_OR_DOWN_TEXT}
+    internal: false
+    disabled_by_default: true
+    platform: template
     on_press:
       then:
         - delay: !lambda return nr_touch_duration->state;
         - binary_sensor.template.publish:
-            id: bs_swipe_left
+            id: bs_swipe_${ID_SWIPE_RIGHT_OR_DOWN_TEXT}
             state: OFF  # yamllint disable-line rule:truthy
-  - id: bs_swipe_right
-    name: Swipe right event
-    icon: mdi:gesture-swipe-right
-    <<: *bs_button_event_template
+  - id: bs_swipe_${ID_SWIPE_LEFT_OR_UP_TEXT}
+    name: Swipe ${ID_SWIPE_LEFT_OR_UP_TEXT} event
+    icon: mdi:gesture-swipe-${ID_SWIPE_LEFT_OR_UP_TEXT}
+    internal: false
+    disabled_by_default: true
+    platform: template
     on_press:
       then:
         - delay: !lambda return nr_touch_duration->state;
         - binary_sensor.template.publish:
-            id: bs_swipe_right
-            state: OFF  # yamllint disable-line rule:truthy
-  - id: bs_swipe_up
-    name: Swipe up event
-    icon: mdi:gesture-swipe-up
-    <<: *bs_button_event_template
-    on_press:
-      then:
-        - delay: !lambda return nr_touch_duration->state;
-        - binary_sensor.template.publish:
-            id: bs_swipe_up
-            state: OFF  # yamllint disable-line rule:truthy
-  - id: bs_swipe_down
-    name: Swipe down event
-    icon: mdi:gesture-swipe-down
-    <<: *bs_button_event_template
-    on_press:
-      then:
-        - delay: !lambda return nr_touch_duration->state;
-        - binary_sensor.template.publish:
-            id: bs_swipe_down
+            id: bs_swipe_${ID_SWIPE_LEFT_OR_UP_TEXT}
             state: OFF  # yamllint disable-line rule:truthy
 
 esphome:
@@ -252,27 +261,15 @@ script:
   - id: boot_initialize_touch_format
     mode: restart
     then:
-      - wait_until:
-          condition:
-            - lambda: return sl_tx_model_format->active_index().has_value();
       - lambda: |-
-          const bool is_model_us = sl_tx_model_format->active_index().has_value() and
-                                    sl_tx_model_format->active_index().value() == 1;
           bs_multi_touch->publish_state(false);
-          bs_swipe_down->publish_state(false);
-          bs_swipe_down->set_internal(!is_model_us);
-          bs_swipe_left->publish_state(false);
-          bs_swipe_left->set_internal(is_model_us);
-          bs_swipe_right->publish_state(false);
-          bs_swipe_right->set_internal(is_model_us);
-          bs_swipe_up->publish_state(false);
-          bs_swipe_up->set_internal(!is_model_us);
+          bs_swipe_${ID_SWIPE_RIGHT_OR_DOWN_TEXT}->publish_state(false);
+          bs_swipe_${ID_SWIPE_LEFT_OR_UP_TEXT}->publish_state(false);
 
   - id: boot_initialize_touch_gang
     mode: restart
     then:
       - lambda: |-
-          tx_ultimate->set_gang_count(id(gang_count));
           bs_button_1_click_event->publish_state(false);
           bs_button_2_click_event->publish_state(false);
           bs_button_3_click_event->publish_state(false);
@@ -285,18 +282,6 @@ script:
           bs_button_2_long_press_event->publish_state(false);
           bs_button_3_long_press_event->publish_state(false);
           bs_button_4_long_press_event->publish_state(false);
-          bs_button_1_click_event->set_internal(id(gang_count) < 1);
-          bs_button_2_click_event->set_internal(id(gang_count) < 2);
-          bs_button_3_click_event->set_internal(id(gang_count) < 3);
-          bs_button_4_click_event->set_internal(id(gang_count) < 4);
-          bs_button_1_double_click_event->set_internal(id(gang_count) < 1);
-          bs_button_2_double_click_event->set_internal(id(gang_count) < 2);
-          bs_button_3_double_click_event->set_internal(id(gang_count) < 3);
-          bs_button_4_double_click_event->set_internal(id(gang_count) < 4);
-          bs_button_1_long_press_event->set_internal(id(gang_count) < 1);
-          bs_button_2_long_press_event->set_internal(id(gang_count) < 2);
-          bs_button_3_long_press_event->set_internal(id(gang_count) < 3);
-          bs_button_4_long_press_event->set_internal(id(gang_count) < 4);
 
   - id: !extend dump_config
     then:
@@ -313,7 +298,7 @@ script:
       - script.wait: dump_config
       - lambda: |-
           // Check for requirements
-          #if !defined(TX_ULTIMATE_EASY_COMMON)
+          #ifndef TX_ULTIMATE_EASY_COMMON
             #error "The package TX-Ultimate-Easy-ESPHome_common.yaml is required."
           #endif
 
@@ -347,23 +332,21 @@ script:
     #   - HW Buttons
     #   - HW Vibration
 
-  - id: touch_swipe_left
+  - id: touch_swipe_${ID_SWIPE_RIGHT_OR_DOWN_TEXT}
     mode: restart
     then:
       # Extended by:
       #   - HW Buttons
       - lambda: |-
-          bs_swipe_left->publish_state(true);
-          bs_swipe_up->publish_state(true);
+          bs_swipe_${ID_SWIPE_RIGHT_OR_DOWN_TEXT}->publish_state(true);
 
-  - id: touch_swipe_right
+  - id: touch_swipe_${ID_SWIPE_LEFT_OR_UP_TEXT}
     mode: restart
     then:
       # Extended by:
       #   - HW Buttons
       - lambda: |-
-          bs_swipe_right->publish_state(true);
-          bs_swipe_down->publish_state(true);
+          bs_swipe_${ID_SWIPE_LEFT_OR_UP_TEXT}->publish_state(true);
 
 switch:
   - id: sw_touch_panel_power
@@ -418,28 +401,24 @@ tx_ultimate_easy:
   on_swipe_left:
     then:
       - lambda: |-
-          const char *direction = (sl_tx_model_format->current_option() == "${TX_MODEL_FORMAT_EU_TEXT}") ?
-                                  "left" : "up";
           esphome::tx_ultimate_easy::fire_ha_event("touch", "swipe", {
-            {"action", direction},
-            {"swipe-direction", direction},
+            {"action", "${ID_SWIPE_LEFT_OR_UP_TEXT}"},
+            {"swipe-direction", "${ID_SWIPE_LEFT_OR_UP_TEXT}"},
             {"position", std::to_string(touch.x)}
           });
-          ESP_LOGI("${TAG_HW_TOUCH}", "Swipe %s", direction);
-          touch_swipe_left->execute();
+          ESP_LOGI("${TAG_HW_TOUCH}", "Swipe ${ID_SWIPE_LEFT_OR_UP_TEXT}");
+          touch_swipe_${ID_SWIPE_LEFT_OR_UP_TEXT}->execute();
 
   on_swipe_right:
     then:
       - lambda: |-
-          const char *direction = (sl_tx_model_format->current_option() == "${TX_MODEL_FORMAT_EU_TEXT}") ?
-                                  "right" : "down";
           esphome::tx_ultimate_easy::fire_ha_event("touch", "swipe", {
-            {"action", direction},
-            {"swipe-direction", direction},
+            {"action", "${ID_SWIPE_RIGHT_OR_DOWN_TEXT}"},
+            {"swipe-direction", "${ID_SWIPE_RIGHT_OR_DOWN_TEXT}"},
             {"position", std::to_string(touch.x)}
           });
-          ESP_LOGI("${TAG_HW_TOUCH}", "Swipe %s", direction);
-          touch_swipe_right->execute();
+          ESP_LOGI("${TAG_HW_TOUCH}", "Swipe ${ID_SWIPE_RIGHT_OR_DOWN_TEXT}");
+          touch_swipe_${ID_SWIPE_RIGHT_OR_DOWN_TEXT}->execute();
 
   on_touch_event:
     - lambda: |-
