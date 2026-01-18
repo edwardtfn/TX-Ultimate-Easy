@@ -400,3 +400,4 @@ select:
         - lambda: |-
             id(button_actions_packed) = (id(button_actions_packed) & ~(0x0F << 12)) |
                                         ((id(sl_button_4_action).active_index().value_or(1) & 0x0F) << 12);
+...
