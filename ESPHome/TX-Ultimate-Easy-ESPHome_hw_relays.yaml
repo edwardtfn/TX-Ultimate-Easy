@@ -80,10 +80,14 @@ light:
     restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
-        - script.execute: show_relay_status
+        - lambda: |-
+            id(relay_1_state) = true;
+            show_relay_status->execute();
     on_turn_off:
       then:
-        - script.execute: show_relay_status
+        - lambda: |-
+            id(relay_1_state) = false;
+            show_relay_status->execute();
   - id: light_output_2
     name: Light output 2
     output: output_relay_2
@@ -92,10 +96,14 @@ light:
     restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
-        - script.execute: show_relay_status
+        - lambda: |-
+            id(relay_2_state) = true;
+            show_relay_status->execute();
     on_turn_off:
       then:
-        - script.execute: show_relay_status
+        - lambda: |-
+            id(relay_2_state) = false;
+            show_relay_status->execute();
   - id: light_output_3
     name: Light output 3
     output: output_relay_3
@@ -104,10 +112,14 @@ light:
     restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
-        - script.execute: show_relay_status
+        - lambda: |-
+            id(relay_3_state) = true;
+            show_relay_status->execute();
     on_turn_off:
       then:
-        - script.execute: show_relay_status
+        - lambda: |-
+            id(relay_3_state) = false;
+            show_relay_status->execute();
   - id: light_output_4
     name: Light output 4
     output: output_relay_4
@@ -116,10 +128,14 @@ light:
     restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
-        - script.execute: show_relay_status
+        - lambda: |-
+            id(relay_4_state) = true;
+            show_relay_status->execute();
     on_turn_off:
       then:
-        - script.execute: show_relay_status
+        - lambda: |-
+            id(relay_4_state) = false;
+            show_relay_status->execute();
 
   # These lights are used to indicate relay's statuses
   - &light_partition_relays
