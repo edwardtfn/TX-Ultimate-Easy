@@ -2,11 +2,11 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome import automation
 from esphome.components import uart
-from esphome.components.esp32 import add_idf_sdkconfig_option
 from esphome.const import (
     CONF_ID,
 )
 from esphome.core import CORE
+import logging
 
 CODEOWNERS = ["@edwardtfn"]
 DEPENDENCIES = ['uart']
@@ -14,6 +14,8 @@ DEPENDENCIES = ['uart']
 CONF_TX_ULTIMATE_EASY = "tx_ultimate_easy"
 
 CONF_UART = "uart"
+
+CONF_DEVICE_FORMAT = "device_format"
 CONF_GANG_COUNT = "gang_count"
 
 CONF_ON_TOUCH_EVENT = "on_touch_event"
@@ -24,6 +26,12 @@ CONF_ON_SWIPE_RIGHT = "on_swipe_right"
 CONF_ON_MULTI_TOUCH_RELEASE = "on_multi_touch_release"
 CONF_ON_LONG_TOUCH_RELEASE = "on_long_touch_release"
 
+# Device format options
+DEVICE_FORMAT_EU = "EU"
+DEVICE_FORMAT_US = "US"
+
+_LOGGER = logging.getLogger(__name__)
+
 tx_ultimate_easy_ns = cg.esphome_ns.namespace('tx_ultimate_easy')
 TouchPoint = tx_ultimate_easy_ns.struct("TouchPoint")
 
@@ -31,11 +39,63 @@ TxUltimateTouch = tx_ultimate_easy_ns.class_(
     'TxUltimateEasy', cg.Component, uart.UARTDevice)
 
 
+def validate_gang_count(value):
+    """
+    Validate gang_count is an integer between 1 and 4.
+    
+    Parameters:
+        value: The gang_count value to validate.
+    
+    Returns:
+        int: The validated gang_count value.
+    
+    Raises:
+        cv.Invalid: If value is not an integer or not in range 1-4.
+    """
+    value = cv.int_(value)
+    if value < 1 or value > 4:
+        raise cv.Invalid(
+            f"gang_count must be between 1 and 4, got {value}\n"
+            "Please set gang_count in your YAML substitutions to 1, 2, 3, or 4\n"
+            "substitutions:\n"
+            "  device_format: EU  # REQUIRED: 'EU' or 'US' (case-sensitive, uppercase only)\n"
+            "  gang_count: 1      # REQUIRED: Number of relays/buttons (1, 2, 3, or 4)"
+        )
+    return value
+
+
+def validate_device_format(value):
+    """
+    Validate device_format is either 'EU' or 'US'.
+    
+    Parameters:
+        value: The device_format value to validate.
+    
+    Returns:
+        str: The validated device_format value.
+    
+    Raises:
+        cv.Invalid: If value is not 'EU' or 'US'.
+    """
+    value = cv.string_strict(value)
+    if value not in [DEVICE_FORMAT_EU, DEVICE_FORMAT_US]:
+        raise cv.Invalid(
+            f"device_format must be either '{DEVICE_FORMAT_EU}' or '{DEVICE_FORMAT_US}', got '{value}'\n"
+            "Please add to your YAML substitutions: device_format: EU  # Must be either 'EU' or 'US'\n"
+            "substitutions:\n"
+            "  device_format: EU  # REQUIRED: 'EU' or 'US' (case-sensitive, uppercase only)\n"
+            "  gang_count: 1      # REQUIRED: Number of relays/buttons (1, 2, 3, or 4)"
+        )
+    return value
+
+
 CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(TxUltimateTouch),
 
     cv.Required(CONF_UART): cv.use_id(uart),
-    cv.Optional(CONF_GANG_COUNT, default=1): cv.int_range(min=1, max=4),
+
+    cv.Optional(CONF_DEVICE_FORMAT): validate_device_format,
+    cv.Optional(CONF_GANG_COUNT): validate_gang_count,
 
     cv.Optional(CONF_ON_TOUCH_EVENT): automation.validate_automation(single=True),
     cv.Optional(CONF_ON_PRESS): automation.validate_automation(single=True),
@@ -49,11 +109,17 @@ CONFIG_SCHEMA = cv.Schema({
 
 
 async def register_tx_ultimate_easy(var, config):
+    """
+    Register the TxUltimateEasy component with its UART device and wire configured automations.
+    
+    For the given component instance, attach the configured UART component and build any automations present in the config for touch events, presses, releases, swipes, multi-touch releases, and long-touch releases. Each automation receives a payload field named "touch" of type `TouchPoint`.
+    
+    Parameters:
+        var: The TxUltimateTouch component instance to configure.
+        config (dict): Parsed configuration mapping containing `CONF_UART` and optional automation keys.
+    """
     uart_component = await cg.get_variable(config[CONF_UART])
     cg.add(var.set_uart_component(uart_component))
-
-    if CONF_GANG_COUNT in config:
-        cg.add(var.set_gang_count(config[CONF_GANG_COUNT]))
 
     if CONF_ON_TOUCH_EVENT in config:
         await automation.build_automation(
@@ -104,23 +170,30 @@ async def register_tx_ultimate_easy(var, config):
             config[CONF_ON_LONG_TOUCH_RELEASE],
         )
 
+    if CONF_DEVICE_FORMAT in config:
+        _LOGGER.info(
+            "TX Ultimate Easy - Device format: %s",
+            config[CONF_DEVICE_FORMAT],
+        )
+
+    if CONF_GANG_COUNT in config:
+        _LOGGER.info(
+            "TX Ultimate Easy - Gang number: %s",
+            config[CONF_GANG_COUNT],
+        )
 
 async def to_code(config):
+    """
+    Create and register a TxUltimateTouch component and its UART device from the provided configuration.
+    
+    This registers the component with ESPHome, registers it as a UART device, applies additional TxUltimateEasy setup, and defines the USE_TX_ULTIMATE_EASY build macro.
+    
+    Parameters:
+        config (dict): Parsed component configuration from YAML used to create and wire the component.
+    """
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
     await uart.register_uart_device(var, config)
     await register_tx_ultimate_easy(var, config)
-
-    if CORE.using_esp_idf:
-        add_idf_sdkconfig_option("CONFIG_BT_ALLOCATION_FROM_SPIRAM_FIRST", True)
-        add_idf_sdkconfig_option("CONFIG_BT_BLE_DYNAMIC_ENV_MEMORY", True)
-        add_idf_sdkconfig_option("CONFIG_ESP32_REV_MIN_3", True)
-        add_idf_sdkconfig_option("CONFIG_MBEDTLS_DYNAMIC_BUFFER", True)
-        add_idf_sdkconfig_option("CONFIG_MBEDTLS_DYNAMIC_FREE_CA_CERT", True)
-        add_idf_sdkconfig_option("CONFIG_MBEDTLS_DYNAMIC_FREE_CONFIG_DATA", True)
-        add_idf_sdkconfig_option("CONFIG_MBEDTLS_EXTERNAL_MEM_ALLOC", True)
-        add_idf_sdkconfig_option("CONFIG_SPIRAM_ALLOW_BSS_SEG_EXTERNAL_MEMORY", True)
-        add_idf_sdkconfig_option("CONFIG_SPIRAM_RODATA", True)
-        add_idf_sdkconfig_option("CONFIG_SPIRAM_TRY_ALLOCATE_WIFI_LWIP", True)
 
     cg.add_define("USE_TX_ULTIMATE_EASY")

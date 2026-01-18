@@ -76,10 +76,10 @@ script:
       - script.wait: dump_config
       - lambda: |-
           // Check for requirements
-          #if !defined(TX_ULTIMATE_EASY_COMMON)
+          #ifndef TX_ULTIMATE_EASY_COMMON
             #error "The package TX-Ultimate-Easy-ESPHome_common.yaml is required."
           #endif
-          #if !defined(TX_ULTIMATE_EASY_HW_AUDIO)
+          #ifndef TX_ULTIMATE_EASY_HW_AUDIO
             #error "The package TX-Ultimate-Easy-ESPHome_hw_audio.yaml is required."
           #endif
 
@@ -129,9 +129,16 @@ script:
     mode: restart
     then:
       - lambda: |-
+          // Remove this after ESPHome v2026.1.0 is released
+          #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
+          if (sl_touch_speaker_feedback->current_option() != "Disabled") {
+            speaker_play_click->execute();
+          }
+          #else
           if (strcmp(sl_touch_speaker_feedback->current_option(), "Disabled") != 0) {
             speaker_play_click->execute();
           }
+          #endif
 
   - id: !extend touch_on_press
     then:
@@ -141,10 +148,18 @@ script:
     mode: restart
     then:
       - lambda: |-
+          // Remove this after ESPHome v2026.1.0 is released
+          #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
+          if (sl_touch_speaker_feedback->current_option() == "On press" or
+              sl_touch_speaker_feedback->current_option() == "Always") {
+            speaker_play_click->execute();
+          }
+          #else
           if (strcmp(sl_touch_speaker_feedback->current_option(), "On press") == 0 or
               strcmp(sl_touch_speaker_feedback->current_option(), "Always") == 0) {
             speaker_play_click->execute();
           }
+          #endif
 
   - id: !extend touch_on_release
     then:
@@ -154,10 +169,18 @@ script:
     mode: restart
     then:
       - lambda: |-
+          // Remove this after ESPHome v2026.1.0 is released
+          #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
+          if (sl_touch_speaker_feedback->current_option() == "On release" or
+              sl_touch_speaker_feedback->current_option() == "Always") {
+            speaker_play_click->execute();
+          }
+          #else
           if (strcmp(sl_touch_speaker_feedback->current_option(), "On release") == 0 or
               strcmp(sl_touch_speaker_feedback->current_option(), "Always") == 0) {
             speaker_play_click->execute();
           }
+          #endif
 
 select:
   - id: sl_touch_speaker_feedback
