@@ -739,7 +739,7 @@ select:
       - "${LIGHT_MODE_BOTH_TEXT}"
     initial_option: "${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}"
     optimistic: true
-    restore_value: false
+    restore_value: ${gang_count >= 1}
     internal: ${gang_count < 1}
     entity_category: config
     disabled_by_default: false
@@ -787,7 +787,7 @@ select:
       - "${RELAY_MODE_TEXT_NOT_USED}"
     initial_option: "${RELAY_MODE_TEXT_SWITCH}"
     optimistic: true
-    restore_value: true
+    restore_value: ${gang_count >= 1}
     internal: ${gang_count < 1}
     entity_category: config
     disabled_by_default: false
@@ -799,6 +799,7 @@ select:
 
   - id: sl_relay_2_light_mode
     name: Relay 2 light mode
+    restore_value: ${gang_count >= 2}
     internal: ${gang_count < 2}
     <<: *relay_light_mode
     on_value:
@@ -844,7 +845,7 @@ select:
       - "${RELAY_MODE_TEXT_NOT_USED}"
     initial_option: "${RELAY_MODE_TEXT_SWITCH}"
     optimistic: true
-    restore_value: true
+    restore_value: ${gang_count >= 2}
     internal: ${gang_count < 2}
     entity_category: config
     disabled_by_default: false
@@ -856,6 +857,7 @@ select:
 
   - id: sl_relay_3_light_mode
     name: Relay 3 light mode
+    restore_value: ${gang_count >= 3}
     internal: ${gang_count < 3}
     <<: *relay_light_mode
     on_value:
@@ -901,7 +903,7 @@ select:
       - "${RELAY_MODE_TEXT_NOT_USED}"
     initial_option: "${RELAY_MODE_TEXT_SWITCH}"
     optimistic: true
-    restore_value: true
+    restore_value: ${gang_count >= 3}
     internal: ${gang_count < 3}
     entity_category: config
     disabled_by_default: false
@@ -913,6 +915,7 @@ select:
 
   - id: sl_relay_4_light_mode
     name: Relay 4 light mode
+    restore_value: ${gang_count >= 4}
     internal: ${gang_count < 4}
     <<: *relay_light_mode
     on_value:
@@ -956,7 +959,7 @@ select:
       - "${RELAY_MODE_TEXT_NOT_USED}"
     initial_option: "${RELAY_MODE_TEXT_SWITCH}"
     optimistic: true
-    restore_value: true
+    restore_value: ${gang_count >= 4}
     internal: ${gang_count < 4}
     entity_category: config
     disabled_by_default: false
@@ -970,6 +973,7 @@ switch:
   - id: sw_relay_1
     name: Relay 1
     internal: ${gang_count < 1}
+    restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
     platform: template
     lambda: |-
       return id(relay_1_state);
@@ -983,6 +987,7 @@ switch:
   - id: sw_relay_2
     name: Relay 2
     internal: ${gang_count < 2}
+    restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
     platform: template
     lambda: |-
       return id(relay_2_state);
@@ -996,6 +1001,7 @@ switch:
   - id: sw_relay_3
     name: Relay 3
     internal: ${gang_count < 3}
+    restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
     platform: template
     lambda: |-
       return id(relay_3_state);
@@ -1009,6 +1015,7 @@ switch:
   - id: sw_relay_4
     name: Relay 4
     internal: ${gang_count < 4}
+    restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
     platform: template
     lambda: |-
       return id(relay_4_state);
