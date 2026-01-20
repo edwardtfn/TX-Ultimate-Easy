@@ -767,7 +767,7 @@ select:
             // Transitioning FROM Disabled - update lights based on relay state
             ESP_LOGI("${TAG_HW_RELAYS}",
                       "Relay 1 light mode changed from ${LIGHT_MODE_DISABLED_TEXT} - updating lights");
-            bool relay_state = id(sw_relay_1).state;
+            bool relay_state = id(relay_1_state);
             if (current_mode == "${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}" || current_mode == "${LIGHT_MODE_BOTH_TEXT}") {
               id(light_set_state)->execute(1, 0, relay_state);
             }
@@ -825,7 +825,7 @@ select:
             // Transitioning FROM Disabled - update lights based on relay state
             ESP_LOGI("${TAG_HW_RELAYS}",
                       "Relay 2 light mode changed from ${LIGHT_MODE_DISABLED_TEXT} - updating lights");
-            bool relay_state = id(sw_relay_2).state;
+            bool relay_state = id(relay_2_state);
             if (current_mode == "${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}" || current_mode == "${LIGHT_MODE_BOTH_TEXT}") {
               id(light_set_state)->execute(1, 1, relay_state);
             }
@@ -883,7 +883,7 @@ select:
             // Transitioning FROM Disabled - update lights based on relay state
             ESP_LOGI("${TAG_HW_RELAYS}",
                       "Relay 3 light mode changed from ${LIGHT_MODE_DISABLED_TEXT} - updating lights");
-            bool relay_state = id(sw_relay_3).state;
+            bool relay_state = id(relay_3_state);
             if (current_mode == "${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}" || current_mode == "${LIGHT_MODE_BOTH_TEXT}") {
               id(light_set_state)->execute(1, 2, relay_state);
             }
@@ -939,7 +939,7 @@ select:
           } else if (previous_mode == "${LIGHT_MODE_DISABLED_TEXT}" && current_mode != "${LIGHT_MODE_DISABLED_TEXT}") {
             // Transitioning FROM Disabled - update lights based on relay state
             ESP_LOGI("${TAG_HW_RELAYS}", "Relay 4 light mode changed from ${LIGHT_MODE_DISABLED_TEXT} - updating lights");
-            bool relay_state = id(sw_relay_4).state;
+            bool relay_state = id(relay_4_state);
             if (current_mode == "${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}" || current_mode == "${LIGHT_MODE_BOTH_TEXT}") {
               id(light_set_state)->execute(1, 3, relay_state);
             }
