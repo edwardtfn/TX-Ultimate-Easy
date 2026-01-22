@@ -24,10 +24,9 @@ substitutions:
   BUTTON_3_ACTION_FAILSAFE_TEXT: "Relay 3 (API failsafe only)"
   BUTTON_4_ACTION_FAILSAFE_TEXT: "Relay 4 (API failsafe only)"
 
-  BUTTON_CLICK_MAX_LENGTH: '500'   # The maximum duration the click should last, in msec (aligned with Android/iOS standards)
   BUTTON_MULTI_CLICK_DELAY: '250'  # The time to wait for another click, in msec
   BUTTON_PRESS_TIMEOUT: '10000'    # Ignore if button is pressed for longer than this time, in msec
-  BUTTON_LONG_PRESS_DELAY: '800'   # The time to wait to consider a long press, in msec
+  BUTTON_LONG_PRESS_DELAY: '500'   # The time to wait to consider a long press, in msec
 
   # Button numbers constants
   BUTTON_1_ID: '1'
@@ -86,6 +85,13 @@ globals:
     type: uint32_t
     restore_value: false
     initial_value: '0'
+    # Used for: current press duration (press → release)
+
+  - id: last_release_time
+    type: uint32_t
+    restore_value: false
+    initial_value: '0'
+    # Used for: inter-click gap timing (time since last release)
 
   - id: click_counter
     type: uint8_t
@@ -179,6 +185,7 @@ script:
           id(button_press_button) = 0;
           id(button_press_position) = 0;
           id(button_press_start_time) = 0;
+          id(last_release_time) = 0;
           id(click_counter) = 0;
           buttons_release->execute();
 
@@ -215,6 +222,7 @@ script:
       - lambda: |-
           // Reset all button-related global state
           id(button_press_start_time) = 0;
+          id(last_release_time) = 0;
           id(click_counter) = 0;
           id(button_press_button) = 0;
           id(button_press_position) = 0;
@@ -305,7 +313,7 @@ script:
           // Check if we should start a new click sequence:
           // 1. Previous cycle completed (start_time was reset to 0)
           // 2. Position changed
-          // 3. Enough time has passed since last press (more than multi-click delay)
+          // 3. Enough time has passed since last release (more than multi-click delay)
           bool start_new_sequence = false;
           if (id(button_press_start_time) == 0) {
             // Previous cycle completed
@@ -313,11 +321,13 @@ script:
           } else if (id(button_press_position) != position) {
             // Position changed
             start_new_sequence = true;
-          } else {
-            // Check if enough time has passed since last press
-            uint32_t time_since_last_press = current_time - id(button_press_start_time);
-            if (time_since_last_press > ${BUTTON_MULTI_CLICK_DELAY}) {
-              // Too much time passed, start fresh
+          } else if (id(last_release_time) > 0) {
+            // Check if enough time has passed since last release (for inter-click gap)
+            // Use runtime value from HA instead of compile-time constant
+            uint32_t gap_window = (uint32_t) nr_button_multi_click_delay->state;
+            uint32_t time_since_last_release = current_time - id(last_release_time);
+            if (time_since_last_release > gap_window) {
+              // Too much time passed since last release, start fresh
               start_new_sequence = true;
             }
           }
@@ -329,6 +339,7 @@ script:
             // Same position and within multi-click window, increment counter
             id(click_counter)++;
           }
+          // Set press start time for this press (for duration calculation)
           id(button_press_start_time) = current_time;
           id(button_press_button) = button;
           // Update binary sensor
@@ -356,7 +367,9 @@ script:
               id(button_press_start_time) < current_time) {
             uint32_t press_duration = current_time - id(button_press_start_time);
             ESP_LOGI("${TAG_HW_BUTTONS}", "Button press duration: %" PRIu32 " ms", press_duration);
-            if (press_duration <= ${BUTTON_CLICK_MAX_LENGTH}) { // Short/normal click
+            // Update last release time for inter-click gap detection
+            id(last_release_time) = current_time;
+            if (press_duration <= ${BUTTON_LONG_PRESS_DELAY}) { // Short/normal click
               // Validate button is still valid (in case swipe/multi-touch happened)
               if (id(button_press_button) > 0 && id(button_press_button) <= 4) {
                 // Don't reset start_time here - let button_action reset it after multi-click delay
@@ -365,17 +378,19 @@ script:
               } else {
                 ESP_LOGW("${TAG_HW_BUTTONS}", "Invalid button state, resetting");
                 id(button_press_start_time) = 0;
+                id(last_release_time) = 0;
                 id(click_counter) = 0;
                 id(button_press_button) = 0;
               }
-            } else if (press_duration > ${BUTTON_CLICK_MAX_LENGTH} and press_duration <= ${BUTTON_PRESS_TIMEOUT}) {
-              // Anything longer than max click length (and within timeout) is a long press
+            } else if (press_duration > ${BUTTON_LONG_PRESS_DELAY} and press_duration <= ${BUTTON_PRESS_TIMEOUT}) {
+              // Long press: anything longer than BUTTON_LONG_PRESS_DELAY (and within timeout) is a long press
               // Validate button is still valid (in case swipe/multi-touch happened)
               if (id(button_press_button) > 0 && id(button_press_button) <= 4) {
                 button_action->execute(id(button_press_button), "long_press", 1);
               } else {
                 ESP_LOGW("${TAG_HW_BUTTONS}", "Invalid button state during long press, resetting");
                 id(button_press_start_time) = 0;
+                id(last_release_time) = 0;
                 id(click_counter) = 0;
                 id(button_press_button) = 0;
               }
@@ -383,11 +398,13 @@ script:
               ESP_LOGW("${TAG_HW_BUTTONS}",
                         "Button press cancelled or timed out after ${BUTTON_PRESS_TIMEOUT} ms");
               id(button_press_start_time) = 0;
+              id(last_release_time) = 0;
               id(click_counter) = 0;
             }
           } else {
             ESP_LOGW("${TAG_HW_BUTTONS}", "Press event timestamp not recorded yet");
             id(button_press_start_time) = 0;
+            id(last_release_time) = 0;
             id(click_counter) = 0;
           }
 
