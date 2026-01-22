@@ -209,6 +209,17 @@ script:
             }
           }
 
+  - id: buttons_reset_state
+    mode: restart
+    then:
+      - lambda: |-
+          // Reset all button-related global state
+          id(button_press_start_time) = 0;
+          id(click_counter) = 0;
+          id(button_press_button) = 0;
+          id(button_press_position) = 0;
+          buttons_release->execute();
+
   - id: !extend dump_config
     then:
       - lambda: |-
@@ -274,7 +285,7 @@ script:
 
   - id: !extend touch_on_multi_touch_release
     then:
-      - script.execute: buttons_release
+      - script.execute: buttons_reset_state
 
   - id: !extend touch_on_press
     then:
@@ -343,16 +354,31 @@ script:
           buttons_release->execute();
           if (id(button_press_start_time) > 0 and
               id(button_press_start_time) < current_time) {
-            uint32_t press_duration  = current_time - id(button_press_start_time);
-            // Handle overflow (optional, since it's unlikely to happen here)
+            uint32_t press_duration = current_time - id(button_press_start_time);
             ESP_LOGI("${TAG_HW_BUTTONS}", "Button press duration: %" PRIu32 " ms", press_duration);
             if (press_duration <= ${BUTTON_CLICK_MAX_LENGTH}) { // Short/normal click
-              // Don't reset start_time here - let button_action reset it after multi-click delay
-              // This allows subsequent presses during the delay to increment the counter
-              button_click_event->execute(id(button_press_button), id(click_counter));
+              // Validate button is still valid (in case swipe/multi-touch happened)
+              if (id(button_press_button) > 0 && id(button_press_button) <= 4) {
+                // Don't reset start_time here - let button_action reset it after multi-click delay
+                // This allows subsequent presses during the delay to increment the counter
+                button_click_event->execute(id(button_press_button), id(click_counter));
+              } else {
+                ESP_LOGW("${TAG_HW_BUTTONS}", "Invalid button state, resetting");
+                id(button_press_start_time) = 0;
+                id(click_counter) = 0;
+                id(button_press_button) = 0;
+              }
             } else if (press_duration > ${BUTTON_CLICK_MAX_LENGTH} and press_duration <= ${BUTTON_PRESS_TIMEOUT}) {
               // Anything longer than max click length (and within timeout) is a long press
-              button_action->execute(id(button_press_button), "long_press", 1);
+              // Validate button is still valid (in case swipe/multi-touch happened)
+              if (id(button_press_button) > 0 && id(button_press_button) <= 4) {
+                button_action->execute(id(button_press_button), "long_press", 1);
+              } else {
+                ESP_LOGW("${TAG_HW_BUTTONS}", "Invalid button state during long press, resetting");
+                id(button_press_start_time) = 0;
+                id(click_counter) = 0;
+                id(button_press_button) = 0;
+              }
             } else if (press_duration > ${BUTTON_PRESS_TIMEOUT}) { // Timeout or invalid
               ESP_LOGW("${TAG_HW_BUTTONS}",
                         "Button press cancelled or timed out after ${BUTTON_PRESS_TIMEOUT} ms");
@@ -367,11 +393,11 @@ script:
 
   - id: !extend touch_swipe_${ID_SWIPE_LEFT_OR_UP_TEXT}
     then:
-      - script.execute: buttons_release
+      - script.execute: buttons_reset_state
 
   - id: !extend touch_swipe_${ID_SWIPE_RIGHT_OR_DOWN_TEXT}
     then:
-      - script.execute: buttons_release
+      - script.execute: buttons_reset_state
 
 select:
   - &button_select_action_base
