@@ -24,15 +24,15 @@ substitutions:
   BUTTON_3_ACTION_FAILSAFE_TEXT: "Relay 3 (API failsafe only)"
   BUTTON_4_ACTION_FAILSAFE_TEXT: "Relay 4 (API failsafe only)"
 
-  BUTTON_MULTI_CLICK_DELAY: '250'  # The time to wait for another click, in msec
-  BUTTON_PRESS_TIMEOUT: '10000'    # Ignore if button is pressed for longer than this time, in msec
-  BUTTON_LONG_PRESS_DELAY: '500'   # The time to wait to consider a long press, in msec
+  BUTTON_MULTI_CLICK_DELAY: "250" # The time to wait for another click, in msec
+  BUTTON_PRESS_TIMEOUT: "10000" # Ignore if button is pressed for longer than this time, in msec
+  BUTTON_LONG_PRESS_DELAY: "500" # The time to wait to consider a long press, in msec
 
   # Button numbers constants
-  BUTTON_1_ID: '1'
-  BUTTON_2_ID: '2'
-  BUTTON_3_ID: '3'
-  BUTTON_4_ID: '4'
+  BUTTON_1_ID: "1"
+  BUTTON_2_ID: "2"
+  BUTTON_3_ID: "3"
+  BUTTON_4_ID: "4"
 
   TAG_HW_BUTTONS: tx_ultimate_easy.hw.buttons
 
@@ -67,36 +67,36 @@ globals:
   - id: button_actions_packed
     type: uint16_t
     restore_value: true
-    initial_value: '4369'  # Binary: 0001000100010001 = all buttons set to option 1 (default action)
+    initial_value: "4369" # Binary: 0001000100010001 = all buttons set to option 1 (default action)
     # Bit layout: [button4(4)][button3(4)][button2(4)][button1(4)]
     # Each button uses 4 bits: 0=None, 1=Toggle, 2=Failsafe, 3-15=Reserved for future options
 
   - id: button_press_button
     type: uint8_t
     restore_value: false
-    initial_value: '0'
+    initial_value: "0"
 
   - id: button_press_position
     type: uint8_t
     restore_value: false
-    initial_value: '0'
+    initial_value: "0"
 
   - id: button_press_start_time
     type: uint32_t
     restore_value: false
-    initial_value: '0'
+    initial_value: "0"
     # Used for: current press duration (press → release)
 
   - id: last_release_time
     type: uint32_t
     restore_value: false
-    initial_value: '0'
+    initial_value: "0"
     # Used for: inter-click gap timing (time since last release)
 
   - id: click_counter
     type: uint8_t
     restore_value: false
-    initial_value: '0'
+    initial_value: "0"
 
 script:
   - id: !extend boot_initialize
@@ -325,13 +325,20 @@ script:
             // Check if enough time has passed since last release (for inter-click gap)
             // Use runtime value from HA instead of compile-time constant
             uint32_t gap_window = (uint32_t) nr_button_multi_click_delay->state;
-            uint32_t time_since_last_release = current_time - id(last_release_time);
+            uint32_t time_since_last_release;
+            // Handle millis() overflow (wraps after ~49 days)
+            if (current_time >= id(last_release_time)) {
+              time_since_last_release = current_time - id(last_release_time);
+            } else {
+              // Overflow occurred, calculate correctly
+              time_since_last_release = (UINT32_MAX - id(last_release_time)) + current_time + 1;
+            }
             if (time_since_last_release > gap_window) {
               // Too much time passed since last release, start fresh
               start_new_sequence = true;
             }
           }
-          
+
           if (start_new_sequence) {
             id(click_counter) = 1;
             id(button_press_position) = position;
@@ -363,9 +370,15 @@ script:
       - lambda: |-
           uint32_t current_time = millis();
           buttons_release->execute();
-          if (id(button_press_start_time) > 0 and
-              id(button_press_start_time) < current_time) {
-            uint32_t press_duration = current_time - id(button_press_start_time);
+          if (id(button_press_start_time) > 0) {
+            uint32_t press_duration;
+            // Handle millis() overflow (wraps after ~49 days)
+            if (current_time >= id(button_press_start_time)) {
+              press_duration = current_time - id(button_press_start_time);
+            } else {
+              // Overflow occurred, calculate correctly
+              press_duration = (UINT32_MAX - id(button_press_start_time)) + current_time + 1;
+            }
             ESP_LOGI("${TAG_HW_BUTTONS}", "Button press duration: %" PRIu32 " ms", press_duration);
             // Update last release time for inter-click gap detection
             id(last_release_time) = current_time;
@@ -482,4 +495,3 @@ select:
         - lambda: |-
             id(button_actions_packed) = (id(button_actions_packed) & ~(0x0F << 12)) |
                                         ((id(sl_button_4_action).active_index().value_or(1) & 0x0F) << 12);
-...
