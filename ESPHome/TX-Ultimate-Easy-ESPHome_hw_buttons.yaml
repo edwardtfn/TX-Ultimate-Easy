@@ -24,9 +24,9 @@ substitutions:
   BUTTON_3_ACTION_FAILSAFE_TEXT: "Relay 3 (API failsafe only)"
   BUTTON_4_ACTION_FAILSAFE_TEXT: "Relay 4 (API failsafe only)"
 
-  BUTTON_MULTI_CLICK_DELAY: "250" # The time to wait for another click, in msec
-  BUTTON_PRESS_TIMEOUT: "10000" # Ignore if button is pressed for longer than this time, in msec
-  BUTTON_LONG_PRESS_DELAY: "500" # The time to wait to consider a long press, in msec
+  BUTTON_MULTI_CLICK_DELAY: "250"  # The time to wait for another click, in msec
+  BUTTON_PRESS_TIMEOUT: "10000"  # Ignore if button is pressed for longer than this time, in msec
+  BUTTON_LONG_PRESS_DELAY: "500"  # The time to wait to consider a long press, in msec
 
   # Button numbers constants
   BUTTON_1_ID: "1"
@@ -67,7 +67,7 @@ globals:
   - id: button_actions_packed
     type: uint16_t
     restore_value: true
-    initial_value: "4369" # Binary: 0001000100010001 = all buttons set to option 1 (default action)
+    initial_value: "4369"  # Binary: 0001000100010001 = all buttons set to option 1 (default action)
     # Bit layout: [button4(4)][button3(4)][button2(4)][button1(4)]
     # Each button uses 4 bits: 0=None, 1=Toggle, 2=Failsafe, 3-15=Reserved for future options
 
@@ -495,3 +495,4 @@ select:
         - lambda: |-
             id(button_actions_packed) = (id(button_actions_packed) & ~(0x0F << 12)) |
                                         ((id(sl_button_4_action).active_index().value_or(1) & 0x0F) << 12);
+...
