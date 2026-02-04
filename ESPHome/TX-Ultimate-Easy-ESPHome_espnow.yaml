@@ -32,12 +32,12 @@ globals:
   - id: espnow_send_enabled
     type: bool
     restore_value: true
-    initial_value: false
+    initial_value: "false"
 
   - id: espnow_receive_enabled
     type: bool
     restore_value: true
-    initial_value: false
+    initial_value: "false"
 
 espnow:
   id: espnow_component
