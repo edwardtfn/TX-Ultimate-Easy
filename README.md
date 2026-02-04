@@ -164,6 +164,7 @@ All device behaviors can be customized through Home Assistant automations withou
 - **Touch Panel Support**: Full support for touch gestures and multi-touch capabilities
 - **Advanced Automations**: Create complex automations using Home Assistant's powerful automation engine
 - **Bluetooth Proxy Support**: Compatible with ESPHome's bluetooth_proxy component for BLE device integration
+- **ESP-NOW**: Optional peer-to-peer control so one switch can toggle relays on other switches without Home Assistant (see [ESP-NOW docs](docs/espnow.md))
 - **Audio Feedback**: Built-in speaker support for audible feedback
 - **Haptic Feedback**: Vibration motor support for tactile feedback
 - **ESP-IDF Framework**: Enhanced performance and stability with ESP-IDF support
@@ -272,6 +273,9 @@ bluetooth_proxy:
 > Bluetooth proxy with TX Ultimate Easy is considered experimental and not fully tested.
 > While the compile-time configuration changes (device format and gang count as substitutions) may enable better compatibility,
 > we continue to consider this as a non-officially-supported customization. Use at your own risk.
+
+#### ESP-NOW (multi-device relay control)
+Add the ESP-NOW package so one switch can toggle relays on another switch directly, without Home Assistant. Configuration is done via YAML substitutions (target MAC and relay per button). For setup, see **[ESP-NOW docs](docs/espnow.md)**.
 
 ### Advanced Settings
 For more granular control over components,
