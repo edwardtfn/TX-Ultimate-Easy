@@ -147,7 +147,7 @@ script:
                     return;
                 }
                 // Default relay to 1 if not in valid range (1-4)
-                if (relay_num < 1 || relay_num > ${gang_count}) {
+                if (relay_num < 1 || relay_num > 4) {
                   relay_num = 1;
                 }
                 ESP_LOGI("${TAG_ESPNOW}", "Sending ESP-NOW message: button=%" PRIu8 ", MAC=%s, relay=%" PRIu8, button, mac_str.c_str(), relay_num);
