@@ -29,23 +29,12 @@ esphome:
     includes:
       - esp_mac.h
 
-globals:
-  - id: espnow_send_enabled
-    type: bool
-    restore_value: true
-    initial_value: "false"
-
-  - id: espnow_receive_enabled
-    type: bool
-    restore_value: true
-    initial_value: "false"
-
 espnow:
   id: espnow_component
   auto_add_peer: true
   on_receive:
     lambda: |-
-      if (!id(espnow_receive_enabled)) {
+      if (!sw_espnow_receive_enabled->state) {
         ESP_LOGD("${TAG_ESPNOW}", "ESP-NOW receiving disabled, ignoring message");
         return;
       }
@@ -99,7 +88,7 @@ script:
       - if:
           condition:
             lambda: |-
-              if (!id(espnow_send_enabled)) {
+              if (!sw_espnow_send_enabled->state) {
                 return false;
               }
               std::string mac_str;
@@ -232,7 +221,7 @@ script:
   - id: !extend button_click_event
     then:
       - lambda: |-
-          if (!id(espnow_send_enabled)) {
+          if (!sw_espnow_send_enabled->state) {
             return;
           }
           espnow_send->execute(button);
@@ -249,12 +238,10 @@ switch:
     on_turn_on:
       then:
         - lambda: |-
-            id(espnow_send_enabled) = true;
             ESP_LOGI("${TAG_ESPNOW}", "ESP-NOW sending enabled");
     on_turn_off:
       then:
         - lambda: |-
-            id(espnow_send_enabled) = false;
             ESP_LOGI("${TAG_ESPNOW}", "ESP-NOW sending disabled");
 
   - id: sw_espnow_receive_enabled
@@ -268,12 +255,10 @@ switch:
     on_turn_on:
       then:
         - lambda: |-
-            id(espnow_receive_enabled) = true;
             ESP_LOGI("${TAG_ESPNOW}", "ESP-NOW receiving enabled");
     on_turn_off:
       then:
         - lambda: |-
-            id(espnow_receive_enabled) = false;
             ESP_LOGI("${TAG_ESPNOW}", "ESP-NOW receiving disabled");
 
 text_sensor:
