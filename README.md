@@ -223,7 +223,6 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
        files:
          - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml                  # Core (essential) packages
          - ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml              # Non-essential, but recommended packages
-         # - ESPHome/TX-Ultimate-Easy-ESPHome_addon_ble_proxy.yaml     # Adds BLE proxy support
    ```
    You can also use a specific version tag for better control over updates:
    ```yaml
@@ -275,7 +274,9 @@ bluetooth_proxy:
 > we continue to consider this as a non-officially-supported customization. Use at your own risk.
 
 #### ESP-NOW (multi-device relay control)
-Add the ESP-NOW package so one switch can toggle relays on another switch directly, without Home Assistant. Configuration is done via YAML substitutions (target MAC and relay per button). For setup, see **[ESP-NOW docs](docs/espnow.md)**.
+Add the ESP-NOW package so one switch can toggle relays on another switch directly, without Home Assistant.
+Configuration is done via YAML substitutions (target MAC and relay per button).
+For setup, see **[ESP-NOW docs](docs/espnow.md)**.
 
 ### Advanced Settings
 For more granular control over components,
@@ -313,6 +314,9 @@ packages:
       # Audio options (use none or choose only one - using both will fail)
       - ESPHome/TX-Ultimate-Easy-ESPHome_media_player.yaml  # Media player (Recommended for most users)
       # - ESPHome/TX-Ultimate-Easy-ESPHome_hw_speaker.yaml  # Basic speaker
+
+      # Advanced/Optional/Add-ons
+      # - ESPHome/TX-Ultimate-Easy-ESPHome_espnow.yaml    # Add support to ESP-NOW
 ```
 
 > [!NOTE]

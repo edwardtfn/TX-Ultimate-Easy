@@ -62,7 +62,7 @@ espnow:
 
       ESP_LOGI("${TAG_ESPNOW}", "ESP-NOW message received: command=0x%02X, relay=%" PRIu8, command, relay_num);
 
-      if (command != 0x01 or relay_num < 1 or relay_num > ${gangs} ) {
+      if (command != 0x01 or relay_num < 1 or relay_num > ${gang_count} ) {
         ESP_LOGW("${TAG_ESPNOW}", "Invalid message format (command=0x%02X, relay=%" PRIu8 ")", command, relay_num);
         return;
       }
@@ -71,17 +71,17 @@ espnow:
         case 1:
           id(sw_relay_1)->toggle();
           break;
-        #if ${gangs} >= 2
+        #if ${gang_count} >= 2
         case 2:
           id(sw_relay_2)->toggle();
           break;
         #endif
-        #if ${gangs} >= 3
+        #if ${gang_count} >= 3
         case 3:
           id(sw_relay_3)->toggle();
           break;
         #endif
-        #if ${gangs} >= 4
+        #if ${gang_count} >= 4
         case 4:
           id(sw_relay_4)->toggle();
           break;
@@ -107,17 +107,17 @@ script:
                   mac_str = "${espnow_target_mac_button_1}";
                   break;
                 #endif
-                #if ${gangs} >= 2
+                #if ${gang_count} >= 2
                 case 2:
                   mac_str = "${espnow_target_mac_button_2}";
                   break;
                 #endif
-                #if ${gangs} >= 3
+                #if ${gang_count} >= 3
                 case 3:
                   mac_str = "${espnow_target_mac_button_3}";
                   break;
                 #endif
-                #if ${gangs} >= 4
+                #if ${gang_count} >= 4
                 case 4:
                   mac_str = "${espnow_target_mac_button_4}";
                   break;
@@ -137,19 +137,19 @@ script:
                     relay_num = ${espnow_target_relay_button_1};
                     break;
                   #endif
-                  #if ${gangs} >= 2
+                  #if ${gang_count} >= 2
                   case 2:
                     mac_str = "${espnow_target_mac_button_2}";
                     relay_num = ${espnow_target_relay_button_2};
                     break;
                   #endif
-                  #if ${gangs} >= 3
+                  #if ${gang_count} >= 3
                   case 3:
                     mac_str = "${espnow_target_mac_button_3}";
                     relay_num = ${espnow_target_relay_button_3};
                     break;
                   #endif
-                  #if ${gangs} >= 4
+                  #if ${gang_count} >= 4
                   case 4:
                     mac_str = "${espnow_target_mac_button_4}";
                     relay_num = ${espnow_target_relay_button_4};
@@ -159,7 +159,7 @@ script:
                     return;
                 }
                 // Default relay to 1 if not in valid range (1-4)
-                if (relay_num < 1 || relay_num > ${gangs}) {
+                if (relay_num < 1 || relay_num > ${gang_count}) {
                   relay_num = 1;
                 }
                 ESP_LOGI("${TAG_ESPNOW}", "Sending ESP-NOW message: button=%" PRIu8 ", MAC=%s, relay=%" PRIu8, button, mac_str.c_str(), relay_num);
@@ -171,17 +171,17 @@ script:
                     case 1:
                       mac_str = "${espnow_target_mac_button_1}";
                       break;
-                    #if ${gangs} >= 2
+                    #if ${gang_count} >= 2
                     case 2:
                       mac_str = "${espnow_target_mac_button_2}";
                       break;
                     #endif
-                    #if ${gangs} >= 3
+                    #if ${gang_count} >= 3
                     case 3:
                       mac_str = "${espnow_target_mac_button_3}";
                       break;
                     #endif
-                    #if ${gangs} >= 4
+                    #if ${gang_count} >= 4
                     case 4:
                       mac_str = "${espnow_target_mac_button_4}";
                       break;
@@ -205,17 +205,17 @@ script:
                     case 1:
                       relay_num = ${espnow_target_relay_button_1};
                       break;
-                    #if ${gangs} >= 2
+                    #if ${gang_count} >= 2
                     case 2:
                       relay_num = ${espnow_target_relay_button_2};
                       break;
                     #endif
-                    #if ${gangs} >= 3
+                    #if ${gang_count} >= 3
                     case 3:
                       relay_num = ${espnow_target_relay_button_3};
                       break;
                     #endif
-                    #if ${gangs} >= 4
+                    #if ${gang_count} >= 4
                     case 4:
                       relay_num = ${espnow_target_relay_button_4};
                       break;
@@ -224,7 +224,7 @@ script:
                       return {0x00, 0x00};
                   }
                   // Default relay to 1 if not in valid range (1-4)
-                  if (relay_num < 1 || relay_num > ${gangs}) {
+                  if (relay_num < 1 || relay_num > ${gang_count}) {
                     relay_num = 1;
                   }
                   return {0x01, relay_num};

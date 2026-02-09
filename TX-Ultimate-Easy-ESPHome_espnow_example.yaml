@@ -9,6 +9,8 @@
 substitutions:
   name: tx-ultimate-easy
   friendly_name: TX Ultimate Easy
+  device_format: EU  # Required: 'EU' or 'US'
+  gang_count: 3      # Required: Number of relays/buttons (1, 2, 3, or 4)
 
 wifi:
   ssid: !secret wifi_ssid
@@ -17,33 +19,33 @@ wifi:
 packages:
   remote_package:
     url: https://github.com/edwardtfn/TX-Ultimate-Easy
-    ref: stable
+    ref: main
     refresh: 5min
     files:
       - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
       - ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml
       - ESPHome/TX-Ultimate-Easy-ESPHome_espnow.yaml  # Add ESP-NOW support
 
-####################################################################################################
-##### Configuration Instructions:                                                             #####
-#####                                                                                            #####
-##### 1. Flash this configuration to all 3 switches                                            #####
+#####################################################################################################
+##### Configuration Instructions:                                                               #####
+#####                                                                                           #####
+##### 1. Flash this configuration to all 3 switches                                             #####
 ##### 2. In Home Assistant, for each switch:                                                    #####
-#####    - Enable "ESP-NOW Enabled" switch                                                     #####
+#####    - Enable "ESP-NOW Enabled" switch                                                      #####
 #####    - For each button, configure:                                                          #####
 #####      * "Button X ESP-NOW Target MAC Address" - Enter the MAC address of the target device #####
-#####      * "Button X ESP-NOW Target Relay" - Select which relay to toggle (1-4)              #####
-#####                                                                                            #####
+#####      * "Button X ESP-NOW Target Relay" - Select which relay to toggle (1-4)               #####
+#####                                                                                           #####
 ##### 3. To find MAC addresses:                                                                 #####
-#####    - Check "ESP-NOW MAC Address" text sensor on each device                                #####
+#####    - Check "ESP-NOW MAC Address" text sensor on each device                               #####
 #####    - Or check device info in Home Assistant                                               #####
-#####                                                                                            #####
-##### Example Setup:                                                                             #####
-##### - Switch 1: Button 1 → Toggle Relay 1 on Switch 2 (enter Switch 2's MAC)                 #####
-##### - Switch 2: Button 1 → Toggle Relay 1 on Switch 3 (enter Switch 3's MAC)                 #####
-##### - Switch 3: Button 1 → Toggle Relay 1 on Switch 1 (enter Switch 1's MAC)                 #####
-#####                                                                                            #####
-##### Note: If MAC address is not configured (00:00:00:00:00:00), the button will toggle       #####
-#####       the local relay instead (fallback behavior).                                       #####
-####################################################################################################
+#####                                                                                           #####
+##### Example Setup:                                                                            #####
+##### - Switch 1: Button 1 -> Toggle Relay 1 on Switch 2 (enter Switch 2's MAC)                 #####
+##### - Switch 2: Button 1 -> Toggle Relay 1 on Switch 3 (enter Switch 3's MAC)                 #####
+##### - Switch 3: Button 1 -> Toggle Relay 1 on Switch 1 (enter Switch 1's MAC)                 #####
+#####                                                                                           #####
+##### Note: If MAC address is not configured (00:00:00:00:00:00), the button will toggle        #####
+#####       the local relay instead (fallback behavior).                                        #####
+#####################################################################################################
 ...
