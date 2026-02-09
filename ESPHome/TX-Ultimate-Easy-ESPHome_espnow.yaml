@@ -90,7 +90,8 @@ espnow:
 
 script:
   - id: espnow_send
-    mode: single
+    mode: queued
+    max_runs: 10
     parameters:
       button: uint8_t
     then:
