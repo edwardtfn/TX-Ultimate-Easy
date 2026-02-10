@@ -516,6 +516,7 @@ jobs:
       - build_ard_core_dev
       - build_ard_basic_dev
       - build_ard_ble_proxy_dev
+      - build_ard_espnow_example_dev
       - build_idf_core_dev
       - build_idf_basic_dev
       - build_idf_ble_proxy_dev
@@ -526,7 +527,7 @@ jobs:
       - name: Dev ESPHome Results
         run: |
           SUCCESS=0
-          TOTAL=6
+          TOTAL=8
 
           # Arduino Dev builds
           [ "${{ needs.build_ard_core_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
