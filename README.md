@@ -206,10 +206,10 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
 4. Copy this basic configuration to your new device:
    ```yaml
    substitutions:
-     name: tx-ultimate-easy
-     friendly_name: TX Ultimate Easy
-     device_format: EU  # Required: 'EU' or 'US' (case-sensitive, uppercase only)
-     gang_count: 1      # Required: Number of relays/buttons (1, 2, 3, or 4)
+     name: tx-ultimate-easy           # Must be unique per device (e.g., tx-ultimate-easy-1, tx-ultimate-easy-2)
+     friendly_name: TX Ultimate Easy  # Must be unique per device
+     device_format: EU                # Required: 'EU' or 'US' (case-sensitive, uppercase only)
+     gang_count: 1                    # Required: Number of relays/buttons (1, 2, 3, or 4)
 
    wifi:
      ssid: !secret wifi_ssid
@@ -290,10 +290,10 @@ This template allows you to selectively include specific packages, which can be 
 Here's an example of the advanced configuration:
 ```yaml
 substitutions:
-  name: tx-ultimate-easy
-  friendly_name: TX Ultimate Easy
-  device_format: EU  # Required: 'EU' or 'US' (case-sensitive, uppercase only)
-  gang_count: 1      # Required: Number of relays/buttons (1, 2, 3, or 4)
+  name: tx-ultimate-easy           # Must be unique per device (e.g., tx-ultimate-easy-1, tx-ultimate-easy-2)
+  friendly_name: TX Ultimate Easy  # Must be unique per device
+  device_format: EU                # Required: 'EU' or 'US' (case-sensitive, uppercase only)
+  gang_count: 1                    # Required: Number of relays/buttons (1, 2, 3, or 4)
 
 packages:
   remote_package:

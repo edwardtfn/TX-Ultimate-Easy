@@ -7,10 +7,10 @@
 ####################################################################################################
 ---
 substitutions:
-  name: tx-ultimate-easy
-  friendly_name: TX Ultimate Easy
-  device_format: EU  # Required: 'EU' or 'US'
-  gang_count: 3      # Required: Number of relays/buttons (1, 2, 3, or 4)
+  name: tx-ultimate-easy           # Must be unique per device (e.g., tx-ultimate-easy-1, tx-ultimate-easy-2)
+  friendly_name: TX Ultimate Easy  # Must be unique per device
+  device_format: EU                # Required: 'EU' or 'US'
+  gang_count: 3                    # Required: Number of relays/buttons (1, 2, 3, or 4)
   espnow_target_mac_button_1: "AA:BB:CC:DD:EE:FF"
   espnow_target_relay_button_1: 1
   espnow_target_mac_button_2: "AB:BC:CD:DE:EF:F0"
@@ -32,25 +32,25 @@ packages:
       - ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml
       - ESPHome/TX-Ultimate-Easy-ESPHome_espnow.yaml  # Add ESP-NOW support
 
-#####################################################################################################
-##### Configuration Instructions:                                                               #####
-#####                                                                                           #####
-##### 1. Flash this configuration to all 3 devices                                              #####
-##### 2. In Home Assistant, for each device, enable the control "ESP-NOW Enabled"               #####
-##### 3. On the device's YAML in ESPHome, configure:                                            #####
-#####      * "Button X ESP-NOW Target MAC Address" - Enter the MAC address of the target device #####
-#####      * "Button X ESP-NOW Target Relay" - Select which relay to toggle (1-4)               #####
-#####                                                                                           #####
-##### 4. To find MAC addresses:                                                                 #####
-#####    - Check "ESP-NOW MAC Address" text sensor on each device                               #####
-#####    - Or check device info in Home Assistant                                               #####
-#####                                                                                           #####
-##### Example Setup:                                                                            #####
-##### - Device 1: Button 1 -> Toggle Relay 1 on Device 2 (enter Device 2's MAC)                 #####
-##### - Device 2: Button 1 -> Toggle Relay 1 on Device 3 (enter Device 3's MAC)                 #####
-##### - Device 3: Button 1 -> Toggle Relay 1 on Device 1 (enter Device 1's MAC)                 #####
-#####                                                                                           #####
-##### Note: If MAC address is not configured (00:00:00:00:00:00), the button will toggle        #####
-#####       the local relay instead (fallback behavior).                                        #####
-#####################################################################################################
+###############################################################################################
+##### Configuration Instructions:                                                         #####
+#####                                                                                     #####
+##### 1. Flash this configuration to all 3 devices                                        #####
+##### 2. In Home Assistant, for each device, enable the control "ESP-NOW Enabled"         #####
+##### 3. On the device's YAML in ESPHome, configure these substitutions:                  #####
+#####      * espnow_target_mac_button_X  - MAC address of the target device               #####
+#####      * espnow_target_relay_button_X - Which relay to toggle (1-4)                   #####
+#####                                                                                     #####
+##### 4. To find MAC addresses:                                                           #####
+#####    - Check "ESP-NOW MAC Address" text sensor on each device                         #####
+#####    - Or check device info in Home Assistant                                         #####
+#####                                                                                     #####
+##### Example Setup:                                                                      #####
+##### - Device 1: Button 1 -> Toggle Relay 1 on Device 2 (enter Device 2's MAC)           #####
+##### - Device 2: Button 1 -> Toggle Relay 1 on Device 3 (enter Device 3's MAC)           #####
+##### - Device 3: Button 1 -> Toggle Relay 1 on Device 1 (enter Device 1's MAC)           #####
+#####                                                                                     #####
+##### Note: If MAC address is not configured (00:00:00:00:00:00), the button will toggle  #####
+#####       the local relay instead (fallback behavior).                                  #####
+###############################################################################################
 ...
