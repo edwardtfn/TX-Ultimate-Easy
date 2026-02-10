@@ -40,44 +40,44 @@ substitutions:
 
   # Validate MAC format (length and colon positions)
   ESPNOW_BUTTON_1_MAC_VALID: >-
-    ${{ '1' if (
+    ${ '1' if (
         espnow_target_mac_button_1|length == 17
         and espnow_target_mac_button_1[2] == ':'
         and espnow_target_mac_button_1[5] == ':'
         and espnow_target_mac_button_1[8] == ':'
         and espnow_target_mac_button_1[11] == ':'
         and espnow_target_mac_button_1[14] == ':'
-    ) else '0' }}
+    ) else '0' }
 
   ESPNOW_BUTTON_2_MAC_VALID: >-
-    ${{ '1' if (
+    ${ '1' if (
         espnow_target_mac_button_2|length == 17
         and espnow_target_mac_button_2[2] == ':'
         and espnow_target_mac_button_2[5] == ':'
         and espnow_target_mac_button_2[8] == ':'
         and espnow_target_mac_button_2[11] == ':'
         and espnow_target_mac_button_2[14] == ':'
-    ) else '0' }}
+    ) else '0' }
 
   ESPNOW_BUTTON_3_MAC_VALID: >-
-    ${{ '1' if (
+    ${ '1' if (
         espnow_target_mac_button_3|length == 17
         and espnow_target_mac_button_3[2] == ':'
         and espnow_target_mac_button_3[5] == ':'
         and espnow_target_mac_button_3[8] == ':'
         and espnow_target_mac_button_3[11] == ':'
         and espnow_target_mac_button_3[14] == ':'
-    ) else '0' }}
+    ) else '0' }
 
   ESPNOW_BUTTON_4_MAC_VALID: >-
-    ${{ '1' if (
+    ${ '1' if (
         espnow_target_mac_button_4|length == 17
         and espnow_target_mac_button_4[2] == ':'
         and espnow_target_mac_button_4[5] == ':'
         and espnow_target_mac_button_4[8] == ':'
         and espnow_target_mac_button_4[11] == ':'
         and espnow_target_mac_button_4[14] == ':'
-    ) else '0' }}
+    ) else '0' }
 
 esphome:
   platformio_options:
@@ -91,10 +91,6 @@ esphome:
       - -D TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_MAC_INVALID=${ 0 if ESPNOW_BUTTON_2_MAC_VALID else 1 }
       - -D TX_ULTIMATE_EASY_ESPNOW_BUTTON_3_MAC_INVALID=${ 0 if ESPNOW_BUTTON_3_MAC_VALID else 1 }
       - -D TX_ULTIMATE_EASY_ESPNOW_BUTTON_4_MAC_INVALID=${ 0 if ESPNOW_BUTTON_4_MAC_VALID else 1 }
-      - -D TX_ULTIMATE_EASY_ESPNOW_BUTTON_1_HEX_INVALID=${ 0 if all(c in '0123456789ABCDEFabcdef:' for c in espnow_target_mac_button_1) else 1 }
-      - -D TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_HEX_INVALID=${ 0 if all(c in '0123456789ABCDEFabcdef:' for c in espnow_target_mac_button_2) else 1 }
-      - -D TX_ULTIMATE_EASY_ESPNOW_BUTTON_3_HEX_INVALID=${ 0 if all(c in '0123456789ABCDEFabcdef:' for c in espnow_target_mac_button_3) else 1 }
-      - -D TX_ULTIMATE_EASY_ESPNOW_BUTTON_4_HEX_INVALID=${ 0 if all(c in '0123456789ABCDEFabcdef:' for c in espnow_target_mac_button_4) else 1 }
 
 espnow:
   id: espnow_component
@@ -125,8 +121,7 @@ espnow:
       const uint8_t command = data[0];
       const uint8_t relay_num = data[1];
 
-      ESP_LOGI("${TAG_ESPNOW}", "ESP-NOW message received: command=0x%02X, relay=%" PRIu8,
-               command, relay_num);
+      ESP_LOGI("${TAG_ESPNOW}", "ESP-NOW message received: command=0x%02X, relay=%" PRIu8, command, relay_num);
 
       // Validate command
       if (command != 0x01) {
@@ -135,8 +130,7 @@ espnow:
       }
 
       if (relay_num < 1 || relay_num > ${gang_count}) {
-        ESP_LOGW("${TAG_ESPNOW}", "Invalid relay number: %" PRIu8 " (valid range: 1-${gang_count})",
-                 relay_num);
+        ESP_LOGW("${TAG_ESPNOW}", "Invalid relay number: %" PRIu8 " (valid range: 1-${gang_count})", relay_num);
         return;
       }
 
@@ -174,10 +168,6 @@ script:
               #error "espnow_target_mac_button_1 has invalid MAC format (must be XX:XX:XX:XX:XX:XX)"
             #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_1_MAC_INVALID
 
-            #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_1_HEX_INVALID
-              #error "espnow_target_mac_button_1 contains invalid hex characters"
-            #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_1_HEX_INVALID
-
             // Validate target relay
             #if ${espnow_target_relay_button_1} < 1 || ${espnow_target_relay_button_1} > 4
               #error "espnow_target_relay_button_1 must be between 1 and 4"
@@ -190,10 +180,6 @@ script:
             #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_MAC_INVALID
               #error "espnow_target_mac_button_2 has invalid MAC format (must be XX:XX:XX:XX:XX:XX)"
             #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_MAC_INVALID
-
-            #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_HEX_INVALID
-              #error "espnow_target_mac_button_2 contains invalid hex characters"
-            #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_HEX_INVALID
 
             // Validate target relay
             #if ${espnow_target_relay_button_2} < 1 || ${espnow_target_relay_button_2} > 4
@@ -208,10 +194,6 @@ script:
               #error "espnow_target_mac_button_3 has invalid MAC format (must be XX:XX:XX:XX:XX:XX)"
             #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_MAC_INVALID
 
-            #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_3_HEX_INVALID
-              #error "espnow_target_mac_button_3 contains invalid hex characters"
-            #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_3_HEX_INVALID
-
             // Validate target relay
             #if ${espnow_target_relay_button_3} < 1 || ${espnow_target_relay_button_3} > 4
               #error "espnow_target_relay_button_3 must be between 1 and 4"
@@ -224,10 +206,6 @@ script:
             #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_4_MAC_INVALID
               #error "espnow_target_mac_button_4 has invalid MAC format (must be XX:XX:XX:XX:XX:XX)"
             #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_4_MAC_INVALID
-
-            #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_4_HEX_INVALID
-              #error "espnow_target_mac_button_4 contains invalid hex characters"
-            #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_4_HEX_INVALID
 
             // Validate target relay
             #if ${espnow_target_relay_button_4} < 1 || ${espnow_target_relay_button_4} > 4
