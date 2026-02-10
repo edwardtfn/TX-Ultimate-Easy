@@ -10,5 +10,5 @@ external_components:
       - tx_ultimate_easy
 
 packages:
-  espnow_example: !include ../TX-Ultimate-Easy-ESPHome_espnow_example.yam
+  espnow_example: !include ../TX-Ultimate-Easy-ESPHome_espnow_example.yaml
 ...
