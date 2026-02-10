@@ -153,7 +153,7 @@ espnow:
       const uint8_t command = data[0];
       const uint8_t relay_num = data[1];
 
-      ESP_LOGI("${TAG_ESPNOW}", "ESP-NOW message received: command=0x%02X, relay=%" PRIu8, 
+      ESP_LOGI("${TAG_ESPNOW}", "ESP-NOW message received: command=0x%02X, relay=%" PRIu8,
                command, relay_num);
 
       // Validate command
@@ -163,7 +163,7 @@ espnow:
       }
 
       if (relay_num < 1 || relay_num > ${gang_count}) {
-        ESP_LOGW("${TAG_ESPNOW}", "Invalid relay number: %" PRIu8 " (valid range: 1-${gang_count})", 
+        ESP_LOGW("${TAG_ESPNOW}", "Invalid relay number: %" PRIu8 " (valid range: 1-${gang_count})",
                  relay_num);
         return;
       }
@@ -264,7 +264,7 @@ script:
           #endif  // ESPNOW_BUTTON_4_IS_NULL
 
           ESP_LOGCONFIG("${TAG_ESPNOW}", "ESP-NOW settings:");
-          
+
           // Button 1 configuration
           #if ${ESPNOW_BUTTON_1_IS_NULL} == 0
             ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 1: Enabled");
