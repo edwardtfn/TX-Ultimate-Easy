@@ -11,16 +11,111 @@
 ####################################################################################################
 ---
 substitutions:
-  TAG_ESPNOW: tx_ultimate_easy.espnow
+  # ============================================================================
+  # USER CONFIGURATION (User should modify these on their local YAML file)
+  # ============================================================================
+
+  # ESP-NOW button 1 configuration
   espnow_target_mac_button_1: "00:00:00:00:00:00"
   espnow_target_relay_button_1: 1
+  
+  # ESP-NOW button 2 configuration
   espnow_target_mac_button_2: "00:00:00:00:00:00"
-  espnow_target_relay_button_2: 1
+  espnow_target_relay_button_2: 2
+  
+  # ESP-NOW button 3 configuration
   espnow_target_mac_button_3: "00:00:00:00:00:00"
-  espnow_target_relay_button_3: 1
+  espnow_target_relay_button_3: 3
+  
+  # ESP-NOW button 4 configuration
   espnow_target_mac_button_4: "00:00:00:00:00:00"
-  espnow_target_relay_button_4: 1
+  espnow_target_relay_button_4: 4
+
   espnow_send_delay: 100ms
+
+  # ============================================================================
+  # INTERNAL VALIDATION (Do not modify)
+  # ============================================================================
+  TAG_ESPNOW: tx_ultimate_easy.espnow
+
+  # Check if MAC is null (disabled)
+  ESPNOW_BUTTON_1_IS_NULL: >-
+    ${{ '1' if espnow_target_mac_button_1 == '00:00:00:00:00:00' else '0' }}
+  
+  ESPNOW_BUTTON_2_IS_NULL: >-
+    ${{ '1' if espnow_target_mac_button_2 == '00:00:00:00:00:00' else '0' }}
+  
+  ESPNOW_BUTTON_3_IS_NULL: >-
+    ${{ '1' if espnow_target_mac_button_3 == '00:00:00:00:00:00' else '0' }}
+  
+  ESPNOW_BUTTON_4_IS_NULL: >-
+    ${{ '1' if espnow_target_mac_button_4 == '00:00:00:00:00:00' else '0' }}
+
+  # Validate MAC format (length and colon positions)
+  ESPNOW_BUTTON_1_MAC_VALID: >-
+    ${{ '1' if (
+        espnow_target_mac_button_1|length == 17
+        and espnow_target_mac_button_1[2] == ':'
+        and espnow_target_mac_button_1[5] == ':'
+        and espnow_target_mac_button_1[8] == ':'
+        and espnow_target_mac_button_1[11] == ':'
+        and espnow_target_mac_button_1[14] == ':'
+    ) else '0' }}
+
+  ESPNOW_BUTTON_2_MAC_VALID: >-
+    ${{ '1' if (
+        espnow_target_mac_button_2|length == 17
+        and espnow_target_mac_button_2[2] == ':'
+        and espnow_target_mac_button_2[5] == ':'
+        and espnow_target_mac_button_2[8] == ':'
+        and espnow_target_mac_button_2[11] == ':'
+        and espnow_target_mac_button_2[14] == ':'
+    ) else '0' }}
+
+  ESPNOW_BUTTON_3_MAC_VALID: >-
+    ${{ '1' if (
+        espnow_target_mac_button_3|length == 17
+        and espnow_target_mac_button_3[2] == ':'
+        and espnow_target_mac_button_3[5] == ':'
+        and espnow_target_mac_button_3[8] == ':'
+        and espnow_target_mac_button_3[11] == ':'
+        and espnow_target_mac_button_3[14] == ':'
+    ) else '0' }}
+
+  ESPNOW_BUTTON_4_MAC_VALID: >-
+    ${{ '1' if (
+        espnow_target_mac_button_4|length == 17
+        and espnow_target_mac_button_4[2] == ':'
+        and espnow_target_mac_button_4[5] == ':'
+        and espnow_target_mac_button_4[8] == ':'
+        and espnow_target_mac_button_4[11] == ':'
+        and espnow_target_mac_button_4[14] == ':'
+    ) else '0' }}
+
+  # Validate hex characters
+  ESPNOW_BUTTON_1_HEX_VALID: >-
+    ${{ '1' if all(
+        c in '0123456789ABCDEFabcdef:' 
+        for c in espnow_target_mac_button_1
+    ) else '0' }}
+
+  ESPNOW_BUTTON_2_HEX_VALID: >-
+    ${{ '1' if all(
+        c in '0123456789ABCDEFabcdef:' 
+        for c in espnow_target_mac_button_2
+    ) else '0' }}
+
+  ESPNOW_BUTTON_3_HEX_VALID: >-
+    ${{ '1' if all(
+        c in '0123456789ABCDEFabcdef:' 
+        for c in espnow_target_mac_button_3
+    ) else '0' }}
+
+  ESPNOW_BUTTON_4_HEX_VALID: >-
+    ${{ '1' if all(
+        c in '0123456789ABCDEFabcdef:' 
+        for c in espnow_target_mac_button_4
+    ) else '0' }}
 
 esphome:
   platformio_options:
@@ -34,50 +129,197 @@ espnow:
   auto_add_peer: true
   on_receive:
     lambda: |-
+      // Check if ESP-NOW receiving is enabled
       if (!sw_espnow_receive_enabled->state) {
         ESP_LOGD("${TAG_ESPNOW}", "ESP-NOW receiving disabled, ignoring message");
         return;
       }
 
-      if (data == nullptr || size < 2) {
-        if (data == nullptr) {
-          ESP_LOGW("${TAG_ESPNOW}", "Received ESP-NOW message with null data pointer");
-        }
+      // Validate message data pointer
+      if (data == nullptr) {
+        ESP_LOGW("${TAG_ESPNOW}", "Received ESP-NOW message with null data pointer");
         return;
       }
 
-      uint8_t command = data[0];
-      uint8_t relay_num = data[1];
-
-      ESP_LOGI("${TAG_ESPNOW}", "ESP-NOW message received: command=0x%02X, relay=%" PRIu8, command, relay_num);
-
-      if (command != 0x01 || relay_num < 1 || relay_num > ${gang_count}) {
-        ESP_LOGW("${TAG_ESPNOW}", "Invalid message format (command=0x%02X, relay=%" PRIu8 ")", command, relay_num);
+      // Validate message size (ESP-NOW Protocol: 2 bytes)
+      // Byte 0: Command (0x01 = Toggle Relay)
+      // Byte 1: Relay Number (1-${gang_count})
+      if (size != 2) {
+        ESP_LOGW("${TAG_ESPNOW}", "Invalid message size: %zu (expected 2)", size);
         return;
       }
+
+      // Parse message
+      const uint8_t command = data[0];
+      const uint8_t relay_num = data[1];
+
+      ESP_LOGI("${TAG_ESPNOW}", "ESP-NOW message received: command=0x%02X, relay=%" PRIu8, 
+               command, relay_num);
+
+      // Validate command
+      if (command != 0x01) {
+        ESP_LOGW("${TAG_ESPNOW}", "Unknown command: 0x%02X", command);
+        return;
+      }
+
+      if (relay_num < 1 || relay_num > ${gang_count}) {
+        ESP_LOGW("${TAG_ESPNOW}", "Invalid relay number: %" PRIu8 " (valid range: 1-${gang_count})", 
+                 relay_num);
+        return;
+      }
+
+      // Toggle the requested relay
       ESP_LOGI("${TAG_ESPNOW}", "Toggling relay %" PRIu8, relay_num);
       switch (relay_num) {
-        case 1:
-          id(sw_relay_1)->toggle();
-          break;
+        case 1: id(sw_relay_1)->toggle(); break;
         #if ${gang_count} >= 2
-        case 2:
-          id(sw_relay_2)->toggle();
-          break;
-        #endif
+        case 2: id(sw_relay_2)->toggle(); break;
+        #endif  // ${gang_count} >= 2
         #if ${gang_count} >= 3
-        case 3:
-          id(sw_relay_3)->toggle();
-          break;
-        #endif
+        case 3: id(sw_relay_3)->toggle(); break;
+        #endif  // ${gang_count} >= 3
         #if ${gang_count} >= 4
-        case 4:
-          id(sw_relay_4)->toggle();
-          break;
-        #endif
+        case 4: id(sw_relay_4)->toggle(); break;
+        #endif  // ${gang_count} >= 4
       }
 
 script:
+  - id: !extend button_click_event
+    then:
+      - lambda: |-
+          if (!sw_espnow_send_enabled->state) {
+            return;
+          }
+          espnow_send->execute(button);
+
+  - id: !extend dump_config
+    then:
+      - lambda: |-
+          // Validate ESP-NOW button 1 configuration
+          #if ${ESPNOW_BUTTON_1_IS_NULL} == 0
+            // MAC is set (not null), validate format
+            #if ${ESPNOW_BUTTON_1_MAC_VALID} == 0
+              #error "espnow_target_mac_button_1 has invalid MAC format (must be XX:XX:XX:XX:XX:XX)"
+            #endif  // ESPNOW_BUTTON_1_MAC_VALID
+
+            #if ${ESPNOW_BUTTON_1_HEX_VALID} == 0
+              #error "espnow_target_mac_button_1 contains invalid hex characters"
+            #endif  // ESPNOW_BUTTON_1_HEX_VALID
+
+            // Validate target relay
+            #if ${espnow_target_relay_button_1} < 1 || ${espnow_target_relay_button_1} > 4
+              #error "espnow_target_relay_button_1 must be between 1 and 4"
+            #endif  // espnow_target_relay_button_1 range
+          #endif  // ESPNOW_BUTTON_1_IS_NULL
+
+          // Validate ESP-NOW button 2 configuration
+          #if ${ESPNOW_BUTTON_2_IS_NULL} == 0
+            // MAC is set (not null), validate format
+            #if ${ESPNOW_BUTTON_2_MAC_VALID} == 0
+              #error "espnow_target_mac_button_2 has invalid MAC format (must be XX:XX:XX:XX:XX:XX)"
+            #endif  // ESPNOW_BUTTON_2_MAC_VALID
+
+            #if ${ESPNOW_BUTTON_2_HEX_VALID} == 0
+              #error "espnow_target_mac_button_2 contains invalid hex characters"
+            #endif  // ESPNOW_BUTTON_2_HEX_VALID
+
+            // Validate target relay
+            #if ${espnow_target_relay_button_2} < 1 || ${espnow_target_relay_button_2} > 4
+              #error "espnow_target_relay_button_2 must be between 1 and 4"
+            #endif  // espnow_target_relay_button_2 range
+          #endif  // ESPNOW_BUTTON_2_IS_NULL
+
+          // Validate ESP-NOW button 3 configuration
+          #if ${ESPNOW_BUTTON_3_IS_NULL} == 0
+            // MAC is set (not null), validate format
+            #if ${ESPNOW_BUTTON_3_MAC_VALID} == 0
+              #error "espnow_target_mac_button_3 has invalid MAC format (must be XX:XX:XX:XX:XX:XX)"
+            #endif  // ESPNOW_BUTTON_3_MAC_VALID
+
+            #if ${ESPNOW_BUTTON_3_HEX_VALID} == 0
+              #error "espnow_target_mac_button_3 contains invalid hex characters"
+            #endif  // ESPNOW_BUTTON_3_HEX_VALID
+
+            // Validate target relay
+            #if ${espnow_target_relay_button_3} < 1 || ${espnow_target_relay_button_3} > 4
+              #error "espnow_target_relay_button_3 must be between 1 and 4"
+            #endif  // espnow_target_relay_button_3 range
+          #endif  // ESPNOW_BUTTON_3_IS_NULL
+
+          // Validate ESP-NOW button 4 configuration
+          #if ${ESPNOW_BUTTON_4_IS_NULL} == 0
+            // MAC is set (not null), validate format
+            #if ${ESPNOW_BUTTON_4_MAC_VALID} == 0
+              #error "espnow_target_mac_button_4 has invalid MAC format (must be XX:XX:XX:XX:XX:XX)"
+            #endif  // ESPNOW_BUTTON_4_MAC_VALID
+
+            #if ${ESPNOW_BUTTON_4_HEX_VALID} == 0
+              #error "espnow_target_mac_button_4 contains invalid hex characters"
+            #endif  // ESPNOW_BUTTON_4_HEX_VALID
+
+            // Validate target relay
+            #if ${espnow_target_relay_button_4} < 1 || ${espnow_target_relay_button_4} > 4
+              #error "espnow_target_relay_button_4 must be between 1 and 4"
+            #endif  // espnow_target_relay_button_4 range
+          #endif  // ESPNOW_BUTTON_4_IS_NULL
+
+          ESP_LOGCONFIG("${TAG_ESPNOW}", "ESP-NOW settings:");
+          
+          // Button 1 configuration
+          #if ${ESPNOW_BUTTON_1_IS_NULL} == 0
+            ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 1: Enabled");
+            ESP_LOGCONFIG("${TAG_ESPNOW}", "    MAC: ${espnow_target_mac_button_1}");
+            ESP_LOGCONFIG("${TAG_ESPNOW}", "    Target Relay: %" PRIu8, 
+                          static_cast<uint8_t>(${espnow_target_relay_button_1}));
+          #else
+            ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 1: Disabled (null MAC)");
+          #endif  // ESPNOW_BUTTON_1_IS_NULL
+
+          // Button 2 configuration
+          #if ${ESPNOW_BUTTON_2_IS_NULL} == 0
+            ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 2: Enabled");
+            ESP_LOGCONFIG("${TAG_ESPNOW}", "    MAC: ${espnow_target_mac_button_2}");
+            ESP_LOGCONFIG("${TAG_ESPNOW}", "    Target Relay: %" PRIu8, 
+                          static_cast<uint8_t>(${espnow_target_relay_button_2}));
+          #else
+            ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 2: Disabled (null MAC)");
+          #endif  // ESPNOW_BUTTON_2_IS_NULL
+
+          // Button 3 configuration
+          #if ${ESPNOW_BUTTON_3_IS_NULL} == 0
+            ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 3: Enabled");
+            ESP_LOGCONFIG("${TAG_ESPNOW}", "    MAC: ${espnow_target_mac_button_3}");
+            ESP_LOGCONFIG("${TAG_ESPNOW}", "    Target Relay: %" PRIu8, 
+                           static_cast<uint8_t>(${espnow_target_relay_button_3}));
+          #else
+            ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 3: Disabled (null MAC)");
+          #endif  // ESPNOW_BUTTON_3_IS_NULL
+
+          // Button 4 configuration
+          #if ${ESPNOW_BUTTON_4_IS_NULL} == 0
+            ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 4: Enabled");
+            ESP_LOGCONFIG("${TAG_ESPNOW}", "    MAC: ${espnow_target_mac_button_4}");
+            ESP_LOGCONFIG("${TAG_ESPNOW}", "    Target Relay: %" PRIu8, 
+                           static_cast<uint8_t>(${espnow_target_relay_button_4}));
+          #else
+            ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 4: Disabled (null MAC)");
+          #endif  // ESPNOW_BUTTON_4_IS_NULL
+
+  - id: !extend dump_config_list_packages
+    then:
+      - script.wait: dump_config
+      - lambda: |-
+          // Check for requirements
+          #ifndef TX_ULTIMATE_EASY_HW_BUTTONS
+            #error "The package TX-Ultimate-Easy-ESPHome_hw_buttons.yaml is required."
+          #endif  // TX_ULTIMATE_EASY_HW_LEDS
+          #ifndef TX_ULTIMATE_EASY_HW_RELAYS
+            #error "The package TX-Ultimate-Easy-ESPHome_hw_relays.yaml is required."
+          #endif  // TX_ULTIMATE_EASY_HW_RELAYS
+
+          // Identify itself
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - ESP-NOW");
+
   - id: espnow_send
     mode: queued
     max_runs: 10
@@ -100,17 +342,17 @@ script:
                 case 2:
                   mac_str = "${espnow_target_mac_button_2}";
                   break;
-                #endif
+                #endif  // ${gang_count} >= 2
                 #if ${gang_count} >= 3
                 case 3:
                   mac_str = "${espnow_target_mac_button_3}";
                   break;
-                #endif
+                #endif  // ${gang_count} >= 3
                 #if ${gang_count} >= 4
                 case 4:
                   mac_str = "${espnow_target_mac_button_4}";
                   break;
-                #endif
+                #endif  // ${gang_count} >= 4
                 default:
                   return false;
               }
@@ -130,19 +372,19 @@ script:
                     mac_str = "${espnow_target_mac_button_2}";
                     relay_num = ${espnow_target_relay_button_2};
                     break;
-                  #endif
+                  #endif  // ${gang_count} >= 2
                   #if ${gang_count} >= 3
                   case 3:
                     mac_str = "${espnow_target_mac_button_3}";
                     relay_num = ${espnow_target_relay_button_3};
                     break;
-                  #endif
+                  #endif  // ${gang_count} >= 3
                   #if ${gang_count} >= 4
                   case 4:
                     mac_str = "${espnow_target_mac_button_4}";
                     relay_num = ${espnow_target_relay_button_4};
                     break;
-                  #endif
+                  #endif  // ${gang_count} >= 4
                   default:
                     return;
                 }
@@ -163,17 +405,17 @@ script:
                     case 2:
                       mac_str = "${espnow_target_mac_button_2}";
                       break;
-                    #endif
+                    #endif  // ${gang_count} >= 2
                     #if ${gang_count} >= 3
                     case 3:
                       mac_str = "${espnow_target_mac_button_3}";
                       break;
-                    #endif
+                    #endif  // ${gang_count} >= 3
                     #if ${gang_count} >= 4
                     case 4:
                       mac_str = "${espnow_target_mac_button_4}";
                       break;
-                    #endif
+                    #endif  // ${gang_count} >= 4
                     default:
                       return {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
                   }
@@ -198,34 +440,22 @@ script:
                     case 2:
                       relay_num = ${espnow_target_relay_button_2};
                       break;
-                    #endif
+                    #endif  // ${gang_count} >= 2
                     #if ${gang_count} >= 3
                     case 3:
                       relay_num = ${espnow_target_relay_button_3};
                       break;
-                    #endif
+                    #endif  // ${gang_count} >= 3
                     #if ${gang_count} >= 4
                     case 4:
                       relay_num = ${espnow_target_relay_button_4};
                       break;
-                    #endif
+                    #endif  // ${gang_count} >= 4   
                     default:
                       return {0x00, 0x00};
                   }
-                  // Default relay to 1 if not in valid range (1-4)
-                  if (relay_num < 1 || relay_num > ${gang_count}) {
-                    relay_num = 1;
-                  }
                   return {0x01, relay_num};
                 wait_for_sent: false
-
-  - id: !extend button_click_event
-    then:
-      - lambda: |-
-          if (!sw_espnow_send_enabled->state) {
-            return;
-          }
-          espnow_send->execute(button);
 
 switch:
   - id: sw_espnow_send_enabled
