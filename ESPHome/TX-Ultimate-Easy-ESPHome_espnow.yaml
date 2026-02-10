@@ -18,15 +18,15 @@ substitutions:
   # ESP-NOW button 1 configuration
   espnow_target_mac_button_1: "00:00:00:00:00:00"
   espnow_target_relay_button_1: 1
-  
+
   # ESP-NOW button 2 configuration
   espnow_target_mac_button_2: "00:00:00:00:00:00"
   espnow_target_relay_button_2: 2
-  
+
   # ESP-NOW button 3 configuration
   espnow_target_mac_button_3: "00:00:00:00:00:00"
   espnow_target_relay_button_3: 3
-  
+
   # ESP-NOW button 4 configuration
   espnow_target_mac_button_4: "00:00:00:00:00:00"
   espnow_target_relay_button_4: 4
@@ -41,13 +41,13 @@ substitutions:
   # Check if MAC is null (disabled)
   ESPNOW_BUTTON_1_IS_NULL: >-
     ${{ '1' if espnow_target_mac_button_1 == '00:00:00:00:00:00' else '0' }}
-  
+
   ESPNOW_BUTTON_2_IS_NULL: >-
     ${{ '1' if espnow_target_mac_button_2 == '00:00:00:00:00:00' else '0' }}
-  
+
   ESPNOW_BUTTON_3_IS_NULL: >-
     ${{ '1' if espnow_target_mac_button_3 == '00:00:00:00:00:00' else '0' }}
-  
+
   ESPNOW_BUTTON_4_IS_NULL: >-
     ${{ '1' if espnow_target_mac_button_4 == '00:00:00:00:00:00' else '0' }}
 
@@ -95,25 +95,25 @@ substitutions:
   # Validate hex characters
   ESPNOW_BUTTON_1_HEX_VALID: >-
     ${{ '1' if all(
-        c in '0123456789ABCDEFabcdef:' 
+        c in '0123456789ABCDEFabcdef:'
         for c in espnow_target_mac_button_1
     ) else '0' }}
 
   ESPNOW_BUTTON_2_HEX_VALID: >-
     ${{ '1' if all(
-        c in '0123456789ABCDEFabcdef:' 
+        c in '0123456789ABCDEFabcdef:'
         for c in espnow_target_mac_button_2
     ) else '0' }}
 
   ESPNOW_BUTTON_3_HEX_VALID: >-
     ${{ '1' if all(
-        c in '0123456789ABCDEFabcdef:' 
+        c in '0123456789ABCDEFabcdef:'
         for c in espnow_target_mac_button_3
     ) else '0' }}
 
   ESPNOW_BUTTON_4_HEX_VALID: >-
     ${{ '1' if all(
-        c in '0123456789ABCDEFabcdef:' 
+        c in '0123456789ABCDEFabcdef:'
         for c in espnow_target_mac_button_4
     ) else '0' }}
 
