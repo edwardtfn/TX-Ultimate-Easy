@@ -209,14 +209,14 @@ script:
           auto parse_mac_bytes = [](const std::string& mac_str, uint8_t* mac_bytes) -> bool {
             std::string mac_upper = mac_str;
             std::transform(mac_upper.begin(), mac_upper.end(), mac_upper.begin(), ::toupper);
-            
+
             int values[6];
             if (sscanf(mac_upper.c_str(), "%02X:%02X:%02X:%02X:%02X:%02X",
                       &values[0], &values[1], &values[2],
                       &values[3], &values[4], &values[5]) != 6) {
               return false;
             }
-            
+
             for (int i = 0; i < 6; i++) {
               mac_bytes[i] = static_cast<uint8_t>(values[i]);
             }
