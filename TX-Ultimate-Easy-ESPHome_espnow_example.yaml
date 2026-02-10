@@ -41,7 +41,7 @@ packages:
 #####      * "Button X ESP-NOW Target MAC Address" - Enter the MAC address of the target device #####
 #####      * "Button X ESP-NOW Target Relay" - Select which relay to toggle (1-4)               #####
 #####                                                                                           #####
-##### 3. To find MAC addresses:                                                                 #####
+##### 4. To find MAC addresses:                                                                 #####
 #####    - Check "ESP-NOW MAC Address" text sensor on each device                               #####
 #####    - Or check device info in Home Assistant                                               #####
 #####                                                                                           #####
