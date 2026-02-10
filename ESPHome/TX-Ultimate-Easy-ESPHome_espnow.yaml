@@ -226,31 +226,31 @@ script:
           #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_1_MAC_DEFINED
 
           // Button 2 configuration
-          #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_MAC_DEFINED
+          #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_MAC_DEFINED && ${gang_count} >= 2
             ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 2: Enabled");
             ESP_LOGCONFIG("${TAG_ESPNOW}", "    MAC: ${espnow_target_mac_button_2}");
             ESP_LOGCONFIG("${TAG_ESPNOW}", "    Target Relay: %" PRIu8,
-                          static_cast<uint8_t>(${espnow_target_relay_button_2}));
+                            static_cast<uint8_t>(${espnow_target_relay_button_2}));
           #else
             ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 2: Disabled (null MAC)");
           #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_MAC_DEFINED
 
           // Button 3 configuration
-          #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_3_MAC_DEFINED
+          #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_3_MAC_DEFINED && ${gang_count} >= 3
             ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 3: Enabled");
             ESP_LOGCONFIG("${TAG_ESPNOW}", "    MAC: ${espnow_target_mac_button_3}");
             ESP_LOGCONFIG("${TAG_ESPNOW}", "    Target Relay: %" PRIu8,
-                           static_cast<uint8_t>(${espnow_target_relay_button_3}));
+                            static_cast<uint8_t>(${espnow_target_relay_button_3}));
           #else
             ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 3: Disabled (null MAC)");
           #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_3_MAC_DEFINED
 
           // Button 4 configuration
-          #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_4_MAC_DEFINED
+          #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_4_MAC_DEFINED && ${gang_count} >= 4
             ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 4: Enabled");
             ESP_LOGCONFIG("${TAG_ESPNOW}", "    MAC: ${espnow_target_mac_button_4}");
             ESP_LOGCONFIG("${TAG_ESPNOW}", "    Target Relay: %" PRIu8,
-                           static_cast<uint8_t>(${espnow_target_relay_button_4}));
+                            static_cast<uint8_t>(${espnow_target_relay_button_4}));
           #else
             ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 4: Disabled (null MAC)");
           #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_4_MAC_DEFINED
