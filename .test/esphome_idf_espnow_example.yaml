@@ -1,0 +1,14 @@
+---
+substitutions:
+  device_format: ${ ["EU", "US"] | random }
+
+external_components:
+  - source:
+      type: local
+      path: ../components
+    components:
+      - tx_ultimate_easy
+
+packages:
+  espnow_example: !include ../TX-Ultimate-Easy-ESPHome_espnow_example.yam
+...
