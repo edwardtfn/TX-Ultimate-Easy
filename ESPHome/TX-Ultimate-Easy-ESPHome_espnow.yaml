@@ -186,6 +186,7 @@ script:
                             static_cast<uint8_t>(values[2]), static_cast<uint8_t>(values[3]),
                             static_cast<uint8_t>(values[4]), static_cast<uint8_t>(values[5])};
                   }
+                  ESP_LOGE("${TAG_ESPNOW}", "Failed to parse MAC address: %s", mac_str.c_str());
                   return {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
                 data: !lambda |-
                   uint8_t relay_num;
