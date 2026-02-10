@@ -121,8 +121,6 @@ esphome:
   platformio_options:
     build_flags:
       - -D TX_ULTIMATE_EASY_ESPNOW
-    includes:
-      - esp_mac.h
 
 espnow:
   id: espnow_component
