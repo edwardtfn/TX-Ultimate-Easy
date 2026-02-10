@@ -176,7 +176,7 @@ jobs:
           version: dev
 
   build_ard_espnow_example_latest:
-    name: "⚡ ESPNow example (latest)"
+    name: "⚡ Arduino ESPNow example (latest)"
     needs: build_ard_basic
     runs-on: ubuntu-latest
     steps:
