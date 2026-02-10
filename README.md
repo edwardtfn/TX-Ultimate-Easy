@@ -375,7 +375,7 @@ We recommend using [ESPHome Web](https://web.esphome.io) for the simplest experi
 #### Detailed Visual Guides
 <!-- markdownlint-disable MD013 -->
 For step-by-step visual instructions, you can reference these existing guides:
-- 🇬🇧 [Let's Automate](https://https://youtu.be/fIOgWQXndhI?si=O3j7sjwn7PvH1vxn) - English video tutorial
+- 🇬🇧 [Let's Automate](https://youtu.be/fIOgWQXndhI?si=O3j7sjwn7PvH1vxn) - English video tutorial
 - 🇪🇸 [Un loco y su tecnología](https://youtu.be/58v8oqSQgXQ?t=143) - Spanish video tutorial
 - 🇩🇪 [SmartHome yourself](https://youtu.be/naDLhX89enQ?t=465) - German video tutorial
 <!-- markdownlint-enable MD013 -->
