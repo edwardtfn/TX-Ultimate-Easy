@@ -38,19 +38,6 @@ substitutions:
   # ============================================================================
   TAG_ESPNOW: tx_ultimate_easy.espnow
 
-  # Check if MAC is null (disabled)
-  ESPNOW_BUTTON_1_IS_NULL: >-
-    ${{ '1' if espnow_target_mac_button_1 == '00:00:00:00:00:00' else '0' }}
-
-  ESPNOW_BUTTON_2_IS_NULL: >-
-    ${{ '1' if espnow_target_mac_button_2 == '00:00:00:00:00:00' else '0' }}
-
-  ESPNOW_BUTTON_3_IS_NULL: >-
-    ${{ '1' if espnow_target_mac_button_3 == '00:00:00:00:00:00' else '0' }}
-
-  ESPNOW_BUTTON_4_IS_NULL: >-
-    ${{ '1' if espnow_target_mac_button_4 == '00:00:00:00:00:00' else '0' }}
-
   # Validate MAC format (length and colon positions)
   ESPNOW_BUTTON_1_MAC_VALID: >-
     ${{ '1' if (
@@ -92,35 +79,22 @@ substitutions:
         and espnow_target_mac_button_4[14] == ':'
     ) else '0' }}
 
-  # Validate hex characters
-  ESPNOW_BUTTON_1_HEX_VALID: >-
-    ${{ '1' if all(
-        c in '0123456789ABCDEFabcdef:'
-        for c in espnow_target_mac_button_1
-    ) else '0' }}
-
-  ESPNOW_BUTTON_2_HEX_VALID: >-
-    ${{ '1' if all(
-        c in '0123456789ABCDEFabcdef:'
-        for c in espnow_target_mac_button_2
-    ) else '0' }}
-
-  ESPNOW_BUTTON_3_HEX_VALID: >-
-    ${{ '1' if all(
-        c in '0123456789ABCDEFabcdef:'
-        for c in espnow_target_mac_button_3
-    ) else '0' }}
-
-  ESPNOW_BUTTON_4_HEX_VALID: >-
-    ${{ '1' if all(
-        c in '0123456789ABCDEFabcdef:'
-        for c in espnow_target_mac_button_4
-    ) else '0' }}
-
 esphome:
   platformio_options:
     build_flags:
       - -D TX_ULTIMATE_EASY_ESPNOW
+      - -D TX_ULTIMATE_EASY_ESPNOW_BUTTON_1_MAC_DEFINED=${ 0 if espnow_target_mac_button_1 == '00:00:00:00:00:00' else 1 }
+      - -D TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_MAC_DEFINED=${ 0 if espnow_target_mac_button_2 == '00:00:00:00:00:00' else 1 }
+      - -D TX_ULTIMATE_EASY_ESPNOW_BUTTON_3_MAC_DEFINED=${ 0 if espnow_target_mac_button_3 == '00:00:00:00:00:00' else 1 }
+      - -D TX_ULTIMATE_EASY_ESPNOW_BUTTON_4_MAC_DEFINED=${ 0 if espnow_target_mac_button_4 == '00:00:00:00:00:00' else 1 }
+      - -D TX_ULTIMATE_EASY_ESPNOW_BUTTON_1_MAC_INVALID=${ 0 if ESPNOW_BUTTON_1_MAC_VALID else 1 }
+      - -D TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_MAC_INVALID=${ 0 if ESPNOW_BUTTON_2_MAC_VALID else 1 }
+      - -D TX_ULTIMATE_EASY_ESPNOW_BUTTON_3_MAC_INVALID=${ 0 if ESPNOW_BUTTON_3_MAC_VALID else 1 }
+      - -D TX_ULTIMATE_EASY_ESPNOW_BUTTON_4_MAC_INVALID=${ 0 if ESPNOW_BUTTON_4_MAC_VALID else 1 }
+      - -D TX_ULTIMATE_EASY_ESPNOW_BUTTON_1_HEX_INVALID=${ 0 if all(c in '0123456789ABCDEFabcdef:' for c in espnow_target_mac_button_1) else 1 }
+      - -D TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_HEX_INVALID=${ 0 if all(c in '0123456789ABCDEFabcdef:' for c in espnow_target_mac_button_2) else 1 }
+      - -D TX_ULTIMATE_EASY_ESPNOW_BUTTON_3_HEX_INVALID=${ 0 if all(c in '0123456789ABCDEFabcdef:' for c in espnow_target_mac_button_3) else 1 }
+      - -D TX_ULTIMATE_EASY_ESPNOW_BUTTON_4_HEX_INVALID=${ 0 if all(c in '0123456789ABCDEFabcdef:' for c in espnow_target_mac_button_4) else 1 }
 
 espnow:
   id: espnow_component
@@ -194,114 +168,114 @@ script:
     then:
       - lambda: |-
           // Validate ESP-NOW button 1 configuration
-          #if ${ESPNOW_BUTTON_1_IS_NULL} == 0
+          #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_1_MAC_DEFINED
             // MAC is set (not null), validate format
-            #if ${ESPNOW_BUTTON_1_MAC_VALID} == 0
+            #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_1_MAC_INVALID
               #error "espnow_target_mac_button_1 has invalid MAC format (must be XX:XX:XX:XX:XX:XX)"
-            #endif  // ESPNOW_BUTTON_1_MAC_VALID
+            #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_1_MAC_INVALID
 
-            #if ${ESPNOW_BUTTON_1_HEX_VALID} == 0
+            #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_1_HEX_INVALID
               #error "espnow_target_mac_button_1 contains invalid hex characters"
-            #endif  // ESPNOW_BUTTON_1_HEX_VALID
+            #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_1_HEX_INVALID
 
             // Validate target relay
             #if ${espnow_target_relay_button_1} < 1 || ${espnow_target_relay_button_1} > 4
               #error "espnow_target_relay_button_1 must be between 1 and 4"
             #endif  // espnow_target_relay_button_1 range
-          #endif  // ESPNOW_BUTTON_1_IS_NULL
+          #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_1_MAC_DEFINED
 
           // Validate ESP-NOW button 2 configuration
-          #if ${ESPNOW_BUTTON_2_IS_NULL} == 0
+          #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_MAC_DEFINED
             // MAC is set (not null), validate format
-            #if ${ESPNOW_BUTTON_2_MAC_VALID} == 0
+            #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_MAC_INVALID
               #error "espnow_target_mac_button_2 has invalid MAC format (must be XX:XX:XX:XX:XX:XX)"
-            #endif  // ESPNOW_BUTTON_2_MAC_VALID
+            #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_MAC_INVALID
 
-            #if ${ESPNOW_BUTTON_2_HEX_VALID} == 0
+            #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_HEX_INVALID
               #error "espnow_target_mac_button_2 contains invalid hex characters"
-            #endif  // ESPNOW_BUTTON_2_HEX_VALID
+            #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_HEX_INVALID
 
             // Validate target relay
             #if ${espnow_target_relay_button_2} < 1 || ${espnow_target_relay_button_2} > 4
               #error "espnow_target_relay_button_2 must be between 1 and 4"
             #endif  // espnow_target_relay_button_2 range
-          #endif  // ESPNOW_BUTTON_2_IS_NULL
+          #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_MAC_DEFINED
 
           // Validate ESP-NOW button 3 configuration
-          #if ${ESPNOW_BUTTON_3_IS_NULL} == 0
+          #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_3_MAC_DEFINED
             // MAC is set (not null), validate format
-            #if ${ESPNOW_BUTTON_3_MAC_VALID} == 0
+            #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_MAC_INVALID
               #error "espnow_target_mac_button_3 has invalid MAC format (must be XX:XX:XX:XX:XX:XX)"
-            #endif  // ESPNOW_BUTTON_3_MAC_VALID
+            #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_MAC_INVALID
 
-            #if ${ESPNOW_BUTTON_3_HEX_VALID} == 0
+            #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_3_HEX_INVALID
               #error "espnow_target_mac_button_3 contains invalid hex characters"
-            #endif  // ESPNOW_BUTTON_3_HEX_VALID
+            #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_3_HEX_INVALID
 
             // Validate target relay
             #if ${espnow_target_relay_button_3} < 1 || ${espnow_target_relay_button_3} > 4
               #error "espnow_target_relay_button_3 must be between 1 and 4"
             #endif  // espnow_target_relay_button_3 range
-          #endif  // ESPNOW_BUTTON_3_IS_NULL
+          #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_3_MAC_DEFINED
 
           // Validate ESP-NOW button 4 configuration
-          #if ${ESPNOW_BUTTON_4_IS_NULL} == 0
+          #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_4_MAC_DEFINED
             // MAC is set (not null), validate format
-            #if ${ESPNOW_BUTTON_4_MAC_VALID} == 0
+            #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_4_MAC_INVALID
               #error "espnow_target_mac_button_4 has invalid MAC format (must be XX:XX:XX:XX:XX:XX)"
-            #endif  // ESPNOW_BUTTON_4_MAC_VALID
+            #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_4_MAC_INVALID
 
-            #if ${ESPNOW_BUTTON_4_HEX_VALID} == 0
+            #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_4_HEX_INVALID
               #error "espnow_target_mac_button_4 contains invalid hex characters"
-            #endif  // ESPNOW_BUTTON_4_HEX_VALID
+            #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_4_HEX_INVALID
 
             // Validate target relay
             #if ${espnow_target_relay_button_4} < 1 || ${espnow_target_relay_button_4} > 4
               #error "espnow_target_relay_button_4 must be between 1 and 4"
             #endif  // espnow_target_relay_button_4 range
-          #endif  // ESPNOW_BUTTON_4_IS_NULL
+          #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_4_MAC_DEFINED
 
           ESP_LOGCONFIG("${TAG_ESPNOW}", "ESP-NOW settings:");
 
           // Button 1 configuration
-          #if ${ESPNOW_BUTTON_1_IS_NULL} == 0
+          #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_1_MAC_DEFINED
             ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 1: Enabled");
             ESP_LOGCONFIG("${TAG_ESPNOW}", "    MAC: ${espnow_target_mac_button_1}");
             ESP_LOGCONFIG("${TAG_ESPNOW}", "    Target Relay: %" PRIu8,
                           static_cast<uint8_t>(${espnow_target_relay_button_1}));
           #else
             ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 1: Disabled (null MAC)");
-          #endif  // ESPNOW_BUTTON_1_IS_NULL
+          #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_1_MAC_DEFINED
 
           // Button 2 configuration
-          #if ${ESPNOW_BUTTON_2_IS_NULL} == 0
+          #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_MAC_DEFINED
             ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 2: Enabled");
             ESP_LOGCONFIG("${TAG_ESPNOW}", "    MAC: ${espnow_target_mac_button_2}");
             ESP_LOGCONFIG("${TAG_ESPNOW}", "    Target Relay: %" PRIu8,
                           static_cast<uint8_t>(${espnow_target_relay_button_2}));
           #else
             ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 2: Disabled (null MAC)");
-          #endif  // ESPNOW_BUTTON_2_IS_NULL
+          #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_MAC_DEFINED
 
           // Button 3 configuration
-          #if ${ESPNOW_BUTTON_3_IS_NULL} == 0
+          #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_3_MAC_DEFINED
             ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 3: Enabled");
             ESP_LOGCONFIG("${TAG_ESPNOW}", "    MAC: ${espnow_target_mac_button_3}");
             ESP_LOGCONFIG("${TAG_ESPNOW}", "    Target Relay: %" PRIu8,
                            static_cast<uint8_t>(${espnow_target_relay_button_3}));
           #else
             ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 3: Disabled (null MAC)");
-          #endif  // ESPNOW_BUTTON_3_IS_NULL
+          #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_3_MAC_DEFINED
 
           // Button 4 configuration
-          #if ${ESPNOW_BUTTON_4_IS_NULL} == 0
+          #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_4_MAC_DEFINED
             ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 4: Enabled");
             ESP_LOGCONFIG("${TAG_ESPNOW}", "    MAC: ${espnow_target_mac_button_4}");
             ESP_LOGCONFIG("${TAG_ESPNOW}", "    Target Relay: %" PRIu8,
                            static_cast<uint8_t>(${espnow_target_relay_button_4}));
           #else
             ESP_LOGCONFIG("${TAG_ESPNOW}", "  Button 4: Disabled (null MAC)");
-          #endif  // ESPNOW_BUTTON_4_IS_NULL
+          #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_4_MAC_DEFINED
 
   - id: !extend dump_config_list_packages
     then:
