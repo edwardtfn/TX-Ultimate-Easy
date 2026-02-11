@@ -177,7 +177,7 @@ jobs:
 
   build_ard_espnow_example_latest:
     name: "⚡ Arduino ESPNow example (latest)"
-    needs: build_ard_basic
+    needs: build_ard_core
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -189,7 +189,7 @@ jobs:
 
   build_ard_espnow_example_dev:
     name: "⚡ Arduino ESPNow example (dev)"
-    needs: build_ard_basic_dev
+    needs: build_ard_core_dev
     if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
@@ -202,7 +202,7 @@ jobs:
 
   build_ard_espnow_sender_latest:
     name: "⚡ Arduino ESPNow sender (latest)"
-    needs: build_ard_basic
+    needs: build_ard_espnow_example_latest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -214,7 +214,7 @@ jobs:
 
   build_ard_espnow_sender_dev:
     name: "⚡ Arduino ESPNow sender (dev)"
-    needs: build_ard_basic_dev
+    needs: build_ard_espnow_example_dev
     if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
@@ -227,7 +227,7 @@ jobs:
 
   build_ard_espnow_receiver_latest:
     name: "⚡ Arduino ESPNow receiver (latest)"
-    needs: build_ard_basic
+    needs: build_ard_espnow_example_latest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -239,7 +239,7 @@ jobs:
 
   build_ard_espnow_receiver_dev:
     name: "⚡ Arduino ESPNow receiver (dev)"
-    needs: build_ard_basic_dev
+    needs: build_ard_espnow_example_dev
     if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
@@ -376,7 +376,7 @@ jobs:
 
   build_idf_espnow_example_latest:
     name: "⚡ IDF ESPNow example (latest)"
-    needs: build_idf_basic
+    needs: build_idf_core
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -388,7 +388,7 @@ jobs:
 
   build_idf_espnow_example_dev:
     name: "⚡ IDF ESPNow example (dev)"
-    needs: build_idf_basic_dev
+    needs: build_idf_core_dev
     if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
@@ -401,7 +401,7 @@ jobs:
 
   build_idf_espnow_sender_latest:
     name: "⚡ IDF ESPNow sender (latest)"
-    needs: build_idf_basic
+    needs: build_idf_espnow_example_latest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -413,7 +413,7 @@ jobs:
 
   build_idf_espnow_sender_dev:
     name: "⚡ IDF ESPNow sender (dev)"
-    needs: build_idf_basic_dev
+    needs: build_idf_espnow_example_dev
     if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
@@ -426,7 +426,7 @@ jobs:
 
   build_idf_espnow_receiver_latest:
     name: "⚡ IDF ESPNow receiver (latest)"
-    needs: build_idf_basic
+    needs: build_idf_espnow_example_latest
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -438,7 +438,7 @@ jobs:
 
   build_idf_espnow_receiver_dev:
     name: "⚡ IDF ESPNow receiver (dev)"
-    needs: build_idf_basic_dev
+    needs: build_idf_espnow_example_dev
     if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
