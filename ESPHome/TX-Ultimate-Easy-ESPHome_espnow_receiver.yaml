@@ -1,0 +1,117 @@
+####################################################################################################
+#####                              TX Ultimate Easy for ESPHome                                #####
+#####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
+##### Purpose: ESPHome - ESP-NOW - Receiver - Communication for Multi-Device Relay Control     #####
+####################################################################################################
+##### Author: jakub-k-dev - https://github.com/jakub-k-dev                                     #####
+####################################################################################################
+##### NOTE:                                                                                    #####
+##### - Make changes ONLY if absolutely necessary and you have the required knowledge.         #####
+##### - For normal system use, modifications to this file are NOT required.                    #####
+####################################################################################################
+---
+substitutions:
+  # ============================================================================
+  # INTERNAL VALIDATION (Do not modify)
+  # ============================================================================
+  TAG_ESPNOW_RECEIVER: tx_ultimate_easy.espnow.receiver
+
+esphome:
+  platformio_options:
+    build_flags:
+      - -D TX_ULTIMATE_EASY_ESPNOW_RECEIVER
+
+espnow:
+  id: espnow_component
+  on_receive:
+    lambda: |-
+      // Check if ESP-NOW receiving is enabled
+      if (!sw_espnow_receive_enabled->state) {
+        ESP_LOGD("${TAG_ESPNOW_RECEIVER}", "ESP-NOW receiving disabled, ignoring message");
+        return;
+      }
+
+      // Validate message data pointer
+      if (data == nullptr) {
+        ESP_LOGW("${TAG_ESPNOW_RECEIVER}", "Received ESP-NOW message with null data pointer");
+        return;
+      }
+
+      // Validate message size (ESP-NOW Protocol: 2 bytes)
+      // Byte 0: Command (0x01 = Toggle Relay)
+      // Byte 1: Relay Number (1-${gang_count})
+      if (size != 2) {
+        ESP_LOGW("${TAG_ESPNOW_RECEIVER}", "Invalid message size: %zu (expected 2)", size);
+        return;
+      }
+
+      // Parse message
+      const uint8_t command = data[0];
+      const uint8_t relay_num = data[1];
+
+      ESP_LOGI("${TAG_ESPNOW_RECEIVER}", "ESP-NOW message received: command=0x%02X, relay=%" PRIu8, command, relay_num);
+
+      // Validate command
+      if (command != 0x01) {
+        ESP_LOGW("${TAG_ESPNOW_RECEIVER}", "Unknown command: 0x%02X", command);
+        return;
+      }
+
+      if (relay_num < 1 || relay_num > ${gang_count}) {
+        ESP_LOGW("${TAG_ESPNOW_RECEIVER}", "Invalid relay number: %" PRIu8 " (valid range: 1-${gang_count})", relay_num);
+        return;
+      }
+
+      // Toggle the requested relay
+      ESP_LOGI("${TAG_ESPNOW_RECEIVER}", "Toggling relay %" PRIu8, relay_num);
+      switch (relay_num) {
+        case 1: id(sw_relay_1)->toggle(); break;
+        #if ${gang_count} >= 2
+        case 2: id(sw_relay_2)->toggle(); break;
+        #endif  // ${gang_count} >= 2
+        #if ${gang_count} >= 3
+        case 3: id(sw_relay_3)->toggle(); break;
+        #endif  // ${gang_count} >= 3
+        #if ${gang_count} >= 4
+        case 4: id(sw_relay_4)->toggle(); break;
+        #endif  // ${gang_count} >= 4
+      }
+
+script:
+  - id: !extend dump_config_list_packages
+    then:
+      - script.wait: dump_config
+      - lambda: |-
+          // Check for requirements
+          #ifndef TX_ULTIMATE_EASY_HW_RELAYS
+            #error "The package TX-Ultimate-Easy-ESPHome_hw_relays.yaml is required."
+          #endif  // TX_ULTIMATE_EASY_HW_RELAYS
+
+          // Identify itself
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - ESP-NOW Receiver");
+
+switch:
+  - id: sw_espnow_receive_enabled
+    name: ESP-NOW Receive Enabled
+    platform: template
+    optimistic: true
+    restore_mode: restore_default_off
+    internal: false
+    entity_category: config
+    icon: mdi:radio
+    on_turn_on:
+      then:
+        - lambda: |-
+            ESP_LOGI("${TAG_ESPNOW_RECEIVER}", "ESP-NOW receiving enabled");
+    on_turn_off:
+      then:
+        - lambda: |-
+            ESP_LOGI("${TAG_ESPNOW_RECEIVER}", "ESP-NOW receiving disabled");
+
+text_sensor:
+  - platform: wifi_info
+    mac_address:
+      name: ESP-NOW MAC Address
+      entity_category: diagnostic
+      icon: mdi:radio
+...
