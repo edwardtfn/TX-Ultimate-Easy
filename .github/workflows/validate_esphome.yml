@@ -582,6 +582,8 @@ jobs:
       - build_ard_hw_vibration
       - build_ard_ble_proxy_latest
       - build_ard_espnow_example_latest
+      - build_ard_espnow_sender_latest
+      - build_ard_espnow_receiver_latest
       - build_idf_core
       - build_idf_basic
       - build_idf_hw_leds_individual
@@ -640,6 +642,8 @@ jobs:
       - build_ard_basic_dev
       - build_ard_ble_proxy_dev
       - build_ard_espnow_example_dev
+      - build_ard_espnow_sender_dev
+      - build_ard_espnow_receiver_dev
       - build_idf_core_dev
       - build_idf_basic_dev
       - build_idf_ble_proxy_dev
