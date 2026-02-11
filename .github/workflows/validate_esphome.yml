@@ -200,6 +200,56 @@ jobs:
           yaml-file: ".test/esphome_ard_espnow_example.yaml"
           version: dev
 
+  build_ard_espnow_sender_latest:
+    name: "⚡ Arduino ESPNow sender (latest)"
+    needs: build_ard_basic
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build Arduino ESPNow sender - latest
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_ard_espnow_sender.yaml"
+          version: latest
+
+  build_ard_espnow_sender_dev:
+    name: "⚡ Arduino ESPNow sender (dev)"
+    needs: build_ard_basic_dev
+    if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build Arduino ESPNow sender - dev
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_ard_espnow_sender.yaml"
+          version: dev
+
+  build_ard_espnow_receiver_latest:
+    name: "⚡ Arduino ESPNow receiver (latest)"
+    needs: build_ard_basic
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build Arduino ESPNow receiver - latest
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_ard_espnow_receiver.yaml"
+          version: latest
+
+  build_ard_espnow_receiver_dev:
+    name: "⚡ Arduino ESPNow receiver (dev)"
+    needs: build_ard_basic_dev
+    if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build Arduino ESPNow receiver - dev
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_ard_espnow_receiver.yaml"
+          version: dev
+
   # IDF Framework - Foundation (latest)
   build_idf_core:
     name: "🏗️ IDF Core (latest)"
@@ -349,6 +399,57 @@ jobs:
           yaml-file: ".test/esphome_idf_espnow_example.yaml"
           version: dev
 
+  build_idf_espnow_sender_latest:
+    name: "⚡ IDF ESPNow sender (latest)"
+    needs: build_idf_basic
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build IDF ESPNow sender - latest
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_idf_espnow_sender.yaml"
+          version: latest
+
+  build_idf_espnow_sender_dev:
+    name: "⚡ IDF ESPNow sender (dev)"
+    needs: build_idf_basic_dev
+    if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build IDF ESPNow sender - dev
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_idf_espnow_sender.yaml"
+          version: dev
+
+  build_idf_espnow_receiver_latest:
+    name: "⚡ IDF ESPNow receiver (latest)"
+    needs: build_idf_basic
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build IDF ESPNow receiver - latest
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_idf_espnow_receiver.yaml"
+          version: latest
+
+  build_idf_espnow_receiver_dev:
+    name: "⚡ IDF ESPNow receiver (dev)"
+    needs: build_idf_basic_dev
+    if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build IDF ESPNow receiver - dev
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_idf_espnow_receiver.yaml"
+          version: dev
+
+
   # Summary Jobs - Grouped by framework and environment
   summary_arduino:
     name: "📊 Arduino Framework"
@@ -365,6 +466,10 @@ jobs:
       - build_ard_ble_proxy_dev
       - build_ard_espnow_example_latest
       - build_ard_espnow_example_dev
+      - build_ard_espnow_sender_latest
+      - build_ard_espnow_sender_dev
+      - build_ard_espnow_receiver_latest
+      - build_ard_espnow_receiver_dev
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -382,7 +487,9 @@ jobs:
           [ "${{ needs.build_ard_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_espnow_example_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-          TOTAL=$((TOTAL + 8))
+          [ "${{ needs.build_ard_espnow_sender_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_espnow_receiver_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          TOTAL=$((TOTAL + 10))
 
           # Count dev builds (if not skipped)
           if [ "${{ github.event.inputs.skip_dev }}" != "true" ]; then
@@ -390,7 +497,9 @@ jobs:
             [ "${{ needs.build_ard_basic_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             [ "${{ needs.build_ard_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             [ "${{ needs.build_ard_espnow_example_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-            TOTAL=$((TOTAL + 4))
+            [ "${{ needs.build_ard_espnow_sender_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+            [ "${{ needs.build_ard_espnow_receiver_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+            TOTAL=$((TOTAL + 6))
           fi
 
           echo "🤖 Arduino Framework: $SUCCESS/$TOTAL builds passed"
@@ -417,6 +526,10 @@ jobs:
       - build_idf_ble_proxy_dev
       - build_idf_espnow_example_latest
       - build_idf_espnow_example_dev
+      - build_idf_espnow_sender_latest
+      - build_idf_espnow_sender_dev
+      - build_idf_espnow_receiver_latest
+      - build_idf_espnow_receiver_dev
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -434,7 +547,9 @@ jobs:
           [ "${{ needs.build_idf_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_espnow_example_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-          TOTAL=$((TOTAL + 8))
+          [ "${{ needs.build_idf_espnow_sender_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_espnow_receiver_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          TOTAL=$((TOTAL + 10))
 
           # Count dev builds (if not skipped)
           if [ "${{ github.event.inputs.skip_dev }}" != "true" ]; then
@@ -442,7 +557,9 @@ jobs:
             [ "${{ needs.build_idf_basic_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             [ "${{ needs.build_idf_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             [ "${{ needs.build_idf_espnow_example_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-            TOTAL=$((TOTAL + 4))
+            [ "${{ needs.build_idf_espnow_sender_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+            [ "${{ needs.build_idf_espnow_receiver_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+            TOTAL=$((TOTAL + 6))
           fi
 
           echo "🔧 ESP-IDF Framework: $SUCCESS/$TOTAL builds passed"
@@ -473,13 +590,15 @@ jobs:
       - build_idf_hw_vibration
       - build_idf_ble_proxy_latest
       - build_idf_espnow_example_latest
+      - build_idf_espnow_sender_latest
+      - build_idf_espnow_receiver_latest
     if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Latest ESPHome Results
         run: |
           SUCCESS=0
-          TOTAL=16
+          TOTAL=20
 
           # Arduino Latest builds
           [ "${{ needs.build_ard_core.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
@@ -490,6 +609,8 @@ jobs:
           [ "${{ needs.build_ard_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_espnow_example_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_espnow_sender_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_espnow_receiver_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
 
           # ESP-IDF Latest builds
           [ "${{ needs.build_idf_core.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
@@ -500,6 +621,8 @@ jobs:
           [ "${{ needs.build_idf_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_ble_proxy_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_espnow_example_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_espnow_sender_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_espnow_receiver_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
 
           echo "📋 ESPHome (Latest): $SUCCESS/$TOTAL builds passed"
 
@@ -521,25 +644,31 @@ jobs:
       - build_idf_basic_dev
       - build_idf_ble_proxy_dev
       - build_idf_espnow_example_dev
+      - build_idf_espnow_sender_dev
+      - build_idf_espnow_receiver_dev
     if: ${{ always() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
       - name: Dev ESPHome Results
         run: |
           SUCCESS=0
-          TOTAL=8
+          TOTAL=12
 
           # Arduino Dev builds
           [ "${{ needs.build_ard_core_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_basic_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_espnow_example_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_espnow_sender_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_espnow_receiver_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
 
           # ESP-IDF Dev builds
           [ "${{ needs.build_idf_core_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_basic_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_ble_proxy_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_espnow_example_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_espnow_sender_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_espnow_receiver_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
 
           echo "🚀 ESPHome (Dev): $SUCCESS/$TOTAL builds passed"
 

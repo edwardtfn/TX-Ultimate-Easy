@@ -1,0 +1,24 @@
+---
+substitutions:
+  device_format: ${ ["EU", "US"] | random }
+  gang_count: ${ [1, 2, 3, 4] | random }
+  espnow_target_mac_button_1: "AA:BB:CC:DD:EE:FF"
+  espnow_target_relay_button_1: 1
+  espnow_target_mac_button_2: "AB:BC:CD:DE:EF:F0"
+  espnow_target_relay_button_2: 3
+  espnow_target_mac_button_3: "01:12:23:34:45:56"
+  espnow_target_relay_button_3: 2
+
+external_components:
+  - source:
+      type: local
+      path: ../components
+    components:
+      - tx_ultimate_easy
+
+packages:
+  common: !include common.yaml
+  core_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
+  standard_package: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml
+  espnow_sender: !include ../ESPHome/TX-Ultimate-Easy-ESPHome_espnow_sender.yaml
+...
