@@ -36,17 +36,6 @@ api:
       - script.execute: dump_config_caller
 
 binary_sensor:
-  - id: bs_pending_restart
-    name: Pending Restart Status
-    internal: false
-    disabled_by_default: false
-    platform: template
-    entity_category: diagnostic
-    device_class: problem
-    on_state:
-      then:
-        - script.execute: dump_config_caller
-
   - id: bs_boot_completed
     name: Boot Completed
     internal: false
@@ -171,9 +160,6 @@ script:
   - id: boot_sequence
     mode: restart
     then:
-      - binary_sensor.template.publish:
-          id: bs_pending_restart
-          state: false
 
   - id: dump_config
     mode: restart
@@ -205,12 +191,6 @@ script:
             ESP_LOGCONFIG("${TAG_COMMON}", "Boot completed: Yes");
           else
             ESP_LOGW("${TAG_COMMON}", "Boot completed: NO");
-
-          // System state
-          if (bs_pending_restart->state)
-            ESP_LOGW("${TAG_COMMON}", "Pending restart: YES");
-          else
-            ESP_LOGCONFIG("${TAG_COMMON}", "Pending restart: No");
 
           // =============================================================================
           // Compile-time validation of required configuration parameters

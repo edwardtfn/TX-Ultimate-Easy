@@ -377,5 +377,4 @@ switch:
       then:
         - lambda: |-
             ESP_LOGI("${TAG_ESPNOW_SENDER}", "ESP-NOW sending disabled");
-
 ...
