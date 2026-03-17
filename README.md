@@ -164,6 +164,7 @@ All device behaviors can be customized through Home Assistant automations withou
 - **Touch Panel Support**: Full support for touch gestures and multi-touch capabilities
 - **Advanced Automations**: Create complex automations using Home Assistant's powerful automation engine
 - **Bluetooth Proxy Support**: Compatible with ESPHome's bluetooth_proxy component for BLE device integration
+- **ESP-NOW**: Optional peer-to-peer control so one switch can toggle relays on other switches without Home Assistant (see [ESP-NOW docs](docs/espnow.md))
 - **Audio Feedback**: Built-in speaker support for audible feedback
 - **Haptic Feedback**: Vibration motor support for tactile feedback
 - **ESP-IDF Framework**: Enhanced performance and stability with ESP-IDF support
@@ -205,10 +206,10 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
 4. Copy this basic configuration to your new device:
    ```yaml
    substitutions:
-     name: tx-ultimate-easy
-     friendly_name: TX Ultimate Easy
-     device_format: EU  # Required: 'EU' or 'US' (case-sensitive, uppercase only)
-     gang_count: 1      # Required: Number of relays/buttons (1, 2, 3, or 4)
+     name: tx-ultimate-easy           # Must be unique per device (e.g., tx-ultimate-easy-1, tx-ultimate-easy-2)
+     friendly_name: TX Ultimate Easy  # Must be unique per device
+     device_format: EU                # Required: 'EU' or 'US' (case-sensitive, uppercase only)
+     gang_count: 1                    # Required: Number of relays/buttons (1, 2, 3, or 4)
 
    wifi:
      ssid: !secret wifi_ssid
@@ -222,7 +223,6 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
        files:
          - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml                  # Core (essential) packages
          - ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml              # Non-essential, but recommended packages
-         # - ESPHome/TX-Ultimate-Easy-ESPHome_addon_ble_proxy.yaml     # Adds BLE proxy support
    ```
    You can also use a specific version tag for better control over updates:
    ```yaml
@@ -273,6 +273,11 @@ bluetooth_proxy:
 > While the compile-time configuration changes (device format and gang count as substitutions) may enable better compatibility,
 > we continue to consider this as a non-officially-supported customization. Use at your own risk.
 
+#### ESP-NOW (multi-device relay control)
+Add the ESP-NOW package so one switch can toggle relays on another switch directly, without Home Assistant.
+Configuration is done via YAML substitutions (target MAC and relay per button).
+For setup, see **[ESP-NOW docs](docs/espnow.md)**.
+
 ### Advanced Settings
 For more granular control over components,
 you can use our [advanced configuration template](TX-Ultimate-Easy-ESPHome_advanced.yaml).
@@ -285,10 +290,10 @@ This template allows you to selectively include specific packages, which can be 
 Here's an example of the advanced configuration:
 ```yaml
 substitutions:
-  name: tx-ultimate-easy
-  friendly_name: TX Ultimate Easy
-  device_format: EU  # Required: 'EU' or 'US' (case-sensitive, uppercase only)
-  gang_count: 1      # Required: Number of relays/buttons (1, 2, 3, or 4)
+  name: tx-ultimate-easy           # Must be unique per device (e.g., tx-ultimate-easy-1, tx-ultimate-easy-2)
+  friendly_name: TX Ultimate Easy  # Must be unique per device
+  device_format: EU                # Required: 'EU' or 'US' (case-sensitive, uppercase only)
+  gang_count: 1                    # Required: Number of relays/buttons (1, 2, 3, or 4)
 
 packages:
   remote_package:
@@ -309,6 +314,9 @@ packages:
       # Audio options (use none or choose only one - using both will fail)
       - ESPHome/TX-Ultimate-Easy-ESPHome_media_player.yaml  # Media player (Recommended for most users)
       # - ESPHome/TX-Ultimate-Easy-ESPHome_hw_speaker.yaml  # Basic speaker
+
+      # Advanced/Optional/Add-ons
+      # - ESPHome/TX-Ultimate-Easy-ESPHome_espnow.yaml    # Add support to ESP-NOW
 ```
 
 > [!NOTE]
@@ -367,7 +375,7 @@ We recommend using [ESPHome Web](https://web.esphome.io) for the simplest experi
 #### Detailed Visual Guides
 <!-- markdownlint-disable MD013 -->
 For step-by-step visual instructions, you can reference these existing guides:
-- 🇬🇧 [WirelessThings Guide](https://wirelessthings.io/index.php/2023/12/19/how-to-flash-sonoff-tx-ultimate-with-esphome/) - English guide with detailed photos
+- 🇬🇧 [Let's Automate](https://youtu.be/fIOgWQXndhI?si=O3j7sjwn7PvH1vxn) - English video tutorial
 - 🇪🇸 [Un loco y su tecnología](https://youtu.be/58v8oqSQgXQ?t=143) - Spanish video tutorial
 - 🇩🇪 [SmartHome yourself](https://youtu.be/naDLhX89enQ?t=465) - German video tutorial
 <!-- markdownlint-enable MD013 -->

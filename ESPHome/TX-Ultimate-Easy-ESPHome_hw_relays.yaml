@@ -442,6 +442,8 @@ script:
           }
 
           // Toggle relay if corresponding button action is enabled
+          // Note: If ESP-NOW package is included, it will extend this script and send ESP-NOW commands
+          // The local relay may toggle based on button action settings, and ESP-NOW will also send remote commands
           const bool api_disconnected = !global_api_server->is_connected() or
                                         !wifi_component->is_connected();
           std::string select_state;
