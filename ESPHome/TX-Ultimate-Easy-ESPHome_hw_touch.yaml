@@ -13,7 +13,6 @@
 ---
 substitutions:
   TOUCH_POSITION_MAX_VALUE: '10'  # Maximum touch position value returned by the touch pad via uart
-  BUTTON_MULTI_CLICK_DELAY: '250'  # The time to wait for another click, in msec
 
   ID_SWIPE_LEFT_TEXT: "left"
   ID_SWIPE_RIGHT_TEXT: "right"
