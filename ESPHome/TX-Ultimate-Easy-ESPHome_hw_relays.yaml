@@ -880,7 +880,7 @@ switch:
 
   - id: sw_relay_2
     name: Relay 2
-    internal: ${SL_RELAY_1_MODE != 1 or gang_count < 2}
+    internal: ${SL_RELAY_2_MODE != 1 or gang_count < 2}
     restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
     platform: template
     lambda: |-
@@ -894,7 +894,7 @@ switch:
 
   - id: sw_relay_3
     name: Relay 3
-    internal: ${SL_RELAY_1_MODE != 1 or gang_count < 3}
+    internal: ${SL_RELAY_3_MODE != 1 or gang_count < 3}
     restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
     platform: template
     lambda: |-
@@ -908,7 +908,7 @@ switch:
 
   - id: sw_relay_4
     name: Relay 4
-    internal: ${SL_RELAY_1_MODE != 1 or gang_count < 4}
+    internal: ${SL_RELAY_4_MODE != 1 or gang_count < 4}
     restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
     platform: template
     lambda: |-

@@ -233,9 +233,9 @@ script:
           // Validate ESP-NOW button 3 configuration
           #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_3_MAC_DEFINED
             // MAC is set (not null), validate format
-            #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_MAC_INVALID
+            #if TX_ULTIMATE_EASY_ESPNOW_BUTTON_3_MAC_INVALID
               #error "espnow_target_mac_button_3 has invalid MAC format (must be XX:XX:XX:XX:XX:XX)"
-            #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_2_MAC_INVALID
+            #endif  // TX_ULTIMATE_EASY_ESPNOW_BUTTON_3_MAC_INVALID
 
             // Validate target relay
             #if ${espnow_target_relay_button_3} < 1 || ${espnow_target_relay_button_3} > 4
