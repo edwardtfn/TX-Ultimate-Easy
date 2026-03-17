@@ -450,28 +450,28 @@ script:
               select_state = sl_button_1_action->current_option();
               toggle_relay = (select_state == "${BUTTON_1_ACTION_TEXT}" or
                               (api_disconnected and select_state == "${BUTTON_1_ACTION_FAILSAFE_TEXT}"));
-              if (toggle_relay)
+              if (toggle_relay && ${SL_RELAY_1_MODE} != 0)
                 sw_relay_1->toggle();
               break;
             case ${BUTTON_2_ID}:
               select_state = sl_button_2_action->current_option();
               toggle_relay = (select_state == "${BUTTON_2_ACTION_TEXT}" or
                               (api_disconnected and select_state == "${BUTTON_2_ACTION_FAILSAFE_TEXT}"));
-              if (toggle_relay)
+              if (toggle_relay && ${SL_RELAY_2_MODE} != 0)
                 sw_relay_2->toggle();
               break;
             case ${BUTTON_3_ID}:
               select_state = sl_button_3_action->current_option();
               toggle_relay = (select_state == "${BUTTON_3_ACTION_TEXT}" or
                               (api_disconnected and select_state == "${BUTTON_3_ACTION_FAILSAFE_TEXT}"));
-              if (toggle_relay)
+              if (toggle_relay && ${SL_RELAY_3_MODE} != 0)
                 sw_relay_3->toggle();
               break;
             case ${BUTTON_4_ID}:
               select_state = sl_button_4_action->current_option();
               toggle_relay = (select_state == "${BUTTON_4_ACTION_TEXT}" or
                               (api_disconnected and select_state == "${BUTTON_4_ACTION_FAILSAFE_TEXT}"));
-              if (toggle_relay)
+              if (toggle_relay && ${SL_RELAY_4_MODE} != 0)
                 sw_relay_4->toggle();
               break;
           }
