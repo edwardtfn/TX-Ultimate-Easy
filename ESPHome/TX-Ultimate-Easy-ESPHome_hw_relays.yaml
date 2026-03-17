@@ -102,7 +102,7 @@ light:
     name: Light output 2
     output: output_relay_2
     platform: binary
-    internal: ${SL_RELAY_1_MODE != 2 or gang_count < 2}
+    internal: ${SL_RELAY_2_MODE != 2 or gang_count < 2}
     restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
@@ -118,7 +118,7 @@ light:
     name: Light output 3
     output: output_relay_3
     platform: binary
-    internal: ${SL_RELAY_1_MODE != 2 or gang_count < 3}
+    internal: ${SL_RELAY_3_MODE != 2 or gang_count < 3}
     restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
@@ -134,7 +134,7 @@ light:
     name: Light output 4
     output: output_relay_4
     platform: binary
-    internal: ${SL_RELAY_1_MODE != 2 or gang_count < 4}
+    internal: ${SL_RELAY_4_MODE != 2 or gang_count < 4}
     restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
