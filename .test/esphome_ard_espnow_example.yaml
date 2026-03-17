@@ -8,6 +8,8 @@ substitutions:
   espnow_target_relay_button_2: 3
   espnow_target_mac_button_3: "01:12:23:34:45:56"
   espnow_target_relay_button_3: 2
+  espnow_target_mac_button_4: "00:00:00:00:00:00"
+  espnow_target_relay_button_4: 4
 
 external_components:
   - source:
