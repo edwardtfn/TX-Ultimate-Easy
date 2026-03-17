@@ -63,19 +63,23 @@ espnow:
       }
 
       // Toggle the requested relay
+      #if ${gang_count} >= 1
       ESP_LOGI("${TAG_ESPNOW_RECEIVER}", "Toggling relay %" PRIu8, relay_num);
       switch (relay_num) {
+        #if ${gang_count} >= 1 && ${SL_RELAY_1_MODE} > 0
         case 1: id(sw_relay_1)->toggle(); break;
-        #if ${gang_count} >= 2
+        #endif  // gang_count >= 1 && SL_RELAY_1_MODE > 0
+        #if ${gang_count} >= 2 && ${SL_RELAY_2_MODE} > 0
         case 2: id(sw_relay_2)->toggle(); break;
-        #endif  // ${gang_count} >= 2
-        #if ${gang_count} >= 3
+        #endif  // gang_count >= 2 && SL_RELAY_2_MODE > 0
+        #if ${gang_count} >= 3 && ${SL_RELAY_3_MODE} > 0
         case 3: id(sw_relay_3)->toggle(); break;
-        #endif  // ${gang_count} >= 3
-        #if ${gang_count} >= 4
+        #endif  // gang_count >= 3 && SL_RELAY_3_MODE > 0
+        #if ${gang_count} >= 4 && ${SL_RELAY_4_MODE} > 0
         case 4: id(sw_relay_4)->toggle(); break;
-        #endif  // ${gang_count} >= 4
+        #endif  // gang_count >= 4 && SL_RELAY_4_MODE > 0
       }
+      #endif  // gang_count >= 1
 
 script:
   - id: !extend dump_config_list_packages

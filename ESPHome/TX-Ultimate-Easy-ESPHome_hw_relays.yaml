@@ -19,7 +19,7 @@ substitutions:
   relay_3_mode: switch  # 'switch', 'light', or 'disabled'
   relay_4_mode: switch  # 'switch', 'light', or 'disabled'
 
-  SL_RELAY_1_MODE: ${ 1 if relay_1_mode is string and relay_1_mode | lower == 'switch' else (2 if relay_1_mode is string and relay_1_mode | lower == 'light' else 0) }
+  SL_RELAY_1_MODE: ${ 1 if relay_1_mode is string and relay_1_mode | lower == "switch" else (2 if relay_1_mode is string and relay_1_mode | lower == "light" else 0) }
   SL_RELAY_2_MODE: ${ 1 if relay_2_mode is string and relay_2_mode | lower == "switch" else (2 if relay_2_mode is string and relay_2_mode | lower == "light" else 0) }
   SL_RELAY_3_MODE: ${ 1 if relay_3_mode is string and relay_3_mode | lower == "switch" else (2 if relay_3_mode is string and relay_3_mode | lower == "light" else 0) }
   SL_RELAY_4_MODE: ${ 1 if relay_4_mode is string and relay_4_mode | lower == "switch" else (2 if relay_4_mode is string and relay_4_mode | lower == "light" else 0) }
