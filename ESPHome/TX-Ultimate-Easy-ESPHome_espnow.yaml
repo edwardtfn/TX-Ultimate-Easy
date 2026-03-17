@@ -1,0 +1,23 @@
+####################################################################################################
+#####                              TX Ultimate Easy for ESPHome                                #####
+#####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
+##### Purpose: ESPHome - ESP-NOW Communication for Multi-Device Relay Control                  #####
+####################################################################################################
+##### Author: jakub-k-dev - https://github.com/jakub-k-dev                                     #####
+####################################################################################################
+##### NOTE:                                                                                    #####
+##### - Make changes ONLY if absolutely necessary and you have the required knowledge.         #####
+##### - For normal system use, modifications to this file are NOT required.                    #####
+####################################################################################################
+---
+esphome:
+  platformio_options:
+    build_flags:
+      - -D TX_ULTIMATE_EASY_ESPNOW
+
+packages:
+  # yamllint disable rule:colons
+  espnow_receiver: !include TX-Ultimate-Easy-ESPHome_espnow_receiver.yaml
+  espnow_sender:   !include TX-Ultimate-Easy-ESPHome_espnow_sender.yaml
+  # yamllint enable rule:colons
+...

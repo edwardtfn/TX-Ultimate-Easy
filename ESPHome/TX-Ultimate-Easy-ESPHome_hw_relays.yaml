@@ -14,6 +14,16 @@
 substitutions:
   expose_relays_leds_to_ha: false
 
+  relay_1_mode: switch  # 'switch', 'light', or 'disabled'
+  relay_2_mode: switch  # 'switch', 'light', or 'disabled'
+  relay_3_mode: switch  # 'switch', 'light', or 'disabled'
+  relay_4_mode: switch  # 'switch', 'light', or 'disabled'
+
+  SL_RELAY_1_MODE: ${ 1 if relay_1_mode is string and relay_1_mode | lower == "switch" else (2 if relay_1_mode is string and relay_1_mode | lower == "light" else 0) }
+  SL_RELAY_2_MODE: ${ 1 if relay_2_mode is string and relay_2_mode | lower == "switch" else (2 if relay_2_mode is string and relay_2_mode | lower == "light" else 0) }
+  SL_RELAY_3_MODE: ${ 1 if relay_3_mode is string and relay_3_mode | lower == "switch" else (2 if relay_3_mode is string and relay_3_mode | lower == "light" else 0) }
+  SL_RELAY_4_MODE: ${ 1 if relay_4_mode is string and relay_4_mode | lower == "switch" else (2 if relay_4_mode is string and relay_4_mode | lower == "light" else 0) }
+
   RELAY_MODE_TEXT_SWITCH: "Switch"
   RELAY_MODE_TEXT_LIGHT: "Light"
   RELAY_MODE_TEXT_NOT_USED: "Not in use"
@@ -76,7 +86,7 @@ light:
     name: Light output 1
     output: output_relay_1
     platform: binary
-    internal: true
+    internal: ${SL_RELAY_1_MODE != 2 or gang_count < 1}
     restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
@@ -92,7 +102,7 @@ light:
     name: Light output 2
     output: output_relay_2
     platform: binary
-    internal: true
+    internal: ${SL_RELAY_2_MODE != 2 or gang_count < 2}
     restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
@@ -108,7 +118,7 @@ light:
     name: Light output 3
     output: output_relay_3
     platform: binary
-    internal: true
+    internal: ${SL_RELAY_3_MODE != 2 or gang_count < 3}
     restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
@@ -124,7 +134,7 @@ light:
     name: Light output 4
     output: output_relay_4
     platform: binary
-    internal: true
+    internal: ${SL_RELAY_4_MODE != 2 or gang_count < 4}
     restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
@@ -395,28 +405,6 @@ script:
     mode: restart
     then:
       - lambda: |-
-          // Set indicator (either switch or light) visible on Home Assistant
-          auto relay_mode_index = sl_relay_1_mode->active_index();
-          if (relay_mode_index.has_value()) {
-            light_output_1->set_internal(${gang_count} < 1 or relay_mode_index.value() != 1);
-            sw_relay_1->set_internal(${gang_count} < 1 or relay_mode_index.value() != 0);
-          }
-          relay_mode_index = sl_relay_2_mode->active_index();
-          if (relay_mode_index.has_value()) {
-            light_output_2->set_internal(${gang_count} < 2 or relay_mode_index.value() != 1);
-            sw_relay_2->set_internal(${gang_count} < 2 or relay_mode_index.value() != 0);
-          }
-          relay_mode_index = sl_relay_3_mode->active_index();
-          if (relay_mode_index.has_value()) {
-            light_output_3->set_internal(${gang_count} < 3 or relay_mode_index.value() != 1);
-            sw_relay_3->set_internal(${gang_count} < 3 or relay_mode_index.value() != 0);
-          }
-          relay_mode_index = sl_relay_4_mode->active_index();
-          if (relay_mode_index.has_value()) {
-            light_output_4->set_internal(${gang_count} < 4 or relay_mode_index.value() != 1);
-            sw_relay_4->set_internal(${gang_count} < 4 or relay_mode_index.value() != 0);
-          }
-
           // Set this section of initialization as completed
           id(boot_initialization_relays_relay_modes) = true;
 
@@ -442,6 +430,8 @@ script:
           }
 
           // Toggle relay if corresponding button action is enabled
+          // Note: If ESP-NOW package is included, it will extend this script and send ESP-NOW commands
+          // The local relay may toggle based on button action settings, and ESP-NOW will also send remote commands
           const bool api_disconnected = !global_api_server->is_connected() or
                                         !wifi_component->is_connected();
           std::string select_state;
@@ -460,28 +450,28 @@ script:
               select_state = sl_button_1_action->current_option();
               toggle_relay = (select_state == "${BUTTON_1_ACTION_TEXT}" or
                               (api_disconnected and select_state == "${BUTTON_1_ACTION_FAILSAFE_TEXT}"));
-              if (toggle_relay)
+              if (toggle_relay && ${SL_RELAY_1_MODE} != 0)
                 sw_relay_1->toggle();
               break;
             case ${BUTTON_2_ID}:
               select_state = sl_button_2_action->current_option();
               toggle_relay = (select_state == "${BUTTON_2_ACTION_TEXT}" or
                               (api_disconnected and select_state == "${BUTTON_2_ACTION_FAILSAFE_TEXT}"));
-              if (toggle_relay)
+              if (toggle_relay && ${SL_RELAY_2_MODE} != 0)
                 sw_relay_2->toggle();
               break;
             case ${BUTTON_3_ID}:
               select_state = sl_button_3_action->current_option();
               toggle_relay = (select_state == "${BUTTON_3_ACTION_TEXT}" or
                               (api_disconnected and select_state == "${BUTTON_3_ACTION_FAILSAFE_TEXT}"));
-              if (toggle_relay)
+              if (toggle_relay && ${SL_RELAY_3_MODE} != 0)
                 sw_relay_3->toggle();
               break;
             case ${BUTTON_4_ID}:
               select_state = sl_button_4_action->current_option();
               toggle_relay = (select_state == "${BUTTON_4_ACTION_TEXT}" or
                               (api_disconnected and select_state == "${BUTTON_4_ACTION_FAILSAFE_TEXT}"));
-              if (toggle_relay)
+              if (toggle_relay && ${SL_RELAY_4_MODE} != 0)
                 sw_relay_4->toggle();
               break;
           }
@@ -503,35 +493,15 @@ script:
           #else
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Relay mode:");
           #endif  // TX_ULTIMATE_EASY_GANG_COUNT > 1
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 1: %s", sl_relay_1_mode->has_state() ?
-          #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
-                                                              sl_relay_1_mode->current_option().c_str() : "Unknown");
-          #else
-                                                              sl_relay_1_mode->current_option() : "Unknown");
-          #endif
+          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 1: ${relay_1_mode}");
           #if TX_ULTIMATE_EASY_GANG_COUNT >= 2
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 2: %s", sl_relay_2_mode->has_state() ?
-          #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
-                                                              sl_relay_2_mode->current_option().c_str() : "Unknown");
-          #else
-                                                              sl_relay_2_mode->current_option() : "Unknown");
-          #endif
+          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 2: ${relay_2_mode}");
           #endif  // TX_ULTIMATE_EASY_GANG_COUNT >= 2
           #if TX_ULTIMATE_EASY_GANG_COUNT >= 3
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 3: %s", sl_relay_3_mode->has_state() ?
-          #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
-                                                              sl_relay_3_mode->current_option().c_str() : "Unknown");
-          #else
-                                                              sl_relay_3_mode->current_option() : "Unknown");
-          #endif
+          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 3: ${relay_3_mode}");
           #endif  // TX_ULTIMATE_EASY_GANG_COUNT >= 3
           #if TX_ULTIMATE_EASY_GANG_COUNT >= 4
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 4: %s", sl_relay_4_mode->has_state() ?
-          #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
-                                                              sl_relay_4_mode->current_option().c_str() : "Unknown");
-          #else
-                                                              sl_relay_4_mode->current_option() : "Unknown");
-          #endif
+          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 4: ${relay_4_mode}");
           #endif  // TX_ULTIMATE_EASY_GANG_COUNT >= 4
 
           // Relay's states
@@ -778,25 +748,6 @@ select:
 
           previous_mode = current_mode;
 
-  - id: sl_relay_1_mode
-    name: Relay 1 display mode
-    platform: template
-    options:
-      - "${RELAY_MODE_TEXT_SWITCH}"
-      - "${RELAY_MODE_TEXT_LIGHT}"
-      - "${RELAY_MODE_TEXT_NOT_USED}"
-    initial_option: "${RELAY_MODE_TEXT_SWITCH}"
-    optimistic: true
-    restore_value: ${gang_count >= 1}
-    internal: ${gang_count < 1}
-    entity_category: config
-    disabled_by_default: false
-    icon: mdi:dip-switch
-    on_value:
-      then:
-        - lambda: |-
-            bs_pending_restart->publish_state(true);
-
   - id: sl_relay_2_light_mode
     name: Relay 2 light mode
     restore_value: ${gang_count >= 2}
@@ -835,25 +786,6 @@ select:
           }
 
           previous_mode = current_mode;
-
-  - id: sl_relay_2_mode
-    name: Relay 2 display mode
-    platform: template
-    options:
-      - "${RELAY_MODE_TEXT_SWITCH}"
-      - "${RELAY_MODE_TEXT_LIGHT}"
-      - "${RELAY_MODE_TEXT_NOT_USED}"
-    initial_option: "${RELAY_MODE_TEXT_SWITCH}"
-    optimistic: true
-    restore_value: ${gang_count >= 2}
-    internal: ${gang_count < 2}
-    entity_category: config
-    disabled_by_default: false
-    icon: mdi:dip-switch
-    on_value:
-      then:
-        - lambda: |-
-            bs_pending_restart->publish_state(true);
 
   - id: sl_relay_3_light_mode
     name: Relay 3 light mode
@@ -894,25 +826,6 @@ select:
 
           previous_mode = current_mode;
 
-  - id: sl_relay_3_mode
-    name: Relay 3 display mode
-    platform: template
-    options:
-      - "${RELAY_MODE_TEXT_SWITCH}"
-      - "${RELAY_MODE_TEXT_LIGHT}"
-      - "${RELAY_MODE_TEXT_NOT_USED}"
-    initial_option: "${RELAY_MODE_TEXT_SWITCH}"
-    optimistic: true
-    restore_value: ${gang_count >= 3}
-    internal: ${gang_count < 3}
-    entity_category: config
-    disabled_by_default: false
-    icon: mdi:dip-switch
-    on_value:
-      then:
-        - lambda: |-
-            bs_pending_restart->publish_state(true);
-
   - id: sl_relay_4_light_mode
     name: Relay 4 light mode
     restore_value: ${gang_count >= 4}
@@ -950,29 +863,10 @@ select:
 
           previous_mode = current_mode;
 
-  - id: sl_relay_4_mode
-    name: Relay 4 display mode
-    platform: template
-    options:
-      - "${RELAY_MODE_TEXT_SWITCH}"
-      - "${RELAY_MODE_TEXT_LIGHT}"
-      - "${RELAY_MODE_TEXT_NOT_USED}"
-    initial_option: "${RELAY_MODE_TEXT_SWITCH}"
-    optimistic: true
-    restore_value: ${gang_count >= 4}
-    internal: ${gang_count < 4}
-    entity_category: config
-    disabled_by_default: false
-    icon: mdi:dip-switch
-    on_value:
-      then:
-        - lambda: |-
-            bs_pending_restart->publish_state(true);
-
 switch:
   - id: sw_relay_1
     name: Relay 1
-    internal: ${gang_count < 1}
+    internal: ${SL_RELAY_1_MODE != 1 or gang_count < 1}
     restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
     platform: template
     lambda: |-
@@ -986,7 +880,7 @@ switch:
 
   - id: sw_relay_2
     name: Relay 2
-    internal: ${gang_count < 2}
+    internal: ${SL_RELAY_2_MODE != 1 or gang_count < 2}
     restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
     platform: template
     lambda: |-
@@ -1000,7 +894,7 @@ switch:
 
   - id: sw_relay_3
     name: Relay 3
-    internal: ${gang_count < 3}
+    internal: ${SL_RELAY_3_MODE != 1 or gang_count < 3}
     restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
     platform: template
     lambda: |-
@@ -1014,7 +908,7 @@ switch:
 
   - id: sw_relay_4
     name: Relay 4
-    internal: ${gang_count < 4}
+    internal: ${SL_RELAY_4_MODE != 1 or gang_count < 4}
     restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
     platform: template
     lambda: |-
