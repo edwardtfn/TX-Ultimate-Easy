@@ -29,10 +29,10 @@ substitutions:
   BUTTON_LONG_PRESS_DELAY: "500"  # The time to wait to consider a long press, in msec
 
   # Button numbers constants
-  BUTTON_1_ID: "1"
-  BUTTON_2_ID: "2"
-  BUTTON_3_ID: "3"
-  BUTTON_4_ID: "4"
+  BUTTON_1_ID: '1'
+  BUTTON_2_ID: '2'
+  BUTTON_3_ID: '3'
+  BUTTON_4_ID: '4'
 
   TAG_HW_BUTTONS: tx_ultimate_easy.hw.buttons
 
@@ -88,12 +88,11 @@ globals:
   - id: button_press_start_time  # Used for: current press duration (press → release)
     type: uint32_t
     restore_value: false
-    initial_value: "0"
+    initial_value: '0'
 
   - id: last_release_time  # Used for: inter-click gap timing (time since last release)
     type: uint32_t
     restore_value: false
-    initial_value: "0"
     initial_value: '0'
 
   - id: click_counter

@@ -14,10 +14,10 @@
 substitutions:
   expose_relays_leds_to_ha: false
 
-  relay_1_mode: switch  # Either 'switch' or 'light'
-  relay_2_mode: switch  # Either 'switch' or 'light'
-  relay_3_mode: switch  # Either 'switch' or 'light'
-  relay_4_mode: switch  # Either 'switch' or 'light'
+  relay_1_mode: switch  # 'switch', 'light', or 'disabled'
+  relay_2_mode: switch  # 'switch', 'light', or 'disabled'
+  relay_3_mode: switch  # 'switch', 'light', or 'disabled'
+  relay_4_mode: switch  # 'switch', 'light', or 'disabled'
 
   SL_RELAY_1_MODE: ${ 1 if relay_1_mode is string and relay_1_mode | lower == 'switch' else (2 if relay_1_mode is string and relay_1_mode | lower == 'light' else 0) }
   SL_RELAY_2_MODE: ${ 1 if relay_2_mode is string and relay_2_mode | lower == "switch" else (2 if relay_2_mode is string and relay_2_mode | lower == "light" else 0) }
