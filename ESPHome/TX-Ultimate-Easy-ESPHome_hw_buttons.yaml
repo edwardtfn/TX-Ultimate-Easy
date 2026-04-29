@@ -310,7 +310,12 @@ script:
           } else if (id(button_press_position) != position) {
             // Position changed
             start_new_sequence = true;
-          } else if (id(last_release_time) > 0) {
+          } else if (id(last_release_time) == 0) {
+            // Previous press never received a release event (touch panel glitch)
+            // Treat as stale press and start a new sequence
+            ESP_LOGW("${TAG_HW_BUTTONS}", "Stale press detected (no release received), starting new sequence");
+            start_new_sequence = true;
+          } else {
             // Check if enough time has passed since last release (for inter-click gap)
             // Use runtime value from HA instead of compile-time constant
             uint32_t gap_window = (uint32_t) nr_button_multi_click_delay->state;
