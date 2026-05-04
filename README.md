@@ -173,7 +173,7 @@ suppresses vibration and click-sound feedback. The state survives reboots.
 1. Set **Lights (all)** in Home Assistant to your desired night color and brightness
 2. Enable the **Night Mode** switch — the color is snapshotted and locked in
 3. Toggle the suppression switches under *Configuration* to allow or block vibration/sound
-4. To change the color while active, adjust **Lights (all)** directly — changes apply immediately
+4. To change the color: disable Night Mode, set **Lights (all)** to the new color, then re-enable Night Mode — this re-snapshots the color and persists it across reboots
 5. Disable the switch to restore normal relay indicator behavior
 
 ## Key Features

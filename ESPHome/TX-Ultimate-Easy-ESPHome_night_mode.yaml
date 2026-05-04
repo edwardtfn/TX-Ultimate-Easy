@@ -50,13 +50,18 @@ script:
   - id: night_mode_apply
     then:
       - script.wait: boot_initialize_relays
-      - light.turn_on:
-          id: lights_all
-          red:        !lambda "return id(night_mode_red);"
-          green:      !lambda "return id(night_mode_green);"
-          blue:       !lambda "return id(night_mode_blue);"
-          brightness: !lambda "return id(night_mode_brightness);"
-          transition_length: 500ms
+      # Re-check the flag: night mode may have been disabled while we were waiting.
+      - if:
+          condition:
+            lambda: "return id(night_mode_active);"
+          then:
+            - light.turn_on:
+                id: lights_all
+                red:        !lambda "return id(night_mode_red);"
+                green:      !lambda "return id(night_mode_green);"
+                blue:       !lambda "return id(night_mode_blue);"
+                brightness: !lambda "return id(night_mode_brightness);"
+                transition_length: 500ms
 
 switch:
   # ── Main control (no entity_category → appears in main entity list) ───────
@@ -119,3 +124,4 @@ esphome:
             lambda: "return id(night_mode_active);"
           then:
             - script.execute: night_mode_apply
+...
