@@ -156,6 +156,26 @@ For more details, please refer to our **[Events docs](docs/events.md)**.
 #### Automation
 All device behaviors can be customized through Home Assistant automations without relying on local device triggers.
 
+### Night Mode
+
+Night Mode freezes the LEDs at a fixed color and brightness and, optionally,
+suppresses vibration and click-sound feedback. The state survives reboots.
+
+**Entities exposed to Home Assistant:**
+
+| Entity | Type | Default | Description |
+|--------|------|---------|-------------|
+| Night Mode | Switch | Off | Enable/disable night mode |
+| Night Mode - Suppress Vibration | Switch (config) | On | Block haptic feedback while night mode is active |
+| Night Mode - Suppress Sound | Switch (config) | On | Block click sounds while night mode is active |
+
+**Usage:**
+1. Set **Lights (all)** in Home Assistant to your desired night color and brightness
+2. Enable the **Night Mode** switch — the color is snapshotted and locked in
+3. Toggle the suppression switches under *Configuration* to allow or block vibration/sound
+4. To change the color while active, adjust **Lights (all)** directly — changes apply immediately
+5. Disable the switch to restore normal relay indicator behavior
+
 ## Key Features
 
 - **Home Assistant UI Configuration**: Manage all device settings directly through the Home Assistant interface
@@ -167,6 +187,7 @@ All device behaviors can be customized through Home Assistant automations withou
 - **ESP-NOW**: Optional peer-to-peer control so one switch can toggle relays on other switches without Home Assistant (see [ESP-NOW docs](docs/espnow.md))
 - **Audio Feedback**: Built-in speaker support for audible feedback
 - **Haptic Feedback**: Vibration motor support for tactile feedback
+- **Night Mode**: Persistent LED color/brightness lock that silences touch-triggered light changes, vibration, and sound — survives device reboots
 - **ESP-IDF Framework**: Enhanced performance and stability with ESP-IDF support
 
 ## Hardware Support

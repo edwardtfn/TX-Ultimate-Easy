@@ -68,8 +68,10 @@ switch:
     lambda: "return id(night_mode_active);"
     turn_on_action:
       - lambda: |-
-          // Snapshot whatever lights_all is currently showing so the color
-          // survives a reboot (globals are persisted, lights_all state is not).
+          // Snapshot lights_all so color/brightness can be restored after a reboot
+          // (globals persist; lights_all partition state does not).
+          // Only overwrite stored values when the light is on — this preserves a
+          // pre-configured color that was saved before the light was turned off.
           if (id(lights_all).current_values.is_on()) {
             id(night_mode_red)        = id(lights_all).current_values.get_red();
             id(night_mode_green)      = id(lights_all).current_values.get_green();
@@ -82,7 +84,7 @@ switch:
       - lambda: "id(night_mode_active) = false;"
       - light.turn_off:
           id: lights_all
-      - script.execute: show_relay_status  # restore relay indicator LEDs
+      - script.execute: show_relay_status  # re-evaluate all relay indicators
 
   # ── Settings (entity_category: config → grouped under "Configuration") ────
   - platform: template
@@ -109,7 +111,7 @@ switch:
 
 esphome:
   on_boot:
-    # Run very late so all components (relays, LEDs) are ready.
+    # priority: -200 ensures all hardware components are ready before we touch LEDs.
     priority: -200
     then:
       - if:

@@ -199,6 +199,7 @@ script:
     then:
       - if:
           condition:
+            # Night mode can suppress click sounds independently of the speaker select.
             lambda: "return id(night_mode_active) && id(night_mode_suppress_sound);"
           then:
             []

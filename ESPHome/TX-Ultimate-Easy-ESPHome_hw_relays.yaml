@@ -590,6 +590,7 @@ script:
       state: bool
     then:
       - lambda: |-
+          // Night mode holds the LED state — skip all automatic relay-triggered updates.
           if (id(night_mode_active)) {
             ESP_LOGV("${TAG_HW_RELAYS}", "Night mode active - skipping LED update");
             return;
