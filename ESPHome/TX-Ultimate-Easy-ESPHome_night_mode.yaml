@@ -72,9 +72,9 @@ script:
           then:
             - light.turn_on:
                 id: light_night_mode
-                red:        !lambda "return id(night_mode_red);"
-                green:      !lambda "return id(night_mode_green);"
-                blue:       !lambda "return id(night_mode_blue);"
+                red: !lambda "return id(night_mode_red);"
+                green: !lambda "return id(night_mode_green);"
+                blue: !lambda "return id(night_mode_blue);"
                 brightness: !lambda "return id(night_mode_brightness);"
                 transition_length: 500ms
 
@@ -93,9 +93,9 @@ switch:
           // Only overwrite stored values when the light is on — this preserves a
           // pre-configured color that was saved before the light was turned off.
           if (id(light_night_mode).current_values.is_on()) {
-            id(night_mode_red)        = id(light_night_mode).current_values.get_red();
-            id(night_mode_green)      = id(light_night_mode).current_values.get_green();
-            id(night_mode_blue)       = id(light_night_mode).current_values.get_blue();
+            id(night_mode_red) = id(light_night_mode).current_values.get_red();
+            id(night_mode_green) = id(light_night_mode).current_values.get_green();
+            id(night_mode_blue) = id(light_night_mode).current_values.get_blue();
             id(night_mode_brightness) = id(light_night_mode).current_values.get_brightness();
           }
           id(night_mode_active) = true;
