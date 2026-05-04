@@ -166,7 +166,7 @@ suppresses vibration and click-sound feedback. The state survives reboots.
 | Entity | Type | Default | Description |
 |--------|------|---------|-------------|
 | Night Mode | Switch | Off | Enable/disable night mode |
-| Night Mode - Color | Light (config) | Off | Set the LED color and brightness used in night mode |
+| Night Mode - Color | Light | Off | Set the LED color and brightness used in night mode |
 | Night Mode - Suppress Vibration | Switch (config) | On | Block haptic feedback while night mode is active |
 | Night Mode - Suppress Sound | Switch (config) | On | Block click sounds while night mode is active |
 

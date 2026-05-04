@@ -52,7 +52,6 @@ light:
   - id: light_night_mode
     name: "Night Mode - Color"
     platform: partition
-    entity_category: config
     icon: mdi:weather-night
     restore_mode: RESTORE_DEFAULT_OFF
     segments:
