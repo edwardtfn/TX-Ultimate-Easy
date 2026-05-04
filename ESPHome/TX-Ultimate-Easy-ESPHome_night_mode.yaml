@@ -118,7 +118,7 @@ switch:
     entity_category: config
     icon: mdi:vibrate-off
     internal: false
-    restore_mode: RESTORE_DEFAULT_OFF
+    restore_mode: RESTORE_DEFAULT_ON
 
   - id: sw_night_mode_suppress_sound
     name: "Night Mode - Suppress Sound"
@@ -126,5 +126,5 @@ switch:
     entity_category: config
     icon: mdi:volume-off
     internal: false
-    restore_mode: RESTORE_DEFAULT_OFF
+    restore_mode: RESTORE_DEFAULT_ON
 ...
