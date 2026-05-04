@@ -85,27 +85,6 @@ globals:
     type: bool
     initial_value: 'false'
 
-  - id: night_mode_active
-    type: bool
-    restore_value: true
-    initial_value: 'false'
-  - id: night_mode_red
-    type: float
-    restore_value: true
-    initial_value: '0.8'
-  - id: night_mode_green
-    type: float
-    restore_value: true
-    initial_value: '0.5'
-  - id: night_mode_blue
-    type: float
-    restore_value: true
-    initial_value: '0.0'
-  - id: night_mode_brightness
-    type: float
-    restore_value: true
-    initial_value: '0.1'
-
 light:
   # These lights are used for the physical relays to be shown as lights
   - id: light_output_1

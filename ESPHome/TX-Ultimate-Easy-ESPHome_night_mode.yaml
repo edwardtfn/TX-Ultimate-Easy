@@ -2,9 +2,48 @@
 #####                              TX Ultimate Easy for ESPHome                                #####
 #####                  Repository: https://github.com/ghigo/TX-Ultimate-Easy                  #####
 ####################################################################################################
-##### Purpose: Night Mode — persistent LED state that suppresses all automatic LED updates    #####
+##### Purpose: Night Mode — persistent LED/vibration/sound override                           #####
+#####                                                                                          #####
+##### All "Night Mode" entities appear together on the HA device page.                         #####
+##### Main switch has no entity_category (prominent).                                          #####
+##### Setting switches use entity_category: config (grouped under Configuration).              #####
 ####################################################################################################
 ---
+globals:
+  # ── Night mode state ──────────────────────────────────────────────────────
+  - id: night_mode_active
+    type: bool
+    restore_value: true
+    initial_value: 'false'
+
+  # ── LED color/brightness snapshot (populated when the switch is turned on) ─
+  - id: night_mode_red
+    type: float
+    restore_value: true
+    initial_value: '0.8'
+  - id: night_mode_green
+    type: float
+    restore_value: true
+    initial_value: '0.5'
+  - id: night_mode_blue
+    type: float
+    restore_value: true
+    initial_value: '0.0'
+  - id: night_mode_brightness
+    type: float
+    restore_value: true
+    initial_value: '0.1'
+
+  # ── Feature suppression flags ─────────────────────────────────────────────
+  - id: night_mode_suppress_vibration
+    type: bool
+    restore_value: true
+    initial_value: 'true'
+  - id: night_mode_suppress_sound
+    type: bool
+    restore_value: true
+    initial_value: 'true'
+
 script:
   # Apply the stored night mode color/brightness to all LEDs.
   # Waits for relay boot initialization so it is safe to call from on_boot.
@@ -20,16 +59,17 @@ script:
           transition_length: 500ms
 
 switch:
+  # ── Main control (no entity_category → appears in main entity list) ───────
   - platform: template
     name: "Night Mode"
     id: sw_night_mode
     icon: mdi:weather-night
-    # Mirror the global so the switch stays in sync after a reboot
+    # Mirror the persistent global so the switch stays in sync after a reboot.
     lambda: "return id(night_mode_active);"
     turn_on_action:
       - lambda: |-
           // Snapshot whatever lights_all is currently showing so the color
-          // survives a reboot (globals are restored, lights_all is not).
+          // survives a reboot (globals are persisted, lights_all state is not).
           if (id(lights_all).current_values.is_on()) {
             id(night_mode_red)        = id(lights_all).current_values.get_red();
             id(night_mode_green)      = id(lights_all).current_values.get_green();
@@ -43,6 +83,29 @@ switch:
       - light.turn_off:
           id: lights_all
       - script.execute: show_relay_status  # restore relay indicator LEDs
+
+  # ── Settings (entity_category: config → grouped under "Configuration") ────
+  - platform: template
+    name: "Night Mode - Suppress Vibration"
+    id: sw_night_mode_suppress_vibration
+    icon: mdi:vibrate-off
+    entity_category: config
+    lambda: "return id(night_mode_suppress_vibration);"
+    turn_on_action:
+      - lambda: "id(night_mode_suppress_vibration) = true;"
+    turn_off_action:
+      - lambda: "id(night_mode_suppress_vibration) = false;"
+
+  - platform: template
+    name: "Night Mode - Suppress Sound"
+    id: sw_night_mode_suppress_sound
+    icon: mdi:volume-off
+    entity_category: config
+    lambda: "return id(night_mode_suppress_sound);"
+    turn_on_action:
+      - lambda: "id(night_mode_suppress_sound) = true;"
+    turn_off_action:
+      - lambda: "id(night_mode_suppress_sound) = false;"
 
 esphome:
   on_boot:

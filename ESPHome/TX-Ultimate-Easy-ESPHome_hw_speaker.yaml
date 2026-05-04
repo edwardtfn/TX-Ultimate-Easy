@@ -197,9 +197,15 @@ script:
 
   - id: speaker_play_click
     then:
-      - speaker.play:
-          id: speaker_embedded
-          data: ${click_sound_data}
+      - if:
+          condition:
+            lambda: "return id(night_mode_active) && id(night_mode_suppress_sound);"
+          then:
+            []
+          else:
+            - speaker.play:
+                id: speaker_embedded
+                data: ${click_sound_data}
 
   - id: speaker_setup
     then:
