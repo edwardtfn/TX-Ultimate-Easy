@@ -1,9 +1,11 @@
 ####################################################################################################
 #####                              TX Ultimate Easy for ESPHome                                #####
-#####                  Repository: https://github.com/ghigo/TX-Ultimate-Easy                   #####
+#####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
 ####################################################################################################
 ##### Purpose: Night Mode — persistent LED/vibration/sound override                            #####
-#####                                                                                          #####
+####################################################################################################
+##### Author: ghigo - https://github.com/ghigo                                                 #####
+####################################################################################################
 ##### All "Night Mode" entities appear together on the HA device page.                         #####
 ##### Main switch has no entity_category (prominent).                                          #####
 ##### Setting entities use entity_category: config (grouped under Configuration).              #####
