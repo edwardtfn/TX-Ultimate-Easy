@@ -84,7 +84,7 @@ switch:
     name: "Night Mode"
     platform: template
     icon: mdi:weather-night
-    internal: false 
+    internal: false
     restore_mode: RESTORE_DEFAULT_OFF
     on_turn_on:
       then:
@@ -115,7 +115,7 @@ switch:
     platform: template
     entity_category: config
     icon: mdi:vibrate-off
-    internal: false 
+    internal: false
     restore_mode: RESTORE_DEFAULT_OFF
 
   - id: sw_night_mode_suppress_sound
@@ -123,6 +123,6 @@ switch:
     platform: template
     entity_category: config
     icon: mdi:volume-off
-    internal: false 
+    internal: false
     restore_mode: RESTORE_DEFAULT_OFF
 ...
