@@ -202,7 +202,7 @@ script:
             lambda: |-
               // Night mode can suppress click sounds independently of the speaker select.
               #ifdef TX_ULTIMATE_EASY_NIGHT_MODE
-              return id(night_mode_active) && id(night_mode_suppress_sound);
+              return sw_night_mode->state && sw_night_mode_suppress_sound->state;
               #else
               return true;  // If night mode is not enabled, don't suppress click sounds.
               #endif
