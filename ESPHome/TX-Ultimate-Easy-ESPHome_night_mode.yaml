@@ -30,24 +30,26 @@ globals:
     restore_value: true
     initial_value: 'false'
 
-  # ── LED color/brightness snapshot — persists across reboots so the color ──
-  # ── can be re-applied without depending on the light partition state.     ──
+  # ─── LED color/brightness snapshot ─ persists across reboots so the color ───
+  # ─── can be re-applied without depending on the light partition state.    ───
+  # ─── Stored as uint8_t (0-255) to save NVS space; converted to/from the    ───
+  # ─── 0.0-1.0 float range used by the light component at runtime.           ───
   - id: night_mode_red
-    type: float
+    type: uint8_t
     restore_value: true
-    initial_value: '0.8'
+    initial_value: '204'  # 0.8 * 255
   - id: night_mode_green
-    type: float
+    type: uint8_t
     restore_value: true
-    initial_value: '0.5'
+    initial_value: '128'  # 0.5 * 255 (rounded)
   - id: night_mode_blue
-    type: float
+    type: uint8_t
     restore_value: true
-    initial_value: '0.0'
+    initial_value: '0'    # 0.0 * 255
   - id: night_mode_brightness
-    type: float
+    type: uint8_t
     restore_value: true
-    initial_value: '0.1'
+    initial_value: '26'   # 0.1 * 255 (rounded)
 
   # ── Feature suppression flags ─────────────────────────────────────────────
   - id: night_mode_suppress_vibration
@@ -86,10 +88,10 @@ script:
           then:
             - light.turn_on:
                 id: light_night_mode
-                red: !lambda "return id(night_mode_red);"
-                green: !lambda "return id(night_mode_green);"
-                blue: !lambda "return id(night_mode_blue);"
-                brightness: !lambda "return id(night_mode_brightness);"
+                red: !lambda "return id(night_mode_red) / 255.0f;"
+                green: !lambda "return id(night_mode_green) / 255.0f;"
+                blue: !lambda "return id(night_mode_blue) / 255.0f;"
+                brightness: !lambda "return id(night_mode_brightness) / 255.0f;"
                 transition_length: 500ms
 
 switch:
@@ -104,13 +106,14 @@ switch:
       - lambda: |-
           // Snapshot light_night_mode so color/brightness can be restored after a reboot
           // (globals persist; partition light state does not).
-          // Only overwrite stored values when the light is on — this preserves a
+          // Only overwrite stored values when the light is on - this preserves a
           // pre-configured color that was saved before the light was turned off.
+          // Values are scaled from 0.0-1.0 float to 0-255 uint8_t for compact NVS storage.
           if (id(light_night_mode).current_values.is_on()) {
-            id(night_mode_red) = id(light_night_mode).current_values.get_red();
-            id(night_mode_green) = id(light_night_mode).current_values.get_green();
-            id(night_mode_blue) = id(light_night_mode).current_values.get_blue();
-            id(night_mode_brightness) = id(light_night_mode).current_values.get_brightness();
+            id(night_mode_red) = static_cast<uint8_t>(id(light_night_mode).current_values.get_red() * 255.0f + 0.5f);  // add 0.5 for rounding to nearest integer
+            id(night_mode_green) = static_cast<uint8_t>(id(light_night_mode).current_values.get_green() * 255.0f + 0.5f);
+            id(night_mode_blue) = static_cast<uint8_t>(id(light_night_mode).current_values.get_blue() * 255.0f + 0.5f);
+            id(night_mode_brightness) = static_cast<uint8_t>(id(light_night_mode).current_values.get_brightness() * 255.0f + 0.5f);
           }
           id(night_mode_active) = true;
       - script.execute: night_mode_apply
