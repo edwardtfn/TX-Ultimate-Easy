@@ -166,15 +166,16 @@ suppresses vibration and click-sound feedback. The state survives reboots.
 | Entity | Type | Default | Description |
 |--------|------|---------|-------------|
 | Night Mode | Switch | Off | Enable/disable night mode |
+| Night Mode - Color | Light (config) | Off | Set the LED color and brightness used in night mode |
 | Night Mode - Suppress Vibration | Switch (config) | On | Block haptic feedback while night mode is active |
 | Night Mode - Suppress Sound | Switch (config) | On | Block click sounds while night mode is active |
 
 **Usage:**
-1. Set **Lights (all)** in Home Assistant to your desired night color and brightness
-2. Enable the **Night Mode** switch — the color is snapshotted and locked in
+1. Set **Night Mode - Color** (under *Configuration*) to your desired color and brightness
+2. Enable the **Night Mode** switch — the color is snapshotted and the LEDs lock in
 3. Toggle the suppression switches under *Configuration* to allow or block vibration/sound
-4. To change the color: disable Night Mode, set **Lights (all)** to the new color, then re-enable Night Mode — this re-snapshots the color and persists it across reboots
-5. Disable the switch to restore normal relay indicator behavior
+4. To change the color: disable Night Mode, adjust **Night Mode - Color**, then re-enable — this re-snapshots the color and persists it across reboots
+5. Disable the switch to restore normal relay indicator behavior — **Lights (all)** is unaffected by night mode
 
 ## Key Features
 

@@ -6,7 +6,7 @@
 #####                                                                                          #####
 ##### All "Night Mode" entities appear together on the HA device page.                         #####
 ##### Main switch has no entity_category (prominent).                                          #####
-##### Setting switches use entity_category: config (grouped under Configuration).              #####
+##### Setting entities use entity_category: config (grouped under Configuration).             #####
 ####################################################################################################
 ---
 globals:
@@ -16,7 +16,8 @@ globals:
     restore_value: true
     initial_value: 'false'
 
-  # ── LED color/brightness snapshot (populated when the switch is turned on) ─
+  # ── LED color/brightness snapshot — persists across reboots so the color ──
+  # ── can be re-applied without depending on the light partition state.     ──
   - id: night_mode_red
     type: float
     restore_value: true
@@ -44,8 +45,23 @@ globals:
     restore_value: true
     initial_value: 'true'
 
+light:
+  # Dedicated configuration light for night mode color/brightness.
+  # Appears under "Configuration" in the HA device page.
+  # lights_all is intentionally left untouched by night mode.
+  - id: light_night_mode
+    name: "Night Mode - Color"
+    platform: partition
+    entity_category: config
+    icon: mdi:weather-night
+    restore_mode: RESTORE_DEFAULT_OFF
+    segments:
+      - id: light_full
+        from: 0
+        to: ${LIGHT_MAX_ADDR}
+
 script:
-  # Apply the stored night mode color/brightness to all LEDs.
+  # Apply the stored night mode color/brightness to the night mode light.
   # Waits for relay boot initialization so it is safe to call from on_boot.
   - id: night_mode_apply
     then:
@@ -56,7 +72,7 @@ script:
             lambda: "return id(night_mode_active);"
           then:
             - light.turn_on:
-                id: lights_all
+                id: light_night_mode
                 red:        !lambda "return id(night_mode_red);"
                 green:      !lambda "return id(night_mode_green);"
                 blue:       !lambda "return id(night_mode_blue);"
@@ -73,22 +89,23 @@ switch:
     lambda: "return id(night_mode_active);"
     turn_on_action:
       - lambda: |-
-          // Snapshot lights_all so color/brightness can be restored after a reboot
-          // (globals persist; lights_all partition state does not).
+          // Snapshot light_night_mode so color/brightness can be restored after a reboot
+          // (globals persist; partition light state does not).
           // Only overwrite stored values when the light is on — this preserves a
           // pre-configured color that was saved before the light was turned off.
-          if (id(lights_all).current_values.is_on()) {
-            id(night_mode_red)        = id(lights_all).current_values.get_red();
-            id(night_mode_green)      = id(lights_all).current_values.get_green();
-            id(night_mode_blue)       = id(lights_all).current_values.get_blue();
-            id(night_mode_brightness) = id(lights_all).current_values.get_brightness();
+          if (id(light_night_mode).current_values.is_on()) {
+            id(night_mode_red)        = id(light_night_mode).current_values.get_red();
+            id(night_mode_green)      = id(light_night_mode).current_values.get_green();
+            id(night_mode_blue)       = id(light_night_mode).current_values.get_blue();
+            id(night_mode_brightness) = id(light_night_mode).current_values.get_brightness();
           }
           id(night_mode_active) = true;
       - script.execute: night_mode_apply
     turn_off_action:
+      - script.stop: night_mode_apply
       - lambda: "id(night_mode_active) = false;"
       - light.turn_off:
-          id: lights_all
+          id: light_night_mode
       - script.execute: show_relay_status  # re-evaluate all relay indicators
 
   # ── Settings (entity_category: config → grouped under "Configuration") ────
