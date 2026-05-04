@@ -1,0 +1,56 @@
+####################################################################################################
+#####                              TX Ultimate Easy for ESPHome                                #####
+#####                  Repository: https://github.com/ghigo/TX-Ultimate-Easy                  #####
+####################################################################################################
+##### Purpose: Night Mode — persistent LED state that suppresses all automatic LED updates    #####
+####################################################################################################
+---
+script:
+  # Apply the stored night mode color/brightness to all LEDs.
+  # Waits for relay boot initialization so it is safe to call from on_boot.
+  - id: night_mode_apply
+    then:
+      - script.wait: boot_initialize_relays
+      - light.turn_on:
+          id: lights_all
+          red:        !lambda "return id(night_mode_red);"
+          green:      !lambda "return id(night_mode_green);"
+          blue:       !lambda "return id(night_mode_blue);"
+          brightness: !lambda "return id(night_mode_brightness);"
+          transition_length: 500ms
+
+switch:
+  - platform: template
+    name: "Night Mode"
+    id: sw_night_mode
+    icon: mdi:weather-night
+    # Mirror the global so the switch stays in sync after a reboot
+    lambda: "return id(night_mode_active);"
+    turn_on_action:
+      - lambda: |-
+          // Snapshot whatever lights_all is currently showing so the color
+          // survives a reboot (globals are restored, lights_all is not).
+          if (id(lights_all).current_values.is_on()) {
+            id(night_mode_red)        = id(lights_all).current_values.get_red();
+            id(night_mode_green)      = id(lights_all).current_values.get_green();
+            id(night_mode_blue)       = id(lights_all).current_values.get_blue();
+            id(night_mode_brightness) = id(lights_all).current_values.get_brightness();
+          }
+          id(night_mode_active) = true;
+      - script.execute: night_mode_apply
+    turn_off_action:
+      - lambda: "id(night_mode_active) = false;"
+      - light.turn_off:
+          id: lights_all
+      - script.execute: show_relay_status  # restore relay indicator LEDs
+
+esphome:
+  on_boot:
+    # Run very late so all components (relays, LEDs) are ready.
+    priority: -200
+    then:
+      - if:
+          condition:
+            lambda: "return id(night_mode_active);"
+          then:
+            - script.execute: night_mode_apply

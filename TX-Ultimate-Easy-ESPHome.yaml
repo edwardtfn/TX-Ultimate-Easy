@@ -16,12 +16,9 @@ wifi:
   password: !secret wifi_password
 
 packages:
-  remote_package:
-    url: https://github.com/edwardtfn/TX-Ultimate-Easy
-    ref: stable  # Or you can specify a version, like `ref: v2024.12.6` or `ref: latest` to the latest non-stable
-    refresh: 5min
-    files:
-      - ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml                  # Core (essential) packages
-      - ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml              # Non-essential, but recommended packages
-      # - ESPHome/TX-Ultimate-Easy-ESPHome_addon_ble_proxy.yaml     # Adds BLE proxy support
+  # yamllint disable rule:colons
+  core:     !include ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
+  standard: !include ESPHome/TX-Ultimate-Easy-ESPHome_standard.yaml
+  # - ESPHome/TX-Ultimate-Easy-ESPHome_addon_ble_proxy.yaml        # Adds BLE proxy support
+  # yamllint enable rule:colons
 ...

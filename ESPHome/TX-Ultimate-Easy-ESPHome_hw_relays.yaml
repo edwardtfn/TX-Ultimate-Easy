@@ -85,6 +85,27 @@ globals:
     type: bool
     initial_value: 'false'
 
+  - id: night_mode_active
+    type: bool
+    restore_value: true
+    initial_value: 'false'
+  - id: night_mode_red
+    type: float
+    restore_value: true
+    initial_value: '0.8'
+  - id: night_mode_green
+    type: float
+    restore_value: true
+    initial_value: '0.5'
+  - id: night_mode_blue
+    type: float
+    restore_value: true
+    initial_value: '0.0'
+  - id: night_mode_brightness
+    type: float
+    restore_value: true
+    initial_value: '0.1'
+
 light:
   # These lights are used for the physical relays to be shown as lights
   - id: light_output_1
@@ -590,6 +611,11 @@ script:
       state: bool
     then:
       - lambda: |-
+          if (id(night_mode_active)) {
+            ESP_LOGV("${TAG_HW_RELAYS}", "Night mode active - skipping LED update");
+            return;
+          }
+
           ESP_LOGV("${TAG_HW_RELAYS}", "script: light_set_state");
           ESP_LOGV("${TAG_HW_RELAYS}", "  light_group: %" PRIu8, light_group);
           ESP_LOGV("${TAG_HW_RELAYS}", "  light_index: %" PRIu8, light_index);
