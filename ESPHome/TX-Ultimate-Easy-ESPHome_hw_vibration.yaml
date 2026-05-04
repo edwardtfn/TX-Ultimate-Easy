@@ -159,7 +159,7 @@ script:
               return sw_night_mode->state && sw_night_mode_suppress_vibration->state;
               #else
               return true;  // No night mode means no suppression, so vibration should proceed as normal.
-              #endif  // TX_ULTIMATE_EASY_HW_LEDS_NIGHT_MODE
+              #endif  // TX_ULTIMATE_EASY_NIGHT_MODE
           then:
             []
           else:

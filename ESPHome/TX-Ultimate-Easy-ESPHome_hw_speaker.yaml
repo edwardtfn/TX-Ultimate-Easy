@@ -205,7 +205,7 @@ script:
               return sw_night_mode->state && sw_night_mode_suppress_sound->state;
               #else
               return true;  // If night mode is not enabled, don't suppress click sounds.
-              #endif
+              #endif  // TX_ULTIMATE_EASY_NIGHT_MODE
           then:
             []
           else:
