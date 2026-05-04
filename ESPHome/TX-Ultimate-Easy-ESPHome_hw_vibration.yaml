@@ -153,8 +153,13 @@ script:
     then:
       - if:
           condition:
-            # Night mode can suppress haptic feedback independently of the vibration select.
-            lambda: "return id(night_mode_active) && id(night_mode_suppress_vibration);"
+            lambda: |-
+              // Night mode can suppress haptic feedback independently of the vibration select.
+              #ifdef TX_ULTIMATE_EASY_NIGHT_MODE
+              return id(night_mode_active) && id(night_mode_suppress_vibration);
+              #else
+              return true;  // No night mode means no suppression, so vibration should proceed as normal.
+              #endif  // TX_ULTIMATE_EASY_HW_LEDS_NIGHT_MODE
           then:
             []
           else:

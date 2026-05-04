@@ -1,14 +1,28 @@
 ####################################################################################################
 #####                              TX Ultimate Easy for ESPHome                                #####
-#####                  Repository: https://github.com/ghigo/TX-Ultimate-Easy                  #####
+#####                  Repository: https://github.com/ghigo/TX-Ultimate-Easy                   #####
 ####################################################################################################
-##### Purpose: Night Mode — persistent LED/vibration/sound override                           #####
+##### Purpose: Night Mode — persistent LED/vibration/sound override                            #####
 #####                                                                                          #####
 ##### All "Night Mode" entities appear together on the HA device page.                         #####
 ##### Main switch has no entity_category (prominent).                                          #####
-##### Setting entities use entity_category: config (grouped under Configuration).             #####
+##### Setting entities use entity_category: config (grouped under Configuration).              #####
 ####################################################################################################
 ---
+esphome:
+  on_boot:
+    # priority: -200 ensures all hardware components are ready before we touch LEDs.
+    priority: -200
+    then:
+      - if:
+          condition:
+            lambda: "return id(night_mode_active);"
+          then:
+            - script.execute: night_mode_apply
+  platformio_options:
+    build_flags:
+      - -D TX_ULTIMATE_EASY_NIGHT_MODE
+
 globals:
   # ── Night mode state ──────────────────────────────────────────────────────
   - id: night_mode_active
@@ -129,15 +143,4 @@ switch:
       - lambda: "id(night_mode_suppress_sound) = true;"
     turn_off_action:
       - lambda: "id(night_mode_suppress_sound) = false;"
-
-esphome:
-  on_boot:
-    # priority: -200 ensures all hardware components are ready before we touch LEDs.
-    priority: -200
-    then:
-      - if:
-          condition:
-            lambda: "return id(night_mode_active);"
-          then:
-            - script.execute: night_mode_apply
 ...
