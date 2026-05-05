@@ -59,17 +59,26 @@ output:
     platform: template
     type: float
     write_action:
-      - script.execute: night_mode_sync_leds
+      - lambda: |-
+          if (sw_night_mode->state) {
+            night_mode_sync_leds->execute();
+          }
   - id: out_night_mode_green
     platform: template
     type: float
     write_action:
-      - script.execute: night_mode_sync_leds
+      - lambda: |-
+          if (sw_night_mode->state) {
+            night_mode_sync_leds->execute();
+          }
   - id: out_night_mode_blue
     platform: template
     type: float
     write_action:
-      - script.execute: night_mode_sync_leds
+      - lambda: |-
+          if (sw_night_mode->state) {
+            night_mode_sync_leds->execute();
+          }
 
 light:
   # Virtual RGB color picker — stores color preference, never drives hardware.
