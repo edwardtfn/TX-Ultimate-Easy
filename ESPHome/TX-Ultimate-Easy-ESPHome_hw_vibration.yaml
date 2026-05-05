@@ -158,7 +158,7 @@ script:
               #ifdef TX_ULTIMATE_EASY_NIGHT_MODE
               return sw_night_mode->state && sw_night_mode_suppress_vibration->state;
               #else
-              return true;  // No night mode means no suppression, so vibration should proceed as normal.
+              return false;  // No night mode: don't suppress — fall through to vibrate.
               #endif  // TX_ULTIMATE_EASY_NIGHT_MODE
           then:
             []

@@ -171,7 +171,7 @@ suppresses vibration and click-sound feedback. The state survives reboots.
 | Night Mode - Suppress Sound | Switch (config) | On | Block click sounds while night mode is active |
 
 **Usage:**
-1. Set **Night Mode - Color** (under *Configuration*) to your desired color and brightness
+1. Set **Night Mode - Color** to your desired color and brightness
 2. Enable the **Night Mode** switch — the color is snapshotted and the LEDs lock in
 3. Toggle the suppression switches under *Configuration* to allow or block vibration/sound
 4. To change the color: disable Night Mode, adjust **Night Mode - Color**, then re-enable — this re-snapshots the color and persists it across reboots
