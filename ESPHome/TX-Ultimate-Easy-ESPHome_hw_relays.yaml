@@ -157,7 +157,7 @@ light:
     id: light_rl_1_1_${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}
     name: Light - Relay 1 of 1 (${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT})
     platform: partition
-    internal: ${not expose_relays_leds_to_ha and gang_count != 1}
+    internal: ${not expose_relays_leds_to_ha or gang_count != 1}
     disabled_by_default: false
     default_transition_length: ${default_transition_length}
     restore_mode: ${RELAYS_LIGHT_PARTITION_RESTORE_MODE}
@@ -167,7 +167,7 @@ light:
         to: ${9 if IS_EU_MODEL else 24}
   - id: light_rl_1_1_${LIGHT_MODE_TOP_OR_RIGHT_TEXT}
     name: Light - Relay 1 of 1 (${LIGHT_MODE_TOP_OR_RIGHT_TEXT})
-    internal: ${not expose_relays_leds_to_ha and gang_count != 1}
+    internal: ${not expose_relays_leds_to_ha or gang_count != 1}
     <<: *light_partition_relays
     segments:
       - id: light_full
@@ -178,7 +178,7 @@ light:
         to: ${23 if IS_EU_MODEL else 8}
   - id: light_rl_1_2_${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}
     name: Light - Relay 1 of 2 (${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT})
-    internal: ${not expose_relays_leds_to_ha and gang_count != 2}
+    internal: ${not expose_relays_leds_to_ha or gang_count != 2}
     <<: *light_partition_relays
     segments:
       - id: light_full
@@ -186,7 +186,7 @@ light:
         to: ${11 if IS_EU_MODEL else 24}
   - id: light_rl_1_2_${LIGHT_MODE_TOP_OR_RIGHT_TEXT}
     name: Light - Relay 1 of 2 (${LIGHT_MODE_TOP_OR_RIGHT_TEXT})
-    internal: ${not expose_relays_leds_to_ha and gang_count != 2}
+    internal: ${not expose_relays_leds_to_ha or gang_count != 2}
     <<: *light_partition_relays
     segments:
       - id: light_full
@@ -197,7 +197,7 @@ light:
         to: ${21 if IS_EU_MODEL else 3}
   - id: light_rl_2_2_${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}
     name: Light - Relay 2 of 2 (${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT})
-    internal: ${not expose_relays_leds_to_ha and gang_count != 2}
+    internal: ${not expose_relays_leds_to_ha or gang_count != 2}
     <<: *light_partition_relays
     segments:
       - id: light_full
@@ -205,7 +205,7 @@ light:
         to: ${7 if IS_EU_MODEL else 19}
   - id: light_rl_2_2_${LIGHT_MODE_TOP_OR_RIGHT_TEXT}
     name: Light - Relay 2 of 2 (${LIGHT_MODE_TOP_OR_RIGHT_TEXT})
-    internal: ${not expose_relays_leds_to_ha and gang_count != 2}
+    internal: ${not expose_relays_leds_to_ha or gang_count != 2}
     <<: *light_partition_relays
     segments:
       - id: light_full
@@ -213,7 +213,7 @@ light:
         to: ${25 if IS_EU_MODEL else 8}
   - id: light_rl_1_3_${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}
     name: Light - Relay 1 of 3 (${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT})
-    internal: ${not expose_relays_leds_to_ha and gang_count != 3}
+    internal: ${not expose_relays_leds_to_ha or gang_count != 3}
     <<: *light_partition_relays
     segments:
       - id: light_full
@@ -221,7 +221,7 @@ light:
         to: ${12 if IS_EU_MODEL else 23}
   - id: light_rl_1_3_${LIGHT_MODE_TOP_OR_RIGHT_TEXT}
     name: Light - Relay 1 of 3 (${LIGHT_MODE_TOP_OR_RIGHT_TEXT})
-    internal: ${not expose_relays_leds_to_ha and gang_count != 3}
+    internal: ${not expose_relays_leds_to_ha or gang_count != 3}
     <<: *light_partition_relays
     segments:
       - id: light_full
@@ -229,7 +229,7 @@ light:
         to: ${20 if IS_EU_MODEL else 1}
   - id: light_rl_2_3_${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}
     name: Light - Relay 2 of 3 (${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT})
-    internal: ${not expose_relays_leds_to_ha and gang_count != 3}
+    internal: ${not expose_relays_leds_to_ha or gang_count != 3}
     <<: *light_partition_relays
     segments:
       - id: light_full
@@ -237,7 +237,7 @@ light:
         to: ${9 if IS_EU_MODEL else 20}
   - id: light_rl_2_3_${LIGHT_MODE_TOP_OR_RIGHT_TEXT}
     name: Light - Relay 2 of 3 (${LIGHT_MODE_TOP_OR_RIGHT_TEXT})
-    internal: ${not expose_relays_leds_to_ha and gang_count != 3}
+    internal: ${not expose_relays_leds_to_ha or gang_count != 3}
     <<: *light_partition_relays
     segments:
       - id: light_full
@@ -245,7 +245,7 @@ light:
         to: ${23 if IS_EU_MODEL else 4}
   - id: light_rl_3_3_${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}
     name: Light - Relay 3 of 3 (${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT})
-    internal: ${not expose_relays_leds_to_ha and gang_count != 3}
+    internal: ${not expose_relays_leds_to_ha or gang_count != 3}
     <<: *light_partition_relays
     segments:
       - id: light_full
@@ -253,7 +253,7 @@ light:
         to: ${6 if IS_EU_MODEL else 17}
   - id: light_rl_3_3_${LIGHT_MODE_TOP_OR_RIGHT_TEXT}
     name: Light - Relay 3 of 3 (${LIGHT_MODE_TOP_OR_RIGHT_TEXT})
-    internal: ${not expose_relays_leds_to_ha and gang_count != 3}
+    internal: ${not expose_relays_leds_to_ha or gang_count != 3}
     <<: *light_partition_relays
     segments:
       - id: light_full
@@ -261,7 +261,7 @@ light:
         to: ${26 if IS_EU_MODEL else 7}
   - id: light_rl_1_4_${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}
     name: Light - Relay 1 of 4 (${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT})
-    internal: ${not expose_relays_leds_to_ha and gang_count != 4}
+    internal: ${not expose_relays_leds_to_ha or gang_count != 4}
     <<: *light_partition_relays
     segments:
       - id: light_full
@@ -269,7 +269,7 @@ light:
         to: ${12 if IS_EU_MODEL else 24}
   - id: light_rl_1_4_${LIGHT_MODE_TOP_OR_RIGHT_TEXT}
     name: Light - Relay 1 of 4 (${LIGHT_MODE_TOP_OR_RIGHT_TEXT})
-    internal: ${not expose_relays_leds_to_ha and gang_count != 4}
+    internal: ${not expose_relays_leds_to_ha or gang_count != 4}
     <<: *light_partition_relays
     segments:
       - id: light_full
@@ -280,7 +280,7 @@ light:
         to: ${20 if IS_EU_MODEL else 0}
   - id: light_rl_2_4_${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}
     name: Light - Relay 2 of 4 (${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT})
-    internal: ${not expose_relays_leds_to_ha and gang_count != 4}
+    internal: ${not expose_relays_leds_to_ha or gang_count != 4}
     <<: *light_partition_relays
     segments:
       - id: light_full
@@ -288,7 +288,7 @@ light:
         to: ${10 if IS_EU_MODEL else 22}
   - id: light_rl_2_4_${LIGHT_MODE_TOP_OR_RIGHT_TEXT}
     name: Light - Relay 2 of 4 (${LIGHT_MODE_TOP_OR_RIGHT_TEXT})
-    internal: ${not expose_relays_leds_to_ha and gang_count != 4}
+    internal: ${not expose_relays_leds_to_ha or gang_count != 4}
     <<: *light_partition_relays
     segments:
       - id: light_full
@@ -296,7 +296,7 @@ light:
         to: ${22 if IS_EU_MODEL else 2}
   - id: light_rl_3_4_${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}
     name: Light - Relay 3 of 4 (${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT})
-    internal: ${not expose_relays_leds_to_ha and gang_count != 4}
+    internal: ${not expose_relays_leds_to_ha or gang_count != 4}
     <<: *light_partition_relays
     segments:
       - id: light_full
@@ -304,7 +304,7 @@ light:
         to: ${8 if IS_EU_MODEL else 18}
   - id: light_rl_3_4_${LIGHT_MODE_TOP_OR_RIGHT_TEXT}
     name: Light - Relay 3 of 4 (${LIGHT_MODE_TOP_OR_RIGHT_TEXT})
-    internal: ${not expose_relays_leds_to_ha and gang_count != 4}
+    internal: ${not expose_relays_leds_to_ha or gang_count != 4}
     <<: *light_partition_relays
     segments:
       - id: light_full
@@ -312,14 +312,14 @@ light:
         to: ${24 if IS_EU_MODEL else 6}
   - id: light_rl_4_4_${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}
     name: Light - Relay 4 of 4 (${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT})
-    internal: ${not expose_relays_leds_to_ha and gang_count != 4}
+    internal: ${not expose_relays_leds_to_ha or gang_count != 4}
     <<: *light_partition_relays
     segments:
       - id: light_full
         from: ${6 if IS_EU_MODEL else 15}
         to: ${6 if IS_EU_MODEL else 16}
   - id: light_rl_4_4_${LIGHT_MODE_TOP_OR_RIGHT_TEXT}
-    internal: ${not expose_relays_leds_to_ha and gang_count != 4}
+    internal: ${not expose_relays_leds_to_ha or gang_count != 4}
     name: Light - Relay 4 of 4 (${LIGHT_MODE_TOP_OR_RIGHT_TEXT})
     <<: *light_partition_relays
     segments:
