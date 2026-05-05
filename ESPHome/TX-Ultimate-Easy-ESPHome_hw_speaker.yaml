@@ -197,9 +197,21 @@ script:
 
   - id: speaker_play_click
     then:
-      - speaker.play:
-          id: speaker_embedded
-          data: ${click_sound_data}
+      - if:
+          condition:
+            lambda: |-
+              // Night mode can suppress click sounds independently of the speaker select.
+              #ifdef TX_ULTIMATE_EASY_NIGHT_MODE
+              return sw_night_mode->state && sw_night_mode_suppress_sound->state;
+              #else
+              return false;  // No night mode: don't suppress — fall through to play click.
+              #endif  // TX_ULTIMATE_EASY_NIGHT_MODE
+          then:
+            []
+          else:
+            - speaker.play:
+                id: speaker_embedded
+                data: ${click_sound_data}
 
   - id: speaker_setup
     then:

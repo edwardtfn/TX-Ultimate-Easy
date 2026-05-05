@@ -590,6 +590,14 @@ script:
       state: bool
     then:
       - lambda: |-
+          // Night mode holds the LED state — skip all automatic relay-triggered updates.
+          #ifdef TX_ULTIMATE_EASY_NIGHT_MODE
+          if (sw_night_mode->state) {
+            ESP_LOGV("${TAG_HW_RELAYS}", "Night mode active - skipping LED update");
+            return;
+          }
+          #endif  // TX_ULTIMATE_EASY_NIGHT_MODE
+
           ESP_LOGV("${TAG_HW_RELAYS}", "script: light_set_state");
           ESP_LOGV("${TAG_HW_RELAYS}", "  light_group: %" PRIu8, light_group);
           ESP_LOGV("${TAG_HW_RELAYS}", "  light_index: %" PRIu8, light_index);

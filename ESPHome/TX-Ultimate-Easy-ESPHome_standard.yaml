@@ -16,5 +16,6 @@ packages:
   hw_relays:    !include TX-Ultimate-Easy-ESPHome_hw_relays.yaml
   hw_vibration: !include TX-Ultimate-Easy-ESPHome_hw_vibration.yaml
   media_player: !include TX-Ultimate-Easy-ESPHome_media_player.yaml
+  night_mode:   !include TX-Ultimate-Easy-ESPHome_night_mode.yaml
   # yamllint enable rule:colons
 ...
