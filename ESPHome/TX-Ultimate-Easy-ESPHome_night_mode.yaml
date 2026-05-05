@@ -55,17 +55,17 @@ output:
     platform: template
     type: float
     write_action:
-      - lambda: "return;"
+      - script.execute: night_mode_sync_leds
   - id: out_night_mode_green
     platform: template
     type: float
     write_action:
-      - lambda: "return;"
+      - script.execute: night_mode_sync_leds
   - id: out_night_mode_blue
     platform: template
     type: float
     write_action:
-      - lambda: "return;"
+      - script.execute: night_mode_sync_leds
 
 light:
   # Virtual RGB color picker — stores color preference, never drives hardware.
@@ -107,6 +107,30 @@ script:
                 blue: !lambda "return id(night_mode_blue) / 255.0f;"
                 brightness: !lambda "return id(night_mode_brightness) / 255.0f;"
                 transition_length: 500ms
+
+  # Called by each template output write_action whenever the color picker value changes.
+  # Debounced so the three channel writes (R, G, B) collapse into one LED update.
+  # Only applies to hardware when night mode is active.
+  - id: night_mode_sync_leds
+    mode: restart
+    then:
+      - delay: 50ms
+      - if:
+          condition:
+            lambda: "return sw_night_mode->state;"
+          then:
+            - lambda: |-
+                id(night_mode_red)        = static_cast<uint8_t>(id(light_night_mode).current_values.get_red()        * 255.0f + 0.5f);
+                id(night_mode_green)      = static_cast<uint8_t>(id(light_night_mode).current_values.get_green()      * 255.0f + 0.5f);
+                id(night_mode_blue)       = static_cast<uint8_t>(id(light_night_mode).current_values.get_blue()       * 255.0f + 0.5f);
+                id(night_mode_brightness) = static_cast<uint8_t>(id(light_night_mode).current_values.get_brightness() * 255.0f + 0.5f);
+            - light.turn_on:
+                id: light_night_mode_leds
+                red:        !lambda "return id(night_mode_red)        / 255.0f;"
+                green:      !lambda "return id(night_mode_green)      / 255.0f;"
+                blue:       !lambda "return id(night_mode_blue)       / 255.0f;"
+                brightness: !lambda "return id(night_mode_brightness) / 255.0f;"
+                transition_length: 0ms
 
 switch:
   # ── Main control (no entity_category → appears in main entity list) ───────
