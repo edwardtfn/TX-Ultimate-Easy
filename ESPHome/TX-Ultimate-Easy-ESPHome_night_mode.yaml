@@ -48,8 +48,7 @@ globals:
     initial_value: '26'   # 0.1 * 255 (rounded)
 
 light:
-  # Dedicated configuration light for night mode color/brightness.
-  # Appears under "Configuration" in the HA device page.
+  # Dedicated light for night mode color/brightness — appears in main Controls.
   # lights_all is intentionally left untouched by night mode.
   - id: light_night_mode
     name: "Night Mode - Color"
