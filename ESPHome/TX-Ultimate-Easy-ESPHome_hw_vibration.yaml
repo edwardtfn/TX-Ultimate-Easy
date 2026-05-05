@@ -151,9 +151,21 @@ script:
   - id: vibrate
     mode: restart
     then:
-      - switch.turn_on: sw_vibration_motor
-      - delay: !lambda return nr_vibrating_duration->state;
-      - switch.turn_off: sw_vibration_motor
+      - if:
+          condition:
+            lambda: |-
+              // Night mode can suppress haptic feedback independently of the vibration select.
+              #ifdef TX_ULTIMATE_EASY_NIGHT_MODE
+              return sw_night_mode->state && sw_night_mode_suppress_vibration->state;
+              #else
+              return false;  // No night mode: don't suppress — fall through to vibrate.
+              #endif  // TX_ULTIMATE_EASY_NIGHT_MODE
+          then:
+            []
+          else:
+            - switch.turn_on: sw_vibration_motor
+            - delay: !lambda return nr_vibrating_duration->state;
+            - switch.turn_off: sw_vibration_motor
 
 select:
   - id: sl_touch_vibration_feedback
