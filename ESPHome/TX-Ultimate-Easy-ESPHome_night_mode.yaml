@@ -54,12 +54,18 @@ output:
   - id: out_night_mode_red
     platform: template
     type: float
+    write_action:
+      - lambda: "return;"
   - id: out_night_mode_green
     platform: template
     type: float
+    write_action:
+      - lambda: "return;"
   - id: out_night_mode_blue
     platform: template
     type: float
+    write_action:
+      - lambda: "return;"
 
 light:
   # Virtual RGB color picker — stores color preference, never drives hardware.
