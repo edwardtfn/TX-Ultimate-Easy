@@ -114,7 +114,7 @@ script:
   - id: night_mode_sync_leds
     mode: restart
     then:
-      - delay: 50ms
+      - delay: 20ms
       - if:
           condition:
             lambda: "return sw_night_mode->state;"
@@ -130,7 +130,7 @@ script:
                 green:      !lambda "return id(night_mode_green)      / 255.0f;"
                 blue:       !lambda "return id(night_mode_blue)       / 255.0f;"
                 brightness: !lambda "return id(night_mode_brightness) / 255.0f;"
-                transition_length: 0ms
+                transition_length: 500ms
 
 switch:
   # ── Main control (no entity_category → appears in main entity list) ───────
