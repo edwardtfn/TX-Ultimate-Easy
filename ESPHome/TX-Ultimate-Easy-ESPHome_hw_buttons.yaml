@@ -100,6 +100,11 @@ globals:
     restore_value: false
     initial_value: '0'
 
+  - id: instant_click_debounce_ts
+    type: uint32_t
+    restore_value: false
+    initial_value: '0'
+
 script:
   - id: !extend boot_initialize
     then:
@@ -184,7 +189,9 @@ script:
       button: uint8_t
       click_count: uint8_t
     then:
-      - delay: !lambda return nr_button_multi_click_delay->state;
+      - delay: !lambda |-
+          if (id(sw_instant_click_mode)->state) return 0;
+          return nr_button_multi_click_delay->state;
       - lambda: |-
           std::string event_name;
           if (click_count == 1) event_name = "click";
@@ -298,6 +305,20 @@ script:
       position: uint8_t
     then:
       - lambda: |-
+          if (id(sw_instant_click_mode)->state) {
+            id(button_press_button) = button;
+            id(button_press_position) = position;
+            id(click_counter) = 1;
+            // Ignore rapid repeats (debounce)
+            uint32_t now = millis();
+            uint32_t elapsed = (now >= id(instant_click_debounce_ts)) ?
+                              (now - id(instant_click_debounce_ts)) :
+                              (UINT32_MAX - id(instant_click_debounce_ts) + now + 1);
+            if (elapsed < 500) return;
+            id(instant_click_debounce_ts) = now;
+            button_click_event->execute(button, 1);
+            return;
+          }
           uint32_t current_time = millis();
           // Check if we should start a new click sequence:
           // 1. Previous cycle completed (start_time was reset to 0)
@@ -362,6 +383,16 @@ script:
   - id: !extend touch_on_release
     then:
       - lambda: |-
+          if (id(sw_instant_click_mode)->state) {
+            // Instant click mode: action already fired on press, just clean up
+            buttons_release->execute();
+            id(button_press_start_time) = 0;
+            id(last_release_time) = 0;
+            id(click_counter) = 0;
+            id(button_press_button) = 0;
+            id(button_press_position) = 0;
+            return;
+          }
           uint32_t current_time = millis();
           buttons_release->execute();
           if (id(button_press_start_time) > 0) {
@@ -492,4 +523,21 @@ select:
         - lambda: |-
             id(button_actions_packed) = (id(button_actions_packed) & ~(0x0F << 12)) |
                                         ((id(sl_button_4_action).active_index().value_or(1) & 0x0F) << 12);
+
+switch:
+  - id: sw_instant_click_mode
+    name: Instant click mode
+    platform: template
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    internal: false
+    entity_category: config
+    disabled_by_default: false
+    icon: mdi:lightning-bolt
+    turn_on_action:
+      - lambda: |-
+            ESP_LOGI("${TAG_HW_BUTTONS}", "Instant click mode ON - clicks fire on press");
+    turn_off_action:
+      - lambda: |-
+            ESP_LOGI("${TAG_HW_BUTTONS}", "Instant click mode OFF - normal click behavior");
 ...
