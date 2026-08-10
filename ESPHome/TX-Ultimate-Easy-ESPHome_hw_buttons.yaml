@@ -16,6 +16,7 @@ substitutions:
 
   instant_click_mode: false
   INSTANT_CLICK_MODE_ACTIVE: ${ 1 if instant_click_mode else 0 }
+  INSTANT_CLICK_DEBOUNCE_MS: "500"  # Debounce window per button, instant click mode only, in msec
 
   BUTTON_ACTION_NONE_TEXT: "None"
   BUTTON_1_ACTION_TEXT: "Relay 1 (toggle)"
@@ -314,18 +315,25 @@ script:
       - lambda: |-
           // Behaviour depends on "instant click mode"
           #if INSTANT_CLICK_MODE_ACTIVE
-          static uint32_t instant_click_debounce_ts = 0;
+          // Debounce timestamps are tracked per button (index 0 unused, buttons are 1-based)
+          static uint32_t instant_click_debounce_ts[${BUTTON_4_ID} + 1] = {};
 
           id(button_press_button) = button;
           id(button_press_position) = position;
           id(click_counter) = 1;
-          // Ignore rapid repeats (debounce)
-          uint32_t now = millis();
-          uint32_t elapsed = (now >= instant_click_debounce_ts) ?
-                            (now - instant_click_debounce_ts) :
-                            (UINT32_MAX - instant_click_debounce_ts + now + 1);
-          if (elapsed < 500) return;
-          instant_click_debounce_ts = now;
+          // Guard the array access; out-of-range buttons carry no click meaning
+          if (button < ${BUTTON_1_ID} || button > ${BUTTON_4_ID}) {
+            return;
+          }
+          // Ignore rapid repeats (debounce) of this button only
+          const uint32_t now = millis();
+          const uint32_t last = instant_click_debounce_ts[button];
+          // Handle millis() overflow (wraps after ~49 days)
+          const uint32_t elapsed = (now >= last) ? (now - last) : (UINT32_MAX - last + now + 1);
+          if (elapsed < ${INSTANT_CLICK_DEBOUNCE_MS}) {
+            return;
+          }
+          instant_click_debounce_ts[button] = now;
           button_click_event->execute(button, 1);
           #else  // INSTANT_CLICK_MODE_ACTIVE
           uint32_t current_time = millis();
