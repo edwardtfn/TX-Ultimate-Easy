@@ -353,6 +353,7 @@ switch:
     pin:
       number: GPIO5
       inverted: true
+      ignore_strapping_warning: true
     restore_mode: ALWAYS_ON
     internal: false
     entity_category: config
