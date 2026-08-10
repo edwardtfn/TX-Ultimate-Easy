@@ -453,7 +453,7 @@ jobs:
           yaml-file: ".test/esphome_idf_espnow_receiver.yaml"
           version: dev
 
-  build_IDF_instant_click_mode_dev:
+  build_idf_instant_click_mode_dev:
     name: "⚡ IDF Instant Click Mode (dev)"
     needs: build_idf_core_dev
     if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
