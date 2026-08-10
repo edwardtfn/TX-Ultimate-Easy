@@ -389,8 +389,8 @@ script:
               bs_button_4->publish_state(true);
               break;
           }
-          #if  // INSTANT_CLICK_MODE_ACTIVE
-          #else
+          #if INSTANT_CLICK_MODE_ACTIVE
+          #else  // INSTANT_CLICK_MODE_ACTIVE
           // Update binary sensor back to false, so just a quick state change should be send
           switch (button) {
             case 1:
