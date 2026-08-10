@@ -241,6 +241,19 @@ jobs:
           yaml-file: ".test/esphome_ard_espnow_receiver.yaml"
           version: dev
 
+  build_ard_instant_click_mode_dev:
+    name: "⚡ Arduino Instant Click Mode (dev)"
+    needs: build_ard_core_dev
+    if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build Arduino Instant Click Mode - dev
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_ard_instant_click_mode.yaml"
+          version: dev
+
   # IDF Framework - Foundation (latest)
   build_idf_core:
     name: "🏗️ IDF Core (latest)"
@@ -440,6 +453,19 @@ jobs:
           yaml-file: ".test/esphome_idf_espnow_receiver.yaml"
           version: dev
 
+  build_IDF_instant_click_mode_dev:
+    name: "⚡ IDF Instant Click Mode (dev)"
+    needs: build_idf_core_dev
+    if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Build IDF Instant Click Mode - dev
+        uses: esphome/build-action@main
+        with:
+          yaml-file: ".test/esphome_idf_instant_click_mode.yaml"
+          version: dev
+
 
   # Summary Jobs - Grouped by framework and environment
   summary_arduino:
@@ -461,6 +487,7 @@ jobs:
       - build_ard_espnow_sender_dev
       - build_ard_espnow_receiver_latest
       - build_ard_espnow_receiver_dev
+      - build_ard_instant_click_mode_dev
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -490,7 +517,8 @@ jobs:
             [ "${{ needs.build_ard_espnow_example_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             [ "${{ needs.build_ard_espnow_sender_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             [ "${{ needs.build_ard_espnow_receiver_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-            TOTAL=$((TOTAL + 6))
+            [ "${{ needs.build_ard_instant_click_mode_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+            TOTAL=$((TOTAL + 7))
           fi
 
           echo "🤖 Arduino Framework: $SUCCESS/$TOTAL builds passed"
@@ -521,6 +549,7 @@ jobs:
       - build_idf_espnow_sender_dev
       - build_idf_espnow_receiver_latest
       - build_idf_espnow_receiver_dev
+      - build_idf_instant_click_mode_dev
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -550,7 +579,8 @@ jobs:
             [ "${{ needs.build_idf_espnow_example_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             [ "${{ needs.build_idf_espnow_sender_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
             [ "${{ needs.build_idf_espnow_receiver_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-            TOTAL=$((TOTAL + 6))
+            [ "${{ needs.build_idf_instant_click_mode_dev.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+            TOTAL=$((TOTAL + 7))
           fi
 
           echo "🔧 ESP-IDF Framework: $SUCCESS/$TOTAL builds passed"
