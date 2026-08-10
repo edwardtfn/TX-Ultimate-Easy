@@ -138,7 +138,7 @@ device integration rather than implementing its own automation tools.
 
 TX Ultimate Easy uses Home Assistant's native Events system for reliable automation triggers.
 While sensors show the current state (e.g., button pressed/not pressed),
-events capture-specific actions like clicks, swipes, and long presses.
+events capture-specific actions like clicks, swipes, and long-presses.
 
 For more details, please refer to our **[Events docs](docs/events.md)**.
 
@@ -302,7 +302,7 @@ For setup, see **[ESP-NOW docs](docs/espnow.md)**.
 
 #### Instant Click Mode
 By default, a button click is only acted upon after the touch is released and the multi-click window expires,
-so the firmware can tell a single click from a double click or a long press.
+so the firmware can tell a single click from a double-click or a long-press.
 Instant click mode removes that wait: the click action fires the moment your finger touches the panel.
 
 To enable it, add the substitution to your device configuration and re-flash:
@@ -336,7 +336,7 @@ only repeats of the same button within the window are suppressed.
 > Swipe and multi-touch events themselves are unaffected and still reach Home Assistant.
 
 > [!NOTE]
-> Automations that rely on double click or long press on the buttons will stop working while this mode is enabled.
+> Automations that rely on double-click or long-press on the buttons will stop working while this mode is enabled.
 > Swipes remain available as an alternative gesture. ESP-NOW is compatible: remote toggles are also sent on touch-down.
 
 ### Advanced Settings
