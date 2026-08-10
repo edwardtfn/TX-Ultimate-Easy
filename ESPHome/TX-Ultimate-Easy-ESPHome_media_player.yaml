@@ -37,7 +37,6 @@ media_player:
     name: Media Player
     internal: false
     platform: speaker
-    codec_support_enabled: true
     buffer_size: 250000
     task_stack_in_psram: false
     announcement_pipeline:
