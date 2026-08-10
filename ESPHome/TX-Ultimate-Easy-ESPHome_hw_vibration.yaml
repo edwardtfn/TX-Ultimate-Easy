@@ -35,9 +35,8 @@ button:
         - script.execute: vibrate
 
 esphome:
-  platformio_options:
-    build_flags:
-      - -D TX_ULTIMATE_EASY_HW_VIBRATION
+  build_flags:
+    - -D TX_ULTIMATE_EASY_HW_VIBRATION
 
 number:
   - id: nr_vibrating_duration

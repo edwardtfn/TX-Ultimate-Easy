@@ -210,9 +210,8 @@ binary_sensor:
             state: OFF  # yamllint disable-line rule:truthy
 
 esphome:
-  platformio_options:
-    build_flags:
-      - -D TX_ULTIMATE_EASY_HW_TOUCH
+  build_flags:
+    - -D TX_ULTIMATE_EASY_HW_TOUCH
 
 number:
   - id: nr_touch_duration

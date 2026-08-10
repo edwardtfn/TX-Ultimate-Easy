@@ -25,9 +25,8 @@ esphome:
             lambda: "return sw_night_mode->state;"
           then:
             - script.execute: night_mode_apply
-  platformio_options:
-    build_flags:
-      - -D TX_ULTIMATE_EASY_NIGHT_MODE
+  build_flags:
+    - -D TX_ULTIMATE_EASY_NIGHT_MODE
 
 globals:
   # ─── LED color/brightness snapshot ─ persists across reboots so the color ───

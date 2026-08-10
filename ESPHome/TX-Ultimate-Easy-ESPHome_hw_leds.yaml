@@ -36,9 +36,8 @@ substitutions:
   TAG_HW_LEDS: tx_ultimate_easy.hw.leds
 
 esphome:
-  platformio_options:
-    build_flags:
-      - -D TX_ULTIMATE_EASY_HW_LEDS
+  build_flags:
+    - -D TX_ULTIMATE_EASY_HW_LEDS
 
 light:
   # These lights are controlling the LEDs on the device

@@ -17,9 +17,8 @@ substitutions:
   TAG_ESPNOW_RECEIVER: tx_ultimate_easy.espnow.receiver
 
 esphome:
-  platformio_options:
-    build_flags:
-      - -D TX_ULTIMATE_EASY_ESPNOW_RECEIVER
+  build_flags:
+    - -D TX_ULTIMATE_EASY_ESPNOW_RECEIVER
 
 espnow:
   id: espnow_component

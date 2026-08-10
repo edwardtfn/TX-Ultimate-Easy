@@ -18,9 +18,8 @@ packages:
   hw_speaker: !include TX-Ultimate-Easy-ESPHome_hw_speaker.yaml
 
 esphome:
-  platformio_options:
-    build_flags:
-      - -D TX_ULTIMATE_EASY_MEDIA_PLAYER
+  build_flags:
+    - -D TX_ULTIMATE_EASY_MEDIA_PLAYER
 
 globals:
   - id: last_media_player_volume

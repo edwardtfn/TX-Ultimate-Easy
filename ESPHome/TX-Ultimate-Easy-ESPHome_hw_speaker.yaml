@@ -143,9 +143,8 @@ api:
             }
 
 esphome:
-  platformio_options:
-    build_flags:
-      - -D TX_ULTIMATE_EASY_HW_SPEAKER
+  build_flags:
+    - -D TX_ULTIMATE_EASY_HW_SPEAKER
 
 number:
   - id: speaker_volume

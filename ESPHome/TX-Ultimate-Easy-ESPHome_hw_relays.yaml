@@ -43,9 +43,8 @@ substitutions:
   TAG_HW_RELAYS: tx_ultimate_easy.hw.relays
 
 esphome:
-  platformio_options:
-    build_flags:
-      - -D TX_ULTIMATE_EASY_HW_RELAYS
+  build_flags:
+    - -D TX_ULTIMATE_EASY_HW_RELAYS
 
 globals:
   - id: boot_initialization_relays

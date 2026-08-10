@@ -62,9 +62,8 @@ binary_sensor:
     internal: ${gang_count < 4}
 
 esphome:
-  platformio_options:
-    build_flags:
-      - -D TX_ULTIMATE_EASY_HW_BUTTONS
+  build_flags:
+    - -D TX_ULTIMATE_EASY_HW_BUTTONS
 
 globals:
   # Packed button actions - replaces 4 separate selects
