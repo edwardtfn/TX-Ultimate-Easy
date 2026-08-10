@@ -328,12 +328,16 @@ script:
           // Ignore rapid repeats (debounce) of this button only
           const uint32_t now = millis();
           const uint32_t last = instant_click_debounce_ts[button];
-          // Handle millis() overflow (wraps after ~49 days)
-          const uint32_t elapsed = (now >= last) ? (now - last) : (UINT32_MAX - last + now + 1);
-          if (elapsed < ${INSTANT_CLICK_DEBOUNCE_MS}) {
-            return;
+          // A zero timestamp means no press has been accepted for this button yet
+          if (last != 0) {
+            // Handle millis() overflow (wraps after ~49 days)
+            const uint32_t elapsed = (now >= last) ? (now - last) : (UINT32_MAX - last + now + 1);
+            if (elapsed < ${INSTANT_CLICK_DEBOUNCE_MS}) {
+              return;
+            }
           }
-          instant_click_debounce_ts[button] = now;
+          // Never store the sentinel back; millis() only returns 0 in the first msec after boot or wrap
+          instant_click_debounce_ts[button] = (now != 0) ? now : 1;
           button_click_event->execute(button, 1);
           #else  // INSTANT_CLICK_MODE_ACTIVE
           uint32_t current_time = millis();
