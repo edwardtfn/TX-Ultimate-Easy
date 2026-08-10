@@ -69,7 +69,7 @@ script:
       - lambda: |-
           // Volume sync configuration
           ESP_LOGCONFIG("${TAG_MEDIA_PLAYER}", "Media Player Volume Sync:");
-          ESP_LOGCONFIG("${TAG_MEDIA_PLAYER}", "  Persistent volume: %" PRIu8 "%",
+          ESP_LOGCONFIG("${TAG_MEDIA_PLAYER}", "  Persistent volume: %" PRIu8 "%%",
                                                     id(persistent_media_player_volume));
           ESP_LOGCONFIG("${TAG_MEDIA_PLAYER}", "  Current volume: %.1f%%", mp_media_player->volume * 100.0f);
 
@@ -97,7 +97,7 @@ script:
           volume: !lambda return id(persistent_media_player_volume) / 100.0f;
       - lambda: |-
           id(last_media_player_volume) = id(persistent_media_player_volume);
-          ESP_LOGI("${TAG_MEDIA_PLAYER}", "Initial volume sync: %.1f%% (restored from persistence)",
+          ESP_LOGI("${TAG_MEDIA_PLAYER}", "Initial volume sync: %" PRIu8 "%% (restored from persistence)",
                                               id(persistent_media_player_volume));
 
 speaker:

@@ -64,7 +64,7 @@ script:
       - lambda: |-
           // Configuration
           ESP_LOGCONFIG("${TAG_HW_VIBRATION}", "Touch - Vibration feedback: %s",
-                                              sl_touch_vibration_feedback->current_option());
+                                              sl_touch_vibration_feedback->current_option().c_str());
           ESP_LOGCONFIG("${TAG_HW_VIBRATION}", "Vibrate duration: %.0fms", nr_vibrating_duration->state);
           ESP_LOGCONFIG("${TAG_HW_VIBRATION}", "Vibrate max duration: ${vibration_max_duration}");
 
