@@ -33,9 +33,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Setup Python
-        uses: actions/setup-python@main
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:
           python-version: '3.11'
       - name: Install Yamllint
@@ -49,9 +51,11 @@ jobs:
     needs: code_scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build Arduino Core - latest
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_ard_core.yaml"
           version: latest
@@ -62,9 +66,11 @@ jobs:
     if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build Arduino Core - dev
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_ard_core.yaml"
           version: dev
@@ -73,9 +79,11 @@ jobs:
     needs: build_ard_core
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build Arduino Basic - latest
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_ard_basic.yaml"
           version: latest
@@ -86,9 +94,11 @@ jobs:
     if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build Arduino Basic - dev
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_ard_basic.yaml"
           version: dev
@@ -98,9 +108,11 @@ jobs:
     needs: build_ard_basic
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build Arduino HW LEDs Individual - latest
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_ard_hw_leds_individual.yaml"
           version: latest
@@ -110,9 +122,11 @@ jobs:
     needs: build_ard_basic
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build Arduino HW Relays - latest
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_ard_hw_relays.yaml"
           version: latest
@@ -122,9 +136,11 @@ jobs:
     needs: build_ard_basic
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build Arduino HW Speaker - latest
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_ard_hw_speaker.yaml"
           version: latest
@@ -134,9 +150,11 @@ jobs:
     needs: build_ard_basic
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build Arduino HW Vibration - latest
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_ard_hw_vibration.yaml"
           version: latest
@@ -146,9 +164,11 @@ jobs:
     needs: build_ard_basic
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build Arduino BLE Proxy - latest
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_ard_ble_proxy.yaml"
           version: latest
@@ -159,9 +179,11 @@ jobs:
     if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build Arduino BLE Proxy - dev
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_ard_ble_proxy.yaml"
           version: dev
@@ -171,9 +193,11 @@ jobs:
     needs: build_ard_core
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build Arduino ESPNow example - latest
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_ard_espnow_example.yaml"
           version: latest
@@ -184,9 +208,11 @@ jobs:
     if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build Arduino ESPNow example - dev
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_ard_espnow_example.yaml"
           version: dev
@@ -196,9 +222,11 @@ jobs:
     needs: build_ard_espnow_example_latest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build Arduino ESPNow sender - latest
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_ard_espnow_sender.yaml"
           version: latest
@@ -209,9 +237,11 @@ jobs:
     if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build Arduino ESPNow sender - dev
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_ard_espnow_sender.yaml"
           version: dev
@@ -221,9 +251,11 @@ jobs:
     needs: build_ard_espnow_example_latest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build Arduino ESPNow receiver - latest
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_ard_espnow_receiver.yaml"
           version: latest
@@ -234,9 +266,11 @@ jobs:
     if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build Arduino ESPNow receiver - dev
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_ard_espnow_receiver.yaml"
           version: dev
@@ -247,9 +281,11 @@ jobs:
     if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build Arduino Instant Click Mode - dev
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_ard_instant_click_mode.yaml"
           version: dev
@@ -260,9 +296,11 @@ jobs:
     needs: code_scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build IDF Core - latest
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_idf_core.yaml"
           version: latest
@@ -273,9 +311,11 @@ jobs:
     if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build IDF Core - dev
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_idf_core.yaml"
           version: dev
@@ -285,9 +325,11 @@ jobs:
     needs: build_idf_core
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build IDF Basic - latest
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_idf_basic.yaml"
           version: latest
@@ -298,9 +340,11 @@ jobs:
     if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build IDF Basic - dev
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_idf_basic.yaml"
           version: dev
@@ -310,9 +354,11 @@ jobs:
     needs: build_idf_basic
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build IDF HW LEDs Individual - latest
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_idf_hw_leds_individual.yaml"
           version: latest
@@ -322,9 +368,11 @@ jobs:
     needs: build_idf_basic
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build IDF HW Relays - latest
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_idf_hw_relays.yaml"
           version: latest
@@ -334,9 +382,11 @@ jobs:
     needs: build_idf_basic
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build IDF HW Speaker - latest
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_idf_hw_speaker.yaml"
           version: latest
@@ -346,9 +396,11 @@ jobs:
     needs: build_idf_basic
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build IDF HW Vibration - latest
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_idf_hw_vibration.yaml"
           version: latest
@@ -358,9 +410,11 @@ jobs:
     needs: build_idf_basic
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build IDF BLE Proxy - latest
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_idf_ble_proxy.yaml"
           version: latest
@@ -371,9 +425,11 @@ jobs:
     if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build IDF BLE Proxy - dev
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_idf_ble_proxy.yaml"
           version: dev
@@ -383,9 +439,11 @@ jobs:
     needs: build_idf_core
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build IDF ESPNow example - latest
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_idf_espnow_example.yaml"
           version: latest
@@ -396,9 +454,11 @@ jobs:
     if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build IDF ESPNow example - dev
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_idf_espnow_example.yaml"
           version: dev
@@ -408,9 +468,11 @@ jobs:
     needs: build_idf_espnow_example_latest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build IDF ESPNow sender - latest
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_idf_espnow_sender.yaml"
           version: latest
@@ -421,9 +483,11 @@ jobs:
     if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build IDF ESPNow sender - dev
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_idf_espnow_sender.yaml"
           version: dev
@@ -433,9 +497,11 @@ jobs:
     needs: build_idf_espnow_example_latest
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build IDF ESPNow receiver - latest
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_idf_espnow_receiver.yaml"
           version: latest
@@ -446,9 +512,11 @@ jobs:
     if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build IDF ESPNow receiver - dev
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_idf_espnow_receiver.yaml"
           version: dev
@@ -459,9 +527,11 @@ jobs:
     if: ${{ success() && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_dev != 'true') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
       - name: Build IDF Instant Click Mode - dev
-        uses: esphome/build-action@main
+        uses: esphome/build-action@6b9d3f593d626a2f0d2c17daebf0a97957d67425  # v8.0.0
         with:
           yaml-file: ".test/esphome_idf_instant_click_mode.yaml"
           version: dev
