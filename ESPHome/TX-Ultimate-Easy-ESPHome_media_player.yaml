@@ -18,9 +18,8 @@ packages:
   hw_speaker: !include TX-Ultimate-Easy-ESPHome_hw_speaker.yaml
 
 esphome:
-  platformio_options:
-    build_flags:
-      - -D TX_ULTIMATE_EASY_MEDIA_PLAYER
+  build_flags:
+    - -D TX_ULTIMATE_EASY_MEDIA_PLAYER
 
 globals:
   - id: last_media_player_volume
@@ -37,7 +36,6 @@ media_player:
     name: Media Player
     internal: false
     platform: speaker
-    codec_support_enabled: true
     buffer_size: 250000
     task_stack_in_psram: false
     announcement_pipeline:
@@ -71,7 +69,7 @@ script:
       - lambda: |-
           // Volume sync configuration
           ESP_LOGCONFIG("${TAG_MEDIA_PLAYER}", "Media Player Volume Sync:");
-          ESP_LOGCONFIG("${TAG_MEDIA_PLAYER}", "  Persistent volume: %" PRIu8 "%",
+          ESP_LOGCONFIG("${TAG_MEDIA_PLAYER}", "  Persistent volume: %" PRIu8 "%%",
                                                     id(persistent_media_player_volume));
           ESP_LOGCONFIG("${TAG_MEDIA_PLAYER}", "  Current volume: %.1f%%", mp_media_player->volume * 100.0f);
 
@@ -99,7 +97,7 @@ script:
           volume: !lambda return id(persistent_media_player_volume) / 100.0f;
       - lambda: |-
           id(last_media_player_volume) = id(persistent_media_player_volume);
-          ESP_LOGI("${TAG_MEDIA_PLAYER}", "Initial volume sync: %.1f%% (restored from persistence)",
+          ESP_LOGI("${TAG_MEDIA_PLAYER}", "Initial volume sync: %" PRIu8 "%% (restored from persistence)",
                                               id(persistent_media_player_volume));
 
 speaker:

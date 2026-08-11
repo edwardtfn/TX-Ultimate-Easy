@@ -43,9 +43,8 @@ substitutions:
   TAG_HW_RELAYS: tx_ultimate_easy.hw.relays
 
 esphome:
-  platformio_options:
-    build_flags:
-      - -D TX_ULTIMATE_EASY_HW_RELAYS
+  build_flags:
+    - -D TX_ULTIMATE_EASY_HW_RELAYS
 
 globals:
   - id: boot_initialization_relays
@@ -84,6 +83,12 @@ globals:
   - id: relay_4_state
     type: bool
     initial_value: 'false'
+
+.light_partition_relays: &light_partition_relays
+  platform: partition
+  disabled_by_default: false
+  default_transition_length: ${default_transition_length}
+  restore_mode: ${RELAYS_LIGHT_PARTITION_RESTORE_MODE}
 
 light:
   # These lights are used for the physical relays to be shown as lights
@@ -153,14 +158,10 @@ light:
             show_relay_status->execute();
 
   # These lights are used to indicate relay's statuses
-  - &light_partition_relays
-    id: light_rl_1_1_${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}
+  - id: light_rl_1_1_${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}
     name: Light - Relay 1 of 1 (${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT})
-    platform: partition
     internal: ${not expose_relays_leds_to_ha or gang_count != 1}
-    disabled_by_default: false
-    default_transition_length: ${default_transition_length}
-    restore_mode: ${RELAYS_LIGHT_PARTITION_RESTORE_MODE}
+    <<: *light_partition_relays
     segments:
       - id: light_full
         from: ${9 if IS_EU_MODEL else 15}
@@ -733,23 +734,25 @@ script:
                   }
                 }
 
+.relay_light_mode: &relay_light_mode
+  platform: template
+  options:
+    - "${LIGHT_MODE_DISABLED_TEXT}"
+    - "${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}"
+    - "${LIGHT_MODE_TOP_OR_RIGHT_TEXT}"
+    - "${LIGHT_MODE_BOTH_TEXT}"
+  initial_option: "${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}"
+  optimistic: true
+  disabled_by_default: false
+  entity_category: config
+  icon: mdi:dots-square
+
 select:
-  - &relay_light_mode
-    id: sl_relay_1_light_mode
+  - id: sl_relay_1_light_mode
     name: Relay 1 light mode
-    platform: template
-    options:
-      - "${LIGHT_MODE_DISABLED_TEXT}"
-      - "${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}"
-      - "${LIGHT_MODE_TOP_OR_RIGHT_TEXT}"
-      - "${LIGHT_MODE_BOTH_TEXT}"
-    initial_option: "${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}"
-    optimistic: true
     restore_value: ${gang_count >= 1}
     internal: ${gang_count < 1}
-    entity_category: config
-    disabled_by_default: false
-    icon: mdi:dots-square
+    <<: *relay_light_mode
     on_value:
       - lambda: |-
           // Handle mode transitions (only after boot is complete)

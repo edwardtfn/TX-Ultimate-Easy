@@ -143,9 +143,8 @@ api:
             }
 
 esphome:
-  platformio_options:
-    build_flags:
-      - -D TX_ULTIMATE_EASY_HW_SPEAKER
+  build_flags:
+    - -D TX_ULTIMATE_EASY_HW_SPEAKER
 
 number:
   - id: speaker_volume
@@ -313,7 +312,9 @@ speaker:
   - id: speaker_embedded
     platform: i2s_audio
     dac_type: external
-    i2s_dout_pin: GPIO15
+    i2s_dout_pin:
+      number: GPIO15
+      ignore_strapping_warning: true
     i2s_audio_id: if_i2s_audio
     i2s_comm_fmt: stand_msb
     channel: mono
