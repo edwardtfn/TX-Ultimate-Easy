@@ -11,9 +11,8 @@
 ####################################################################################################
 ---
 esphome:
-  platformio_options:
-    build_flags:
-      - -D TX_ULTIMATE_EASY_ESPNOW
+  build_flags:
+    - -D TX_ULTIMATE_EASY_ESPNOW
 
 packages:
   # yamllint disable rule:colons

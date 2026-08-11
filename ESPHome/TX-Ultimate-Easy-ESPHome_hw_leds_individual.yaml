@@ -16,9 +16,8 @@ substitutions:
   TAG_HW_LEDS_INDIVIDUAL: tx_ultimate_easy.hw.leds.individual
 
 esphome:
-  platformio_options:
-    build_flags:
-      - -D TX_ULTIMATE_EASY_HW_LEDS_INDIVIDUAL
+  build_flags:
+    - -D TX_ULTIMATE_EASY_HW_LEDS_INDIVIDUAL
 
 light:
   - &light_partition_individual_led
