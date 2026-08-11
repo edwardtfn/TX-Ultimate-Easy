@@ -138,7 +138,7 @@ device integration rather than implementing its own automation tools.
 
 TX Ultimate Easy uses Home Assistant's native Events system for reliable automation triggers.
 While sensors show the current state (e.g., button pressed/not pressed),
-events capture-specific actions like clicks, swipes, and long presses.
+events capture-specific actions like clicks, swipes, and long-presses.
 
 For more details, please refer to our **[Events docs](docs/events.md)**.
 
@@ -299,6 +299,45 @@ bluetooth_proxy:
 Add the ESP-NOW package so one switch can toggle relays on another switch directly, without Home Assistant.
 Configuration is done via YAML substitutions (target MAC and relay per button).
 For setup, see **[ESP-NOW docs](docs/espnow.md)**.
+
+#### Instant Click Mode
+By default, a button click is only acted upon after the touch is released and the multi-click window expires,
+so the firmware can tell a single click from a double-click or a long-press.
+Instant click mode removes that wait: the click action fires the moment your finger touches the panel.
+
+To enable it, add the substitution to your device configuration and re-flash:
+
+```yaml
+substitutions:
+  instant_click_mode: true
+```
+
+This is a compile-time option. It cannot be changed from Home Assistant, and the device must be recompiled and
+uploaded for a change to take effect. The active mode is reported in the boot log by `dump_config`.
+
+**What changes when instant click mode is on:**
+
+| Behaviour | Normal mode | Instant click mode |
+|-----------|-------------|--------------------|
+| Relay toggle | On release, after the multi-click delay | On touch-down |
+| `click` event | Fired after the multi-click delay, `count` may be higher than 1 | Fired on touch-down, `count` is always 1 |
+| `double_click` / `multiple-click` events | Available | Never fired |
+| `long_press` event | Available | Never fired |
+| **Button multi-click delay** number entity | Applies to buttons | Ignored by buttons |
+| **Button N** binary sensor | Short pulse on press | Follows the real press, on while held |
+| Repeated presses of the same button | Counted as multi-click | Ignored for 500 ms after the previous accepted press |
+
+The 500 ms window is tracked per button, so pressing button 1 and then button 2 in quick succession works normally;
+only repeats of the same button within the window are suppressed.
+
+> [!WARNING]
+> Because the action fires on touch-down, a swipe or a multi-touch gesture that starts over a button region will
+> toggle that relay before the panel reports the gesture. The swipe and multi-touch guards cannot suppress it.
+> Swipe and multi-touch events themselves are unaffected and still reach Home Assistant.
+
+> [!NOTE]
+> Automations that rely on double-click or long-press on the buttons will stop working while this mode is enabled.
+> Swipes remain available as an alternative gesture. ESP-NOW is compatible: remote toggles are also sent on touch-down.
 
 ### Advanced Settings
 For more granular control over components,
