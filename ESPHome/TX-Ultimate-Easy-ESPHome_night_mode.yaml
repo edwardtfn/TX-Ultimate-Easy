@@ -21,11 +21,10 @@ esphome:
   on_boot:
     - priority: -200  # Ensures all hardware components are ready before we touch LEDs.
       then:
-        - if:
-            condition:
-              lambda: "return sw_night_mode->state;"
-            then:
-              - script.execute: night_mode_apply
+        - lambda: |-
+            if (sw_night_mode->state) {
+              night_mode_apply->execute();
+            }
 
 globals:
   # ─── LED color/brightness snapshot ─ persists across reboots so the color ───
