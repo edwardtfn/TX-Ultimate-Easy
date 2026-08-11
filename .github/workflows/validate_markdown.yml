@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0  # Ensures full commit history for diff
 
@@ -35,7 +35,7 @@ jobs:
           fi
 
       - name: Markdown Lint
-        uses: DavidAnson/markdownlint-cli2-action@v14
+        uses: DavidAnson/markdownlint-cli2-action@v24
         if: env.any_changed == 'true'
         with:
           globs: ${{ env.changed_files }}
@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 

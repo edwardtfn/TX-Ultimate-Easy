@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
-      - uses: RafikFarhad/clang-format-github-action@v3
+      - uses: RafikFarhad/clang-format-github-action@v7
         with:
           sources: "components/tx_ultimate_easy/*.h,components/tx_ultimate_easy/*.cpp"
 ...
