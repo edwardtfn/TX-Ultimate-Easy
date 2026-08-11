@@ -422,22 +422,24 @@ script:
     then:
       - script.execute: buttons_reset_state
 
+.button_select_action_base: &button_select_action_base
+  platform: template
+  optimistic: true
+  restore_value: false
+  disabled_by_default: false
+  entity_category: config
+  icon: mdi:dip-switch
+
 select:
-  - &button_select_action_base
-    id: sl_button_1_action
+  - id: sl_button_1_action
     name: Button 1 action
-    platform: template
     options:
       - "${BUTTON_ACTION_NONE_TEXT}"
       - "${BUTTON_1_ACTION_TEXT}"
       - "${BUTTON_1_ACTION_FAILSAFE_TEXT}"
     initial_option: "${BUTTON_1_ACTION_TEXT}"
-    optimistic: true
-    restore_value: false
     internal: ${gang_count < 1}
-    entity_category: config
-    disabled_by_default: false
-    icon: mdi:dip-switch
+    <<: *button_select_action_base
     on_value:
       then:
         - lambda: |-
@@ -446,7 +448,6 @@ select:
 
   - id: sl_button_2_action
     name: Button 2 action
-    platform: template
     options:
       - "${BUTTON_ACTION_NONE_TEXT}"
       - "${BUTTON_2_ACTION_TEXT}"
@@ -462,7 +463,6 @@ select:
 
   - id: sl_button_3_action
     name: Button 3 action
-    platform: template
     options:
       - "${BUTTON_ACTION_NONE_TEXT}"
       - "${BUTTON_3_ACTION_TEXT}"
@@ -478,7 +478,6 @@ select:
 
   - id: sl_button_4_action
     name: Button 4 action
-    platform: template
     options:
       - "${BUTTON_ACTION_NONE_TEXT}"
       - "${BUTTON_4_ACTION_TEXT}"
