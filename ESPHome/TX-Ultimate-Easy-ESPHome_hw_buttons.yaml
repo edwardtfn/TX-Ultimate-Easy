@@ -143,7 +143,13 @@ script:
                 bs_button_4_click_event->publish_state(true);
                 break;
             }
-          } else if (action == "double_click") {
+          }
+          #if INSTANT_CLICK_MODE_ACTIVE
+          // Instant click mode only ever produces single clicks: `touch_on_press_buttons` fires
+          // with a fixed count of 1 and `touch_on_release` performs no long press detection,
+          // so the double click and long press branches are compiled out to save flash.
+          #else   // INSTANT_CLICK_MODE_ACTIVE
+          else if (action == "double_click") {
             switch (button) {
               case ${BUTTON_1_ID}:
                 bs_button_1_double_click_event->publish_state(true);
@@ -174,12 +180,19 @@ script:
                 break;
             }
           }
+          #endif  // INSTANT_CLICK_MODE_ACTIVE
+          #if INSTANT_CLICK_MODE_ACTIVE
+          // Instant click mode: the click already fired on touch-down and the finger may still
+          // be down, so the press state and the button binary sensor must survive until the
+          // physical release. `touch_on_release` performs the cleanup.
+          #else   // INSTANT_CLICK_MODE_ACTIVE
           id(button_press_button) = 0;
           id(button_press_position) = 0;
           id(button_press_start_time) = 0;
           id(last_release_time) = 0;
           id(click_counter) = 0;
           buttons_release->execute();
+          #endif  // INSTANT_CLICK_MODE_ACTIVE
 
   - id: button_click_event
     mode: restart
@@ -195,11 +208,17 @@ script:
           return nr_button_multi_click_delay->state;
           #endif  // INSTANT_CLICK_MODE_ACTIVE
       - lambda: |-
+          #if INSTANT_CLICK_MODE_ACTIVE
+          // Instant click mode always fires with `click_count` fixed at 1, so the multi-click
+          // naming is resolved at compile time.
+          button_action->execute(button, "click", click_count);
+          #else   // INSTANT_CLICK_MODE_ACTIVE
           std::string event_name;
           if (click_count == 1) event_name = "click";
           else if (click_count == 2) event_name = "double_click";
           else event_name = "multiple_click";
           button_action->execute(button, event_name.c_str(), click_count);
+          #endif  // INSTANT_CLICK_MODE_ACTIVE
 
   - id: buttons_release
     mode: restart
