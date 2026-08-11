@@ -14,6 +14,10 @@
 substitutions:
   invalid_cooldown: 100ms
 
+  instant_click_mode: false
+  INSTANT_CLICK_MODE_ACTIVE: ${ 1 if instant_click_mode else 0 }
+  INSTANT_CLICK_DEBOUNCE_MS: "500"  # Debounce window per button, instant click mode only, in msec
+
   BUTTON_ACTION_NONE_TEXT: "None"
   BUTTON_1_ACTION_TEXT: "Relay 1 (toggle)"
   BUTTON_2_ACTION_TEXT: "Relay 2 (toggle)"
@@ -183,7 +187,13 @@ script:
       button: uint8_t
       click_count: uint8_t
     then:
-      - delay: !lambda return nr_button_multi_click_delay->state;
+      - delay: !lambda |-
+          // Return `0` (instant) when instant click mode is active
+          #if INSTANT_CLICK_MODE_ACTIVE
+          return 0;
+          #else   // INSTANT_CLICK_MODE_ACTIVE
+          return nr_button_multi_click_delay->state;
+          #endif  // INSTANT_CLICK_MODE_ACTIVE
       - lambda: |-
           std::string event_name;
           if (click_count == 1) event_name = "click";
@@ -251,6 +261,11 @@ script:
             #else
                                                                 sl_button_4_action->current_option() : "Unknown");
             #endif
+          #if INSTANT_CLICK_MODE_ACTIVE
+          ESP_LOGCONFIG("${TAG_HW_BUTTONS}", "Instant click mode ON - clicks fire on press");
+          #else   // INSTANT_CLICK_MODE_ACTIVE
+          ESP_LOGCONFIG("${TAG_HW_BUTTONS}", "Instant click mode OFF - normal click behavior");
+          #endif  // INSTANT_CLICK_MODE_ACTIVE
 
   - id: !extend dump_config_list_packages
     then:
@@ -297,6 +312,33 @@ script:
       position: uint8_t
     then:
       - lambda: |-
+          // Behaviour depends on "instant click mode"
+          #if INSTANT_CLICK_MODE_ACTIVE
+          // Debounce timestamps are tracked per button (index 0 unused, buttons are 1-based)
+          static uint32_t instant_click_debounce_ts[${BUTTON_4_ID} + 1] = {};
+
+          id(button_press_button) = button;
+          id(button_press_position) = position;
+          id(click_counter) = 1;
+          // Guard the array access; out-of-range buttons carry no click meaning
+          if (button < ${BUTTON_1_ID} || button > ${BUTTON_4_ID}) {
+            return;
+          }
+          // Ignore rapid repeats (debounce) of this button only
+          const uint32_t now = millis();
+          const uint32_t last = instant_click_debounce_ts[button];
+          // A zero timestamp means no press has been accepted for this button yet
+          if (last != 0) {
+            // Handle millis() overflow (wraps after ~49 days)
+            const uint32_t elapsed = (now >= last) ? (now - last) : (UINT32_MAX - last + now + 1);
+            if (elapsed < ${INSTANT_CLICK_DEBOUNCE_MS}) {
+              return;
+            }
+          }
+          // Never store the sentinel back; millis() only returns 0 in the first msec after boot or wrap
+          instant_click_debounce_ts[button] = (now != 0) ? now : 1;
+          button_click_event->execute(button, 1);
+          #else  // INSTANT_CLICK_MODE_ACTIVE
           uint32_t current_time = millis();
           // Check if we should start a new click sequence:
           // 1. Previous cycle completed (start_time was reset to 0)
@@ -342,6 +384,7 @@ script:
           // Set press start time for this press (for duration calculation)
           id(button_press_start_time) = current_time;
           id(button_press_button) = button;
+          #endif  // INSTANT_CLICK_MODE_ACTIVE
           // Update binary sensor
           switch (button) {
             case 1:
@@ -357,10 +400,38 @@ script:
               bs_button_4->publish_state(true);
               break;
           }
+          #if INSTANT_CLICK_MODE_ACTIVE
+          #else  // INSTANT_CLICK_MODE_ACTIVE
+          // Update binary sensor back to false, so just a quick state change should be send
+          switch (button) {
+            case 1:
+              bs_button_1->publish_state(false);
+              break;
+            case 2:
+              bs_button_2->publish_state(false);
+              break;
+            case 3:
+              bs_button_3->publish_state(false);
+              break;
+            case 4:
+              bs_button_4->publish_state(false);
+              break;
+          }
+          #endif  // INSTANT_CLICK_MODE_ACTIVE
 
   - id: !extend touch_on_release
     then:
       - lambda: |-
+          // Behaviour depends on "instant click mode"
+          #if INSTANT_CLICK_MODE_ACTIVE
+            // Instant click mode: action already fired on press, just clean up
+            buttons_release->execute();
+            id(button_press_start_time) = 0;
+            id(last_release_time) = 0;
+            id(click_counter) = 0;
+            id(button_press_button) = 0;
+            id(button_press_position) = 0;
+          #else   // INSTANT_CLICK_MODE_ACTIVE
           uint32_t current_time = millis();
           buttons_release->execute();
           if (id(button_press_start_time) > 0) {
@@ -413,6 +484,7 @@ script:
             id(last_release_time) = 0;
             id(click_counter) = 0;
           }
+          #endif  // INSTANT_CLICK_MODE_ACTIVE
 
   - id: !extend touch_swipe_${ID_SWIPE_LEFT_OR_UP_TEXT}
     then:
