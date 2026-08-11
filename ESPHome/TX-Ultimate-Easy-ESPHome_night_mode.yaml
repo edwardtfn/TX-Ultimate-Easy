@@ -14,6 +14,8 @@
 substitutions:
   night_mode_light_transition_length: 500ms
   night_mode_sync_leds_delay: 20ms
+  # Safety bound for the fade-out wait; must be longer than the transition itself.
+  night_mode_light_off_timeout: 2s
 
 esphome:
   build_flags:
@@ -173,11 +175,21 @@ switch:
             night_mode_apply->execute();
     on_turn_off:
       then:
-        - lambda: |-
-            // No need to clear the snapshot values - they will be overwritten next time night mode is enabled.
-            night_mode_apply->stop();  // stop in case we're in the middle of a transition
-            light_night_mode_leds->turn_off();
-            show_relay_status->execute();  // re-evaluate all relay indicators
+        # Stop the apply script in case we are in the middle of a transition.
+        # The snapshot globals are intentionally left untouched - they are
+        # overwritten the next time night mode is enabled.
+        - script.stop: night_mode_apply
+        - light.turn_off:
+            id: light_night_mode_leds
+            transition_length: ${night_mode_light_transition_length}
+        # The night mode partition spans the whole strip and keeps writing to it
+        # until the fade-out completes, so an earlier repaint would be overwritten.
+        # The timeout is defense-in-depth only: it should never be reached.
+        - wait_until:
+            condition:
+              - light.is_off: light_night_mode_leds
+            timeout: ${night_mode_light_off_timeout}
+        - script.execute: show_relay_status  # re-evaluate all relay indicators
 
   # ── Settings (entity_category: config → grouped under "Configuration") ────
   - id: sw_night_mode_suppress_vibration
