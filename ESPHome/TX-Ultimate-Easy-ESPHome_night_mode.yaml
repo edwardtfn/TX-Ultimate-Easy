@@ -16,17 +16,16 @@ substitutions:
   night_mode_sync_leds_delay: 20ms
 
 esphome:
-  on_boot:
-    # priority: -200 ensures all hardware components are ready before we touch LEDs.
-    priority: -200
-    then:
-      - if:
-          condition:
-            lambda: "return sw_night_mode->state;"
-          then:
-            - script.execute: night_mode_apply
   build_flags:
     - -D TX_ULTIMATE_EASY_NIGHT_MODE
+  on_boot:
+    - priority: -200  # Ensures all hardware components are ready before we touch LEDs.
+      then:
+        - if:
+            condition:
+              lambda: "return sw_night_mode->state;"
+            then:
+              - script.execute: night_mode_apply
 
 globals:
   # ─── LED color/brightness snapshot ─ persists across reboots so the color ───

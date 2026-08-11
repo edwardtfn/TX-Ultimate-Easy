@@ -1,0 +1,28 @@
+---
+# Dependabot version updates
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates
+
+version: 2
+
+updates:
+  # GitHub Actions referenced by the workflows in .github/workflows.
+  # Dependabot can only update actions pinned to a tag or a commit SHA;
+  # references to a branch (for example "@main") are silently skipped.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Stockholm"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    groups:
+      # One pull request for all action bumps. Each pull request that
+      # touches a workflow file triggers the full ESPHome build matrix,
+      # so grouping keeps the CI cost to a single run per week.
+      github-actions:
+        patterns:
+          - "*"
+...
