@@ -147,6 +147,15 @@ light:
       - id: light_full
         from: 0
         to: ${LIGHT_MAX_ADDR}
+    on_turn_off:
+      then:
+        - lambda: |-
+            #ifdef TX_ULTIMATE_EASY_NIGHT_MODE
+            if (sw_night_mode->state) { night_mode_apply->execute(); }
+            #endif
+            #ifdef TX_ULTIMATE_EASY_HW_RELAYS
+            show_relay_status->execute();
+            #endif
 
   - id: light_bottom
     name: Light - Bottom
