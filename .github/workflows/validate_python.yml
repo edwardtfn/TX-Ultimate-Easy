@@ -17,13 +17,13 @@ jobs:
     name: Lint
     steps:
       - name: Check out source repository
-        uses: actions/checkout@main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
       - name: Set up Python environment
-        uses: actions/setup-python@main
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:
           python-version: "3.11"
       - name: flake8 Lint
-        uses: py-actions/flake8@v2
+        uses: py-actions/flake8@84ec6726560b6d5bd68f2a5bed83d62b52bb50ba  # v2.3.0
         with:
           max-line-length: "200"
           path: "components/tx_ultimate_easy"

@@ -35,7 +35,7 @@ jobs:
           fi
 
       - name: Markdown Lint
-        uses: DavidAnson/markdownlint-cli2-action@v24
+        uses: DavidAnson/markdownlint-cli2-action@21c1be1b93ad9ed58fa840aacc3f279cde2a72ff  # v24.2.0
         if: env.any_changed == 'true'
         with:
           globs: ${{ env.changed_files }}
@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           fetch-depth: 0
 
@@ -66,7 +66,7 @@ jobs:
           fi
 
       - name: Markdown links
-        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        uses: gaurav-nelson/github-action-markdown-link-check@5c5dfc0ac2e225883c0e5f03a85311ec2830d368  # v1
         if: env.any_changed == 'true'
         with:
           check-modified-files-only: yes
