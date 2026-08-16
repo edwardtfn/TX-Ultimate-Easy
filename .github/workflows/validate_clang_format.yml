@@ -19,8 +19,8 @@ jobs:
   clang-format-checking:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@main
-      - uses: RafikFarhad/clang-format-github-action@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: RafikFarhad/clang-format-github-action@601dce42932921470d1acf9295faa87752162048  # v7
         with:
           sources: "components/tx_ultimate_easy/*.h,components/tx_ultimate_easy/*.cpp"
 ...
