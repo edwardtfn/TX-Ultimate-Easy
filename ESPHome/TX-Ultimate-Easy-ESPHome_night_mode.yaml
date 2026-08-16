@@ -16,6 +16,7 @@ substitutions:
   night_mode_sync_leds_delay: 20ms
   # Safety bound for the fade-out wait; must be longer than the transition itself.
   night_mode_light_off_timeout: 2s
+  night_mode_light_default_transition_length: 0s
 
 esphome:
   build_flags:
@@ -90,6 +91,7 @@ light:
     blue: out_night_mode_blue
     icon: mdi:weather-night
     restore_mode: RESTORE_DEFAULT_OFF
+    default_transition_length: ${night_mode_light_default_transition_length}
 
   # Internal partition that drives the physical strip while Night Mode is active.
   - id: light_night_mode_leds
