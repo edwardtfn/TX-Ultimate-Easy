@@ -1060,5 +1060,5 @@ switch:
     on_turn_on:
       - lambda: if (id(nr_pulse_4_time).state > 0) id(pulse_4_delay).execute();
     on_turn_off:
-      - lambda: id(pulse_4_delay).top();
+      - lambda: id(pulse_4_delay).stop();
 ...
