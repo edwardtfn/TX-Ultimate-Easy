@@ -996,14 +996,14 @@ switch:
     turn_on_action:
       - lambda: id(relay_1_state) = true;
       - light.turn_on: light_output_1
-      - lambda: if (id(pulse_1_delay).is_running()) id(pulse_1_delay)->execute();
+      - lambda: if (id(pulse_1_delay).is_running()) id(pulse_1_delay).execute();
     turn_off_action:
       - lambda: id(relay_1_state) = false;
       - light.turn_off: light_output_1
     on_turn_on:
-      - lambda: if (id(pulse_1_time).state > 0) id(pulse_1_delay)->execute();
+      - lambda: if (id(pulse_1_time).state > 0) id(pulse_1_delay).execute();
     on_turn_off:
-      - lambda: id(pulse_1_delay)->stop();
+      - lambda: id(pulse_1_delay).stop();
 
   - id: sw_relay_2
     name: Relay 2
@@ -1015,14 +1015,14 @@ switch:
     turn_on_action:
       - lambda: id(relay_2_state) = true;
       - light.turn_on: light_output_2
-      - lambda: if (id(pulse_2_delay).is_running()) id(pulse_2_delay)->execute();
+      - lambda: if (id(pulse_2_delay).is_running()) id(pulse_2_delay).execute();
     turn_off_action:
       - lambda: id(relay_2_state) = false;
       - light.turn_off: light_output_2
     on_turn_on:
-      - lambda: if (id(pulse_2_time).state > 0) id(pulse_2_delay)->execute();
+      - lambda: if (id(pulse_2_time).state > 0) id(pulse_2_delay).execute();
     on_turn_off:
-      - lambda: id(pulse_2_delay)->stop();
+      - lambda: id(pulse_2_delay).stop();
 
   - id: sw_relay_3
     name: Relay 3
@@ -1034,14 +1034,14 @@ switch:
     turn_on_action:
       - lambda: id(relay_3_state) = true;
       - light.turn_on: light_output_3
-      - lambda: if (id(pulse_3_delay).is_running()) id(pulse_3_delay)->execute();
+      - lambda: if (id(pulse_3_delay).is_running()) id(pulse_3_delay).execute();
     turn_off_action:
       - lambda: id(relay_3_state) = false;
       - light.turn_off: light_output_3
     on_turn_on:
-      - lambda: if (id(pulse_3_time).state > 0) id(pulse_3_delay)->execute();
+      - lambda: if (id(pulse_3_time).state > 0) id(pulse_3_delay).execute();
     on_turn_off:
-      - lambda: id(pulse_3_delay)->stop();
+      - lambda: id(pulse_3_delay).stop();
 
   - id: sw_relay_4
     name: Relay 4
@@ -1053,12 +1053,12 @@ switch:
     turn_on_action:
       - lambda: id(relay_4_state) = true;
       - light.turn_on: light_output_4
-      - lambda: if (id(pulse_4_delay).is_running()) id(pulse_4_delay)->execute();
+      - lambda: if (id(pulse_4_delay).is_running()) id(pulse_4_delay).execute();
     turn_off_action:
       - lambda: id(relay_4_state) = false;
       - light.turn_off: light_output_4
     on_turn_on:
-      - lambda: if (id(pulse_4_time).state > 0) id(pulse_4_delay)->execute();
+      - lambda: if (id(pulse_4_time).state > 0) id(pulse_4_delay).execute();
     on_turn_off:
-      - lambda: id(pulse_4_delay)->stop();
+      - lambda: id(pulse_4_delay).top();
 ...
