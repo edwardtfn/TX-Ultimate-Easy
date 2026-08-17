@@ -19,10 +19,10 @@ substitutions:
   relay_3_mode: switch  # 'switch', 'light', or 'disabled'
   relay_4_mode: switch  # 'switch', 'light', or 'disabled'
 
-  relay_1_pulse_initial: '0'
-  relay_2_pulse_initial: '0'
-  relay_3_pulse_initial: '0'
-  relay_4_pulse_initial: '0'
+  relay_1_pulse_initial: '0' # 0 - pulse disabled, otherwise time in seconds to turn_off
+  relay_2_pulse_initial: '0' # 0 - pulse disabled, otherwise time in seconds to turn_off
+  relay_3_pulse_initial: '0' # 0 - pulse disabled, otherwise time in seconds to turn_off
+  relay_4_pulse_initial: '0' # 0 - pulse disabled, otherwise time in seconds to turn_off
 
   RELAY_1_MODE_LOWER: ${ relay_1_mode | lower }
   RELAY_2_MODE_LOWER: ${ relay_2_mode | lower }
