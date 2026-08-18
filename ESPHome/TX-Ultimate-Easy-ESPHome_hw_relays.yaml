@@ -19,6 +19,11 @@ substitutions:
   relay_3_mode: switch  # 'switch', 'light', or 'disabled'
   relay_4_mode: switch  # 'switch', 'light', or 'disabled'
 
+  relay_1_pulse_time: '0'  # 0 - pulse disabled, otherwise time in seconds to turn_off
+  relay_2_pulse_time: '0'  # 0 - pulse disabled, otherwise time in seconds to turn_off
+  relay_3_pulse_time: '0'  # 0 - pulse disabled, otherwise time in seconds to turn_off
+  relay_4_pulse_time: '0'  # 0 - pulse disabled, otherwise time in seconds to turn_off
+
   RELAY_1_MODE_LOWER: ${ relay_1_mode | lower }
   RELAY_2_MODE_LOWER: ${ relay_2_mode | lower }
   RELAY_3_MODE_LOWER: ${ relay_3_mode | lower }
@@ -734,6 +739,27 @@ script:
                   }
                 }
 
+  - id: pulse_1_delay
+    mode: restart
+    then:
+      - delay: !lambda 'return id(nr_pulse_1_time).state * 1000;'
+      - lambda: id(sw_relay_1).turn_off();
+  - id: pulse_2_delay
+    mode: restart
+    then:
+      - delay: !lambda 'return id(nr_pulse_2_time).state * 1000;'
+      - lambda: id(sw_relay_2).turn_off();
+  - id: pulse_3_delay
+    mode: restart
+    then:
+      - delay: !lambda 'return id(nr_pulse_3_time).state * 1000;'
+      - lambda: id(sw_relay_3).turn_off();
+  - id: pulse_4_delay
+    mode: restart
+    then:
+      - delay: !lambda 'return id(nr_pulse_4_time).state * 1000;'
+      - lambda: id(sw_relay_4).turn_off();
+
 .relay_light_mode: &relay_light_mode
   platform: template
   options:
@@ -902,6 +928,63 @@ select:
 
           previous_mode = current_mode;
 
+.number_pulse_time_base: &number_pulse_time_base
+  restore_value: true
+  optimistic: true
+  device_class: 'duration'
+  entity_category: 'config'
+  unit_of_measurement: 's'
+  icon: 'mdi:clock-end'
+  mode: box
+  min_value: 0
+  max_value: 3600
+  step: 1
+
+number:
+  - platform: template
+    id: nr_pulse_1_time
+    name: "Relay 1 Pulse Time"
+    initial_value: ${relay_1_pulse_time}
+    internal: ${SL_RELAY_1_MODE != 1 or  gang_count < 1}
+    <<: *number_pulse_time_base
+    on_value_range:
+      below: 0
+      then:
+        - script.stop: pulse_1_delay
+
+  - platform: template
+    id: nr_pulse_2_time
+    name: "Relay 2 Pulse Time"
+    initial_value: ${relay_2_pulse_time}
+    internal: ${SL_RELAY_2_MODE != 1 or gang_count < 2}
+    <<: *number_pulse_time_base
+    on_value_range:
+      below: 0
+      then:
+        - script.stop: pulse_2_delay
+
+  - platform: template
+    id: nr_pulse_3_time
+    name: "Relay 3 Pulse Time"
+    initial_value: ${relay_3_pulse_time}
+    internal: ${SL_RELAY_3_MODE != 1 or gang_count < 3}
+    <<: *number_pulse_time_base
+    on_value_range:
+      below: 0
+      then:
+        - script.stop: pulse_3_delay
+
+  - platform: template
+    id: nr_pulse_4_time
+    name: "Relay 4 Pulse Time"
+    initial_value: ${relay_4_pulse_time}
+    internal: ${SL_RELAY_4_MODE != 1 or gang_count < 4}
+    <<: *number_pulse_time_base
+    on_value_range:
+      below: 0
+      then:
+        - script.stop: pulse_4_delay
+
 switch:
   - id: sw_relay_1
     name: Relay 1
@@ -913,9 +996,14 @@ switch:
     turn_on_action:
       - lambda: id(relay_1_state) = true;
       - light.turn_on: light_output_1
+      - lambda: if (id(pulse_1_delay).is_running()) id(pulse_1_delay).execute();
     turn_off_action:
       - lambda: id(relay_1_state) = false;
       - light.turn_off: light_output_1
+    on_turn_on:
+      - lambda: if (id(nr_pulse_1_time).state > 0) id(pulse_1_delay).execute();
+    on_turn_off:
+      - lambda: id(pulse_1_delay).stop();
 
   - id: sw_relay_2
     name: Relay 2
@@ -927,9 +1015,14 @@ switch:
     turn_on_action:
       - lambda: id(relay_2_state) = true;
       - light.turn_on: light_output_2
+      - lambda: if (id(pulse_2_delay).is_running()) id(pulse_2_delay).execute();
     turn_off_action:
       - lambda: id(relay_2_state) = false;
       - light.turn_off: light_output_2
+    on_turn_on:
+      - lambda: if (id(nr_pulse_2_time).state > 0) id(pulse_2_delay).execute();
+    on_turn_off:
+      - lambda: id(pulse_2_delay).stop();
 
   - id: sw_relay_3
     name: Relay 3
@@ -941,9 +1034,14 @@ switch:
     turn_on_action:
       - lambda: id(relay_3_state) = true;
       - light.turn_on: light_output_3
+      - lambda: if (id(pulse_3_delay).is_running()) id(pulse_3_delay).execute();
     turn_off_action:
       - lambda: id(relay_3_state) = false;
       - light.turn_off: light_output_3
+    on_turn_on:
+      - lambda: if (id(nr_pulse_3_time).state > 0) id(pulse_3_delay).execute();
+    on_turn_off:
+      - lambda: id(pulse_3_delay).stop();
 
   - id: sw_relay_4
     name: Relay 4
@@ -955,7 +1053,12 @@ switch:
     turn_on_action:
       - lambda: id(relay_4_state) = true;
       - light.turn_on: light_output_4
+      - lambda: if (id(pulse_4_delay).is_running()) id(pulse_4_delay).execute();
     turn_off_action:
       - lambda: id(relay_4_state) = false;
       - light.turn_off: light_output_4
+    on_turn_on:
+      - lambda: if (id(nr_pulse_4_time).state > 0) id(pulse_4_delay).execute();
+    on_turn_off:
+      - lambda: id(pulse_4_delay).stop();
 ...
