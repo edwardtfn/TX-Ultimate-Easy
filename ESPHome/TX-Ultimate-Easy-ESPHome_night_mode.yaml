@@ -54,9 +54,9 @@ light:
     default_transition_length: ${night_mode_light_default_transition_length}
     initial_state:
       color_mode: RGB
-      red:        ${night_mode_red}
-      green:      ${night_mode_green}
-      blue:       ${night_mode_blue}
+      red: ${night_mode_red}
+      green: ${night_mode_green}
+      blue: ${night_mode_blue}
       brightness: ${night_mode_brightness}
 
   # Internal partition that drives the physical strip while Night Mode is active.
