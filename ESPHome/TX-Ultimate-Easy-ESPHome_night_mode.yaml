@@ -31,6 +31,9 @@ esphome:
       then:
         - script.execute: night_mode_apply
 
+preferences:
+  flash_write_interval: 1s
+
 output:
   # No-op outputs backing the virtual color picker.
   # The rgb light platform requires float outputs; these intentionally do nothing
