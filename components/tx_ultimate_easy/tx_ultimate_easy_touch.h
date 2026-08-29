@@ -38,6 +38,14 @@ namespace esphome {
             int8_t x = -1;
             int8_t state = -1;
             std::string state_str = "Unknown";
+            // Populated only for TOUCH_STATE_SWIPE_LEFT / TOUCH_STATE_SWIPE_RIGHT.
+            // Decoded from the 10-bit crossed-channel bitmap in the raw frame
+            // (see get_swipe_range()); direction-aware start/end channel and
+            // their mapped button indices.
+            uint8_t swipe_from = 0;
+            uint8_t swipe_to = 0;
+            uint8_t swipe_from_button = 0;
+            uint8_t swipe_to_button = 0;
         };
 
         class TxUltimateEasy : public uart::UARTDevice, public Component {
@@ -155,6 +163,16 @@ namespace esphome {
              * @returns Numeric touch state code corresponding to the TOUCH_STATE_* constants, or -1 if not present/valid.
              */
             int get_touch_state(const std::array<int, UART_RECEIVED_BYTES_SIZE> &bytes);
+
+            /**
+             * Decode the lowest and highest touched channel from a swipe gesture's
+             * 10-bit crossed-channel bitmap (bytes 6-7 of the raw frame).
+             * @param bytes Array containing the raw received bytes.
+             * @param lowest_channel  Output: lowest channel number with its bit set (0 if none).
+             * @param highest_channel Output: highest channel number with its bit set (0 if none).
+             */
+            void get_swipe_range(const std::array<int, UART_RECEIVED_BYTES_SIZE> &bytes,
+                                  uint8_t &lowest_channel, uint8_t &highest_channel);
 
             Trigger<TouchPoint> trigger_touch_event_;
             Trigger<TouchPoint> trigger_touch_;
