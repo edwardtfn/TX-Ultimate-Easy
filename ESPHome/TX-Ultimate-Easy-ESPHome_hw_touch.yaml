@@ -375,7 +375,6 @@ tx_ultimate_easy:
       - lambda: |-
           esphome::tx_ultimate_easy::fire_ha_event("touch", "multi_touch", {
             {"action", "release"},
-            {"position", std::to_string(touch.x)}
           });
           ESP_LOGI("${TAG_HW_TOUCH}", "Multi-touch released");
           touch_on_multi_touch_release->execute();
@@ -403,7 +402,10 @@ tx_ultimate_easy:
           esphome::tx_ultimate_easy::fire_ha_event("touch", "swipe", {
             {"action", "${ID_SWIPE_LEFT_OR_UP_TEXT}"},
             {"swipe-direction", "${ID_SWIPE_LEFT_OR_UP_TEXT}"},
-            {"position", std::to_string(touch.x)}
+            {"swipe-from", std::to_string(touch.swipe_from)},
+            {"swipe-to", std::to_string(touch.swipe_to)},
+            {"swipe-from-button", std::to_string(touch.swipe_from_button)},
+            {"swipe-to-button", std::to_string(touch.swipe_to_button)}
           });
           ESP_LOGI("${TAG_HW_TOUCH}", "Swipe ${ID_SWIPE_LEFT_OR_UP_TEXT}");
           touch_swipe_${ID_SWIPE_LEFT_OR_UP_TEXT}->execute();
@@ -414,7 +416,10 @@ tx_ultimate_easy:
           esphome::tx_ultimate_easy::fire_ha_event("touch", "swipe", {
             {"action", "${ID_SWIPE_RIGHT_OR_DOWN_TEXT}"},
             {"swipe-direction", "${ID_SWIPE_RIGHT_OR_DOWN_TEXT}"},
-            {"position", std::to_string(touch.x)}
+            {"swipe-from", std::to_string(touch.swipe_from)},
+            {"swipe-to", std::to_string(touch.swipe_to)},
+            {"swipe-from-button", std::to_string(touch.swipe_from_button)},
+            {"swipe-to-button", std::to_string(touch.swipe_to_button)}
           });
           ESP_LOGI("${TAG_HW_TOUCH}", "Swipe ${ID_SWIPE_RIGHT_OR_DOWN_TEXT}");
           touch_swipe_${ID_SWIPE_RIGHT_OR_DOWN_TEXT}->execute();

@@ -111,16 +111,23 @@ void TxUltimateEasy::send_touch_(TouchPoint tp) {
       break;
 
     case TOUCH_STATE_SWIPE_LEFT:
-      ESP_LOGV(TAG, "Swipe - Left (x=%d)", tp.x);
+      ESP_LOGV(TAG, "Swipe - Left (from=%d, to=%d, from_button=%d, to_button=%d)", tp.swipe_from, tp.swipe_to,
+               tp.swipe_from_button, tp.swipe_to_button);
       this->trigger_swipe_left_.trigger(tp);
       break;
 
     case TOUCH_STATE_SWIPE_RIGHT:
-      ESP_LOGV(TAG, "Swipe - Right (x=%d)", tp.x);
+      ESP_LOGV(TAG, "Swipe - Right (from=%d, to=%d, from_button=%d, to_button=%d)", tp.swipe_from, tp.swipe_to,
+               tp.swipe_from_button, tp.swipe_to_button);
       this->trigger_swipe_right_.trigger(tp);
       break;
 
     case TOUCH_STATE_MULTI_TOUCH:
+      // NOTE: uart_received_bytes[5] for a multi-touch event is a fixed
+      // sentinel (0x0B), not a position. The hardware protocol does not
+      // report which buttons participated in a multi-touch gesture, so
+      // tp.x/tp.button are intentionally left invalid (see
+      // get_touch_position_x()). Do not rely on tp.button here.
       ESP_LOGV(TAG, "Multi touch - Released");
       this->trigger_multi_touch_release_.trigger(tp);
       break;
@@ -143,37 +150,61 @@ bool TxUltimateEasy::is_valid_data(const std::array<int, UART_RECEIVED_BYTES_SIZ
          (uart_received_bytes[6] >= 0 || state == TOUCH_STATE_MULTI_TOUCH);
 }
 
+/**
+ * @brief Decodes the lowest and highest touched channel from a swipe bitmap.
+ *
+ * uart_received_bytes[6] and uart_received_bytes[7] together form a 10-bit
+ * bitmap of channels crossed during the swipe gesture:
+ *   - uart_received_bytes[7] bits 0-7 represent channels 1-8
+ *   - uart_received_bytes[6] bits 0-1 represent channels 9-10
+ * (Confirmed both by the pre-existing implementation's comments and by
+ * community findings on the blakadder/tx-ultimate Berry driver.)
+ *
+ * @param uart_received_bytes Raw frame bytes.
+ * @param lowest_channel  Output: lowest channel number with its bit set (0 if none).
+ * @param highest_channel Output: highest channel number with its bit set (0 if none).
+ */
+void TxUltimateEasy::get_swipe_range(const std::array<int, UART_RECEIVED_BYTES_SIZE> &uart_received_bytes,
+                                     uint8_t &lowest_channel, uint8_t &highest_channel) {
+  lowest_channel = 0;
+  highest_channel = 0;
+  const uint16_t crossed =
+      (static_cast<uint16_t>(uart_received_bytes[6]) << 8) | static_cast<uint16_t>(uart_received_bytes[7]);
+  for (uint8_t ch = 1; ch <= TOUCH_MAX_POSITION; ch++) {
+    if (crossed & (1 << (ch - 1))) {
+      if (lowest_channel == 0)
+        lowest_channel = ch;
+      highest_channel = ch;
+    }
+  }
+}
+
 int TxUltimateEasy::get_touch_position_x(const std::array<int, UART_RECEIVED_BYTES_SIZE> &uart_received_bytes) {
   switch (uart_received_bytes[4]) {
     case TOUCH_STATE_RELEASE:
-    case TOUCH_STATE_MULTI_TOUCH:
       return uart_received_bytes[5];
 
+    case TOUCH_STATE_MULTI_TOUCH:
+      // uart_received_bytes[5] is a fixed sentinel value (0x0B) that only
+      // marks "this is a multi-touch event". It is NOT a touch position,
+      // unlike TOUCH_STATE_RELEASE. The hardware provides no per-button
+      // information for multi-touch, so there is no valid position to
+      // report here. Returning -1 correctly prevents get_touch_point()
+      // from computing a bogus tp.button value from the sentinel byte.
+      return -1;
+
     case TOUCH_STATE_SWIPE_LEFT:
-    case TOUCH_STATE_SWIPE_RIGHT:
-      // uart_received_bytes[5] indicates swipe direction:
-      // 12 = find last touch position (scan right to left)
-      // 13 = find first touch position (scan left to right)
-      // Bytes 6-7 contain a 10-bit bitmap of touch positions:
-      // Byte 7: bits 0-7 represent positions 1-8
-      // Byte 6: bits 0-1 represent positions 9-10
-      switch (uart_received_bytes[5]) {
-        case 12:
-          for (uint8_t i = 10; i > 0; i--) {
-            if (i > 8 ? uart_received_bytes[6] & (1 << (i - 9)) : uart_received_bytes[7] & (1 << (i - 1))) {
-              return i;
-            }
-          }
-          break;
-        case 13:
-          for (uint8_t i = 1; i <= 10; i++) {
-            if (i > 8 ? uart_received_bytes[6] & (1 << (i - 9)) : uart_received_bytes[7] & (1 << (i - 1))) {
-              return i;
-            }
-          }
-          break;
-      }
-      return uart_received_bytes[5];
+    case TOUCH_STATE_SWIPE_RIGHT: {
+      // Bytes 6-7 form a 10-bit bitmap of crossed channels (see
+      // get_swipe_range()). Kept for backward compatibility with
+      // existing consumers of tp.x: returns the highest crossed
+      // channel for a rightward swipe, or the lowest for a
+      // leftward swipe -- the same single endpoint the original
+      // implementation returned.
+      uint8_t lowest = 0, highest = 0;
+      this->get_swipe_range(uart_received_bytes, lowest, highest);
+      return (uart_received_bytes[5] == TOUCH_STATE_SWIPE_RIGHT) ? highest : lowest;
+    }
 
     default:
       return uart_received_bytes[6];
@@ -200,6 +231,21 @@ TouchPoint TxUltimateEasy::get_touch_point(const std::array<int, UART_RECEIVED_B
   if (tp.x >= 0)
     tp.button = this->get_button_from_position(static_cast<uint8_t>(tp.x));
   tp.state = this->get_touch_state(uart_received_bytes);
+
+  if (tp.state == TOUCH_STATE_SWIPE_LEFT || tp.state == TOUCH_STATE_SWIPE_RIGHT) {
+    uint8_t lowest = 0, highest = 0;
+    this->get_swipe_range(uart_received_bytes, lowest, highest);
+    if (tp.state == TOUCH_STATE_SWIPE_RIGHT) {
+      tp.swipe_from = lowest;
+      tp.swipe_to = highest;
+    } else {  // TOUCH_STATE_SWIPE_LEFT
+      tp.swipe_from = highest;
+      tp.swipe_to = lowest;
+    }
+    tp.swipe_from_button = this->get_button_from_position(tp.swipe_from);
+    tp.swipe_to_button = this->get_button_from_position(tp.swipe_to);
+  }
+
   switch (tp.state) {
     case TOUCH_STATE_RELEASE:
       tp.state_str = "RELEASE";
