@@ -23,6 +23,7 @@ substitutions:
   relay_2_pulse_time: '0'  # 0 - pulse disabled, otherwise time in seconds to turn_off
   relay_3_pulse_time: '0'  # 0 - pulse disabled, otherwise time in seconds to turn_off
   relay_4_pulse_time: '0'  # 0 - pulse disabled, otherwise time in seconds to turn_off
+  pulse_time_internal: true
 
   RELAY_1_MODE_LOWER: ${ relay_1_mode | lower }
   RELAY_2_MODE_LOWER: ${ relay_2_mode | lower }
@@ -945,7 +946,7 @@ number:
     id: nr_pulse_1_time
     name: "Relay 1 Pulse Time"
     initial_value: ${relay_1_pulse_time}
-    internal: ${SL_RELAY_1_MODE != 1 or  gang_count < 1}
+    internal: ${SL_RELAY_1_MODE != 1 or gang_count < 1 or pulse_time_internal}
     <<: *number_pulse_time_base
     on_value_range:
       below: 0
@@ -956,7 +957,7 @@ number:
     id: nr_pulse_2_time
     name: "Relay 2 Pulse Time"
     initial_value: ${relay_2_pulse_time}
-    internal: ${SL_RELAY_2_MODE != 1 or gang_count < 2}
+    internal: ${SL_RELAY_2_MODE != 1 or gang_count < 2 or pulse_time_internal}
     <<: *number_pulse_time_base
     on_value_range:
       below: 0
@@ -967,7 +968,7 @@ number:
     id: nr_pulse_3_time
     name: "Relay 3 Pulse Time"
     initial_value: ${relay_3_pulse_time}
-    internal: ${SL_RELAY_3_MODE != 1 or gang_count < 3}
+    internal: ${SL_RELAY_3_MODE != 1 or gang_count < 3 or pulse_time_internal}
     <<: *number_pulse_time_base
     on_value_range:
       below: 0
@@ -978,7 +979,7 @@ number:
     id: nr_pulse_4_time
     name: "Relay 4 Pulse Time"
     initial_value: ${relay_4_pulse_time}
-    internal: ${SL_RELAY_4_MODE != 1 or gang_count < 4}
+    internal: ${SL_RELAY_4_MODE != 1 or gang_count < 4 or pulse_time_internal}
     <<: *number_pulse_time_base
     on_value_range:
       below: 0
