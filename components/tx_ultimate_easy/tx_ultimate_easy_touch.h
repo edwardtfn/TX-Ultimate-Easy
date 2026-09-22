@@ -38,10 +38,8 @@ namespace esphome {
             int8_t x = -1;
             int8_t state = -1;
             std::string state_str = "Unknown";
-            // Populated only for TOUCH_STATE_SWIPE_LEFT / TOUCH_STATE_SWIPE_RIGHT.
-            // Decoded from the 10-bit crossed-channel bitmap in the raw frame
-            // (see get_swipe_range()); direction-aware start/end channel and
-            // their mapped button indices.
+            // Swipe only (TOUCH_STATE_SWIPE_LEFT / TOUCH_STATE_SWIPE_RIGHT): direction-aware start/end
+            // channel (1..TOUCH_MAX_POSITION) and mapped button, decoded by get_swipe_range(); 0 = unknown
             uint8_t swipe_from = 0;
             uint8_t swipe_to = 0;
             uint8_t swipe_from_button = 0;
@@ -151,9 +149,10 @@ namespace esphome {
             bool is_valid_data(const std::array<int, UART_RECEIVED_BYTES_SIZE> &bytes);
 
             /**
-             * Extract the horizontal touch position (x) from a raw UART packet.
+             * Extract the horizontal touch position (x) from a raw press/release UART packet.
+             * Swipe and multi-touch packets carry no single position and are handled by get_touch_point().
              * @param bytes Array containing the raw received bytes.
-             * @returns X position in device-specific coordinates, or -1 if not present/valid.
+             * @returns X position in device-specific coordinates.
              */
             int get_touch_position_x(const std::array<int, UART_RECEIVED_BYTES_SIZE> &bytes);
 

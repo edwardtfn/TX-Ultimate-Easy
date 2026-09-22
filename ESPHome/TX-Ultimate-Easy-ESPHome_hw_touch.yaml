@@ -374,7 +374,7 @@ tx_ultimate_easy:
     then:
       - lambda: |-
           esphome::tx_ultimate_easy::fire_ha_event("touch", "multi_touch", {
-            {"action", "release"},
+            {"action", "release"}
           });
           ESP_LOGI("${TAG_HW_TOUCH}", "Multi-touch released");
           touch_on_multi_touch_release->execute();
