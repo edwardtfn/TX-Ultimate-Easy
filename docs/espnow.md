@@ -5,6 +5,7 @@ Switches can control relays on other TX Ultimate Easy devices directly (peer-to-
 **Setup:**
 
 1. Add the package to your device YAML:
+
    ```yaml
    packages:
      remote_package:
@@ -20,6 +21,7 @@ Switches can control relays on other TX Ultimate Easy devices directly (peer-to-
 2. Get each switch’s MAC from the **"ESP-NOW MAC Address"** text sensor in Home Assistant.
 
 3. In your device YAML, set per-button target MAC and relay (1–4). For buttons you don’t want on ESP-NOW, don’t set anything (they use local relay only).
+
    ```yaml
    substitutions:
      espnow_target_mac_button_1: "AA:BB:CC:DD:EE:FF"
