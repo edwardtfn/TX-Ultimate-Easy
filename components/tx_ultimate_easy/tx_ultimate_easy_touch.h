@@ -38,6 +38,12 @@ struct TouchPoint {
   int8_t x = -1;
   int8_t state = -1;
   std::string state_str = "Unknown";
+  // Swipe only (TOUCH_STATE_SWIPE_LEFT / TOUCH_STATE_SWIPE_RIGHT): direction-aware start/end
+  // channel (1..TOUCH_MAX_POSITION) and mapped button, decoded by get_swipe_range(); 0 = unknown
+  uint8_t swipe_from = 0;
+  uint8_t swipe_to = 0;
+  uint8_t swipe_from_button = 0;
+  uint8_t swipe_to_button = 0;
 };
 
 class TxUltimateEasy : public uart::UARTDevice, public Component {
@@ -143,9 +149,10 @@ class TxUltimateEasy : public uart::UARTDevice, public Component {
   bool is_valid_data(const std::array<int, UART_RECEIVED_BYTES_SIZE> &bytes);
 
   /**
-   * Extract the horizontal touch position (x) from a raw UART packet.
+   * Extract the horizontal touch position (x) from a raw press/release UART packet.
+   * Swipe and multi-touch packets carry no single position and are handled by get_touch_point().
    * @param bytes Array containing the raw received bytes.
-   * @returns X position in device-specific coordinates, or -1 if not present/valid.
+   * @returns X position in device-specific coordinates.
    */
   int get_touch_position_x(const std::array<int, UART_RECEIVED_BYTES_SIZE> &bytes);
 
@@ -155,6 +162,16 @@ class TxUltimateEasy : public uart::UARTDevice, public Component {
    * @returns Numeric touch state code corresponding to the TOUCH_STATE_* constants, or -1 if not present/valid.
    */
   int get_touch_state(const std::array<int, UART_RECEIVED_BYTES_SIZE> &bytes);
+
+  /**
+   * Decode the lowest and highest touched channel from a swipe gesture's
+   * 10-bit crossed-channel bitmap (bytes 6-7 of the raw frame).
+   * @param bytes Array containing the raw received bytes.
+   * @param lowest_channel  Output: lowest channel number with its bit set (0 if none).
+   * @param highest_channel Output: highest channel number with its bit set (0 if none).
+   */
+  void get_swipe_range(const std::array<int, UART_RECEIVED_BYTES_SIZE> &bytes, uint8_t &lowest_channel,
+                       uint8_t &highest_channel);
 
   Trigger<TouchPoint> trigger_touch_event_;
   Trigger<TouchPoint> trigger_touch_;
