@@ -38,6 +38,11 @@ substitutions:
   # ============================================================================
   TAG_ESPNOW_SENDER: tx_ultimate_easy.espnow.sender
 
+  # Send mode options (order matters: the index is used by espnow_send)
+  ESPNOW_SEND_MODE_OFF_TEXT: "Off"                         # Index 0
+  ESPNOW_SEND_MODE_ALWAYS_TEXT: "Always"                   # Index 1
+  ESPNOW_SEND_MODE_FAILSAFE_TEXT: "API failsafe only"      # Index 2
+
   # Validate MAC format (length and colon positions)
   ESPNOW_BUTTON_1_MAC_VALID: >-
     ${ '1' if (
@@ -192,9 +197,7 @@ script:
   - id: !extend button_click_event
     then:
       - lambda: |-
-          if (!sw_espnow_send_enabled->state) {
-            return;
-          }
+          // Send mode is evaluated by espnow_send
           if (click_count != 1) {
             return;
           }
@@ -327,7 +330,16 @@ script:
     then:
       - if:
           condition:
-            - switch.is_on: sw_espnow_send_enabled                    # Early exit if sending disabled
+            - lambda: |-
+                // Early exit based on send mode (see ESPNOW_SEND_MODE_*_TEXT for the index mapping)
+                switch (sl_espnow_send_mode->active_index().value_or(0)) {
+                  case 1:  // Always
+                    return true;
+                  case 2:  // API failsafe only
+                    return !global_api_server->is_connected() || !wifi_component->is_connected();
+                  default:  // Off
+                    return false;
+                }
             - lambda: return button > 0 && button <= ${gang_count};  // Validate button range
             - lambda: return id(espnow_button_enabled)[button - 1];  // Check if button is enabled (validated at boot)
           then:
@@ -359,21 +371,22 @@ script:
                               id(espnow_mac_addresses)[idx].c_str(),
                               id(espnow_relay_numbers)[idx]);
 
-switch:
-  - id: sw_espnow_send_enabled
-    name: ESP-NOW Send Enabled
+select:
+  - id: sl_espnow_send_mode
+    name: ESP-NOW Send
     platform: template
+    options:
+      - "${ESPNOW_SEND_MODE_OFF_TEXT}"
+      - "${ESPNOW_SEND_MODE_ALWAYS_TEXT}"
+      - "${ESPNOW_SEND_MODE_FAILSAFE_TEXT}"
+    initial_option: "${ESPNOW_SEND_MODE_OFF_TEXT}"
     optimistic: true
-    restore_mode: restore_default_off
+    restore_value: true
     internal: false
     entity_category: config
     icon: mdi:radio
-    on_turn_on:
+    on_value:
       then:
         - lambda: |-
-            ESP_LOGI("${TAG_ESPNOW_SENDER}", "ESP-NOW sending enabled");
-    on_turn_off:
-      then:
-        - lambda: |-
-            ESP_LOGI("${TAG_ESPNOW_SENDER}", "ESP-NOW sending disabled");
+            ESP_LOGI("${TAG_ESPNOW_SENDER}", "ESP-NOW send mode: %s", x.c_str());
 ...

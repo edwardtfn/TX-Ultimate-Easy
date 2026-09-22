@@ -29,6 +29,9 @@ Switches can control relays on other TX Ultimate Easy devices directly (peer-to-
      # Only set espnow_target_mac_button_2..4 and espnow_target_relay_button_2..4 if you want those buttons to control a remote relay
    ```
 
-4. Recompile and flash. In Home Assistant, turn on **"ESP-NOW Send Enabled"** and **"ESP-NOW Receive Enabled"** on the devices that should send and receive.
+4. Recompile and flash. In Home Assistant, set **"ESP-NOW Send"** on the devices that should send, and turn on **"ESP-NOW Receive Enabled"** on the devices that should receive.
+   - **Off**: never send (default).
+   - **Always**: send whenever a configured button is clicked.
+   - **API failsafe only**: send only while the device is not connected to Home Assistant (API or Wi-Fi disconnected), matching the "API failsafe only" button action.
 
 Works without Home Assistant. Config is in YAML only; changes need recompile and flash.
