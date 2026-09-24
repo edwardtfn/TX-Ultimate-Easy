@@ -36,7 +36,8 @@ packages:
 ##### Configuration Instructions:                                                         #####
 #####                                                                                     #####
 ##### 1. Flash this configuration to all 3 devices                                        #####
-##### 2. In Home Assistant, for each device, enable the control "ESP-NOW Enabled"         #####
+##### 2. In Home Assistant, for each device, set the control "ESP-NOW Send" to "Always"   #####
+#####    (or "API failsafe only") and enable "ESP-NOW Receive Enabled"                    #####
 ##### 3. On the device's YAML in ESPHome, configure these substitutions:                  #####
 #####      * espnow_target_mac_button_X  - MAC address of the target device               #####
 #####      * espnow_target_relay_button_X - Which relay to toggle (1-4)                   #####

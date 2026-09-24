@@ -86,8 +86,20 @@ Below is a detailed description of the keys used:
 
 #### `position`
 
-- **Description**: An integer from 1 to 10 indicating the touch position (available on all touch events).
+- **Description**: An integer from 1 to 10 indicating the touch position (used with `type: button`).
 - **Example**: `position: 3`
+
+#### `swipe-from` and `swipe-to`
+
+- **Description**: Integers from 1 to 10 indicating the touch channel where the swipe started and ended
+  (used with `type: swipe`). `0` means the channel could not be determined.
+- **Example**: `swipe-from: 8`, `swipe-to: 3`
+
+#### `swipe-from-button` and `swipe-to-button`
+
+- **Description**: The buttons corresponding to `swipe-from` and `swipe-to`, from 1 to the number of gangs
+  (used with `type: swipe`). `0` means the button could not be determined.
+- **Example**: `swipe-from-button: 2`, `swipe-to-button: 1`
 
 ### Supported Event Types
 
@@ -154,7 +166,10 @@ Below is a detailed description of the keys used:
     type: swipe
     action: left
     swipe-direction: left
-    position: 3
+    swipe-from: 8
+    swipe-to: 3
+    swipe-from-button: 2
+    swipe-to-button: 1
 ```
 
 ```yaml
@@ -166,7 +181,10 @@ Below is a detailed description of the keys used:
     type: swipe
     action: up
     swipe-direction: up
-    position: 3
+    swipe-from: 8
+    swipe-to: 3
+    swipe-from-button: 2
+    swipe-to-button: 1
 ```
 
 ##### Multi-Touch Event
@@ -179,7 +197,6 @@ Below is a detailed description of the keys used:
     domain: touch
     type: multi_touch
     action: release
-    position: 3
 ```
 
 ### Integration in Automations
@@ -225,7 +242,6 @@ trigger:
       type: swipe
       action: left
       swipe-direction: left
-      position: 3
 action:
   - service: script.activate_scene
     target:
