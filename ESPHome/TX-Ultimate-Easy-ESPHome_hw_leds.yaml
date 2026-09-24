@@ -88,7 +88,7 @@ light:
     pin: GPIO13
     restore_mode: ${LIGHT_FULL_RESTORE_MODE}
     platform: esp32_rmt_led_strip
-    rgb_order: GRB
+    channel_colors: GRB
     chipset: ws2812
     max_refresh_rate: 33ms
     use_psram: false
