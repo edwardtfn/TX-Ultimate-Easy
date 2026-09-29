@@ -94,6 +94,7 @@ globals:
   platform: partition
   disabled_by_default: false
   default_transition_length: ${default_transition_length}
+  gamma_correct: ${LIGHT_GAMMA_CORRECT}
   restore_mode: ${RELAYS_LIGHT_PARTITION_RESTORE_MODE}
 
 light:
