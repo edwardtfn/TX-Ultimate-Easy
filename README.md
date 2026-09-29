@@ -383,6 +383,25 @@ packages:
 > [!NOTE]
 > Use the advanced configuration with caution. Excluding core packages may cause instability or reduced functionality.
 
+#### LED Gamma Correction
+
+All LED lights use the ESPHome default gamma correction of `2.8`.
+The LEDs have 8-bit resolution per color channel, so at low brightness each channel has only a few usable levels left after gamma correction.
+In that range, colors mixing channels with different intensities (e.g. orange or warm white) cannot be rendered accurately.
+
+Starting with ESPHome `2026.9.0`, a non-zero color channel is never rounded down to off.
+Previously, the weaker channels of a mixed color were switched off at low brightness; now they stay at the lowest level,
+which can shift the resulting color (e.g. a dim orange may look yellow).
+
+If you prefer more color accuracy at low brightness, you can lower the gamma correction for all LED lights with a substitution:
+
+```yaml
+substitutions:
+  LIGHT_GAMMA_CORRECT: 2.0  # Default: 2.8 (lower values keep more color resolution at low brightness)
+```
+
+Lower values make low brightness levels appear brighter, so you may need to readjust brightness in your automations and in Night Mode.
+
 ### Device Flashing
 
 Initial flashing must be done via serial connection.

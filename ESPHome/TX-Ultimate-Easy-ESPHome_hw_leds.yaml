@@ -27,6 +27,11 @@ substitutions:
   LIGHT_TRANSITION_TURN_OFF: 0  # Transition time in msec
   LIGHT_BRIGHTNESS_TURN_ON: 0   # Brightness (1 to 100%, 0 to not set it)
 
+  # Gamma correction applied to all LED lights (ESPHome default: 2.8).
+  # Lower values (e.g. 1.8 to 2.2) keep more color resolution at low brightness,
+  # at the cost of a less linear perceived brightness curve. 0 disables it.
+  LIGHT_GAMMA_CORRECT: 2.8
+
   LIGHT_FULL_RESTORE_MODE: RESTORE_DEFAULT_OFF
   LIGHT_SIDES_RESTORE_MODE: RESTORE_DEFAULT_OFF
 
@@ -42,6 +47,7 @@ esphome:
 .light_partition_sides: &light_partition_sides
   platform: partition
   default_transition_length: ${default_transition_length}
+  gamma_correct: ${LIGHT_GAMMA_CORRECT}
   disabled_by_default: true
   internal: false
   restore_mode: ${LIGHT_SIDES_RESTORE_MODE}
@@ -90,6 +96,7 @@ light:
     platform: esp32_rmt_led_strip
     rgb_order: GRB
     chipset: ws2812
+    gamma_correct: ${LIGHT_GAMMA_CORRECT}
     max_refresh_rate: 33ms
     use_psram: false
     # platform: neopixelbus
@@ -101,6 +108,7 @@ light:
     name: Lights (all)
     platform: partition
     default_transition_length: ${default_transition_length}
+    gamma_correct: ${LIGHT_GAMMA_CORRECT}
     internal: false
     restore_mode: ${LIGHT_SIDES_RESTORE_MODE}
     effects:

@@ -55,6 +55,8 @@ light:
     icon: mdi:weather-night
     restore_mode: RESTORE_DEFAULT_OFF
     default_transition_length: ${night_mode_light_default_transition_length}
+    # No effect on the LEDs; shares the LED gamma table to avoid a second one in flash.
+    gamma_correct: ${LIGHT_GAMMA_CORRECT}
     initial_state:
       color_mode: RGB
       red: ${night_mode_red}
@@ -65,6 +67,7 @@ light:
   # Internal partition that drives the physical strip while Night Mode is active.
   - id: light_night_mode_leds
     platform: partition
+    gamma_correct: ${LIGHT_GAMMA_CORRECT}
     internal: true
     restore_mode: RESTORE_DEFAULT_OFF
     segments:
