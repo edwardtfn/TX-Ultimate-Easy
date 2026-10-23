@@ -331,7 +331,7 @@ script:
       position: uint8_t
     then:
       - lambda: |-
-          // Behavior regardless of INSTANT_CLICK_MODE_ACTIVE
+          // Behavior not depending of INSTANT_CLICK_MODE_ACTIVE
           switch (button) {
             case 1:
               bs_button_1->publish_state(true);
