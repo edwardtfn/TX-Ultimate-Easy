@@ -152,6 +152,7 @@ For more details, please refer to our **[Events docs](docs/events.md)**.
   Example: Trigger scenes or complex automations through Home Assistant
 - **Relay Toggle**: Direct control of the associated relay
   Example: Toggle relay state with each press, independent of Home Assistant
+- **Cover open / Cover close**: Local control of a cover, available when the [cover package](docs/cover.md) is installed
 
 #### Automation
 All device behaviors can be customized through Home Assistant automations without relying on local device triggers.
@@ -299,6 +300,12 @@ bluetooth_proxy:
 Add the ESP-NOW package so one switch can toggle relays on another switch directly, without Home Assistant.
 Configuration is done via YAML substitutions (target MAC and relay per button).
 For setup, see **[ESP-NOW docs](docs/espnow.md)**.
+
+#### Cover (blinds, shutters, curtains)
+
+Add the cover package so two relays drive a motorized cover, with a software interlock between both directions.
+The cover is exposed to Home Assistant as a `cover` entity and can be controlled locally from the buttons.
+Requires a 2, 3 or 4-gang device. For setup, see **[Cover docs](docs/cover.md)**.
 
 #### Instant Click Mode
 By default, a button click is only acted upon after the touch is released and the multi-click window expires,
