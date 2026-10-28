@@ -76,7 +76,8 @@ globals:
     restore_value: true
     initial_value: '4369'  # Binary: 0001000100010001 = all buttons set to option 1 (default action)
     # Bit layout: [button4(4)][button3(4)][button2(4)][button1(4)]
-    # Each button uses 4 bits: 0=None, 1=Toggle, 2=Failsafe, 3-15=Reserved for future options
+    # Each button uses 4 bits: 0=None, 1=Toggle, 2=Failsafe, 3=Cover open, 4=Cover close (cover package),
+    # 5-15=Reserved for future options
 
   - id: button_press_button
     type: uint8_t
@@ -300,18 +301,28 @@ script:
 
   - id: !extend restore_from_nvs
     then:
+      # Each button action is stored as a 4-bit index. Indexes not available in the current build (e.g. a cover
+      # action after the cover package is removed) fall back to the default action (index 1).
       - select.set_index:
           id: sl_button_1_action
-          index: !lambda return std::min((uint8_t)(id(button_actions_packed) & 0x0F), (uint8_t)2);
+          index: !lambda |-
+            const size_t index = id(button_actions_packed) & 0x0F;
+            return sl_button_1_action->has_index(index) ? index : 1;
       - select.set_index:
           id: sl_button_2_action
-          index: !lambda return std::min((uint8_t)((id(button_actions_packed) >> 4) & 0x0F), (uint8_t)2);
+          index: !lambda |-
+            const size_t index = (id(button_actions_packed) >> 4) & 0x0F;
+            return sl_button_2_action->has_index(index) ? index : 1;
       - select.set_index:
           id: sl_button_3_action
-          index: !lambda return std::min((uint8_t)((id(button_actions_packed) >> 8) & 0x0F), (uint8_t)2);
+          index: !lambda |-
+            const size_t index = (id(button_actions_packed) >> 8) & 0x0F;
+            return sl_button_3_action->has_index(index) ? index : 1;
       - select.set_index:
           id: sl_button_4_action
-          index: !lambda return std::min((uint8_t)((id(button_actions_packed) >> 12) & 0x0F), (uint8_t)2);
+          index: !lambda |-
+            const size_t index = (id(button_actions_packed) >> 12) & 0x0F;
+            return sl_button_4_action->has_index(index) ? index : 1;
 
   - id: !extend touch_on_multi_touch_release
     then:
