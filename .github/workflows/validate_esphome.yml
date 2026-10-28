@@ -117,6 +117,20 @@ jobs:
           yaml-file: ".test/esphome_ard_hw_leds_individual.yaml"
           version: latest
 
+  build_ard_cover:
+    name: "Arduino Cover (latest)"
+    needs: build_ard_basic
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build Arduino Cover - latest
+        uses: esphome/build-action@ae5408cdbc4f70692bf8e345c4982bca05a93667  # v8.1.0
+        with:
+          yaml-file: ".test/esphome_ard_cover.yaml"
+          version: latest
+
   build_ard_hw_relays:
     name: "🔌 Arduino HW Relays (latest)"
     needs: build_ard_basic
@@ -363,6 +377,20 @@ jobs:
           yaml-file: ".test/esphome_idf_hw_leds_individual.yaml"
           version: latest
 
+  build_idf_cover:
+    name: "IDF Cover (latest)"
+    needs: build_idf_basic
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Build IDF Cover - latest
+        uses: esphome/build-action@ae5408cdbc4f70692bf8e345c4982bca05a93667  # v8.1.0
+        with:
+          yaml-file: ".test/esphome_idf_cover.yaml"
+          version: latest
+
   build_idf_hw_relays:
     name: "🔌 IDF HW Relays (latest)"
     needs: build_idf_basic
@@ -546,6 +574,7 @@ jobs:
       - build_ard_basic
       - build_ard_basic_dev
       - build_ard_hw_leds_individual
+      - build_ard_cover
       - build_ard_hw_relays
       - build_ard_hw_speaker
       - build_ard_hw_vibration
@@ -570,6 +599,7 @@ jobs:
           [ "${{ needs.build_ard_core.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_basic.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_hw_leds_individual.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_cover.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_hw_relays.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_hw_speaker.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
@@ -577,7 +607,7 @@ jobs:
           [ "${{ needs.build_ard_espnow_example_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_espnow_sender_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_espnow_receiver_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-          TOTAL=$((TOTAL + 10))
+          TOTAL=$((TOTAL + 11))
 
           # Count dev builds (if not skipped)
           if [ "${{ github.event.inputs.skip_dev }}" != "true" ]; then
@@ -608,6 +638,7 @@ jobs:
       - build_idf_basic
       - build_idf_basic_dev
       - build_idf_hw_leds_individual
+      - build_idf_cover
       - build_idf_hw_relays
       - build_idf_hw_speaker
       - build_idf_hw_vibration
@@ -632,6 +663,7 @@ jobs:
           [ "${{ needs.build_idf_core.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_basic.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_hw_leds_individual.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_cover.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_hw_relays.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_hw_speaker.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
@@ -639,7 +671,7 @@ jobs:
           [ "${{ needs.build_idf_espnow_example_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_espnow_sender_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_espnow_receiver_latest.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
-          TOTAL=$((TOTAL + 10))
+          TOTAL=$((TOTAL + 11))
 
           # Count dev builds (if not skipped)
           if [ "${{ github.event.inputs.skip_dev }}" != "true" ]; then
@@ -668,6 +700,7 @@ jobs:
       - build_ard_core
       - build_ard_basic
       - build_ard_hw_leds_individual
+      - build_ard_cover
       - build_ard_hw_relays
       - build_ard_hw_speaker
       - build_ard_hw_vibration
@@ -678,6 +711,7 @@ jobs:
       - build_idf_core
       - build_idf_basic
       - build_idf_hw_leds_individual
+      - build_idf_cover
       - build_idf_hw_relays
       - build_idf_hw_speaker
       - build_idf_hw_vibration
@@ -691,12 +725,13 @@ jobs:
       - name: Latest ESPHome Results
         run: |
           SUCCESS=0
-          TOTAL=20
+          TOTAL=22
 
           # Arduino Latest builds
           [ "${{ needs.build_ard_core.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_basic.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_hw_leds_individual.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_ard_cover.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_hw_relays.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_hw_speaker.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_ard_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
@@ -709,6 +744,7 @@ jobs:
           [ "${{ needs.build_idf_core.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_basic.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_hw_leds_individual.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
+          [ "${{ needs.build_idf_cover.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_hw_relays.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_hw_speaker.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
           [ "${{ needs.build_idf_hw_vibration.result }}" == "success" ] && SUCCESS=$((SUCCESS + 1))
