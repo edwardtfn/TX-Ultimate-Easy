@@ -68,6 +68,7 @@ binary_sensor:
 esphome:
   build_flags:
     - -D TX_ULTIMATE_EASY_HW_BUTTONS
+    - -D INSTANT_CLICK_MODE_ACTIVE=${INSTANT_CLICK_MODE_ACTIVE}
 
 globals:
   # Packed button actions - replaces 4 separate selects
