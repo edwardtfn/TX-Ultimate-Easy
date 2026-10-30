@@ -1,2 +1,16 @@
 *.cmd
 *.bat
+!run_tests.cmd
+!run_tests.bat
+
+__pycache__/
+*.pyc
+
+# ESPHome build cache
+.esphome/
+.pytest_cache/
+
+.test/simulation/
+
+# Local developer overrides and private scripts
+.local/

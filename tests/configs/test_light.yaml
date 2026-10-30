@@ -1,0 +1,45 @@
+esphome:
+  name: tx-qemu-light
+  friendly_name: TX QEMU Light Relay Test
+  includes:
+    - qemu_stubs.h
+  build_flags:
+    - "-Wl,--wrap=rmt_tx_wait_all_done"
+    - "-Wl,--wrap=rmt_transmit"
+
+esp32:
+  board: esp32dev
+  framework:
+    type: esp-idf
+
+logger:
+  level: VERBOSE
+  baud_rate: 115200
+
+substitutions:
+  name: tx-qemu-light
+  friendly_name: TX QEMU Light Relay Test
+  device_format: EU
+  gang_count: 2
+  relay_1_mode: "switch"
+  relay_2_mode: "light"
+  expose_relays_leds_to_ha: "true"
+  touch_uart_rx_pin: GPIO3
+  touch_uart_tx_pin: GPIO1
+
+external_components:
+  - source:
+      type: local
+      path: ../../components
+    components:
+      - tx_ultimate_easy
+
+wifi: !remove
+
+ethernet:
+  type: OPENETH
+
+packages:
+  core: !include ../../ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
+  relays: !include ../../ESPHome/TX-Ultimate-Easy-ESPHome_hw_relays.yaml
+  vibration: !include ../../ESPHome/TX-Ultimate-Easy-ESPHome_hw_vibration.yaml
