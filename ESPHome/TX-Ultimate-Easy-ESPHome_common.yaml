@@ -68,7 +68,7 @@ esphome:
   name: ${name}
   friendly_name: ${friendly_name}
   comment: TX Ultimate Easy
-  min_version: 2026.6.0
+  min_version: 2026.9.0
   project:
     name: "edwardtfn.tx_ultimate_easy"
     version: ${version}
