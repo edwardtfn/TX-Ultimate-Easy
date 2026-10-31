@@ -35,7 +35,7 @@ Starting with version `2025.12.2`, device configuration has moved from UI select
 
 ### Requirements
 
-- **ESPHome 2025.11.0 or later** (older versions will not compile)
+- **ESPHome 2026.9.0 or later** (older versions will not compile)
 - Updated YAML configuration with required substitutions (see below)
 
 ### Required Changes
@@ -65,7 +65,7 @@ While this moves slightly away from our "Easy" philosophy of pure UI configurati
 ### Migration Guide
 
 1. **Update ESPHome** (if needed):
-   - Ensure you're running ESPHome 2025.11.0 or later
+   - Ensure you're running ESPHome 2026.9.0 or later
    - Update via Home Assistant: Settings → Add-ons → ESPHome → Update
 2. Open your ESPHome configuration file
 3. Add the **new** substitutions to your **existing** `substitutions:` section:
@@ -79,7 +79,7 @@ While this moves slightly away from our "Easy" philosophy of pure UI configurati
 The compiler will provide clear error messages if required substitutions are missing or invalid.
 
 > [!WARNING]
-> ESPHome builder v2025.11.0+ is required
+> ESPHome builder v2026.9.0+ is required
 
 ## Framework Migration to ESP-IDF
 
@@ -204,7 +204,7 @@ Before getting started, ensure you have:
 
 1. A Sonoff TX Ultimate device
 2. Home Assistant installation
-3. ESPHome (could be as an add-on to Home Assistant - version 2025.11.0 or later required)
+3. ESPHome (could be as an add-on to Home Assistant - version 2026.9.0 or later required)
 4. Basic knowledge of Home Assistant
 
 ## Installation
