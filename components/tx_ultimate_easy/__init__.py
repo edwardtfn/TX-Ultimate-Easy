@@ -5,7 +5,6 @@ from esphome.components import uart
 from esphome.const import (
     CONF_ID,
 )
-from esphome.core import CORE
 import logging
 
 CODEOWNERS = ["@edwardtfn"]
@@ -42,13 +41,13 @@ TxUltimateTouch = tx_ultimate_easy_ns.class_(
 def validate_gang_count(value):
     """
     Validate gang_count is an integer between 1 and 4.
-    
+
     Parameters:
         value: The gang_count value to validate.
-    
+
     Returns:
         int: The validated gang_count value.
-    
+
     Raises:
         cv.Invalid: If value is not an integer or not in range 1-4.
     """
@@ -67,13 +66,13 @@ def validate_gang_count(value):
 def validate_device_format(value):
     """
     Validate device_format is either 'EU' or 'US'.
-    
+
     Parameters:
         value: The device_format value to validate.
-    
+
     Returns:
         str: The validated device_format value.
-    
+
     Raises:
         cv.Invalid: If value is not 'EU' or 'US'.
     """
@@ -111,9 +110,12 @@ CONFIG_SCHEMA = cv.Schema({
 async def register_tx_ultimate_easy(var, config):
     """
     Register the TxUltimateEasy component with its UART device and wire configured automations.
-    
-    For the given component instance, attach the configured UART component and build any automations present in the config for touch events, presses, releases, swipes, multi-touch releases, and long-touch releases. Each automation receives a payload field named "touch" of type `TouchPoint`.
-    
+
+    For the given component instance, attach the configured UART component and build
+    any automations present in the config for touch events, presses, releases, swipes,
+    multi-touch releases, and long-touch releases. Each automation receives a payload
+    field named "touch" of type `TouchPoint`.
+
     Parameters:
         var: The TxUltimateTouch component instance to configure.
         config (dict): Parsed configuration mapping containing `CONF_UART` and optional automation keys.
@@ -182,12 +184,14 @@ async def register_tx_ultimate_easy(var, config):
             config[CONF_GANG_COUNT],
         )
 
+
 async def to_code(config):
     """
     Create and register a TxUltimateTouch component and its UART device from the provided configuration.
-    
-    This registers the component with ESPHome, registers it as a UART device, applies additional TxUltimateEasy setup, and defines the USE_TX_ULTIMATE_EASY build macro.
-    
+
+    This registers the component with ESPHome, registers it as a UART device, applies
+    additional TxUltimateEasy setup, and defines the USE_TX_ULTIMATE_EASY build macro.
+
     Parameters:
         config (dict): Parsed component configuration from YAML used to create and wire the component.
     """
