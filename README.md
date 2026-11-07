@@ -35,7 +35,7 @@ Starting with version `2025.12.2`, device configuration has moved from UI select
 
 ### Requirements
 
-- **ESPHome 2026.9.0 or later** (older versions will not compile)
+- **ESPHome 2026.8.0 or later** (older versions will not compile)
 - Updated YAML configuration with required substitutions (see below)
 
 ### Required Changes
@@ -65,8 +65,8 @@ While this moves slightly away from our "Easy" philosophy of pure UI configurati
 ### Migration Guide
 
 1. **Update ESPHome** (if needed):
-   - Ensure you're running ESPHome 2026.9.0 or later
-   - Update via Home Assistant: Settings → Add-ons → ESPHome → Update
+   - Ensure you're running ESPHome 2026.8.0 or later
+   - Update via Home Assistant: Settings → Apps → ESPHome Device Builder → Update
 2. Open your ESPHome configuration file
 3. Add the **new** substitutions to your **existing** `substitutions:` section:
    - `device_format: EU` or `model: US` (required)
@@ -79,7 +79,7 @@ While this moves slightly away from our "Easy" philosophy of pure UI configurati
 The compiler will provide clear error messages if required substitutions are missing or invalid.
 
 > [!WARNING]
-> ESPHome builder v2026.9.0+ is required
+> ESPHome builder v2026.8.0+ is required
 
 ## Framework Migration to ESP-IDF
 
@@ -204,7 +204,7 @@ Before getting started, ensure you have:
 
 1. A Sonoff TX Ultimate device
 2. Home Assistant installation
-3. ESPHome (could be as an add-on to Home Assistant - version 2026.9.0 or later required)
+3. ESPHome (could be as an app in Home Assistant - version 2026.8.0 or later required)
 4. Basic knowledge of Home Assistant
 
 ## Installation
@@ -213,11 +213,11 @@ Follow these steps to get your TX Ultimate device up and running with ESPHome.
 
 ### ESPHome Integration Setup
 
-1. Install the ESPHome add-on in Home Assistant if not already installed:
-   - Go to Settings → Add-ons → Add-on Store
-   - Search for "ESPHome" 
+1. Install the ESPHome Device Builder app in Home Assistant if not already installed:
+   - Go to Settings → Apps and open the app store
+   - Search for "ESPHome"
    - Click Install
-2. Start the ESPHome add-on and verify it's running
+2. Start the ESPHome Device Builder app and verify it's running
 3. Access ESPHome dashboard through Home Assistant
 
 ### Setup Device
@@ -464,7 +464,7 @@ Note: While these guides may use different firmware, the physical flashing proce
 
 #### Subsequent Updates
 After initial flashing, all future updates can be done wirelessly (OTA)
-through the ESPHome dashboard in your ESPHome add-on.
+through the ESPHome dashboard in your ESPHome Device Builder app.
 
 ### Home Assistant Integration
 
