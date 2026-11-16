@@ -1,50 +1,51 @@
 ---
-name: "🧪 QEMU Hardware Integration Tests"
+name: QEMU Integration Tests
 
 permissions:
   contents: read
 
 # yamllint disable-line rule:truthy
 on:
-  push:
-    branches:
-      - main
-      - dev
   pull_request:
-    branches:
-      - main
-      - dev
+    paths:
+      - ".github/workflows/qemu_integration_tests.yml"
+      - "components/**"
+      - "ESPHome/**"
+      - "tests/**"
+      - "pytest.ini"
+      - "requirements-test.txt"
+      - "run_tests.py"
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
   qemu_tests:
-    name: "🖥️ QEMU Standalone Integration Tests"
+    name: QEMU Standalone Integration Tests
     runs-on: ubuntu-latest
     timeout-minutes: 25
 
     steps:
-      - name: 📥 Checkout repository
-        uses: actions/checkout@v7
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           persist-credentials: false
 
-      - name: 🐍 Set up Python 3.12
-        uses: actions/setup-python@v7
+      - name: Set up Python 3.12
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
         with:
           python-version: "3.12"
           cache: "pip"
           cache-dependency-path: "requirements-test.txt"
 
-      - name: 📦 Install Python Dependencies
+      - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements-test.txt
 
-      - name: ⚙️ Install QEMU Runtime System Libraries
+      - name: Install QEMU runtime system libraries
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
@@ -54,7 +55,7 @@ jobs:
             libsdl2-2.0-0 \
             libslirp0
 
-      - name: ⚡ Download & Set Up Espressif QEMU
+      - name: Download and set up Espressif QEMU
         run: |
           QEMU_URL="https://github.com/espressif/qemu/releases/download/esp-develop-9.2.2-20260417/qemu-xtensa-softmmu-esp_develop_9.2.2_20260417-x86_64-linux-gnu.tar.xz"
           mkdir -p "$HOME/qemu-dist"
@@ -79,7 +80,7 @@ jobs:
           echo "$QEMU_DIR" >> "$GITHUB_PATH"
           echo "QEMU_BIN=$QEMU_BIN_PATH" >> "$GITHUB_ENV"
 
-      - name: 🧪 Execute Standalone QEMU Integration Test Suite
+      - name: Run QEMU integration test suite
         env:
           PYTHONUNBUFFERED: "1"
         run: |

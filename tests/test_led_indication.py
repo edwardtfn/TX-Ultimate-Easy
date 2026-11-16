@@ -73,7 +73,7 @@ def test_tc_l04_led_mode_off(switch):
     switch.assert_no_log("Turn-on Top light for Relay 1")
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: stranded LEDs when switching active modes", strict=False)
+@pytest.mark.xfail(reason="Stock firmware upstream defect: stranded LEDs when switching active modes")
 def test_tc_l05_active_to_active_mode_transition_updates_leds(switch):
     """TC-L05: Transitioning light mode from 'Both' to 'Bottom' while Relay is ON must turn off the Top LED.
 
@@ -95,7 +95,7 @@ def test_tc_l05_active_to_active_mode_transition_updates_leds(switch):
     switch.assert_log("Turn-off Top light for Relay 1", timeout=3.0)
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: toggling relay off fails to clear unselected partition groups", strict=False)
+@pytest.mark.xfail(reason="Stock firmware upstream defect: toggling relay off fails to clear unselected partition groups")
 def test_tc_l06_gang3_toggle_clears_inactive_leds(switch):
     """TC-L06: Toggling Relay 3 OFF must extinguish all assigned LED groups.
 
@@ -127,7 +127,6 @@ def test_tc_l06_gang3_toggle_clears_inactive_leds(switch):
 
 @pytest.mark.xfail(
     reason="Stock firmware upstream defect: previous_mode initialization on first mode change suppresses transition",
-    strict=False,
 )
 def test_tc_l07_first_light_mode_change_after_boot_applies_immediately(switch):
     """TC-L07: First user light mode change after boot must apply immediately.
@@ -151,7 +150,7 @@ def test_tc_l07_first_light_mode_change_after_boot_applies_immediately(switch):
     switch.assert_log("Relay 1 light mode changed to Disabled - turning off lights", timeout=2.5)
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: side partition turn-off lacks relay indicator restoration hook", strict=False)
+@pytest.mark.xfail(reason="Stock firmware upstream defect: side partition turn-off lacks relay indicator restoration hook")
 def test_tc_l08_side_partition_turn_off_restores_relay_indicator(switch):
     """TC-L08: Turning OFF an individual side partition must restore active relay status LEDs.
 

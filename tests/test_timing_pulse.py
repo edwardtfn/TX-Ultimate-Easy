@@ -130,7 +130,7 @@ def test_tc_tp06_pulse_timer_aborts_when_disabled(switch):
     assert switch.get_entity_state("Relay 1") is True, "Relay 1 turned off despite pulse time being set to 0.0!"
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: inching timer does not re-arm when commanded while already on", strict=False)
+@pytest.mark.xfail(reason="Stock firmware upstream defect: inching timer does not re-arm when commanded while already on")
 def test_tc_tp07_inching_rearms_when_relay_already_on(switch):
     """TC-TP07: Configuring pulse time and commanding turn_on while relay is already ON must start inching.
 
@@ -176,7 +176,6 @@ def test_tc_tp08_inching_triggered_by_physical_tap(switch):
     switch.set_number("Relay 1 Pulse Time", 0.0)
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: inching timer not cancelled cleanly by physical tap off", strict=False)
 def test_tc_tp09_inching_cancelled_by_manual_physical_tap_off(switch):
     """TC-TP09: Inching timer is cancelled cleanly when user manually taps off the relay."""
     # 1. Set Relay 1 Pulse Time to 4.0s

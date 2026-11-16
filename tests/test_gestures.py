@@ -10,7 +10,6 @@ def test_tc_g01_single_click(switch, gang):
     switch.assert_log(f"Toggle relay {gang}")
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: multi-click coalescing resets accumulator", strict=False)
 def test_tc_g04_double_click(switch):
     """TC-G04: Double-click with 80ms interval registers double_click."""
     switch.double_click(gang=1, interval_ms=80)
@@ -85,6 +84,8 @@ def test_tc_g12_partial_swipe_same_gang(switch):
     switch.assert_log("Button 1 action: 'click'")
 
 
+# Not strict: the 30-40 ms margins around the 250 ms window are within the timing jitter of the emulator,
+# so the result is not deterministic (XFAIL and XPASS both seen in CI). Re-evaluate on hardware.
 @pytest.mark.xfail(reason="Stock firmware upstream defect: multi-click coalescing resets accumulator", strict=False)
 def test_tc_g14_multi_click_window_boundaries(switch):
     """TC-G14: Precise boundary timing around the 250ms multi-click detection window.

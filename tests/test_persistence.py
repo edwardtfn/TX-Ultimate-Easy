@@ -1,9 +1,7 @@
 """Test Cases: NVS Flash Persistence and Reboot State Recovery under QEMU emulation."""
 import time
-import pytest
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: button_action select lacks restore_value", strict=False)
 def test_tc_p01_button_action_persists_across_reboot(switch):
     """TC-P01: Configured Button Action (None) survives hard device restart/reboot."""
     # Switch Button 2 action to None
@@ -27,7 +25,6 @@ def test_tc_p01_button_action_persists_across_reboot(switch):
     time.sleep(1.0)
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: relay light mode select lacks restore_value", strict=False)
 def test_tc_p02_led_mode_persists_across_reboot(switch):
     """TC-P02: Configured Relay LED Mode survives hard device restart/reboot."""
     # Change Relay 1 LED mode to Top
@@ -80,7 +77,6 @@ def test_tc_p04_boot_deferred_led_repaint_sequence(switch):
     switch.assert_log("Overall:     YES")
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: relays boot to default OFF instead of restoring last active state", strict=False)
 def test_tc_p05_relay_last_state_persists_across_reboot(switch):
     """TC-P05: Relay states persist across reboot per RESTORE_DEFAULT_OFF policy.
 
@@ -90,10 +86,13 @@ def test_tc_p05_relay_last_state_persists_across_reboot(switch):
     switch.set_relay(1, True)
     switch.set_relay(2, True)
     switch.set_relay(3, False)
-    time.sleep(0.5)
-    assert switch.get_entity_state("Relay 1") is True
-    assert switch.get_entity_state("Relay 2") is True
-    assert switch.get_entity_state("Relay 3") is False
+    # Wait for the states to be reported instead of a fixed delay, which was flaky under emulation
+    assert switch.wait_for_entity_state("Relay 1", True)
+    assert switch.wait_for_entity_state("Relay 2", True)
+    assert switch.wait_for_entity_state("Relay 3", False)
+
+    # Allow ESPHome preferences component to flush dirty state to NVS (flash_write_interval: 1s)
+    time.sleep(2.0)
 
     # 2. Hard reboot device
     print("\n  [*] Rebooting QEMU emulator with active relays to test state persistence...", flush=True)
@@ -105,10 +104,10 @@ def test_tc_p05_relay_last_state_persists_across_reboot(switch):
     switch.assert_log("Relay 2: ON")
     switch.assert_log("Relay 3: OFF")
 
-    # 4. Verify subscribed states
-    assert switch.get_entity_state("Relay 1") is True
-    assert switch.get_entity_state("Relay 2") is True
-    assert switch.get_entity_state("Relay 3") is False
+    # 4. Verify subscribed states (reported after the API reconnects)
+    assert switch.wait_for_entity_state("Relay 1", True)
+    assert switch.wait_for_entity_state("Relay 2", True)
+    assert switch.wait_for_entity_state("Relay 3", False)
 
     # Cleanup: restore relays to OFF
     switch.set_relay(1, False)

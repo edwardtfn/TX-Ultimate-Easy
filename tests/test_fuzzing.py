@@ -96,7 +96,7 @@ def test_tc_f04_rapid_burst_flood(switch):
     switch.assert_log("Button 1 action: 'click'")
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: loop discards partial UART frame between ticks", strict=False)
+@pytest.mark.xfail(reason="Stock firmware upstream defect: loop discards partial UART frame between ticks")
 def test_tc_f05_touch_packet_split_across_ticks_registers_press(switch):
     """TC-F05: Touch packet split across loop ticks must be buffered and recognized.
 
