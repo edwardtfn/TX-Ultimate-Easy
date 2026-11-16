@@ -369,6 +369,9 @@ tx_ultimate_easy:
         } else {
           ESP_LOGI("${TAG_HW_TOUCH}", "Long-touch released at position %" PRIu8, touch_position);
         }
+        // A long touch is still the release of a press: run the same release handling, so the
+        // button state and binary sensor are cleared and the press duration is evaluated.
+        touch_on_release->execute();
 
   on_multi_touch_release:
     then:
