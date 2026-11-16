@@ -48,7 +48,7 @@ def test_tc_ba03_button_action_failsafe(switch):
     switch.assert_no_log("Toggle relay 1")
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: rapid cross-gang tap state collision", strict=False)
+@pytest.mark.xfail(reason="Stock firmware upstream defect: rapid cross-gang tap state collision")
 def test_tc_ba04_rapid_cross_gang_taps_fire_all_clicks(switch):
     """TC-BA04: Rapid cross-gang tapping must process all clicks without dropping any gang.
 
@@ -78,7 +78,6 @@ def test_tc_ba04_rapid_cross_gang_taps_fire_all_clicks(switch):
     switch.assert_log("Toggle relay 2", timeout=1.0)
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: hardware long touch release unhandled", strict=False)
 def test_tc_ba05_hardware_long_touch_release_fires_long_press(switch):
     """TC-BA05: Hardware long-touch release frame (x >= 17) must trigger the button long press action.
 

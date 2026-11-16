@@ -10,7 +10,6 @@ def test_tc_g01_single_click(switch, gang):
     switch.assert_log(f"Toggle relay {gang}")
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: multi-click coalescing resets accumulator", strict=False)
 def test_tc_g04_double_click(switch):
     """TC-G04: Double-click with 80ms interval registers double_click."""
     switch.double_click(gang=1, interval_ms=80)
@@ -85,7 +84,7 @@ def test_tc_g12_partial_swipe_same_gang(switch):
     switch.assert_log("Button 1 action: 'click'")
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: multi-click coalescing resets accumulator", strict=False)
+@pytest.mark.xfail(reason="Stock firmware upstream defect: multi-click coalescing resets accumulator")
 def test_tc_g14_multi_click_window_boundaries(switch):
     """TC-G14: Precise boundary timing around the 250ms multi-click detection window.
 

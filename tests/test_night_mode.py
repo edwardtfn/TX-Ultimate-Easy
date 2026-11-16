@@ -1,8 +1,6 @@
 import time
-import pytest
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: night mode lacks relay LED suppression guard", strict=False)
 def test_tc_nm02_night_mode_suppresses_relay_led_updates(switch):
     """TC-NM02: When Night Mode is active, toggling physical relays does not alter relay status LEDs."""
     switch.set_night_mode(True)
@@ -17,7 +15,6 @@ def test_tc_nm02_night_mode_suppresses_relay_led_updates(switch):
     switch.assert_no_log("Turn-on Bottom light for Relay 1")
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: disabling night mode does not restore relay indicators", strict=False)
 def test_tc_nm03_disable_night_mode_restores_relay_indicators(switch):
     """TC-NM03: Disabling Night Mode repaints the relay status LEDs for active relays."""
     # Ensure relay 1 is ON
@@ -35,7 +32,6 @@ def test_tc_nm03_disable_night_mode_restores_relay_indicators(switch):
     time.sleep(1.5)
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: night mode sound suppression causes connection reset", strict=False)
 def test_tc_nm05_night_mode_suppress_sound_toggle(switch):
     """TC-NM05: Night Mode sound suppression toggle operates correctly."""
     switch.set_switch("Night Mode - Suppress Sound", False)
@@ -46,7 +42,6 @@ def test_tc_nm05_night_mode_suppress_sound_toggle(switch):
     assert switch.wait_for_entity_state("Night Mode - Suppress Sound", True, timeout=6.0)
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: gestures do not honor night mode vibration suppression", strict=False)
 def test_tc_nm06_swipe_and_palm_during_active_night_mode(switch):
 
     """TC-NM06: Gestures operate during Night Mode while haptic feedback remains suppressed."""
