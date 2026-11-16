@@ -41,7 +41,7 @@ def test_tc_ha03_simultaneous_touch_and_remote_api_toggle(switch):
     assert isinstance(state, bool)
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: show_relay_status lacks ambient override guard", strict=False)
+@pytest.mark.xfail(reason="Stock firmware upstream defect: show_relay_status lacks ambient override guard")
 def test_tc_ha04_lights_all_overrides_relay_indicators(switch):
     """TC-HA04: When 'Lights (all)' is ON, ambient lighting overrides all gang LEDs.
 
