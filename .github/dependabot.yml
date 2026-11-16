@@ -25,4 +25,21 @@ updates:
       github-actions:
         patterns:
           - "*"
+
+  # Python packages used by the QEMU integration tests (requirements-test.txt).
+  # Grouped, so esphome and its pinned aioesphomeapi version are updated together.
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Stockholm"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    groups:
+      python-test:
+        patterns:
+          - "*"
 ...
