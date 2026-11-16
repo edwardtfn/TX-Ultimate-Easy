@@ -15,6 +15,8 @@ substitutions:
   invalid_cooldown: 100ms
 
   instant_click_mode: false
+  # Use it in lambdas as `#if ${INSTANT_CLICK_MODE_ACTIVE}`. The `${}` is required: a bare
+  # `INSTANT_CLICK_MODE_ACTIVE` is not substituted and silently evaluates to `0`.
   INSTANT_CLICK_MODE_ACTIVE: ${ 1 if instant_click_mode else 0 }
   INSTANT_CLICK_DEBOUNCE_MS: "500"  # Debounce window per button, instant click mode only, in msec
 
@@ -68,7 +70,6 @@ binary_sensor:
 esphome:
   build_flags:
     - -D TX_ULTIMATE_EASY_HW_BUTTONS
-    - -D INSTANT_CLICK_MODE_ACTIVE=${INSTANT_CLICK_MODE_ACTIVE}
 
 globals:
   # Packed button actions - replaces 4 separate selects
@@ -145,7 +146,7 @@ script:
                 break;
             }
           }
-          #if INSTANT_CLICK_MODE_ACTIVE
+          #if ${INSTANT_CLICK_MODE_ACTIVE}
           // Instant click mode only ever produces single clicks: `touch_on_press_buttons` fires
           // with a fixed count of 1 and `touch_on_release` performs no long press detection,
           // so the double click and long press branches are compiled out to save flash.
@@ -182,7 +183,7 @@ script:
             }
           }
           #endif  // INSTANT_CLICK_MODE_ACTIVE
-          #if INSTANT_CLICK_MODE_ACTIVE
+          #if ${INSTANT_CLICK_MODE_ACTIVE}
           // Instant click mode: the click already fired on touch-down and the finger may still
           // be down, so the press state and the button binary sensor must survive until the
           // physical release. `touch_on_release` performs the cleanup.
@@ -203,13 +204,13 @@ script:
     then:
       - delay: !lambda |-
           // Return `0` (instant) when instant click mode is active
-          #if INSTANT_CLICK_MODE_ACTIVE
+          #if ${INSTANT_CLICK_MODE_ACTIVE}
           return 0;
           #else   // INSTANT_CLICK_MODE_ACTIVE
           return nr_button_multi_click_delay->state;
           #endif  // INSTANT_CLICK_MODE_ACTIVE
       - lambda: |-
-          #if INSTANT_CLICK_MODE_ACTIVE
+          #if ${INSTANT_CLICK_MODE_ACTIVE}
           // Instant click mode always fires with `click_count` fixed at 1, so the multi-click
           // naming is resolved at compile time.
           button_action->execute(button, "click", click_count);
@@ -281,7 +282,7 @@ script:
             #else
                                                                 sl_button_4_action->current_option() : "Unknown");
             #endif
-          #if INSTANT_CLICK_MODE_ACTIVE
+          #if ${INSTANT_CLICK_MODE_ACTIVE}
           ESP_LOGCONFIG("${TAG_HW_BUTTONS}", "Instant click mode ON - clicks fire on press");
           #else   // INSTANT_CLICK_MODE_ACTIVE
           ESP_LOGCONFIG("${TAG_HW_BUTTONS}", "Instant click mode OFF - normal click behavior");
@@ -333,7 +334,7 @@ script:
     then:
       - lambda: |-
           // Behaviour depends on "instant click mode"
-          #if INSTANT_CLICK_MODE_ACTIVE
+          #if ${INSTANT_CLICK_MODE_ACTIVE}
           // Debounce timestamps are tracked per button (index 0 unused, buttons are 1-based)
           static uint32_t instant_click_debounce_ts[${BUTTON_4_ID} + 1] = {};
 
@@ -425,7 +426,7 @@ script:
     then:
       - lambda: |-
           // Behaviour depends on "instant click mode"
-          #if INSTANT_CLICK_MODE_ACTIVE
+          #if ${INSTANT_CLICK_MODE_ACTIVE}
             // Instant click mode: action already fired on press, just clean up
             buttons_release->execute();
             id(button_press_start_time) = 0;
