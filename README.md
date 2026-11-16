@@ -324,7 +324,6 @@ uploaded for a change to take effect. The active mode is reported in the boot lo
 | `double_click` / `multiple-click` events | Available | Never fired |
 | `long_press` event | Available | Never fired |
 | **Button multi-click delay** number entity | Applies to buttons | Ignored by buttons |
-| **Button N** binary sensor | Short pulse on press | Follows the real press, on while held |
 | Repeated presses of the same button | Counted as multi-click | Ignored for 500 ms after the previous accepted press |
 
 The 500 ms window is tracked per button, so pressing button 1 and then button 2 in quick succession works normally;
