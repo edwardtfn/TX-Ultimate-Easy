@@ -5,7 +5,6 @@ esphome:
   includes:
     - qemu_stubs.h
   build_flags:
-    - "-DINSTANT_CLICK_MODE_ACTIVE"
     - "-Wl,--wrap=rmt_tx_wait_all_done"
     - "-Wl,--wrap=rmt_transmit"
 
