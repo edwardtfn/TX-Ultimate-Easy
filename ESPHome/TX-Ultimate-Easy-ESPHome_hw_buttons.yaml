@@ -197,7 +197,11 @@ script:
           #endif  // INSTANT_CLICK_MODE_ACTIVE
 
   - id: button_click_event
-    mode: restart
+    # Normal mode: `restart` lets each new click of a sequence cancel the pending one, so only the final
+    # click count fires after the multi-click delay.
+    # Instant click mode: `parallel`, as every click is final. With `restart`, a press on another button
+    # arriving before the zero delay resumes would cancel the pending click.
+    mode: ${ "parallel" if instant_click_mode else "restart" }
     parameters:
       button: uint8_t
       click_count: uint8_t
