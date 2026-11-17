@@ -160,7 +160,9 @@ script:
               return false;  // No night mode: don't suppress — fall through to vibrate.
               #endif  // TX_ULTIMATE_EASY_NIGHT_MODE
           then:
-            []
+            # Suppressed. As this script runs in restart mode, a pulse that was still running has just been
+            # cancelled before its turn_off, so stop the motor here instead of leaving it to the safety cutoff.
+            - switch.turn_off: sw_vibration_motor
           else:
             - switch.turn_on: sw_vibration_motor
             - delay: !lambda return nr_vibrating_duration->state;
