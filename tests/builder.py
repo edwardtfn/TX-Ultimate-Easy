@@ -77,7 +77,8 @@ def get_compiler_identity(esphome_exe: str) -> str:
     # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-audit
     # Audit: fixed argument list with shell=False
     res = subprocess.run(
-        [esphome_exe, "version"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, shell=False
+        [esphome_exe, "version"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=False,
+        encoding="utf-8", errors="replace",  # ESPHome prints UTF-8; the Windows default code page cannot decode it
     )
     return f"{os.path.realpath(esphome_exe)}\n{res.stdout.strip()}"
 
@@ -186,7 +187,10 @@ def build_and_pad_firmware(
         cmd = [esphome_exe, "compile", temp_config_path]
         # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-audit
         # Audit: internal compile command using isolated temp configuration path with shell=False
-        res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, shell=False)
+        res = subprocess.run(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=False,
+            encoding="utf-8", errors="replace",  # ESPHome prints UTF-8; the Windows default code page cannot decode it
+        )
 
         if res.returncode != 0:
             print(f"[!] Compilation failed for {target_name}:\n{res.stdout}")
