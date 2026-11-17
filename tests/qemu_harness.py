@@ -32,17 +32,6 @@ BUTTON_ACTION_MAP = {
     "failsafe": "Relay {gang} (API failsafe only)",
 }
 
-GANG_MODE_MAP = {
-    "disabled": "Disabled",
-    "relay": "Relay",
-    "virtualrelay": "Virtual Relay",
-    "virtual relay": "Virtual Relay",
-    "detachedrelay": "Detached Relay",
-    "detached relay": "Detached Relay",
-    "detachedvirtualrelay": "Detached Virtual Relay",
-    "detached virtual relay": "Detached Virtual Relay",
-}
-
 LIGHT_MODE_MAP = {
     "bottom": "Bottom",
     "top": "Top",
@@ -216,11 +205,13 @@ class QemuHarness:
         self.api_client = APIClient("127.0.0.1", self.api_port, password="", noise_psk=None)
         await self.api_client.connect(login=True)
         self._states = {}
+        self._ha_events = []
 
         def _on_state(state):
             self._states[state.key] = getattr(state, "state", None)
 
         self.api_client.subscribe_states(_on_state)
+        self.api_client.subscribe_service_calls(self._on_service_call)
         entities, _ = await self.api_client.list_entities_services()
         self._entities = {e.name: e for e in entities}
 
@@ -239,6 +230,31 @@ class QemuHarness:
         def _on_state(state):
             self._states[state.key] = getattr(state, "state", None)
         self.api_client.subscribe_states(_on_state)
+        self.api_client.subscribe_service_calls(self._on_service_call)
+
+    def _on_service_call(self, call):
+        """Record Home Assistant events fired by the firmware (runs on the API loop thread)."""
+        if call.is_event:
+            self._ha_events.append((call.service, dict(call.data)))
+
+    def clear_ha_events(self):
+        """Forget the Home Assistant events received so far."""
+        self._ha_events = []
+
+    def wait_for_ha_event(self, event_type: str, timeout: float = 3.0, **expected) -> Optional[dict]:
+        """Wait for an 'esphome.tx_ultimate_easy' event of the given type whose data contains all expected values.
+
+        Returns the event data, or None if no matching event arrived within the timeout.
+        """
+        start = time.time()
+        while time.time() - start < timeout:
+            for service, data in list(getattr(self, "_ha_events", [])):
+                if service != "esphome.tx_ultimate_easy" or data.get("type") != event_type:
+                    continue
+                if all(data.get(key) == str(value) for key, value in expected.items()):
+                    return data
+            time.sleep(0.05)
+        return None
 
     def reconnect_api(self):
         """Reconnect the Native API client after simulated connection loss."""
@@ -486,20 +502,6 @@ class QemuHarness:
         self._api_loop.call_soon_threadsafe(self.api_client.select_command, entity.key, normalized)
         time.sleep(0.5)
 
-    def set_gang_mode(self, gang: int, mode: str):
-        """Set Gang mode at runtime if entity exists."""
-        if not self.api_client or not self._api_loop:
-            raise RuntimeError("ESPHome Native API client is not connected")
-        normalized = GANG_MODE_MAP.get(mode.lower().strip(), mode)
-        entity_name = f"Gang {gang} mode"
-        entity = self._entities.get(entity_name)
-        if not entity:
-            # Fallback to button action if stock
-            return
-        self.drain_logs()
-        self._api_loop.call_soon_threadsafe(self.api_client.select_command, entity.key, normalized)
-        time.sleep(0.5)
-
     def set_gang_light_mode(self, gang: int, light_mode: str):
         """Set Gang / Relay light mode at runtime: 'Bottom', 'Top', 'Both', 'Disabled' ('Off')."""
         if not self.api_client or not self._api_loop:
@@ -516,15 +518,16 @@ class QemuHarness:
         self._api_loop.call_soon_threadsafe(self.api_client.select_command, entity.key, normalized)
         time.sleep(0.5)
 
-    def set_switch(self, name: str, state: bool):
-        """Set a switch entity by name."""
+    def set_switch(self, name: str, state: bool, settle: float = 0.5):
+        """Set a switch entity by name, then wait `settle` seconds (0 to return right after sending)."""
         if not self.api_client or not self._api_loop:
             raise RuntimeError("ESPHome Native API client is not connected")
         entity = self._entities.get(name)
         if not entity:
             raise ValueError(f"Entity '{name}' not found. Available switches: {[k for k, v in self._entities.items() if 'switch' in str(type(v)).lower()]}")
         self._api_loop.call_soon_threadsafe(self.api_client.switch_command, entity.key, state)
-        time.sleep(0.5)
+        if settle > 0:
+            time.sleep(settle)
 
     def set_select(self, name: str, option: str):
         """Set a select entity by name."""
@@ -564,9 +567,9 @@ class QemuHarness:
         """Set touch vibration duration in ms."""
         self.set_number("Vibrate duration", duration_ms)
 
-    def set_night_mode(self, state: bool):
+    def set_night_mode(self, state: bool, settle: float = 0.5):
         """Toggle Night Mode on/off."""
-        self.set_switch("Night Mode", state)
+        self.set_switch("Night Mode", state, settle=settle)
 
     def set_relay(self, gang: int, state: bool):
         """Directly toggle or set physical relay state via API."""
