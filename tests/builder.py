@@ -5,6 +5,7 @@ import shutil
 import tempfile
 import subprocess
 import hashlib
+from typing import Optional
 
 REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TESTS_DIR = os.path.join(REPO_DIR, "tests")
@@ -68,6 +69,51 @@ def find_qemu_binary() -> str:
     )
 
 
+BUILD_INFO_FILENAME = ".build_info"
+
+
+def get_compiler_identity(esphome_exe: str) -> str:
+    """Return the path and reported version of the ESPHome compiler, used to invalidate cached builds."""
+    # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-audit
+    # Audit: fixed argument list with shell=False
+    res = subprocess.run(
+        [esphome_exe, "version"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=False,
+        encoding="utf-8", errors="replace",  # ESPHome prints UTF-8; the Windows default code page cannot decode it
+    )
+    return f"{os.path.realpath(esphome_exe)}\n{res.stdout.strip()}"
+
+
+def compute_build_fingerprint(esphome_exe: str, config_path: str) -> str:
+    """Return a SHA-256 fingerprint of the compiler identity and of every file the firmware is built from."""
+    sources = [config_path, os.path.join(CONFIGS_DIR, "qemu_stubs.h")]
+    for source_dir in ("ESPHome", "components", "versioning"):
+        for root, dirs, files in os.walk(os.path.join(REPO_DIR, source_dir)):
+            dirs[:] = [d for d in dirs if d != "__pycache__"]
+            sources.extend(os.path.join(root, fname) for fname in files)
+    digest = hashlib.sha256(get_compiler_identity(esphome_exe).encode("utf-8"))
+    for src in sorted(sources):
+        if not os.path.isfile(src):
+            continue
+        digest.update(os.path.relpath(src, REPO_DIR).replace("\\", "/").encode("utf-8") + b"\0")
+        with open(src, "rb") as f:
+            digest.update(hashlib.sha256(f.read()).digest())
+    return digest.hexdigest()
+
+
+def read_build_info(path: str) -> Optional[str]:
+    """Return the build fingerprint stored with a cached build, or None if there is none."""
+    if not os.path.exists(path):
+        return None
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
+
+
+def write_build_info(path: str, fingerprint: str):
+    """Store the build fingerprint of a successful build next to its output."""
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(fingerprint)
+
+
 def ensure_efuse_bin() -> str:
 
     """Ensure the 124-byte dummy efuse binary exists."""
@@ -101,35 +147,18 @@ def build_and_pad_firmware(
 
     os.makedirs(target_build_dir, exist_ok=True)
 
-    # Check if rebuild is necessary
-    needs_build = force or not os.path.exists(output_flash_path) or not os.path.exists(factory_bin)
-    if not needs_build:
-        flash_mtime = os.path.getmtime(output_flash_path)
-        # Check if source config, stubs, or repo files are newer
-        stubs_path = os.path.join(CONFIGS_DIR, "qemu_stubs.h")
-        if os.path.getmtime(config_path) > flash_mtime or (
-            os.path.exists(stubs_path) and os.path.getmtime(stubs_path) > flash_mtime
-        ):
-            needs_build = True
-        else:
-            esphome_dir = os.path.join(REPO_DIR, "ESPHome")
-            if os.path.isdir(esphome_dir):
-                for fname in os.listdir(esphome_dir):
-                    fpath = os.path.join(esphome_dir, fname)
-                    if os.path.isfile(fpath) and os.path.getmtime(fpath) > flash_mtime:
-                        needs_build = True
-                        break
-            components_dir = os.path.join(REPO_DIR, "components")
-            if not needs_build and os.path.isdir(components_dir):
-                for root, _, files in os.walk(components_dir):
-                    for fname in files:
-                        fpath = os.path.join(root, fname)
-                        if os.path.getmtime(fpath) > flash_mtime:
-                            needs_build = True
-                            break
+    # Check if rebuild is necessary. The cache key is a fingerprint of the compiler identity and of the
+    # path and content of every source file, so edits, deletions, equal timestamps and edits made while
+    # a build was running are all detected. It is computed before compiling and stored only on success.
+    esphome_exe = find_esphome_binary()
+    build_info_path = os.path.join(target_build_dir, BUILD_INFO_FILENAME)
+    fingerprint = compute_build_fingerprint(esphome_exe, config_path)
+    needs_build = force or not os.path.exists(factory_bin) or read_build_info(build_info_path) != fingerprint
 
     if needs_build:
-        esphome_exe = find_esphome_binary()
+        # Invalidate the cache first, so a failed or interrupted build is never trusted later
+        if os.path.exists(build_info_path):
+            os.remove(build_info_path)
         print(f"[*] Compiling firmware target '{target_name}' using {esphome_exe}...")
 
         # Read config, inject build_path to local temp to ensure smooth compilation (avoids SMB file locking issues)
@@ -158,7 +187,10 @@ def build_and_pad_firmware(
         cmd = [esphome_exe, "compile", temp_config_path]
         # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-audit
         # Audit: internal compile command using isolated temp configuration path with shell=False
-        res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, shell=False)
+        res = subprocess.run(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=False,
+            encoding="utf-8", errors="replace",  # ESPHome prints UTF-8; the Windows default code page cannot decode it
+        )
 
         if res.returncode != 0:
             print(f"[!] Compilation failed for {target_name}:\n{res.stdout}")
@@ -167,15 +199,18 @@ def build_and_pad_firmware(
         if not os.path.exists(factory_bin):
             raise FileNotFoundError(f"Expected factory binary not found at {factory_bin}")
 
-        # Pad to 8MB
-        with open(factory_bin, "rb") as f:
-            bin_data = f.read()
+        write_build_info(build_info_path, fingerprint)
 
-        target_size = 8 * 1024 * 1024
-        padded = bin_data + b"\xFF" * (target_size - len(bin_data))
-        with open(output_flash_path, "wb") as f:
-            f.write(padded)
-        print(f"[+] Prepared 8MB QEMU flash image: {output_flash_path} ({len(padded)} bytes)")
+    # Always recreate the flash image from the factory binary, so every session starts from a clean flash
+    # (no NVS state left over from a previous session) and never from an image modified by QEMU.
+    with open(factory_bin, "rb") as f:
+        bin_data = f.read()
+
+    target_size = 8 * 1024 * 1024
+    padded = bin_data + b"\xFF" * (target_size - len(bin_data))
+    with open(output_flash_path, "wb") as f:
+        f.write(padded)
+    print(f"[+] Prepared 8MB QEMU flash image: {output_flash_path} ({len(padded)} bytes)")
 
     return output_flash_path
 

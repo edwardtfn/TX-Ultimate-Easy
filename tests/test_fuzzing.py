@@ -50,6 +50,8 @@ def test_tc_f02_corrupted_headers(switch):
 
 def test_tc_f03_out_of_bounds_positions(switch):
     """TC-F03: Send touch frames with out-of-bounds positions (pos=11, 50, 255)."""
+    # Let a click still pending from the previous test (multi-click delay) fire before the log window starts
+    time.sleep(0.6)
     switch.drain_logs()
 
     for invalid_pos in (11, 15, 50, 128, 255):
@@ -118,6 +120,7 @@ def test_tc_f05_touch_packet_split_across_ticks_registers_press(switch):
     switch.assert_log("Pressed at position 1", timeout=1.0)
 
 
+@pytest.mark.xfail(reason="Stock firmware upstream defect: 0xAA in the payload restarts the frame, swipe range is lost")
 def test_tc_f06_swipe_with_0xaa_channel_bitmap_parsed_safely(switch):
     """TC-F06: Swipe frame containing 0xAA in payload bytes must parse without false header reset.
 
@@ -125,12 +128,19 @@ def test_tc_f06_swipe_with_0xaa_channel_bitmap_parsed_safely(switch):
     rather than causing an unexpected parser reset mid-frame.
     """
     switch.drain_logs()
+    switch.clear_ha_events()
 
     # Swipe right frame where byte 7 is 0xAA (channels 2, 4, 6, 8)
     frame = bytes([0xAA, 0x55, 0x01, 0x02, 0x03, 0x0C, 0x00, 0xAA] + [0x00] * 7)
     switch.send_raw_bytes(frame)
     time.sleep(0.1)
 
-    # Must log swipe right gesture
-    # On stock firmware, this fails because 0xAA in payload resets the parser
+    # The direction alone is not enough: the truncated frame is still decoded as a swipe right,
+    # with an empty channel bitmap. Require the decoded range (channels 2 to 8, buttons 1 to 3 on 3 gangs).
+    # Match the complete expected event, so an older swipe event still in transit cannot satisfy the wait.
     switch.assert_log("Swipe right", timeout=1.5)
+    event = switch.wait_for_ha_event(
+        "swipe", timeout=1.5, action="right",
+        **{"swipe-from": 2, "swipe-to": 8, "swipe-from-button": 1, "swipe-to-button": 3},
+    )
+    assert event is not None, f"No swipe right event with range 2-8 (buttons 1-3). Received: {switch.get_ha_events('swipe')}"

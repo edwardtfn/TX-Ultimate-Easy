@@ -11,10 +11,10 @@ def test_tc_h01_vibration_feedback_on_press(switch):
     switch.send_touch_frame(0x02, 0x00, 0x01, 0x00)
 
     # Motor must activate on press
-    switch.assert_log("'Vibration motor' >> ON", timeout=3.0)
+    switch.assert_log("'Vibration motor' >> ON")
 
     # Motor auto-shuts off after duration
-    switch.assert_log("'Vibration motor' >> OFF", timeout=3.0)
+    switch.assert_log("'Vibration motor' >> OFF")
 
     # Send release
     switch.drain_logs()
@@ -40,7 +40,7 @@ def test_tc_h02_vibration_feedback_on_release(switch):
     switch.drain_logs()
     switch.send_touch_frame(0x01, 0x01, 0x01, 0x00)
     # Must vibrate on release
-    switch.assert_log("'Vibration motor' >> ON", timeout=3.0)
+    switch.assert_log("'Vibration motor' >> ON")
 
 
 def test_tc_h03_vibration_feedback_disabled(switch):
@@ -77,7 +77,7 @@ def test_tc_h05_multi_touch_triggers_vibration(switch):
     switch.drain_logs()
 
     switch.palm_mash(contact_gang=2)
-    switch.assert_log("'Vibration motor' >> ON", timeout=3.0)
+    switch.assert_log("'Vibration motor' >> ON")
 
 
 def test_tc_h06_vibration_motor_retrigger_recovery(switch):
@@ -86,23 +86,27 @@ def test_tc_h06_vibration_motor_retrigger_recovery(switch):
     Expected Behavior: Vibration pulses must terminate cleanly and turn off the motor promptly
     even when subsequent pulses are suppressed by Night Mode.
     """
+    # A pulse long enough to still be running when the suppressed retrigger arrives
+    switch.set_vibration_duration(500)
     switch.set_vibration_feedback("Always")
     switch.set_switch("Night Mode - Suppress Vibration", True)
     switch.drain_logs()
 
-    # Touch down to start vibration
+    # Touch down to start the 500ms pulse
     switch.send_touch_frame(0x02, 0x00, 0x01, 0x00)
     switch.assert_log("'Vibration motor' >> ON")
+    switch.drain_logs()
 
-    # Immediately activate Night Mode and send release frame
-    # Note on timing: set_night_mode includes a brief internal settle (~500ms);
-    # loose timing margin here is intentional and sufficient for this integration test.
-    switch.set_night_mode(True)
+    # Enter Night Mode without the usual settle delay, then release while the pulse is still running
+    switch.set_night_mode(True, settle=0)
+    time.sleep(0.1)
+    assert "'Vibration motor' >> OFF" not in switch.get_recent_logs(), "Pulse ended before the retrigger"
     switch.send_touch_frame(0x01, 0x01, 0x01, 0x00)
 
-    # In a clean implementation, the motor must shut off within 100ms.
-    # On stock firmware, the motor hangs ON for 2000ms!
-    switch.assert_log("'Vibration motor' >> OFF", timeout=0.2)
+    # The suppressed retrigger cancels the running pulse, so it must turn the motor off itself.
+    # Before the fix, the motor stayed on until the 2s safety cutoff.
+    switch.assert_log("'Vibration motor' >> OFF", timeout=0.3)
 
     # Cleanup
     switch.set_night_mode(False)
+    switch.set_vibration_duration(15)

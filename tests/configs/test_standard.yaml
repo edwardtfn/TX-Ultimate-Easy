@@ -10,6 +10,9 @@ esphome:
 
 esp32:
   board: esp32dev
+  # Each emulated flash write takes ~0.2 s, and the first boot from a clean flash saves ~35 preferences in one
+  # loop pass: longer than the 5 s default task watchdog, whose reset then crash-loops under QEMU.
+  watchdog_timeout: 30s
   framework:
     type: esp-idf
 
@@ -26,6 +29,9 @@ substitutions:
   pulse_time_internal: false
   touch_uart_rx_pin: GPIO3
   touch_uart_tx_pin: GPIO1
+  # Emulator timing jitter has stretched 50 ms taps to ~900 ms, past the 500 ms default.
+  # Use a threshold well clear of that jitter; the long-press holds in the tests exceed it.
+  BUTTON_LONG_PRESS_DELAY: "2000"
 
 external_components:
   - source:

@@ -127,4 +127,4 @@ def test_tc_g15_triple_click_multiple_click_event(switch):
     switch.multi_click(gang=1, count=3, interval_ms=40.0, hold_ms=20.0)
     time.sleep(0.35)
 
-    switch.assert_log("Button 1 action: 'multiple_click'", timeout=2.0)
+    switch.assert_log("Button 1 action: 'multiple_click'")

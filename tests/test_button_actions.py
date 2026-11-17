@@ -1,6 +1,8 @@
 import time
 import pytest
 
+from tests.qemu_harness import LONG_PRESS_HOLD_MS
+
 
 def test_tc_ba01_button_action_toggle(switch):
     """TC-BA01: Button action set to 'Relay X (toggle)' toggles the physical relay ON and OFF."""
@@ -90,7 +92,7 @@ def test_tc_ba05_hardware_long_touch_release_fires_long_press(switch):
 
     # Press Gang 1 (pos = 1)
     switch.send_touch_frame(0x02, 0x00, 0x01, 0x00)
-    time.sleep(0.65)  # Hold for long press
+    time.sleep(LONG_PRESS_HOLD_MS / 1000.0)  # Hold past the long press threshold
 
     # Hardware long-touch release (pos + 16 = 17)
     switch.send_touch_frame(0x01, 0x11, 0x01, 0x00)
@@ -101,7 +103,7 @@ def test_tc_ba05_hardware_long_touch_release_fires_long_press(switch):
 
     # On properly integrated firmware, this fires long_press.
     # On stock firmware, this action is dropped completely because on_long_touch_release is unhandled.
-    switch.assert_log("Button 1 action: 'long_press'", timeout=2.0)
+    switch.assert_log("Button 1 action: 'long_press'")
 
 
 def test_tc_ba06_failsafe_fallback_on_api_disconnect(switch):
@@ -169,10 +171,10 @@ def test_tc_ba07_decoupled_relay_remote_toggle_led_coherence(switch):
     switch.drain_logs()
     switch.set_relay(1, True)
     switch.assert_log("Turn-on Bottom light for Relay 1")
-    assert switch.wait_for_entity_state("Relay 1", True, timeout=2.0)
+    assert switch.wait_for_entity_state("Relay 1", True)
 
     # Home Assistant automation commands Relay 1 OFF via API
     switch.drain_logs()
     switch.set_relay(1, False)
     switch.assert_log("Turn-off Bottom light for Relay 1")
-    assert switch.wait_for_entity_state("Relay 1", False, timeout=2.0)
+    assert switch.wait_for_entity_state("Relay 1", False)

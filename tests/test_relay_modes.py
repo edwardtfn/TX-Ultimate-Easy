@@ -27,7 +27,7 @@ def test_tc_rm02_remote_ha_turn_on_light_toggles_relay_gpio_and_led(light_switch
     light_switch.assert_log("Setting:")
     light_switch.assert_log("State: ON")
     light_switch.assert_log("Relay 2 is ON")
-    assert light_switch.wait_for_entity_state("Light output 2", True, timeout=3.0)
+    assert light_switch.wait_for_entity_state("Light output 2", True)
 
     # 2. Turn off Light output 2 via Native API light command
     light_switch.drain_logs()
@@ -35,7 +35,7 @@ def test_tc_rm02_remote_ha_turn_on_light_toggles_relay_gpio_and_led(light_switch
     light_switch.assert_log("Setting:")
     light_switch.assert_log("State: OFF")
     light_switch.assert_log("Relay 2 is OFF")
-    assert light_switch.wait_for_entity_state("Light output 2", False, timeout=3.0)
+    assert light_switch.wait_for_entity_state("Light output 2", False)
 
 
 def test_tc_rm03_physical_touch_toggles_light_mode_relay(light_switch):
@@ -52,9 +52,9 @@ def test_tc_rm03_physical_touch_toggles_light_mode_relay(light_switch):
     time.sleep(0.05)
     light_switch.send_touch_frame(0x01, 0x08, 0x08, 0x00)
 
-    light_switch.assert_log("Toggle relay 2", timeout=3.0)
+    light_switch.assert_log("Toggle relay 2")
     light_switch.assert_log("Relay 2 is ON")
-    assert light_switch.wait_for_entity_state("Light output 2", True, timeout=3.0)
+    assert light_switch.wait_for_entity_state("Light output 2", True)
 
     # Touch press on Gang 2 again to toggle OFF
     light_switch.drain_logs()
@@ -62,9 +62,9 @@ def test_tc_rm03_physical_touch_toggles_light_mode_relay(light_switch):
     time.sleep(0.05)
     light_switch.send_touch_frame(0x01, 0x08, 0x08, 0x00)
 
-    light_switch.assert_log("Toggle relay 2", timeout=3.0)
+    light_switch.assert_log("Toggle relay 2")
     light_switch.assert_log("Relay 2 is OFF")
-    assert light_switch.wait_for_entity_state("Light output 2", False, timeout=3.0)
+    assert light_switch.wait_for_entity_state("Light output 2", False)
 
 
 def test_tc_rm04_inching_pulse_time_entity_hidden_for_light_mode(light_switch):

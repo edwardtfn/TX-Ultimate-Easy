@@ -1,6 +1,8 @@
 import time
 import pytest
 
+from tests.qemu_harness import LONG_PRESS_HOLD_MS
+
 
 def test_tc_ic01_click_fires_immediately_on_press_before_release(instant_switch):
     """TC-IC01: In Instant Click Mode, a single click fires immediately on touch down, before release."""
@@ -24,9 +26,9 @@ def test_tc_ic02_long_press_does_not_fire_long_press_event(instant_switch):
     time.sleep(0.6)
     instant_switch.drain_logs()
 
-    # Touch and hold for 600ms (> 500ms long press threshold)
+    # Touch and hold past the long press threshold
     instant_switch.send_touch_frame(0x02, 0x00, 0x01, 0x00)
-    time.sleep(0.60)
+    time.sleep(LONG_PRESS_HOLD_MS / 1000.0)
 
     # In Instant Click Mode, software long press timer must NOT trigger long press
     instant_switch.assert_no_log("long_click", duration=0.2)
