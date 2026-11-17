@@ -29,8 +29,8 @@ The test suite is fully self-contained within the repository and automatically m
        **Instant Click Mode** (`instant_click_mode: true`).
      - `test_light.yaml`: Mixed Gang Presentation (`relay_1_mode: switch`, `relay_2_mode: light`).
    - Pads the factory binaries into 8MB raw flash images.
-   - Recompiles only when a source file is newer than the cached factory binary, when the ESPHome
-     version changes, or when `--compile` is passed. The flash images are recreated from the factory
+   - Recompiles only when the content of a source file (`ESPHome/`, `components/`, `versioning/`,
+     the test configuration or stubs) or the ESPHome compiler changes, or when `--compile` is passed. The flash images are recreated from the factory
      binaries on every run, so each session starts with a clean flash.
 
 3. **Multi-QEMU Session Isolation**:

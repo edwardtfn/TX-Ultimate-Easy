@@ -82,18 +82,35 @@ def get_compiler_identity(esphome_exe: str) -> str:
     return f"{os.path.realpath(esphome_exe)}\n{res.stdout.strip()}"
 
 
+def compute_build_fingerprint(esphome_exe: str, config_path: str) -> str:
+    """Return a SHA-256 fingerprint of the compiler identity and of every file the firmware is built from."""
+    sources = [config_path, os.path.join(CONFIGS_DIR, "qemu_stubs.h")]
+    for source_dir in ("ESPHome", "components", "versioning"):
+        for root, dirs, files in os.walk(os.path.join(REPO_DIR, source_dir)):
+            dirs[:] = [d for d in dirs if d != "__pycache__"]
+            sources.extend(os.path.join(root, fname) for fname in files)
+    digest = hashlib.sha256(get_compiler_identity(esphome_exe).encode("utf-8"))
+    for src in sorted(sources):
+        if not os.path.isfile(src):
+            continue
+        digest.update(os.path.relpath(src, REPO_DIR).replace("\\", "/").encode("utf-8") + b"\0")
+        with open(src, "rb") as f:
+            digest.update(hashlib.sha256(f.read()).digest())
+    return digest.hexdigest()
+
+
 def read_build_info(path: str) -> Optional[str]:
-    """Return the compiler identity stored with a cached build, or None if there is none."""
+    """Return the build fingerprint stored with a cached build, or None if there is none."""
     if not os.path.exists(path):
         return None
     with open(path, "r", encoding="utf-8") as f:
         return f.read()
 
 
-def write_build_info(path: str, compiler_id: str):
-    """Store the compiler identity of a successful build next to its output."""
+def write_build_info(path: str, fingerprint: str):
+    """Store the build fingerprint of a successful build next to its output."""
     with open(path, "w", encoding="utf-8") as f:
-        f.write(compiler_id)
+        f.write(fingerprint)
 
 
 def ensure_efuse_bin() -> str:
@@ -129,23 +146,18 @@ def build_and_pad_firmware(
 
     os.makedirs(target_build_dir, exist_ok=True)
 
-    # Check if rebuild is necessary. Freshness is judged against the factory binary, which only the
-    # compiler writes (the padded flash image is written by QEMU at runtime), and against the identity
-    # of the ESPHome compiler used for that build.
+    # Check if rebuild is necessary. The cache key is a fingerprint of the compiler identity and of the
+    # path and content of every source file, so edits, deletions, equal timestamps and edits made while
+    # a build was running are all detected. It is computed before compiling and stored only on success.
     esphome_exe = find_esphome_binary()
-    compiler_id = get_compiler_identity(esphome_exe)
     build_info_path = os.path.join(target_build_dir, BUILD_INFO_FILENAME)
-    needs_build = force or not os.path.exists(factory_bin) or read_build_info(build_info_path) != compiler_id
-    if not needs_build:
-        build_mtime = os.path.getmtime(factory_bin)
-        stubs_path = os.path.join(CONFIGS_DIR, "qemu_stubs.h")
-        sources = [config_path, stubs_path]
-        for source_dir in (os.path.join(REPO_DIR, "ESPHome"), os.path.join(REPO_DIR, "components")):
-            for root, _, files in os.walk(source_dir):
-                sources.extend(os.path.join(root, fname) for fname in files)
-        needs_build = any(os.path.isfile(src) and os.path.getmtime(src) > build_mtime for src in sources)
+    fingerprint = compute_build_fingerprint(esphome_exe, config_path)
+    needs_build = force or not os.path.exists(factory_bin) or read_build_info(build_info_path) != fingerprint
 
     if needs_build:
+        # Invalidate the cache first, so a failed or interrupted build is never trusted later
+        if os.path.exists(build_info_path):
+            os.remove(build_info_path)
         print(f"[*] Compiling firmware target '{target_name}' using {esphome_exe}...")
 
         # Read config, inject build_path to local temp to ensure smooth compilation (avoids SMB file locking issues)
@@ -183,7 +195,7 @@ def build_and_pad_firmware(
         if not os.path.exists(factory_bin):
             raise FileNotFoundError(f"Expected factory binary not found at {factory_bin}")
 
-        write_build_info(build_info_path, compiler_id)
+        write_build_info(build_info_path, fingerprint)
 
     # Always recreate the flash image from the factory binary, so every session starts from a clean flash
     # (no NVS state left over from a previous session) and never from an image modified by QEMU.
