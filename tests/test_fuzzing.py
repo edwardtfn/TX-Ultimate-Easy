@@ -50,6 +50,8 @@ def test_tc_f02_corrupted_headers(switch):
 
 def test_tc_f03_out_of_bounds_positions(switch):
     """TC-F03: Send touch frames with out-of-bounds positions (pos=11, 50, 255)."""
+    # Let a click still pending from the previous test (multi-click delay) fire before the log window starts
+    time.sleep(0.6)
     switch.drain_logs()
 
     for invalid_pos in (11, 15, 50, 128, 255):
