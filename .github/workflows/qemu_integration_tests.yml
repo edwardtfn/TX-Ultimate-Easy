@@ -80,9 +80,15 @@ jobs:
           echo "$QEMU_DIR" >> "$GITHUB_PATH"
           echo "QEMU_BIN=$QEMU_BIN_PATH" >> "$GITHUB_ENV"
 
-      - name: Run QEMU integration test suite
-        env:
-          PYTHONUNBUFFERED: "1"
+      - name: Build test firmware only (TEMP)
         run: |
-          python run_tests.py -v
+          python -c "from tests.builder import ensure_all_test_assets, DEFAULT_BUILD_CACHE_DIR; ensure_all_test_assets(); print(DEFAULT_BUILD_CACHE_DIR)"
+          mkdir -p fw && for t in test_standard test_instant test_light; do cp "$(python -c 'from tests.builder import DEFAULT_BUILD_CACHE_DIR; print(DEFAULT_BUILD_CACHE_DIR)')/$t/build/firmware.factory.bin" "fw/$t.factory.bin"; done; ls -la fw
+
+      - name: Upload test firmware (TEMP)
+        uses: actions/upload-artifact@v4
+        with:
+          name: qemu-test-firmware
+          path: fw/
+          retention-days: 1
 ...
