@@ -4,7 +4,9 @@ This automated integration test suite runs completely standalone without any age
 driving it. It verifies the firmware using standard `pytest` directly against
 **Espressif QEMU ESP32** hardware emulation before flashing physical devices.
 
-All tests run against 100% stock upstream YAML configurations in `ESPHome/`.
+All tests build the unmodified YAML packages in `ESPHome/` and `components/`. The wrapper configurations in
+`tests/configs/` only adapt them to the emulator: they remove `wifi` in favour of the `OPENETH` Ethernet
+emulation, move the touch UART to the emulated pins, and stub the RMT LED driver calls (`qemu_stubs.h`).
 
 ---
 
@@ -22,12 +24,14 @@ The test suite is fully self-contained within the repository and automatically m
 
 2. **Automated Multi-Target Builds & Flash Caching**:
    - Compiles three isolated firmware targets to local temporary storage (preventing network locks):
-     - `test_standard.yaml`: Core + Relays + LEDs + Touchpad + Vibration + Night Mode.
-     - `test_instant.yaml`: Core + Relays + LEDs + Touchpad + Vibration +
+     - `test_standard.yaml`: Core (Buttons + LEDs + Touchpad) + Relays + Vibration + Night Mode.
+     - `test_instant.yaml`: Core (Buttons + LEDs + Touchpad) + Relays +
        **Instant Click Mode** (`instant_click_mode: true`).
      - `test_light.yaml`: Mixed Gang Presentation (`relay_1_mode: switch`, `relay_2_mode: light`).
    - Pads the factory binaries into 8MB raw flash images.
-   - Recompiles only when source configuration files change, or when `--compile` is passed.
+   - Recompiles only when a source file is newer than the cached factory binary, when the ESPHome
+     version changes, or when `--compile` is passed. The flash images are recreated from the factory
+     binaries on every run, so each session starts with a clean flash.
 
 3. **Multi-QEMU Session Isolation**:
    - Standard firmware runs on ports `4444` (UART0 logs), `4445` (UART1 touch), and `6053` (API).
@@ -140,7 +144,8 @@ python run_tests.py -k test_relay_modes
 python run_tests.py -k test_ha_coherence
 ```
 
-### Raw Pytest:
+### Raw Pytest
+
 ```bash
 pytest
 ```
