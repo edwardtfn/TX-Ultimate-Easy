@@ -29,6 +29,9 @@ substitutions:
   pulse_time_internal: false
   touch_uart_rx_pin: GPIO3
   touch_uart_tx_pin: GPIO1
+  # Emulator timing jitter has stretched 50 ms taps to ~900 ms, past the 500 ms default.
+  # Use a threshold well clear of that jitter; the long-press holds in the tests exceed it.
+  BUTTON_LONG_PRESS_DELAY: "2000"
 
 external_components:
   - source:

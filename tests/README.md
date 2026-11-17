@@ -7,6 +7,9 @@ driving it. It verifies the firmware using standard `pytest` directly against
 All tests build the unmodified YAML packages in `ESPHome/` and `components/`. The wrapper configurations in
 `tests/configs/` only adapt them to the emulator: they remove `wifi` in favour of the `OPENETH` Ethernet
 emulation, move the touch UART to the emulated pins, and stub the RMT LED driver calls (`qemu_stubs.h`).
+They also raise `BUTTON_LONG_PRESS_DELAY` from 500 ms to 2000 ms: emulator timing jitter has measured 50 ms taps
+as ~900 ms presses, so the default threshold turned taps into long presses. The tests take the threshold and the
+long-press hold from `LONG_PRESS_DELAY_MS` and `LONG_PRESS_HOLD_MS` in `tests/qemu_harness.py`.
 
 ---
 

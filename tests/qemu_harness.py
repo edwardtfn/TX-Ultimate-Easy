@@ -25,6 +25,13 @@ GANG_POSITIONS = {
     3: 9
 }
 
+# BUTTON_LONG_PRESS_DELAY set in tests/configs/*.yaml (the firmware default is 500 ms). The emulator has
+# measured 50 ms taps as up to ~900 ms, so a press is only treated as long well past that jitter.
+LONG_PRESS_DELAY_MS = 2000
+# Hold used for long presses: clear of the threshold by more than the jitter, in the other direction too
+# (a delayed press frame shortens the measured duration).
+LONG_PRESS_HOLD_MS = 3500
+
 BUTTON_ACTION_MAP = {
     "none": "None",
     "toggle": "Relay {gang} (toggle)",
@@ -404,7 +411,7 @@ class QemuHarness:
             if i < count - 1:
                 time.sleep(interval_ms / 1000.0)
 
-    def long_press(self, gang: int = 1, duration_ms: float = 600.0):
+    def long_press(self, gang: int = 1, duration_ms: float = LONG_PRESS_HOLD_MS):
         """Simulate a long press on the specified gang."""
         pos = GANG_POSITIONS.get(gang, 1)
         # Press

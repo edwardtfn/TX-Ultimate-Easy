@@ -11,10 +11,10 @@ def test_tc_h01_vibration_feedback_on_press(switch):
     switch.send_touch_frame(0x02, 0x00, 0x01, 0x00)
 
     # Motor must activate on press
-    switch.assert_log("'Vibration motor' >> ON", timeout=3.0)
+    switch.assert_log("'Vibration motor' >> ON")
 
     # Motor auto-shuts off after duration
-    switch.assert_log("'Vibration motor' >> OFF", timeout=3.0)
+    switch.assert_log("'Vibration motor' >> OFF")
 
     # Send release
     switch.drain_logs()
@@ -40,7 +40,7 @@ def test_tc_h02_vibration_feedback_on_release(switch):
     switch.drain_logs()
     switch.send_touch_frame(0x01, 0x01, 0x01, 0x00)
     # Must vibrate on release
-    switch.assert_log("'Vibration motor' >> ON", timeout=3.0)
+    switch.assert_log("'Vibration motor' >> ON")
 
 
 def test_tc_h03_vibration_feedback_disabled(switch):
@@ -77,7 +77,7 @@ def test_tc_h05_multi_touch_triggers_vibration(switch):
     switch.drain_logs()
 
     switch.palm_mash(contact_gang=2)
-    switch.assert_log("'Vibration motor' >> ON", timeout=3.0)
+    switch.assert_log("'Vibration motor' >> ON")
 
 
 def test_tc_h06_vibration_motor_retrigger_recovery(switch):
@@ -94,7 +94,7 @@ def test_tc_h06_vibration_motor_retrigger_recovery(switch):
 
     # Touch down to start the 500ms pulse
     switch.send_touch_frame(0x02, 0x00, 0x01, 0x00)
-    switch.assert_log("'Vibration motor' >> ON", timeout=1.0)
+    switch.assert_log("'Vibration motor' >> ON")
     switch.drain_logs()
 
     # Enter Night Mode without the usual settle delay, then release while the pulse is still running

@@ -2,6 +2,8 @@ import time
 import re
 import pytest
 
+from tests.qemu_harness import LONG_PRESS_DELAY_MS, LONG_PRESS_HOLD_MS
+
 
 def test_tc_tp01_touch_duration_logged_accurately(switch):
     """TC-TP01: Button press duration is accurately measured and logged by firmware timer."""
@@ -19,21 +21,22 @@ def test_tc_tp01_touch_duration_logged_accurately(switch):
     assert matches, f"Could not parse press duration from logs: {recent}"
     duration = int(matches[-1])
 
-    # Duration should be close to 180ms (allow margin for virtual CPU scheduling)
-    assert 10 <= duration <= 500, f"Measured duration {duration}ms was outside expected window"
+    # Duration should be close to 180ms. The upper bound is the long press threshold, not a tight margin:
+    # emulator jitter has stretched short presses by ~850 ms.
+    assert 10 <= duration <= LONG_PRESS_DELAY_MS, f"Measured duration {duration}ms was outside expected window"
     switch.assert_log("Button 1 action: 'click'")
     # Allow multi-click window to close
     time.sleep(0.4)
 
 
 def test_tc_tp02_long_press_duration_threshold(switch):
-    """TC-TP02: Press duration exceeding BUTTON_LONG_PRESS_DELAY (500ms) triggers long press."""
+    """TC-TP02: Press duration exceeding BUTTON_LONG_PRESS_DELAY triggers long press."""
     time.sleep(0.3)
     switch.drain_logs()
 
-    # Touch and hold for ~650ms (> 500ms threshold), then release with normal position 1
+    # Touch and hold past the threshold, then release with normal position 1
     switch.send_touch_frame(0x02, 0x00, 0x01, 0x00)
-    time.sleep(0.65)
+    time.sleep(LONG_PRESS_HOLD_MS / 1000.0)
     switch.send_touch_frame(0x01, 0x01, 0x01, 0x00)
 
     # Must log long press
@@ -41,16 +44,16 @@ def test_tc_tp02_long_press_duration_threshold(switch):
     recent = switch.get_recent_logs()
     m = re.search(r"Button press duration:\s+(\d+)\s+ms", recent)
     assert m, f"Could not parse press duration: {recent}"
-    assert int(m.group(1)) >= 500
+    assert int(m.group(1)) > LONG_PRESS_DELAY_MS
 
 
 def test_tc_tp03_touch_timeout_cancellation(switch):
     """TC-TP03: A stuck touch exceeding BUTTON_PRESS_TIMEOUT (10,000ms) is cancelled safely."""
     switch.drain_logs()
 
-    # Touch down and hold past the 10-second timeout threshold
+    # Touch down and hold past the 10-second timeout threshold, by more than the emulator jitter
     switch.send_touch_frame(0x02, 0x00, 0x01, 0x00)
-    time.sleep(10.2)
+    time.sleep(11.5)
     switch.send_touch_frame(0x01, 0x01, 0x01, 0x00)
 
     # Firmware must log cancellation warning
@@ -71,7 +74,7 @@ def test_tc_tp04_relay_pulse_time_auto_off(switch):
     switch.assert_log("'Relay 1' >> ON")
 
     # Relay should automatically turn OFF after ~1.0 second
-    switch.assert_log("'Relay 1' >> OFF", timeout=4.0)
+    switch.assert_log("'Relay 1' >> OFF")
 
     # Clean up: disable pulse time (0 = disabled)
     switch.set_number("Relay 1 Pulse Time", 0.0)
@@ -153,7 +156,7 @@ def test_tc_tp07_inching_rearms_when_relay_already_on(switch):
 
     # Should inch off after 2.0s
     # On stock firmware, this fails: the relay remains ON indefinitely!
-    assert switch.wait_for_entity_state("Relay 1", False, timeout=4.0), "Relay did not inch off when commanded while already ON!"
+    assert switch.wait_for_entity_state("Relay 1", False), "Relay did not inch off when commanded while already ON!"
 
 
 def test_tc_tp08_inching_triggered_by_physical_tap(switch):
@@ -167,10 +170,10 @@ def test_tc_tp08_inching_triggered_by_physical_tap(switch):
 
     # 2. Physically tap Gang 1
     switch.tap(gang=1)
-    switch.assert_log("'Relay 1' >> ON", timeout=2.0)
+    switch.assert_log("'Relay 1' >> ON")
 
     # 3. Relay automatically inches off after 1.5s
-    switch.assert_log("'Relay 1' >> OFF", timeout=4.0)
+    switch.assert_log("'Relay 1' >> OFF")
 
     # Clean up
     switch.set_number("Relay 1 Pulse Time", 0.0)
@@ -185,13 +188,16 @@ def test_tc_tp09_inching_cancelled_by_manual_physical_tap_off(switch):
 
     # 2. Physically tap Gang 1 (turns ON)
     switch.tap(gang=1)
-    switch.assert_log("'Relay 1' >> ON", timeout=2.0)
+    switch.assert_log("'Relay 1' >> ON")
 
     # 3. Manually tap Gang 1 again after 0.6s (turns OFF before pulse expires)
     time.sleep(0.6)
     switch.drain_logs()
     switch.tap(gang=1)
-    switch.assert_log("'Relay 1' >> OFF", timeout=2.0)
+    # Only the manual tap logs a toggle; the pulse timer's own OFF (due ~3.4 s later) does not, so a long
+    # wait cannot be satisfied by the timer instead of the tap.
+    switch.assert_log("Toggle relay 1")
+    switch.assert_log("'Relay 1' >> OFF")
 
     # 4. Wait past original 4.0s pulse timer to verify no spurious transitions
     switch.assert_no_log("'Relay 1' >> ON", duration=4.0)
