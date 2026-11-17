@@ -118,7 +118,6 @@ def test_tc_f05_touch_packet_split_across_ticks_registers_press(switch):
     switch.assert_log("Pressed at position 1", timeout=1.0)
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: 0xAA in the payload restarts the frame, swipe range is lost")
 def test_tc_f06_swipe_with_0xaa_channel_bitmap_parsed_safely(switch):
     """TC-F06: Swipe frame containing 0xAA in payload bytes must parse without false header reset.
 
