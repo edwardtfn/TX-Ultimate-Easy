@@ -2,7 +2,7 @@
 name: QEMU Integration Tests
 
 permissions:
-  contents: read
+  contents: write
 
 # yamllint disable-line rule:truthy
 on:
@@ -85,10 +85,13 @@ jobs:
           python -c "from tests.builder import ensure_all_test_assets, DEFAULT_BUILD_CACHE_DIR; ensure_all_test_assets(); print(DEFAULT_BUILD_CACHE_DIR)"
           mkdir -p fw && for t in test_standard test_instant test_light; do cp "$(python -c 'from tests.builder import DEFAULT_BUILD_CACHE_DIR; print(DEFAULT_BUILD_CACHE_DIR)')/$t/build/firmware.factory.bin" "fw/$t.factory.bin"; done; ls -la fw
 
-      - name: Upload test firmware (TEMP)
-        uses: actions/upload-artifact@v4
-        with:
-          name: qemu-test-firmware
-          path: fw/
-          retention-days: 1
+      - name: Push test firmware to a temporary branch (TEMP)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd fw
+          git init -q -b tmp/qemu-fw
+          git config user.name "ci" && git config user.email "ci@users.noreply.github.com"
+          git add . && git commit -qm "TEMP: QEMU test firmware ${GITHUB_SHA}"
+          git push -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" tmp/qemu-fw
 ...
