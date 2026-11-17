@@ -135,8 +135,10 @@ def test_tc_f06_swipe_with_0xaa_channel_bitmap_parsed_safely(switch):
 
     # The direction alone is not enough: the truncated frame is still decoded as a swipe right,
     # with an empty channel bitmap. Require the decoded range (channels 2 to 8, buttons 1 to 3 on 3 gangs).
+    # Match the complete expected event, so an older swipe event still in transit cannot satisfy the wait.
     switch.assert_log("Swipe right", timeout=1.5)
-    event = switch.wait_for_ha_event("swipe", timeout=1.5, action="right")
-    assert event is not None, "No swipe right event received"
-    assert event.get("swipe-from") == "2" and event.get("swipe-to") == "8", f"Wrong swipe range: {event}"
-    assert event.get("swipe-from-button") == "1" and event.get("swipe-to-button") == "3", f"Wrong swipe buttons: {event}"
+    event = switch.wait_for_ha_event(
+        "swipe", timeout=1.5, action="right",
+        **{"swipe-from": 2, "swipe-to": 8, "swipe-from-button": 1, "swipe-to-button": 3},
+    )
+    assert event is not None, f"No swipe right event with range 2-8 (buttons 1-3). Received: {switch.get_ha_events('swipe')}"

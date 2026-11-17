@@ -241,16 +241,22 @@ class QemuHarness:
         """Forget the Home Assistant events received so far."""
         self._ha_events = []
 
+    def get_ha_events(self, event_type: str) -> list:
+        """Return the data of the 'esphome.tx_ultimate_easy' events of the given type received so far."""
+        return [
+            data for service, data in list(getattr(self, "_ha_events", []))
+            if service == "esphome.tx_ultimate_easy" and data.get("type") == event_type
+        ]
+
     def wait_for_ha_event(self, event_type: str, timeout: float = 3.0, **expected) -> Optional[dict]:
         """Wait for an 'esphome.tx_ultimate_easy' event of the given type whose data contains all expected values.
 
-        Returns the event data, or None if no matching event arrived within the timeout.
+        Returns the event data, or None if no matching event arrived within the timeout. Pass every value
+        that identifies the expected event: an older event still in transit then cannot satisfy the wait.
         """
         start = time.time()
         while time.time() - start < timeout:
-            for service, data in list(getattr(self, "_ha_events", [])):
-                if service != "esphome.tx_ultimate_easy" or data.get("type") != event_type:
-                    continue
+            for data in self.get_ha_events(event_type):
                 if all(data.get(key) == str(value) for key, value in expected.items()):
                     return data
             time.sleep(0.05)
