@@ -33,6 +33,9 @@ substitutions:
   BUTTON_MULTI_CLICK_DELAY: "250"  # The time to wait for another click, in msec
   BUTTON_PRESS_TIMEOUT: "10000"  # Ignore if button is pressed for longer than this time, in msec
   BUTTON_LONG_PRESS_DELAY: "500"  # The time to wait to consider a long press, in msec
+  # Delay before the Button N binary sensors turn off, so a short tap is not lost in the API batch.
+  # Must be longer than `api: batch_delay` (default 100ms); raise it if you raise `batch_delay`.
+  BUTTON_SENSOR_MIN_ON_TIME: 150ms
 
   # Button numbers constants
   BUTTON_1_ID: '1'
@@ -48,24 +51,32 @@ binary_sensor:
     icon: mdi:gesture-tap-box
     platform: template
     internal: ${gang_count < 1}
+    filters:
+      - delayed_off: ${BUTTON_SENSOR_MIN_ON_TIME}
 
   - id: bs_button_2
     name: Button 2
     icon: mdi:gesture-tap-box
     platform: template
     internal: ${gang_count < 2}
+    filters:
+      - delayed_off: ${BUTTON_SENSOR_MIN_ON_TIME}
 
   - id: bs_button_3
     name: Button 3
     icon: mdi:gesture-tap-box
     platform: template
     internal: ${gang_count < 3}
+    filters:
+      - delayed_off: ${BUTTON_SENSOR_MIN_ON_TIME}
 
   - id: bs_button_4
     name: Button 4
     icon: mdi:gesture-tap-box
     platform: template
     internal: ${gang_count < 4}
+    filters:
+      - delayed_off: ${BUTTON_SENSOR_MIN_ON_TIME}
 
 esphome:
   build_flags:
