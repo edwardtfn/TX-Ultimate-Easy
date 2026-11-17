@@ -40,6 +40,8 @@ The test suite is fully self-contained within the repository and automatically m
    - Standard firmware runs on ports `4444` (UART0 logs), `4445` (UART1 touch), and `6053` (API).
    - Instant Click firmware runs on ports `4446` (UART0 logs), `4447` (UART1 touch), and `6054` (API).
    - Light Relay Mode runs on ports `4448` (UART0 logs), `4449` (UART1 touch), and `6056` (API).
+   - The standard emulator runs for the whole session. The Instant Click and Light Relay Mode emulators run only
+     during their own module (`test_instant_click.py`, `test_relay_modes.py`), so at most two run at once.
    - Instant session abort (`pytest.exit`) and automatic process termination cleanup if boot times out.
 
 ---

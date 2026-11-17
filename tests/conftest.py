@@ -34,10 +34,13 @@ def switch(qemu_switch):
     return qemu_switch
 
 
-@pytest.fixture(scope="session")
+# The Instant Click and Light Relay Mode emulators are module-scoped: each is used by one module only, and
+# shutting it down afterwards keeps it from competing for CPU with the standard emulator for the rest of the
+# session, which adds to the timing jitter.
+@pytest.fixture(scope="module")
 def qemu_instant_switch():
-    """Session-scoped QEMU harness instance running Instant Click Mode firmware."""
-    print("\n[*] Initializing QEMU Instant-Click switch harness (session scope)...")
+    """Module-scoped QEMU harness instance running Instant Click Mode firmware."""
+    print("\n[*] Initializing QEMU Instant-Click switch harness (module scope)...")
     try:
         harness = QemuHarness(
             log_port=4446,
@@ -61,10 +64,10 @@ def instant_switch(qemu_instant_switch):
     return qemu_instant_switch
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="module")
 def qemu_light_switch():
-    """Session-scoped QEMU harness instance running Light Relay Mode firmware."""
-    print("\n[*] Initializing QEMU Light Relay Mode switch harness (session scope)...")
+    """Module-scoped QEMU harness instance running Light Relay Mode firmware."""
+    print("\n[*] Initializing QEMU Light Relay Mode switch harness (module scope)...")
     try:
         harness = QemuHarness(
             log_port=4448,
