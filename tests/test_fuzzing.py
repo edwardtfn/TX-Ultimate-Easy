@@ -109,8 +109,10 @@ def test_tc_f05_touch_packet_split_across_ticks_registers_press(switch):
 
     # Send first 5 bytes of a valid Gang 1 tap frame
     switch.send_raw_bytes(bytes([0xAA, 0x55, 0x01, 0x02, 0x02]))
-    # Yield execution so loop() runs on the partial buffer
-    time.sleep(0.02)
+    # Wait until loop() has processed the partial buffer (it logs the received bytes) before sending the rest.
+    # A fixed delay was not enough under emulation: both halves could arrive before the next loop() pass,
+    # so the frame was read whole and the test passed although the defect is present.
+    switch.assert_log("- UART-Log -", timeout=2.0, msg="Firmware did not process the partial frame")
     # Send remaining 10 bytes
     switch.send_raw_bytes(bytes([0x00, 0x01, 0x00] + [0x00] * 7))
     time.sleep(0.1)
