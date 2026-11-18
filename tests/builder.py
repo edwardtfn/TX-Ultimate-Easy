@@ -134,6 +134,7 @@ def build_and_pad_firmware(
     output_flash_name: str,
     force: bool = False,
     build_cache_dir: str = DEFAULT_BUILD_CACHE_DIR,
+    _retry: bool = False,
 ) -> str:
     """Compile an ESPHome YAML config to a local temp build dir and generate an 8MB padded QEMU flash image."""
     config_path = os.path.join(CONFIGS_DIR, config_filename)
@@ -201,11 +202,17 @@ def build_and_pad_firmware(
             raise FileNotFoundError(f"Expected factory binary not found at {factory_bin}")
 
         # Only trust the build if no source changed while it ran: otherwise the binary may come from a
-        # different source than the fingerprint describes (e.g. a file edited, then reverted).
-        if compute_build_fingerprint(esphome_exe, config_path) == fingerprint:
-            write_build_info(build_info_path, fingerprint)
-        else:
-            print(f"[!] Sources changed while '{target_name}' was compiling; it will be rebuilt on the next run.")
+        # different source than the fingerprint describes (e.g. a file edited, then reverted). Do not use it
+        # for this run either: rebuild once from the current sources, then give up.
+        if compute_build_fingerprint(esphome_exe, config_path) != fingerprint:
+            if _retry:
+                raise RuntimeError(
+                    f"Sources changed while '{target_name}' was compiling, twice. Stop editing and run the tests again."
+                )
+            print(f"[!] Sources changed while '{target_name}' was compiling; rebuilding from the current sources...")
+            return build_and_pad_firmware(config_filename, output_flash_name, force=True, build_cache_dir=build_cache_dir, _retry=True)
+
+        write_build_info(build_info_path, fingerprint)
 
     # Always recreate the flash image from the factory binary, so every session starts from a clean flash
     # (no NVS state left over from a previous session) and never from an image modified by QEMU.
