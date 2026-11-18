@@ -149,7 +149,8 @@ def build_and_pad_firmware(
 
     # Check if rebuild is necessary. The cache key is a fingerprint of the compiler identity and of the
     # path and content of every source file, so edits, deletions, equal timestamps and edits made while
-    # a build was running are all detected. It is computed before compiling and stored only on success.
+    # a build was running are all detected. It is computed before compiling and stored only when the build
+    # succeeded and the sources are unchanged after it.
     esphome_exe = find_esphome_binary()
     build_info_path = os.path.join(target_build_dir, BUILD_INFO_FILENAME)
     fingerprint = compute_build_fingerprint(esphome_exe, config_path)
@@ -199,7 +200,12 @@ def build_and_pad_firmware(
         if not os.path.exists(factory_bin):
             raise FileNotFoundError(f"Expected factory binary not found at {factory_bin}")
 
-        write_build_info(build_info_path, fingerprint)
+        # Only trust the build if no source changed while it ran: otherwise the binary may come from a
+        # different source than the fingerprint describes (e.g. a file edited, then reverted).
+        if compute_build_fingerprint(esphome_exe, config_path) == fingerprint:
+            write_build_info(build_info_path, fingerprint)
+        else:
+            print(f"[!] Sources changed while '{target_name}' was compiling; it will be rebuilt on the next run.")
 
     # Always recreate the flash image from the factory binary, so every session starts from a clean flash
     # (no NVS state left over from a previous session) and never from an image modified by QEMU.
