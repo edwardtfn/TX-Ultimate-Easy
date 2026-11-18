@@ -97,9 +97,11 @@ def test_tc_h06_vibration_motor_retrigger_recovery(switch):
     switch.assert_log("'Vibration motor' >> ON")
     switch.drain_logs()
 
-    # Enter Night Mode without the usual settle delay, then release while the pulse is still running
+    # Enter Night Mode without the usual settle delay, and wait until the firmware reports it: the API command
+    # and the touch UART are separate channels, so a fixed delay does not guarantee it is applied before the
+    # release. The wait is bounded by the 500ms pulse, which must still be running when the release arrives.
     switch.set_night_mode(True, settle=0)
-    time.sleep(0.1)
+    assert switch.wait_for_entity_state("Night Mode", True, timeout=0.4), "Night Mode not reported ON in time"
     assert "'Vibration motor' >> OFF" not in switch.get_recent_logs(), "Pulse ended before the retrigger"
     switch.send_touch_frame(0x01, 0x01, 0x01, 0x00)
 
