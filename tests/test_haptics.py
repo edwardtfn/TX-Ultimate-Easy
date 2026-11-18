@@ -86,29 +86,38 @@ def test_tc_h06_vibration_motor_retrigger_recovery(switch):
     Expected Behavior: Vibration pulses must terminate cleanly and turn off the motor promptly
     even when subsequent pulses are suppressed by Night Mode.
     """
-    # A pulse long enough to still be running when the suppressed retrigger arrives
-    switch.set_vibration_duration(500)
-    switch.set_vibration_feedback("Always")
-    switch.set_switch("Night Mode - Suppress Vibration", True)
-    switch.drain_logs()
+    try:
+        # A pulse long enough to still be running when the suppressed retrigger arrives
+        switch.set_vibration_duration(500)
+        switch.set_vibration_feedback("Always")
+        switch.set_switch("Night Mode - Suppress Vibration", True)
+        switch.drain_logs()
 
-    # Touch down to start the 500ms pulse
-    switch.send_touch_frame(0x02, 0x00, 0x01, 0x00)
-    switch.assert_log("'Vibration motor' >> ON")
-    switch.drain_logs()
+        # Touch down to start the 500ms pulse
+        switch.send_touch_frame(0x02, 0x00, 0x01, 0x00)
+        switch.assert_log("'Vibration motor' >> ON")
+        switch.drain_logs()
 
-    # Enter Night Mode without the usual settle delay, and wait until the firmware reports it: the API command
-    # and the touch UART are separate channels, so a fixed delay does not guarantee it is applied before the
-    # release. The wait is bounded by the 500ms pulse, which must still be running when the release arrives.
-    switch.set_night_mode(True, settle=0)
-    assert switch.wait_for_entity_state("Night Mode", True, timeout=0.4), "Night Mode not reported ON in time"
-    assert "'Vibration motor' >> OFF" not in switch.get_recent_logs(), "Pulse ended before the retrigger"
-    switch.send_touch_frame(0x01, 0x01, 0x01, 0x00)
+        # Enter Night Mode without the usual settle delay, and wait until the firmware reports it: the API command
+        # and the touch UART are separate channels, so a fixed delay does not guarantee it is applied before the
+        # release. The wait is bounded by the 500ms pulse, which must still be running when the release arrives.
+        switch.set_night_mode(True, settle=0)
+        assert switch.wait_for_entity_state("Night Mode", True, timeout=0.4), "Night Mode not reported ON in time"
+        assert "'Vibration motor' >> OFF" not in switch.get_recent_logs(), "Pulse ended before the retrigger"
+        switch.send_touch_frame(0x01, 0x01, 0x01, 0x00)
 
-    # The suppressed retrigger cancels the running pulse, so it must turn the motor off itself.
-    # Before the fix, the motor stayed on until the 2s safety cutoff.
-    switch.assert_log("'Vibration motor' >> OFF", timeout=0.3)
+        # The suppressed retrigger cancels the running pulse, so it must turn the motor off itself.
+        # Before the fix, the motor stayed on until the 2s safety cutoff.
+        switch.assert_log("'Vibration motor' >> OFF", timeout=0.3)
 
-    # Cleanup
-    switch.set_night_mode(False)
-    switch.set_vibration_duration(15)
+        # The OFF must come from the release handling, not from the pulse expiring on its own before the firmware
+        # processed the release: the firmware logs "Released" before running the release feedback.
+        logs = switch.get_recent_logs()
+        released_idx = logs.find("]: Released")
+        assert released_idx != -1, f"Release was not processed by the firmware:\n{logs}"
+        assert released_idx < logs.find("'Vibration motor' >> OFF"), f"Motor turned off before the release:\n{logs}"
+
+    finally:
+        # Restore the defaults even when an assertion failed, so later tests are not affected
+        switch.set_night_mode(False)
+        switch.set_vibration_duration(15)
