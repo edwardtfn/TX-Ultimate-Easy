@@ -15,6 +15,8 @@ substitutions:
   invalid_cooldown: 100ms
 
   instant_click_mode: false
+  # Use it in lambdas as `#if ${INSTANT_CLICK_MODE_ACTIVE}`. The `${}` is required: a bare
+  # `INSTANT_CLICK_MODE_ACTIVE` is not substituted and silently evaluates to `0`.
   INSTANT_CLICK_MODE_ACTIVE: ${ 1 if instant_click_mode else 0 }
   INSTANT_CLICK_DEBOUNCE_MS: "500"  # Debounce window per button, instant click mode only, in msec
 
@@ -31,6 +33,9 @@ substitutions:
   BUTTON_MULTI_CLICK_DELAY: "250"  # The time to wait for another click, in msec
   BUTTON_PRESS_TIMEOUT: "10000"  # Ignore if button is pressed for longer than this time, in msec
   BUTTON_LONG_PRESS_DELAY: "500"  # The time to wait to consider a long press, in msec
+  # Delay before the Button N binary sensors turn off, so a short tap is not lost in the API batch.
+  # Must be longer than `api: batch_delay` (default 100ms); raise it if you raise `batch_delay`.
+  BUTTON_SENSOR_MIN_ON_TIME: 150ms
 
   # Button numbers constants
   BUTTON_1_ID: '1'
@@ -46,24 +51,32 @@ binary_sensor:
     icon: mdi:gesture-tap-box
     platform: template
     internal: ${gang_count < 1}
+    filters:
+      - delayed_off: ${BUTTON_SENSOR_MIN_ON_TIME}
 
   - id: bs_button_2
     name: Button 2
     icon: mdi:gesture-tap-box
     platform: template
     internal: ${gang_count < 2}
+    filters:
+      - delayed_off: ${BUTTON_SENSOR_MIN_ON_TIME}
 
   - id: bs_button_3
     name: Button 3
     icon: mdi:gesture-tap-box
     platform: template
     internal: ${gang_count < 3}
+    filters:
+      - delayed_off: ${BUTTON_SENSOR_MIN_ON_TIME}
 
   - id: bs_button_4
     name: Button 4
     icon: mdi:gesture-tap-box
     platform: template
     internal: ${gang_count < 4}
+    filters:
+      - delayed_off: ${BUTTON_SENSOR_MIN_ON_TIME}
 
 esphome:
   build_flags:
@@ -118,6 +131,7 @@ script:
       button: uint8_t
       action: string
       count: uint8_t
+      position: uint8_t  # Touch position of this action, captured when it was triggered
     then:
       - lambda: |-
           // Send event to Home Assistant
@@ -125,7 +139,7 @@ script:
             {"action", action.c_str()},
             {"button_id", std::to_string(button)},
             {"count", std::to_string(count)},
-            {"position", std::to_string(id(button_press_position))}
+            {"position", std::to_string(position)}
           });
           ESP_LOGI("${TAG_HW_BUTTONS}", "Button %" PRIu8 " action: '%s'", button, action.c_str());
           if (action == "click") {
@@ -144,7 +158,7 @@ script:
                 break;
             }
           }
-          #if INSTANT_CLICK_MODE_ACTIVE
+          #if ${INSTANT_CLICK_MODE_ACTIVE}
           // Instant click mode only ever produces single clicks: `touch_on_press_buttons` fires
           // with a fixed count of 1 and `touch_on_release` performs no long press detection,
           // so the double click and long press branches are compiled out to save flash.
@@ -181,7 +195,7 @@ script:
             }
           }
           #endif  // INSTANT_CLICK_MODE_ACTIVE
-          #if INSTANT_CLICK_MODE_ACTIVE
+          #if ${INSTANT_CLICK_MODE_ACTIVE}
           // Instant click mode: the click already fired on touch-down and the finger may still
           // be down, so the press state and the button binary sensor must survive until the
           // physical release. `touch_on_release` performs the cleanup.
@@ -195,29 +209,34 @@ script:
           #endif  // INSTANT_CLICK_MODE_ACTIVE
 
   - id: button_click_event
-    mode: restart
+    # Normal mode: `restart` lets each new click of a sequence cancel the pending one, so only the final
+    # click count fires after the multi-click delay.
+    # Instant click mode: `parallel`, as every click is final. With `restart`, a press on another button
+    # arriving before the zero delay resumes would cancel the pending click.
+    mode: ${ "parallel" if instant_click_mode else "restart" }
     parameters:
       button: uint8_t
       click_count: uint8_t
+      position: uint8_t  # Captured on press, as the shared global may change before the delay ends
     then:
       - delay: !lambda |-
           // Return `0` (instant) when instant click mode is active
-          #if INSTANT_CLICK_MODE_ACTIVE
+          #if ${INSTANT_CLICK_MODE_ACTIVE}
           return 0;
           #else   // INSTANT_CLICK_MODE_ACTIVE
           return nr_button_multi_click_delay->state;
           #endif  // INSTANT_CLICK_MODE_ACTIVE
       - lambda: |-
-          #if INSTANT_CLICK_MODE_ACTIVE
+          #if ${INSTANT_CLICK_MODE_ACTIVE}
           // Instant click mode always fires with `click_count` fixed at 1, so the multi-click
           // naming is resolved at compile time.
-          button_action->execute(button, "click", click_count);
+          button_action->execute(button, "click", click_count, position);
           #else   // INSTANT_CLICK_MODE_ACTIVE
           std::string event_name;
           if (click_count == 1) event_name = "click";
           else if (click_count == 2) event_name = "double_click";
           else event_name = "multiple_click";
-          button_action->execute(button, event_name.c_str(), click_count);
+          button_action->execute(button, event_name.c_str(), click_count, position);
           #endif  // INSTANT_CLICK_MODE_ACTIVE
 
   - id: buttons_release
@@ -280,7 +299,7 @@ script:
             #else
                                                                 sl_button_4_action->current_option() : "Unknown");
             #endif
-          #if INSTANT_CLICK_MODE_ACTIVE
+          #if ${INSTANT_CLICK_MODE_ACTIVE}
           ESP_LOGCONFIG("${TAG_HW_BUTTONS}", "Instant click mode ON - clicks fire on press");
           #else   // INSTANT_CLICK_MODE_ACTIVE
           ESP_LOGCONFIG("${TAG_HW_BUTTONS}", "Instant click mode OFF - normal click behavior");
@@ -332,7 +351,7 @@ script:
     then:
       - lambda: |-
           // Behaviour depends on "instant click mode"
-          #if INSTANT_CLICK_MODE_ACTIVE
+          #if ${INSTANT_CLICK_MODE_ACTIVE}
           // Debounce timestamps are tracked per button (index 0 unused, buttons are 1-based)
           static uint32_t instant_click_debounce_ts[${BUTTON_4_ID} + 1] = {};
 
@@ -356,7 +375,7 @@ script:
           }
           // Never store the sentinel back; millis() only returns 0 in the first msec after boot or wrap
           instant_click_debounce_ts[button] = (now != 0) ? now : 1;
-          button_click_event->execute(button, 1);
+          button_click_event->execute(button, 1, position);
           #else  // INSTANT_CLICK_MODE_ACTIVE
           uint32_t current_time = millis();
           // Check if we should start a new click sequence:
@@ -419,30 +438,12 @@ script:
               bs_button_4->publish_state(true);
               break;
           }
-          #if INSTANT_CLICK_MODE_ACTIVE
-          #else  // INSTANT_CLICK_MODE_ACTIVE
-          // Update binary sensor back to false, so just a quick state change should be send
-          switch (button) {
-            case 1:
-              bs_button_1->publish_state(false);
-              break;
-            case 2:
-              bs_button_2->publish_state(false);
-              break;
-            case 3:
-              bs_button_3->publish_state(false);
-              break;
-            case 4:
-              bs_button_4->publish_state(false);
-              break;
-          }
-          #endif  // INSTANT_CLICK_MODE_ACTIVE
 
   - id: !extend touch_on_release
     then:
       - lambda: |-
           // Behaviour depends on "instant click mode"
-          #if INSTANT_CLICK_MODE_ACTIVE
+          #if ${INSTANT_CLICK_MODE_ACTIVE}
             // Instant click mode: action already fired on press, just clean up
             buttons_release->execute();
             id(button_press_start_time) = 0;
@@ -470,7 +471,7 @@ script:
               if (id(button_press_button) > 0 && id(button_press_button) <= 4) {
                 // Don't reset start_time here - let button_action reset it after multi-click delay
                 // This allows subsequent presses during the delay to increment the counter
-                button_click_event->execute(id(button_press_button), id(click_counter));
+                button_click_event->execute(id(button_press_button), id(click_counter), id(button_press_position));
               } else {
                 ESP_LOGW("${TAG_HW_BUTTONS}", "Invalid button state, resetting");
                 id(button_press_start_time) = 0;
@@ -482,7 +483,7 @@ script:
               // Long press: anything longer than BUTTON_LONG_PRESS_DELAY (and within timeout) is a long press
               // Validate button is still valid (in case swipe/multi-touch happened)
               if (id(button_press_button) > 0 && id(button_press_button) <= 4) {
-                button_action->execute(id(button_press_button), "long_press", 1);
+                button_action->execute(id(button_press_button), "long_press", 1, id(button_press_position));
               } else {
                 ESP_LOGW("${TAG_HW_BUTTONS}", "Invalid button state during long press, resetting");
                 id(button_press_start_time) = 0;
