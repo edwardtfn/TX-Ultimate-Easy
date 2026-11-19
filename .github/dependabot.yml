@@ -27,7 +27,9 @@ updates:
           - "*"
 
   # Python packages used by the QEMU integration tests (requirements-test.txt).
-  # Grouped, so esphome and its pinned aioesphomeapi version are updated together.
+  # aioesphomeapi is intentionally not listed there: esphome pins an exact
+  # version of it, so it follows every esphome bump. Listing it directly lets
+  # Dependabot bump it past that pin, which pip cannot resolve (see PR #228).
   - package-ecosystem: "pip"
     directory: "/"
     schedule:

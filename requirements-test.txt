@@ -1,4 +1,3 @@
-esphome==2026.10.2
+esphome==2026.11.0  # Also pins aioesphomeapi (used by tests/qemu_harness.py)
 pytest==9.2.0
 pytest-asyncio==1.5.0
-aioesphomeapi==46.30.0  # Must match the version required by esphome
