@@ -169,11 +169,13 @@ suppresses vibration and click-sound feedback. The state survives reboots.
 | Night Mode - Color | Light | Off | Set the LED color and brightness used in night mode |
 | Night Mode - Suppress Vibration | Switch (config) | On | Block haptic feedback while night mode is active |
 | Night Mode - Suppress Sound | Switch (config) | On | Block click sounds while night mode is active |
+| Night Mode - Suppress Relay LEDs | Switch (config) | On | Turn off to keep showing the relay LEDs over the night mode color |
 
 **Usage:**
 1. Set **Night Mode - Color** to your desired color and brightness
 2. Enable the **Night Mode** switch — the color is snapshotted and the LEDs lock in
-3. Toggle the suppression switches under *Configuration* to allow or block vibration/sound
+3. Toggle the suppression switches under *Configuration* to allow or block vibration/sound,
+   or to show the relay LEDs: relays that are on are then shown as usual, and the night mode color fills the rest
 4. To change the color: disable Night Mode, adjust **Night Mode - Color**, then re-enable — this re-snapshots the color and persists it across reboots
 5. Disable the switch to restore normal relay indicator behavior — **Lights (all)** is unaffected by night mode
 

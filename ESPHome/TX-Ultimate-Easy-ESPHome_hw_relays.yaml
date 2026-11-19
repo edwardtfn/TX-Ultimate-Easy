@@ -610,10 +610,16 @@ script:
       state: bool
     then:
       - lambda: |-
-          // Night mode holds the LED state — skip all automatic relay-triggered updates.
+          // Night mode holds the LED state — skip all automatic relay-triggered updates, unless the relay
+          // LEDs are shown over the Night Mode color. They are then repainted together, in a single pass.
           #ifdef TX_ULTIMATE_EASY_NIGHT_MODE
           if (sw_night_mode->state) {
-            ESP_LOGV("${TAG_HW_RELAYS}", "Night mode active - skipping LED update");
+            if (sw_night_mode_suppress_relay_leds->state) {
+              ESP_LOGV("${TAG_HW_RELAYS}", "Night mode active - skipping LED update");
+            } else {
+              ESP_LOGV("${TAG_HW_RELAYS}", "Night mode active - repainting relay LEDs");
+              night_mode_relay_leds_paint->execute();
+            }
             return;
           }
           #endif  // TX_ULTIMATE_EASY_NIGHT_MODE
@@ -680,6 +686,85 @@ script:
               ESP_LOGE("${TAG_HW_RELAYS}", "Invalid light_group=%" PRIu8 " (expected 1 or 2)", light_group);
               break;
           }
+
+  # Shows the relay LEDs over the Night Mode color ("Night Mode - Suppress Relay LEDs" turned off).
+  # The Night Mode color covers the whole strip, so a relay LED turned off would leave a dark gap in it.
+  # Instead, all LEDs are repainted in one pass: the Night Mode color first, then the LEDs of the relays that are on.
+  - id: night_mode_relay_leds_paint
+    mode: restart
+    then:
+      # Collapses the calls of one update for all relays (e.g. from show_relay_status) into a single repaint.
+      - delay: 20ms
+      # Waits for a Night Mode color transition (e.g. Night Mode being turned on), which would paint over the relay LEDs.
+      - wait_until:
+          condition:
+            lambda: |-
+              #ifdef TX_ULTIMATE_EASY_NIGHT_MODE
+              return !light_night_mode_leds->is_transformer_active();
+              #else   // TX_ULTIMATE_EASY_NIGHT_MODE
+              return true;
+              #endif  // TX_ULTIMATE_EASY_NIGHT_MODE
+          timeout: 2s
+      - lambda: |-
+          #ifdef TX_ULTIMATE_EASY_NIGHT_MODE
+          if (!sw_night_mode->state || sw_night_mode_suppress_relay_leds->state)
+            return;
+          // As in show_relay_status, the LEDs are only painted after boot (boot_done repaints them)
+          if (!bs_boot_completed->state)
+            return;
+          // "Lights (all)" takes precedence: Night Mode leaves it untouched
+          if (lights_all->remote_values.is_on()) {
+            ESP_LOGV("${TAG_HW_RELAYS}", "Lights (all) is on - skipping the Night Mode relay LEDs");
+            return;
+          }
+
+          static const uint8_t LIGHT_BRIGHTNESS_TURN_ON = ${LIGHT_BRIGHTNESS_TURN_ON};
+          const bool relay_states[] = {id(relay_1_state), id(relay_2_state), id(relay_3_state), id(relay_4_state)};
+          select::Select *light_modes[] = {sl_relay_1_light_mode, sl_relay_2_light_mode,
+                                           sl_relay_3_light_mode, sl_relay_4_light_mode};
+          const std::vector<light::LightState *> *groups[] = {&id(gb_lights_1), &id(gb_lights_2)};
+
+          // Without a transition, each light writes to the strip as soon as its call is performed, so the order
+          // below is what is shown: LEDs of relays that are off, the Night Mode color, then LEDs of relays that are on.
+          for (const bool lit_pass : {false, true}) {
+            if (lit_pass) {
+              const light::LightColorValues &night = light_night_mode->current_values;
+              auto call = light_night_mode_leds->turn_on();
+              call.set_rgb(night.get_red(), night.get_green(), night.get_blue());
+              call.set_brightness(night.get_brightness());
+              call.set_transition_length(0);
+              call.perform();
+            }
+            for (uint8_t i = 0; i < ${gang_count}; i++) {
+              const std::string light_mode = light_modes[i]->current_option();
+              const bool group_enabled[] = {
+                  light_mode == "${LIGHT_MODE_BOTTOM_OR_LEFT_TEXT}" || light_mode == "${LIGHT_MODE_BOTH_TEXT}",
+                  light_mode == "${LIGHT_MODE_TOP_OR_RIGHT_TEXT}" || light_mode == "${LIGHT_MODE_BOTH_TEXT}"};
+              for (uint8_t group = 0; group < 2; group++) {
+                if (i >= groups[group]->size())
+                  continue;
+                const bool lit = relay_states[i] && group_enabled[group];
+                if (lit != lit_pass)
+                  continue;
+                light::LightState *led = (*groups[group])[i];
+                if (lit) {
+                  ESP_LOGV("${TAG_HW_RELAYS}", "Night mode - showing light %" PRIu8 " for Relay %" PRIu8,
+                           group + 1, i + 1);
+                  auto call = led->turn_on();
+                  if (LIGHT_BRIGHTNESS_TURN_ON > 0 && LIGHT_BRIGHTNESS_TURN_ON <= 100)
+                    call.set_brightness(LIGHT_BRIGHTNESS_TURN_ON / 100.0f);
+                  call.set_transition_length(0);
+                  call.perform();
+                } else if (led->remote_values.is_on()) {
+                  auto call = led->turn_off();
+                  call.set_transition_length(0);
+                  call.perform();
+                }
+              }
+            }
+          }
+          ESP_LOGD("${TAG_HW_RELAYS}", "Night mode - relay LEDs repainted");
+          #endif  // TX_ULTIMATE_EASY_NIGHT_MODE
 
   - id: show_relay_status
     mode: restart
