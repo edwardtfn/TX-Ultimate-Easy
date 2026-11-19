@@ -102,6 +102,11 @@ script:
                       blue: !lambda "return id(light_night_mode).current_values.get_blue();"
                       brightness: !lambda "return id(light_night_mode).current_values.get_brightness();"
                       transition_length: ${night_mode_light_transition_length}
+                  - lambda: |-
+                      #ifdef TX_ULTIMATE_EASY_HW_RELAYS
+                      // Show the relay LEDs over the Night Mode color, if enabled (waits for the transition)
+                      night_mode_relay_leds_paint->execute();
+                      #endif  // TX_ULTIMATE_EASY_HW_RELAYS
 
   # Called by each template output write_action whenever the color picker value changes.
   # Debounced so the three channel writes (R, G, B) collapse into one LED update.
@@ -121,6 +126,11 @@ script:
                 blue: !lambda "return id(light_night_mode).current_values.get_blue();"
                 brightness: !lambda "return id(light_night_mode).current_values.get_brightness();"
                 transition_length: ${night_mode_light_transition_length}
+            - lambda: |-
+                #ifdef TX_ULTIMATE_EASY_HW_RELAYS
+                // Show the relay LEDs over the new Night Mode color, if enabled (waits for the transition)
+                night_mode_relay_leds_paint->execute();
+                #endif  // TX_ULTIMATE_EASY_HW_RELAYS
 
 switch:
   # ── Main control (no entity_category → appears in main entity list) ───────
@@ -137,8 +147,6 @@ switch:
     on_turn_off:
       then:
         # Stop the apply script in case we are in the middle of a transition.
-        # The snapshot globals are intentionally left untouched - they are
-        # overwritten the next time night mode is enabled.
         - script.stop: night_mode_apply
         - light.turn_off:
             id: light_night_mode_leds
@@ -170,4 +178,29 @@ switch:
     internal: false
     optimistic: true
     restore_mode: RESTORE_DEFAULT_ON
+
+  # When off, the relay LEDs keep showing the relay states over the Night Mode color.
+  # Needs the relays package; without it, this has no effect.
+  - id: sw_night_mode_suppress_relay_leds
+    name: "Night Mode - Suppress Relay LEDs"
+    platform: template
+    entity_category: config
+    icon: mdi:led-off
+    internal: false
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    on_turn_on:
+      then:
+        # Cover the relay LEDs with the Night Mode color again (after boot; the boot sequence applies it itself)
+        - if:
+            condition:
+              - binary_sensor.is_on: bs_boot_completed
+            then:
+              - script.execute: night_mode_apply
+    on_turn_off:
+      then:
+        - lambda: |-
+            #ifdef TX_ULTIMATE_EASY_HW_RELAYS
+            night_mode_relay_leds_paint->execute();
+            #endif  // TX_ULTIMATE_EASY_HW_RELAYS
 ...
