@@ -147,8 +147,6 @@ switch:
     on_turn_off:
       then:
         # Stop the apply script in case we are in the middle of a transition.
-        # The snapshot globals are intentionally left untouched - they are
-        # overwritten the next time night mode is enabled.
         - script.stop: night_mode_apply
         - light.turn_off:
             id: light_night_mode_leds
