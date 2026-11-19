@@ -12,6 +12,7 @@ from tests.builder import find_qemu_binary, ensure_efuse_bin, DEFAULT_BUILD_CACH
 FLASH_BIN_DEFAULT = os.path.join(DEFAULT_BUILD_CACHE_DIR, "qemu_flash_test.bin")
 FLASH_INSTANT_BIN_DEFAULT = os.path.join(DEFAULT_BUILD_CACHE_DIR, "qemu_flash_instant.bin")
 FLASH_LIGHT_BIN_DEFAULT = os.path.join(DEFAULT_BUILD_CACHE_DIR, "qemu_flash_light.bin")
+FLASH_COVER_BIN_DEFAULT = os.path.join(DEFAULT_BUILD_CACHE_DIR, "qemu_flash_cover.bin")
 EFUSE_BIN_DEFAULT = ensure_efuse_bin()
 
 # Mapping for 3-gang EU device:
@@ -212,12 +213,10 @@ class QemuHarness:
         self.api_client = APIClient("127.0.0.1", self.api_port, password="", noise_psk=None)
         await self.api_client.connect(login=True)
         self._states = {}
+        self._raw_states = {}
         self._ha_events = []
 
-        def _on_state(state):
-            self._states[state.key] = getattr(state, "state", None)
-
-        self.api_client.subscribe_states(_on_state)
+        self.api_client.subscribe_states(self._on_state)
         self.api_client.subscribe_service_calls(self._on_service_call)
         entities, _ = await self.api_client.list_entities_services()
         self._entities = {e.name: e for e in entities}
@@ -233,11 +232,18 @@ class QemuHarness:
     async def _async_reconnect_api(self):
         """Re-establish Native API connection following a simulated network disconnect."""
         await self.api_client.connect(login=True)
-
-        def _on_state(state):
-            self._states[state.key] = getattr(state, "state", None)
-        self.api_client.subscribe_states(_on_state)
+        self.api_client.subscribe_states(self._on_state)
         self.api_client.subscribe_service_calls(self._on_service_call)
+
+    def _on_state(self, state):
+        """Record an entity state update (runs on the API loop thread).
+
+        Entities with a single value (switches, selects, numbers...) are kept in `_states`. The full state object
+        is also kept in `_raw_states`, for entities whose state has several fields (e.g. a cover's position and
+        current operation).
+        """
+        self._states[state.key] = getattr(state, "state", None)
+        self._raw_states[state.key] = state
 
     def _on_service_call(self, call):
         """Record Home Assistant events fired by the firmware (runs on the API loop thread)."""
@@ -607,6 +613,39 @@ class QemuHarness:
             functools.partial(self.api_client.light_command, entity.key, state=state)
         )
         time.sleep(0.3)
+
+    def cover_command(self, name: str = "Cover", position: Optional[float] = None, stop: bool = False):
+        """Send a cover command via API: a target position (0.0 closed, 1.0 open) or a stop."""
+        if not self.api_client or not self._api_loop:
+            raise RuntimeError("ESPHome Native API client is not connected")
+        entity = self._entities.get(name)
+        if not entity:
+            raise ValueError(f"Entity '{name}' not found")
+        import functools
+        self._api_loop.call_soon_threadsafe(
+            functools.partial(self.api_client.cover_command, entity.key, position=position, stop=stop)
+        )
+        time.sleep(0.3)
+
+    def get_cover_state(self, name: str = "Cover"):
+        """Return the last full state received for a cover (with `position` and `current_operation`), or None."""
+        entity = self._entities.get(name)
+        if not entity:
+            return None
+        return self._raw_states.get(entity.key)
+
+    def wait_for_cover(self, name: str = "Cover", operation=None, position: Optional[float] = None,
+                       timeout: float = 6.0) -> bool:
+        """Wait until a cover reports the given current operation and/or position (within 0.01)."""
+        start = time.time()
+        while time.time() - start < timeout:
+            state = self.get_cover_state(name)
+            if state is not None and \
+                    (operation is None or state.current_operation == operation) and \
+                    (position is None or abs(state.position - position) < 0.01):
+                return True
+            time.sleep(0.1)
+        return False
 
     def get_entity_state(self, name: str, timeout: float = 4.0):
         """Get the current subscribed state of an entity by name, waiting for state packet if needed."""
