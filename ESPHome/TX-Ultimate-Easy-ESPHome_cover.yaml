@@ -1,0 +1,288 @@
+####################################################################################################
+#####                              TX Ultimate Easy for ESPHome                                #####
+#####                  Repository: https://github.com/edwardtfn/TX-Ultimate-Easy               #####
+####################################################################################################
+##### Purpose: ESPHome - Cover (time-based control of blinds, shutters, curtains, etc.)        #####
+####################################################################################################
+##### Author: edwardtfn - https://github.com/edwardtfn - https://buymeacoffee.com/edwardfirmo  #####
+####################################################################################################
+##### NOTE:                                                                                    #####
+##### - Make changes ONLY if absolutely necessary and you have the required knowledge.         #####
+##### - For normal system use, modifications to this file are NOT required.                    #####
+##### - Requires 'TX-Ultimate-Easy-ESPHome_hw_relays.yaml' and a device with 2 or more gangs.  #####
+##### - The cover relays must be set to 'disabled' (e.g. 'relay_1_mode: disabled'), so no      #####
+#####   switch, light or ESP-NOW command can bypass the interlock.                             #####
+####################################################################################################
+---
+substitutions:
+  cover_name: Cover
+  cover_device_class: shutter          # Any HA cover device class, e.g. 'blind', 'curtain', 'shutter', 'awning'
+  cover_open_relay: '1'                # Relay driving the "open" direction (1-4)
+  cover_close_relay: '2'               # Relay driving the "close" direction (1-4)
+  cover_open_duration: '30'            # Default full travel time to open, in seconds (adjustable in HA)
+  cover_close_duration: '30'           # Default full travel time to close, in seconds (adjustable in HA)
+  cover_interlock_wait_time: '500'     # Dead time between de-energizing one direction and energizing the other, in msec
+  cover_has_built_in_endstop: 'false'  # Keep the relay energized at the end positions (motor has its own endstops)
+  cover_manual_control: 'false'        # Always run a full travel on open/close commands (resyncs the position)
+
+  COVER_BUTTON_ACTION_OPEN_TEXT: "Cover open"
+  COVER_BUTTON_ACTION_CLOSE_TEXT: "Cover close"
+
+  TAG_COVER: tx_ultimate_easy.cover
+
+esphome:
+  build_flags:
+    - -D TX_ULTIMATE_EASY_COVER
+
+globals:
+  # Timestamp (millis) of the last time a cover relay was de-energized. Used to enforce the interlock dead time.
+  - id: cover_relays_off_time
+    type: uint32_t
+    restore_value: false
+    initial_value: '0'
+
+cover:
+  - id: cv_cover
+    name: ${cover_name}
+    platform: time_based
+    device_class: ${cover_device_class}
+    open_duration: ${cover_open_duration}s
+    close_duration: ${cover_close_duration}s
+    has_built_in_endstop: ${cover_has_built_in_endstop}
+    manual_control: ${cover_manual_control}
+    # The time_based cover goes straight from one direction to the other on a reversal (no stop in between)
+    # and cancels the actions of the previous command, including a pending delay. The interlock is therefore
+    # enforced here: de-energize the opposite relay, wait for the dead time, then energize the requested one.
+    open_action:
+      - lambda: cover_relays_off->execute(${cover_close_relay});
+      - delay: !lambda |-
+          // Wait only for what is left of the dead time (unsigned math is safe across millis() overflow)
+          static constexpr uint32_t INTERLOCK_WAIT_TIME = ${cover_interlock_wait_time};
+          const uint32_t elapsed = millis() - id(cover_relays_off_time);
+          return (elapsed >= INTERLOCK_WAIT_TIME) ? 0 : (INTERLOCK_WAIT_TIME - elapsed);
+      - lambda: cover_relay_on->execute(${cover_open_relay}, ${cover_close_relay});
+    close_action:
+      - lambda: cover_relays_off->execute(${cover_open_relay});
+      - delay: !lambda |-
+          // Wait only for what is left of the dead time (unsigned math is safe across millis() overflow)
+          static constexpr uint32_t INTERLOCK_WAIT_TIME = ${cover_interlock_wait_time};
+          const uint32_t elapsed = millis() - id(cover_relays_off_time);
+          return (elapsed >= INTERLOCK_WAIT_TIME) ? 0 : (INTERLOCK_WAIT_TIME - elapsed);
+      - lambda: cover_relay_on->execute(${cover_close_relay}, ${cover_open_relay});
+    stop_action:
+      - lambda: |-
+          cover_relays_off->execute(${cover_open_relay});
+          cover_relays_off->execute(${cover_close_relay});
+
+light:
+  # The cover relays must never be energized at boot, regardless of any state saved while they were in use
+  # as a switch or a light. 'ALWAYS_OFF' ignores any saved state.
+  - id: !extend light_output_${cover_open_relay}
+    restore_mode: ALWAYS_OFF
+  - id: !extend light_output_${cover_close_relay}
+    restore_mode: ALWAYS_OFF
+
+number:
+  - id: nr_cover_open_duration
+    name: Cover open duration
+    platform: template
+    initial_value: ${cover_open_duration}
+    restore_value: true
+    optimistic: true
+    entity_category: config
+    device_class: duration
+    unit_of_measurement: s
+    icon: mdi:arrow-expand-up
+    mode: box
+    min_value: 1
+    max_value: 600
+    step: 0.1
+    on_value:
+      then:
+        - lambda: |-
+            cv_cover->set_open_duration(static_cast<uint32_t>(x * 1000.0f));
+            ESP_LOGD("${TAG_COVER}", "Open duration: %.1f s", x);
+
+  - id: nr_cover_close_duration
+    name: Cover close duration
+    platform: template
+    initial_value: ${cover_close_duration}
+    restore_value: true
+    optimistic: true
+    entity_category: config
+    device_class: duration
+    unit_of_measurement: s
+    icon: mdi:arrow-collapse-down
+    mode: box
+    min_value: 1
+    max_value: 600
+    step: 0.1
+    on_value:
+      then:
+        - lambda: |-
+            cv_cover->set_close_duration(static_cast<uint32_t>(x * 1000.0f));
+            ESP_LOGD("${TAG_COVER}", "Close duration: %.1f s", x);
+
+script:
+  - id: !extend button_click_event
+    then:
+      - lambda: |-
+          // Handle only single clicks, consistent with the relay toggle handling
+          if (click_count != 1)
+            return;
+
+          // Ignore if other touch events are active
+          if (bs_multi_touch->state ||
+              bs_swipe_${ID_SWIPE_LEFT_OR_UP_TEXT}->state ||
+              bs_swipe_${ID_SWIPE_RIGHT_OR_DOWN_TEXT}->state)
+            return;
+
+          select::Select *action_select = nullptr;
+          switch (button) {
+            case ${BUTTON_1_ID}:
+              action_select = sl_button_1_action;
+              break;
+            case ${BUTTON_2_ID}:
+              action_select = sl_button_2_action;
+              break;
+            case ${BUTTON_3_ID}:
+              action_select = sl_button_3_action;
+              break;
+            case ${BUTTON_4_ID}:
+              action_select = sl_button_4_action;
+              break;
+            default:
+              return;
+          }
+
+          const StringRef action = action_select->current_option();
+          const bool cmd_open = (action == "${COVER_BUTTON_ACTION_OPEN_TEXT}");
+          if (!cmd_open && action != "${COVER_BUTTON_ACTION_CLOSE_TEXT}")
+            return;  // Not a cover action
+
+          // Any cover button stops a moving cover, otherwise it starts moving in its own direction
+          auto call = cv_cover->make_call();
+          if (cv_cover->current_operation != cover::COVER_OPERATION_IDLE) {
+            ESP_LOGI("${TAG_COVER}", "Button %" PRIu8 ": stop", button);
+            call.set_command_stop();
+          } else if (cmd_open) {
+            ESP_LOGI("${TAG_COVER}", "Button %" PRIu8 ": open", button);
+            call.set_command_open();
+          } else {
+            ESP_LOGI("${TAG_COVER}", "Button %" PRIu8 ": close", button);
+            call.set_command_close();
+          }
+          call.perform();
+
+  - id: cover_relay_on
+    mode: parallel
+    parameters:
+      relay: uint8_t
+      opposite_relay: uint8_t
+    then:
+      - lambda: |-
+          // Last line of defense: never energize a relay while the opposite direction is still energized
+          light::LightState *relays[] = {light_output_1, light_output_2, light_output_3, light_output_4};
+          if (relays[opposite_relay - 1]->remote_values.is_on()) {
+            ESP_LOGE("${TAG_COVER}", "Interlock: relay %" PRIu8 " is on, not energizing relay %" PRIu8,
+                     opposite_relay, relay);
+            return;
+          }
+          ESP_LOGD("${TAG_COVER}", "Relay %" PRIu8 ": on", relay);
+          relays[relay - 1]->turn_on().perform();
+
+  - id: cover_relays_off
+    mode: parallel
+    parameters:
+      relay: uint8_t
+    then:
+      - lambda: |-
+          // De-energize the relay and record when it happened, as this starts the interlock dead time
+          light::LightState *relays[] = {light_output_1, light_output_2, light_output_3, light_output_4};
+          if (relays[relay - 1]->remote_values.is_on()) {
+            ESP_LOGD("${TAG_COVER}", "Relay %" PRIu8 ": off", relay);
+            relays[relay - 1]->turn_off().perform();
+            id(cover_relays_off_time) = millis();
+          }
+
+  - id: !extend dump_config
+    then:
+      - lambda: |-
+          ESP_LOGCONFIG("${TAG_COVER}", "Cover:");
+          ESP_LOGCONFIG("${TAG_COVER}", "  Open relay:      ${cover_open_relay}");
+          ESP_LOGCONFIG("${TAG_COVER}", "  Close relay:     ${cover_close_relay}");
+          ESP_LOGCONFIG("${TAG_COVER}", "  Interlock wait:  ${cover_interlock_wait_time} ms");
+          ESP_LOGCONFIG("${TAG_COVER}", "  Open duration:   %.1f s", nr_cover_open_duration->state);
+          ESP_LOGCONFIG("${TAG_COVER}", "  Close duration:  %.1f s", nr_cover_close_duration->state);
+
+  - id: !extend dump_config_list_packages
+    then:
+      - script.wait: dump_config
+      - lambda: |-
+          // Check for requirements
+          #ifndef TX_ULTIMATE_EASY_COMMON
+            #error "The package TX-Ultimate-Easy-ESPHome_common.yaml is required."
+          #endif  // TX_ULTIMATE_EASY_COMMON
+          #ifndef TX_ULTIMATE_EASY_HW_BUTTONS
+            #error "The package TX-Ultimate-Easy-ESPHome_hw_buttons.yaml is required."
+          #endif  // TX_ULTIMATE_EASY_HW_BUTTONS
+          #ifndef TX_ULTIMATE_EASY_HW_RELAYS
+            #error "The package TX-Ultimate-Easy-ESPHome_hw_relays.yaml is required."
+          #endif  // TX_ULTIMATE_EASY_HW_RELAYS
+
+          // Validate the cover relays
+          #if TX_ULTIMATE_EASY_GANG_COUNT < 2
+            #error "The cover requires a device with 2 or more gangs ('gang_count')."
+          #endif  // TX_ULTIMATE_EASY_GANG_COUNT < 2
+          #if ${cover_open_relay} < 1 || ${cover_open_relay} > TX_ULTIMATE_EASY_GANG_COUNT
+            #error "'cover_open_relay' must be between 1 and 'gang_count'."
+          #endif  // cover_open_relay range
+          #if ${cover_close_relay} < 1 || ${cover_close_relay} > TX_ULTIMATE_EASY_GANG_COUNT
+            #error "'cover_close_relay' must be between 1 and 'gang_count'."
+          #endif  // cover_close_relay range
+          #if ${cover_open_relay} == ${cover_close_relay}
+            #error "'cover_open_relay' and 'cover_close_relay' must be different relays."
+          #endif  // cover_open_relay == cover_close_relay
+          #if (${cover_open_relay} == 1 || ${cover_close_relay} == 1) && ${SL_RELAY_1_MODE} != 0
+            #error "Relay 1 is used by the cover. Set 'relay_1_mode: disabled' in your substitutions."
+          #endif  // Relay 1 mode
+          #if (${cover_open_relay} == 2 || ${cover_close_relay} == 2) && ${SL_RELAY_2_MODE} != 0
+            #error "Relay 2 is used by the cover. Set 'relay_2_mode: disabled' in your substitutions."
+          #endif  // Relay 2 mode
+          #if (${cover_open_relay} == 3 || ${cover_close_relay} == 3) && ${SL_RELAY_3_MODE} != 0
+            #error "Relay 3 is used by the cover. Set 'relay_3_mode: disabled' in your substitutions."
+          #endif  // Relay 3 mode
+          #if (${cover_open_relay} == 4 || ${cover_close_relay} == 4) && ${SL_RELAY_4_MODE} != 0
+            #error "Relay 4 is used by the cover. Set 'relay_4_mode: disabled' in your substitutions."
+          #endif  // Relay 4 mode
+
+          // Identify itself
+          ESP_LOGCONFIG(ESPHOME_PROJECT_NAME, "  - Cover");
+
+select:
+  # Add the cover actions to the button action selects. The packed NVS storage reserves 4 bits per button,
+  # so these extra options (indexes 3 and 4) are persisted the same way as the existing ones.
+  - id: !extend sl_button_1_action
+    options:
+      - "${COVER_BUTTON_ACTION_OPEN_TEXT}"
+      - "${COVER_BUTTON_ACTION_CLOSE_TEXT}"
+  - id: !extend sl_button_2_action
+    options:
+      - "${COVER_BUTTON_ACTION_OPEN_TEXT}"
+      - "${COVER_BUTTON_ACTION_CLOSE_TEXT}"
+  - id: !extend sl_button_3_action
+    options:
+      - "${COVER_BUTTON_ACTION_OPEN_TEXT}"
+      - "${COVER_BUTTON_ACTION_CLOSE_TEXT}"
+  - id: !extend sl_button_4_action
+    options:
+      - "${COVER_BUTTON_ACTION_OPEN_TEXT}"
+      - "${COVER_BUTTON_ACTION_CLOSE_TEXT}"
+
+switch:
+  # Same as the lights above: the cover relays must never be energized by a restored switch state at boot
+  - id: !extend sw_relay_${cover_open_relay}
+    restore_mode: ALWAYS_OFF
+  - id: !extend sw_relay_${cover_close_relay}
+    restore_mode: ALWAYS_OFF
+...

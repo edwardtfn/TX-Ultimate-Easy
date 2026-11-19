@@ -240,4 +240,7 @@ def ensure_all_test_assets(force: bool = False, build_cache_dir: str = DEFAULT_B
     light_flash = build_and_pad_firmware(
         "test_light.yaml", "qemu_flash_light.bin", force=force, build_cache_dir=build_cache_dir
     )
-    return std_flash, inst_flash, light_flash
+    cover_flash = build_and_pad_firmware(
+        "test_cover.yaml", "qemu_flash_cover.bin", force=force, build_cache_dir=build_cache_dir
+    )
+    return std_flash, inst_flash, light_flash, cover_flash

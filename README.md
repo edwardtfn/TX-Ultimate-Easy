@@ -152,6 +152,7 @@ For more details, please refer to our **[Events docs](docs/events.md)**.
   Example: Trigger scenes or complex automations through Home Assistant
 - **Relay Toggle**: Direct control of the associated relay
   Example: Toggle relay state with each press, independent of Home Assistant
+- **Cover open / Cover close**: Local control of a cover, available when the [cover package](docs/cover.md) is installed
 
 #### Automation
 All device behaviors can be customized through Home Assistant automations without relying on local device triggers.
@@ -173,10 +174,10 @@ suppresses vibration and click-sound feedback. The state survives reboots.
 
 **Usage:**
 1. Set **Night Mode - Color** to your desired color and brightness
-2. Enable the **Night Mode** switch — the color is snapshotted and the LEDs lock in
+2. Enable the **Night Mode** switch — the LEDs lock to that color
 3. Toggle the suppression switches under *Configuration* to allow or block vibration/sound,
    or to show the relay LEDs: relays that are on are then shown as usual, and the night mode color fills the rest
-4. To change the color: disable Night Mode, adjust **Night Mode - Color**, then re-enable — this re-snapshots the color and persists it across reboots
+4. To change the color, adjust **Night Mode - Color** at any time — while Night Mode is on, the LEDs follow the new color right away, and the color is kept across reboots
 5. Disable the switch to restore normal relay indicator behavior — **Lights (all)** is unaffected by night mode
 
 ## Key Features
@@ -301,6 +302,12 @@ bluetooth_proxy:
 Add the ESP-NOW package so one switch can toggle relays on another switch directly, without Home Assistant.
 Configuration is done via YAML substitutions (target MAC and relay per button).
 For setup, see **[ESP-NOW docs](docs/espnow.md)**.
+
+#### Cover (blinds, shutters, curtains)
+
+Add the cover package so two relays drive a motorized cover, with a software interlock between both directions.
+The cover is exposed to Home Assistant as a `cover` entity and can be controlled locally from the buttons.
+Requires a 2, 3 or 4-gang device. For setup, see **[Cover docs](docs/cover.md)**.
 
 #### Instant Click Mode
 By default, a button click is only acted upon after the touch is released and the multi-click window expires,
