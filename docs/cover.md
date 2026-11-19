@@ -67,6 +67,11 @@ A click on any of these buttons while the cover is moving stops it.
 
 Double clicks, long presses, swipes and multi-touch gestures do not control the cover, and are still sent to Home Assistant as events.
 
+> [!WARNING]
+> With [instant click mode](../README.md#instant-click-mode) enabled, a cover button acts on touch-down,
+> before a long press or a swipe can be recognized. A long press, or a swipe that starts on a cover button,
+> then also starts or stops the cover.
+
 ## Relay LEDs
 
 The relay LEDs show which direction is active while the cover is moving, using the same settings as regular relays.
