@@ -28,6 +28,9 @@ substitutions:
   gang_count: 3
   relay_1_mode: disabled  # Used by the cover (open)
   relay_2_mode: disabled  # Used by the cover (close)
+  # Shorter than a full travel: the cover must ignore the pulse timer of its relays
+  relay_1_pulse_time: '1'
+  relay_2_pulse_time: '1'
   cover_open_duration: '3'
   cover_close_duration: '3'
   touch_uart_rx_pin: GPIO3

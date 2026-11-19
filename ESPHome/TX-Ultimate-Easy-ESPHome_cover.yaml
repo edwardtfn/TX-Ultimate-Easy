@@ -83,6 +83,16 @@ light:
     restore_mode: ALWAYS_OFF
 
 number:
+  # The pulse timer of a relay turns it off directly, which would stop the motor while the cover still
+  # reports movement and skip the interlock dead time. Keep it disabled for the cover relays, including
+  # any pulse time saved while the relay was used as a regular switch.
+  - id: !extend nr_pulse_${cover_open_relay}_time
+    initial_value: '0'
+    restore_value: false
+  - id: !extend nr_pulse_${cover_close_relay}_time
+    initial_value: '0'
+    restore_value: false
+
   - id: nr_cover_open_duration
     name: Cover open duration
     platform: template
