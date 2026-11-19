@@ -1,4 +1,6 @@
 """Test Cases: Cover package (time-based cover driven by relays 1 and 2, with a software interlock)."""
+import time
+
 from aioesphomeapi import CoverOperation
 
 # Travel times are set to 3 s in tests/configs/test_cover.yaml. The emulator runs slower than real time, so
@@ -12,6 +14,17 @@ def _close_fully(sw):
     assert sw.wait_for_cover(operation=CoverOperation.IDLE, position=0.0, timeout=FULL_TRAVEL_TIMEOUT), (
         f"Cover did not close fully: {sw.get_cover_state()}"
     )
+
+
+def _wait_until_moved(sw, min_position: float = 0.2, timeout: float = FULL_TRAVEL_TIMEOUT):
+    """Wait until an opening cover has travelled past `min_position`, so a reversal has somewhere to go."""
+    start = time.time()
+    while time.time() - start < timeout:
+        state = sw.get_cover_state()
+        if state is not None and state.position >= min_position:
+            return
+        time.sleep(0.1)
+    raise AssertionError(f"Cover did not travel past {min_position}: {sw.get_cover_state()}")
 
 
 def _assert_in_order(sw, first: str, second: str):
@@ -71,6 +84,8 @@ def test_tc_cv03_reversal_releases_before_energizing(cover_switch):
     cover_switch.drain_logs()
     cover_switch.cover_command(position=1.0)
     cover_switch.assert_log("Relay 1: on")
+    # A reversal right at the start would find the cover already at the target, and just stop it
+    _wait_until_moved(cover_switch)
 
     cover_switch.drain_logs()
     cover_switch.cover_command(position=0.0)
