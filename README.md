@@ -172,9 +172,9 @@ suppresses vibration and click-sound feedback. The state survives reboots.
 
 **Usage:**
 1. Set **Night Mode - Color** to your desired color and brightness
-2. Enable the **Night Mode** switch — the color is snapshotted and the LEDs lock in
+2. Enable the **Night Mode** switch — the LEDs lock to that color
 3. Toggle the suppression switches under *Configuration* to allow or block vibration/sound
-4. To change the color: disable Night Mode, adjust **Night Mode - Color**, then re-enable — this re-snapshots the color and persists it across reboots
+4. To change the color, adjust **Night Mode - Color** at any time — while Night Mode is on, the LEDs follow the new color right away, and the color is kept across reboots
 5. Disable the switch to restore normal relay indicator behavior — **Lights (all)** is unaffected by night mode
 
 ## Key Features
