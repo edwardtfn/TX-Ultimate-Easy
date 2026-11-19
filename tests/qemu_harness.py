@@ -704,6 +704,14 @@ class QemuHarness:
                 self._api_loop.call_soon_threadsafe(self.api_client.switch_command, entity.key, False)
                 changed = True
 
+        # 5b. Keep the relay LEDs suppressed in Night Mode (the default) if present
+        srl_name = "Night Mode - Suppress Relay LEDs"
+        if srl_name in self._entities and self.get_entity_state(srl_name) is False:
+            entity = self._entities.get(srl_name)
+            if entity:
+                self._api_loop.call_soon_threadsafe(self.api_client.switch_command, entity.key, True)
+                changed = True
+
         # 6. Reset ambient lighting if active
         light_all = "Lights (all)"
         if light_all in self._entities and self.get_entity_state(light_all) is True:

@@ -46,7 +46,7 @@ The test suite is fully self-contained within the repository and automatically m
 
 ---
 
-## Test Modules & Expected Behavioral Coverage (75 Collected Tests)
+## Test Modules & Expected Behavioral Coverage (78 Collected Tests)
 
 The test suite is partitioned into 11 focused test modules:
 
@@ -96,11 +96,13 @@ The test suite is partitioned into 11 focused test modules:
    - Inching rearm when already ON (`TC-TP07`): commanding `turn_on` on active relay must arm auto-off.
    - Inching triggered and cancelled by physical taps.
 
-7. **`tests/test_night_mode.py` (4 Tests)**:
+7. **`tests/test_night_mode.py` (7 Tests)**:
    - Night mode activation suppressing relay LED updates during quiet hours.
    - Disabling Night Mode evaluating and restoring relay status indicators (`show_relay_status`).
    - Night mode sound suppression toggle.
    - Gestures and palm mash handling during active Night Mode.
+   - Relay LEDs shown over the Night Mode color (`TC-NM07`) when `Night Mode - Suppress Relay LEDs` is off,
+     suppressed again when it is turned back on (`TC-NM08`), and never painted over `Lights (all)` (`TC-NM09`).
 
 8. **`tests/test_persistence.py` (5 Tests)**:
    - Button action configuration persistence across hard reboots.
