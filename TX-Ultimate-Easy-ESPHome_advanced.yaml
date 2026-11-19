@@ -34,6 +34,7 @@ packages:
       # Optional functionality - Can be enabled/disabled as needed
       - ESPHome/TX-Ultimate-Easy-ESPHome_hw_relays.yaml       # Relay control
       - ESPHome/TX-Ultimate-Easy-ESPHome_hw_vibration.yaml    # Haptic feedback
+      # - ESPHome/TX-Ultimate-Easy-ESPHome_cover.yaml         # Cover (requires 2+ gangs, see docs/cover.md)
 
       # Audio options (use none or choose only one - using both will fail)
       - ESPHome/TX-Ultimate-Easy-ESPHome_media_player.yaml    # Media player (Recommended for most users)

@@ -4,6 +4,7 @@ from tests.qemu_harness import (
     QemuHarness,
     FLASH_INSTANT_BIN_DEFAULT,
     FLASH_LIGHT_BIN_DEFAULT,
+    FLASH_COVER_BIN_DEFAULT,
 )
 
 
@@ -34,7 +35,7 @@ def switch(qemu_switch):
     return qemu_switch
 
 
-# The Instant Click and Light Relay Mode emulators are module-scoped: each is used by one module only, and
+# The Instant Click, Light Relay Mode and Cover emulators are module-scoped: each is used by one module only, and
 # shutting it down afterwards keeps it from competing for CPU with the standard emulator for the rest of the
 # session, which adds to the timing jitter.
 @pytest.fixture(scope="module")
@@ -92,3 +93,34 @@ def light_switch(qemu_light_switch):
     """Per-test fixture providing access to the live light-mode switch."""
     qemu_light_switch.reset_state()
     return qemu_light_switch
+
+
+@pytest.fixture(scope="module")
+def qemu_cover_switch():
+    """Module-scoped QEMU harness instance running Cover firmware."""
+    print("\n[*] Initializing QEMU Cover switch harness (module scope)...")
+    try:
+        harness = QemuHarness(
+            log_port=4450,
+            touch_port=4451,
+            api_port=6058,
+            flash_bin=FLASH_COVER_BIN_DEFAULT,
+        )
+    except Exception as exc:
+        pytest.exit(
+            f"\n[!] FATAL: Cover QEMU firmware failed to initialize/boot: {exc}\nAborting test session.",
+            returncode=1,
+        )
+    try:
+        yield harness
+    finally:
+        print("\n[*] Shutting down QEMU Cover switch harness...")
+        harness.close()
+
+
+@pytest.fixture
+def cover_switch(qemu_cover_switch):
+    """Per-test fixture providing access to the live cover switch, with the cover stopped."""
+    qemu_cover_switch.reset_state()
+    qemu_cover_switch.cover_command(stop=True)
+    return qemu_cover_switch
