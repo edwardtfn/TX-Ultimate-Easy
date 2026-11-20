@@ -26,11 +26,12 @@ The test suite is fully self-contained within the repository and automatically m
      missing on a clean clone.
 
 2. **Automated Multi-Target Builds & Flash Caching**:
-   - Compiles three isolated firmware targets to local temporary storage (preventing network locks):
+   - Compiles four isolated firmware targets to local temporary storage (preventing network locks):
      - `test_standard.yaml`: Core (Buttons + LEDs + Touchpad) + Relays + Vibration + Night Mode.
      - `test_instant.yaml`: Core (Buttons + LEDs + Touchpad) + Relays +
        **Instant Click Mode** (`instant_click_mode: true`).
      - `test_light.yaml`: Mixed Gang Presentation (`relay_1_mode: switch`, `relay_2_mode: light`).
+     - `test_cover.yaml`: Core + Relays + Cover (relays 1 and 2 drive the cover, relay 3 is a regular relay).
    - Pads the factory binaries into 8MB raw flash images.
    - Recompiles only when the content of a source file (`ESPHome/`, `components/`, `versioning/`,
      the test configuration or stubs) or the ESPHome compiler changes, or when `--compile` is passed. The flash images are recreated from the factory
@@ -40,15 +41,17 @@ The test suite is fully self-contained within the repository and automatically m
    - Standard firmware runs on ports `4444` (UART0 logs), `4445` (UART1 touch), and `6053` (API).
    - Instant Click firmware runs on ports `4446` (UART0 logs), `4447` (UART1 touch), and `6054` (API).
    - Light Relay Mode runs on ports `4448` (UART0 logs), `4449` (UART1 touch), and `6056` (API).
-   - The standard emulator runs for the whole session. The Instant Click and Light Relay Mode emulators run only
-     during their own module (`test_instant_click.py`, `test_relay_modes.py`), so at most two run at once.
+   - Cover firmware runs on ports `4450` (UART0 logs), `4451` (UART1 touch), and `6058` (API).
+   - The standard emulator runs for the whole session. The Instant Click, Light Relay Mode and Cover emulators run
+     only during their own module (`test_instant_click.py`, `test_relay_modes.py`, `test_cover.py`), so at most two
+     run at once.
    - Instant session abort (`pytest.exit`) and automatic process termination cleanup if boot times out.
 
 ---
 
-## Test Modules & Expected Behavioral Coverage (75 Collected Tests)
+## Test Modules & Expected Behavioral Coverage (84 Collected Tests)
 
-The test suite is partitioned into 11 focused test modules:
+The test suite is partitioned into 12 focused test modules:
 
 1. **`tests/test_button_actions.py` (7 Tests)**:
    - Button action modes: `Toggle`, `None`, and `Failsafe`.
@@ -96,11 +99,13 @@ The test suite is partitioned into 11 focused test modules:
    - Inching rearm when already ON (`TC-TP07`): commanding `turn_on` on active relay must arm auto-off.
    - Inching triggered and cancelled by physical taps.
 
-7. **`tests/test_night_mode.py` (4 Tests)**:
+7. **`tests/test_night_mode.py` (7 Tests)**:
    - Night mode activation suppressing relay LED updates during quiet hours.
    - Disabling Night Mode evaluating and restoring relay status indicators (`show_relay_status`).
    - Night mode sound suppression toggle.
    - Gestures and palm mash handling during active Night Mode.
+   - Relay LEDs shown over the Night Mode color (`TC-NM07`) when `Night Mode - Suppress Relay LEDs` is off,
+     suppressed again when it is turned back on (`TC-NM08`), and never painted over `Lights (all)` (`TC-NM09`).
 
 8. **`tests/test_persistence.py` (5 Tests)**:
    - Button action configuration persistence across hard reboots.
@@ -129,6 +134,14 @@ The test suite is partitioned into 11 focused test modules:
     - Out-of-bounds position bytes and rapid FIFO flood handling without crashes.
     - Chunked touch packets across loop ticks (`TC-F05`): split packets must buffer and register a valid press.
     - Payload handling (`TC-F06`): payload bytes containing 0xAA must parse safely without false header reset.
+
+12. **`tests/test_cover.py` (6 Tests)**:
+    - Tests dedicated cover firmware build (`TX-Ultimate-Easy-ESPHome_cover.yaml`).
+    - Entity exposure: the cover and its travel times are exposed, the cover relays are not.
+    - Full open and close energizing only the relay of the requested direction.
+    - Direction reversal (`TC-CV03`): the active relay must turn off before the opposite one turns on.
+    - Stop from Home Assistant and from the buttons (`Cover open` / `Cover close` button actions).
+    - A relay not used by the cover keeps working as a regular relay.
 
 ---
 
