@@ -113,3 +113,32 @@ def test_tc_p05_relay_last_state_persists_across_reboot(switch):
     switch.set_relay(1, False)
     switch.set_relay(2, False)
     time.sleep(0.5)
+
+
+def test_tc_p06_momentary_action_persists_and_relay_off_after_reboot(switch):
+    """TC-P06: The momentary button action survives a reboot, and its relay is not restored on.
+
+    The momentary option has its own NVS code (5), independent of its position in the select.
+    A momentary relay is only on while its button is held, so it is turned off after a restart.
+    """
+    switch.set_button_action(1, "momentary")
+    assert switch.wait_for_entity_state("Button 1 action", "Relay 1 (momentary)")
+    # Relay 1 on (as if the power was lost while the button was held)
+    switch.set_relay(1, True)
+    assert switch.wait_for_entity_state("Relay 1", True)
+
+    # Allow ESPHome preferences component to flush dirty state to NVS (flash_write_interval: 1s)
+    time.sleep(2.0)
+
+    print("\n  [*] Rebooting QEMU emulator to test momentary action persistence...", flush=True)
+    switch.restart()
+
+    switch.assert_log("Momentary relay 1: off (boot)", timeout=30.0)
+    assert switch.wait_for_entity_state("Button 1 action", "Relay 1 (momentary)", timeout=6.0), (
+        "Button 1 action did not persist across reboot!"
+    )
+    assert switch.wait_for_entity_state("Relay 1", False)
+
+    # Clean up state back to Relay 1 (toggle)
+    switch.set_button_action(1, "Relay 1 (toggle)")
+    time.sleep(1.0)

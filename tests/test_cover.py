@@ -155,3 +155,29 @@ def test_tc_cv06_regular_relay_unaffected(cover_switch):
     assert cover_switch.wait_for_entity_state("Relay 3", False), "Button 3 should toggle Relay 3 off"
     assert cover_switch.get_cover_state().current_operation == CoverOperation.IDLE
     assert "tx_ultimate_easy.cover" not in cover_switch.get_recent_logs(), "Relay 3 must not drive the cover"
+
+
+def test_tc_cv07_cover_actions_persist_across_reboot(cover_switch):
+    """TC-CV07: The cover button actions survive a reboot.
+
+    The cover options are appended after the momentary option, so their select indexes (4 and 5) differ from
+    their NVS codes (3 and 4). The codes are unchanged from the release that introduced the cover, so a stored
+    cover action is restored as the same action after an update.
+    """
+    cover_switch.set_button_action(1, "Cover open")
+    cover_switch.set_button_action(2, "Cover close")
+    assert cover_switch.wait_for_entity_state("Button 1 action", "Cover open")
+    assert cover_switch.wait_for_entity_state("Button 2 action", "Cover close")
+
+    # Allow ESPHome preferences component to flush dirty state to NVS (flash_write_interval: 1s)
+    time.sleep(2.0)
+
+    print("\n  [*] Rebooting QEMU emulator to test cover action persistence...", flush=True)
+    cover_switch.restart()
+
+    assert cover_switch.wait_for_entity_state("Button 1 action", "Cover open", timeout=6.0), (
+        "Button 1 action did not persist across reboot!"
+    )
+    assert cover_switch.wait_for_entity_state("Button 2 action", "Cover close", timeout=6.0), (
+        "Button 2 action did not persist across reboot!"
+    )
