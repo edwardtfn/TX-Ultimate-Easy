@@ -271,7 +271,8 @@ script:
 
 select:
   # Add the cover actions to the button action selects. The packed NVS storage reserves 4 bits per button,
-  # so these extra options (indexes 3 and 4) are persisted the same way as the existing ones.
+  # so these extra options (select indexes 4 and 5, after the momentary option) are persisted the same way as
+  # the existing ones, as NVS codes 3 and 4 (see the `BUTTON_ACTION_MOMENTARY_INDEX` substitution).
   - id: !extend sl_button_1_action
     options:
       - "${COVER_BUTTON_ACTION_OPEN_TEXT}"

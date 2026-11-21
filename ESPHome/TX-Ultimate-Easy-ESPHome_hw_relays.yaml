@@ -90,6 +90,12 @@ globals:
     type: bool
     initial_value: 'false'
 
+  # Relays currently held on by a momentary button, one bit per relay (bit 0 = relay 1)
+  - id: relays_momentary_held
+    type: uint8_t
+    restore_value: false
+    initial_value: '0'
+
 .light_partition_relays: &light_partition_relays
   platform: partition
   disabled_by_default: false
@@ -360,6 +366,23 @@ script:
       # guard in show_relay_status no longer short-circuits. Repaint relay LEDs once
       # to reflect the relay state that was restored (but deferred) during boot.
       - script.execute: show_relay_status
+      # A momentary relay is only on while its button is held, so it must not stay on after a restart
+      # (e.g. a power loss while the button was held). The button actions are restored at this point.
+      # The relay globals are checked instead of the switch state: the template switches only publish the
+      # restored state on their first loop, after this point.
+      - lambda: |-
+          switch_::Switch *relays[] = {sw_relay_1, sw_relay_2, sw_relay_3, sw_relay_4};
+          const bool relay_states[] = {id(relay_1_state), id(relay_2_state), id(relay_3_state), id(relay_4_state)};
+          select::Select *actions[] = {sl_button_1_action, sl_button_2_action,
+                                       sl_button_3_action, sl_button_4_action};
+          for (uint8_t i = 0; i < TX_ULTIMATE_EASY_GANG_COUNT; i++) {
+            const uint8_t relay = i + 1;
+            if (relay_states[i] && actions[i]->has_state() &&
+                actions[i]->active_index().value_or(0) == ${BUTTON_ACTION_MOMENTARY_INDEX}) {
+              ESP_LOGI("${TAG_HW_RELAYS}", "Momentary relay %" PRIu8 ": off (boot)", relay);
+              relays[i]->turn_off();
+            }
+          }
 
   - id: boot_initialize_relays
     # Runs once at boot (triggered by boot_initialize). "single" mode means stray
@@ -432,6 +455,81 @@ script:
       - lambda: |-
           // Set this section of initialization as completed
           id(boot_initialization_relays_relay_modes) = true;
+
+  # Momentary button action: the relay follows the touch, on while the button is held and off on release.
+  # It reacts to the touch itself, without the click/long press timing, so it can drive inputs that need a
+  # held contact (e.g. the push-button input of a dimmer, a door bell or a gate opener).
+  - id: !extend touch_on_press_buttons
+    then:
+      - lambda: relays_momentary_press->execute(button);
+
+  # Any end of a touch releases the momentary relays: a regular or long-touch release, a multi-touch or a
+  # swipe (the panel reports a swipe instead of a release when the finger moves across the buttons).
+  - id: !extend touch_on_release
+    then:
+      - script.execute: relays_momentary_release
+
+  - id: !extend touch_on_multi_touch_release
+    then:
+      - script.execute: relays_momentary_release
+
+  - id: !extend touch_swipe_${ID_SWIPE_LEFT_OR_UP_TEXT}
+    then:
+      - script.execute: relays_momentary_release
+
+  - id: !extend touch_swipe_${ID_SWIPE_RIGHT_OR_DOWN_TEXT}
+    then:
+      - script.execute: relays_momentary_release
+
+  - id: relays_momentary_press
+    mode: restart
+    parameters:
+      button: uint8_t
+    then:
+      - lambda: |-
+          switch_::Switch *relays[] = {sw_relay_1, sw_relay_2, sw_relay_3, sw_relay_4};
+          select::Select *actions[] = {sl_button_1_action, sl_button_2_action,
+                                       sl_button_3_action, sl_button_4_action};
+          // Relays in 'disabled' mode (e.g. driven by the cover) are never energized by a button
+          static constexpr bool RELAY_ENABLED[] = {${SL_RELAY_1_MODE} != 0, ${SL_RELAY_2_MODE} != 0,
+                                                   ${SL_RELAY_3_MODE} != 0, ${SL_RELAY_4_MODE} != 0};
+          for (uint8_t i = 0; i < TX_ULTIMATE_EASY_GANG_COUNT; i++) {
+            const uint8_t relay = i + 1;
+            const uint8_t mask = 1 << i;
+            if (button == relay) {
+              // Pressed button: energize its relay, if set to momentary and not held yet
+              if ((id(relays_momentary_held) & mask) == 0 && RELAY_ENABLED[i] && actions[i]->has_state() &&
+                  actions[i]->active_index().value_or(0) == ${BUTTON_ACTION_MOMENTARY_INDEX}) {
+                ESP_LOGI("${TAG_HW_RELAYS}", "Momentary relay %" PRIu8 ": on", button);
+                id(relays_momentary_held) |= mask;
+                relays[i]->turn_on();
+              }
+            } else if ((id(relays_momentary_held) & mask) != 0) {
+              // The touch moved to another button: release the relay held by the previous one
+              ESP_LOGI("${TAG_HW_RELAYS}", "Momentary relay %" PRIu8 ": off (moved to button %" PRIu8 ")",
+                       relay, button);
+              id(relays_momentary_held) &= ~mask;
+              relays[i]->turn_off();
+            }
+          }
+
+  - id: relays_momentary_release
+    mode: restart
+    then:
+      - lambda: |-
+          // Nothing to do unless a momentary relay is held (the common case for regular buttons)
+          if (id(relays_momentary_held) == 0)
+            return;
+          switch_::Switch *relays[] = {sw_relay_1, sw_relay_2, sw_relay_3, sw_relay_4};
+          for (uint8_t i = 0; i < TX_ULTIMATE_EASY_GANG_COUNT; i++) {
+            // Release regardless of the current button action, so changing it while held never latches the relay
+            if ((id(relays_momentary_held) & (1 << i)) != 0) {
+              const uint8_t relay = i + 1;
+              ESP_LOGI("${TAG_HW_RELAYS}", "Momentary relay %" PRIu8 ": off", relay);
+              relays[i]->turn_off();
+            }
+          }
+          id(relays_momentary_held) = 0;
 
   - id: !extend button_click_event
     then:
