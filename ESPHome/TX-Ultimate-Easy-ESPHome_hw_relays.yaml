@@ -368,13 +368,16 @@ script:
       - script.execute: show_relay_status
       # A momentary relay is only on while its button is held, so it must not stay on after a restart
       # (e.g. a power loss while the button was held). The button actions are restored at this point.
+      # The relay globals are checked instead of the switch state: the template switches only publish the
+      # restored state on their first loop, after this point.
       - lambda: |-
           switch_::Switch *relays[] = {sw_relay_1, sw_relay_2, sw_relay_3, sw_relay_4};
+          const bool relay_states[] = {id(relay_1_state), id(relay_2_state), id(relay_3_state), id(relay_4_state)};
           select::Select *actions[] = {sl_button_1_action, sl_button_2_action,
                                        sl_button_3_action, sl_button_4_action};
           for (uint8_t i = 0; i < TX_ULTIMATE_EASY_GANG_COUNT; i++) {
             const uint8_t relay = i + 1;
-            if (relays[i]->state && actions[i]->has_state() &&
+            if (relay_states[i] && actions[i]->has_state() &&
                 actions[i]->active_index().value_or(0) == ${BUTTON_ACTION_MOMENTARY_INDEX}) {
               ESP_LOGI("${TAG_HW_RELAYS}", "Momentary relay %" PRIu8 ": off (boot)", relay);
               relays[i]->turn_off();
