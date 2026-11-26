@@ -38,6 +38,9 @@ constexpr uint8_t UART_FRAME_MIN_SIZE = 7;
 constexpr uint8_t UART_FRAME_DECODE_SIZE = 8;
 // A frame with at least UART_FRAME_MIN_SIZE bytes, but no more bytes for this long, is dispatched as it is
 constexpr uint32_t UART_FRAME_IDLE_TIMEOUT_MS = 20;
+// After a gap this long between reads, a lone 0xAA is no longer paired with a following 0x55 as a header.
+// Longer than the idle timeout, as it is measured when the bytes are read, which a slow loop() can delay.
+constexpr uint32_t UART_HEADER_GAP_TIMEOUT_MS = 100;
 
 struct TouchPoint {
   uint8_t button = 0;
@@ -181,7 +184,7 @@ class TxUltimateEasy : public uart::UARTDevice, public Component {
 
   /**
    * Dispatch the frame being received, if it is long enough to be decoded, and start waiting for a new frame.
-   * Frames shorter than UART_FRAME_MIN_SIZE are discarded.
+   * Frames shorter than UART_FRAME_MIN_SIZE, and swipes shorter than UART_FRAME_DECODE_SIZE, are discarded.
    */
   void flush_frame_();
 

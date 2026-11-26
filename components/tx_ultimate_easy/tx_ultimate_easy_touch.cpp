@@ -24,8 +24,10 @@ void TxUltimateEasy::setup() { ESP_LOGI(TAG, "TX Ultimate Easy is initialized");
  *
  * A frame is dispatched as soon as UART_FRAME_DECODE_SIZE bytes are received, as no later byte is decoded, and
  * the rest of it is ignored. This also keeps a 0xAA in the payload (e.g. a swipe channel bitmap) from being taken
- * as a new header. A shorter frame is dispatched when a new header arrives or after UART_FRAME_IDLE_TIMEOUT_MS
- * without new bytes, if it has at least UART_FRAME_MIN_SIZE bytes; otherwise it is discarded.
+ * as a new header. A 0xAA as the last decoded byte is only taken as a new header if a 0x55 follows it. A shorter frame
+ * is dispatched when a new header arrives or after UART_FRAME_IDLE_TIMEOUT_MS without new bytes, if it has at least
+ * UART_FRAME_MIN_SIZE bytes (all UART_FRAME_DECODE_SIZE bytes for a swipe); otherwise it is discarded. A lone 0xAA
+ * followed by a gap of UART_HEADER_GAP_TIMEOUT_MS is not taken as the start of a header.
  */
 void TxUltimateEasy::loop() {
   bool received = false;
@@ -34,9 +36,14 @@ void TxUltimateEasy::loop() {
     if (byte < 0)
       break;
     received = true;
-    const int previous_byte = this->uart_last_byte_;
+    const uint32_t now = millis();
+    // Bytes of a frame arrive back-to-back: after a gap, an earlier byte is not part of the same header or frame
+    const bool contiguous = (now - this->uart_last_byte_ms_) < UART_HEADER_GAP_TIMEOUT_MS;
+    const int previous_byte = contiguous ? this->uart_last_byte_ : -1;
     this->uart_last_byte_ = byte;
-    this->uart_last_byte_ms_ = millis();
+    this->uart_last_byte_ms_ = now;
+    if (!contiguous && this->uart_frame_size_ == 1 && !this->uart_frame_dispatched_)
+      this->uart_frame_size_ = 0;  // Expire a lone 0xAA, so a later 0x55 does not complete it as a header
     const bool receiving = this->uart_frame_size_ > 0 && !this->uart_frame_dispatched_;
 
     // A header (0xAA 0x55) other than the one of the frame being received always starts a new frame
@@ -68,10 +75,20 @@ void TxUltimateEasy::loop() {
       continue;
     }
 
-    if (this->uart_frame_size_ < UART_RECEIVED_BYTES_SIZE)
-      this->uart_frame_[this->uart_frame_size_++] = byte;
-    if (this->uart_frame_size_ >= UART_FRAME_DECODE_SIZE)
-      this->flush_frame_();  // No later byte is decoded: dispatch now and ignore the rest of the frame
+    if (this->uart_frame_size_ >= UART_FRAME_DECODE_SIZE) {
+      // Byte 7 was 0xAA and this byte is not 0x55: it was payload (e.g. a swipe bitmap), not a new header.
+      // Dispatch the frame, and handle this byte as the first one after it.
+      this->flush_frame_();
+      if (byte == HEADER_BYTE_1)
+        this->start_frame_(1);
+      continue;
+    }
+
+    this->uart_frame_[this->uart_frame_size_++] = byte;
+    // No later byte is decoded: dispatch now and ignore the rest of the frame. A 0xAA in byte 7 may instead be
+    // the start of the next header, after a shorter frame: the next byte decides.
+    if (this->uart_frame_size_ >= UART_FRAME_DECODE_SIZE && byte != HEADER_BYTE_1)
+      this->flush_frame_();
   }  // while available
 
   // Incomplete frame: dispatch it once no more bytes arrive, if long enough to be decoded
@@ -95,7 +112,10 @@ void TxUltimateEasy::start_frame_(const uint8_t header_size) {
 }
 
 void TxUltimateEasy::flush_frame_() {
-  if (this->uart_frame_size_ >= UART_FRAME_MIN_SIZE) {
+  // A swipe needs all UART_FRAME_DECODE_SIZE bytes, as its channel bitmap ends in byte 7
+  const bool truncated_swipe =
+      this->uart_frame_[4] == TOUCH_STATE_SWIPE && this->uart_frame_size_ < UART_FRAME_DECODE_SIZE;
+  if (this->uart_frame_size_ >= UART_FRAME_MIN_SIZE && !truncated_swipe) {
     this->handle_touch(this->uart_frame_);
   } else if (this->uart_frame_size_ > 0) {
     ESP_LOGV(TAG, "UART - Discarded incomplete frame: %" PRIu8 " bytes", this->uart_frame_size_);
