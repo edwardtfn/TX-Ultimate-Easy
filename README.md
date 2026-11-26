@@ -158,6 +158,7 @@ For more details, please refer to our **[Events docs](docs/events.md)**.
   - It reacts to the touch itself, so a swipe or multi-touch starting over the button briefly energizes the relay
   - Click, double-click and long-press events are still sent to Home Assistant
   - The relay is turned off after a restart, and the relay pulse time (if set) still limits how long it stays on
+  - As a safety limit, the relay is turned off if no release is received within 6 seconds
 - **Cover open / Cover close**: Local control of a cover, available when the [cover package](docs/cover.md) is installed
 
 #### Automation
