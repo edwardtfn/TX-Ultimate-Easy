@@ -2,6 +2,7 @@
 
 #ifdef TX_ULTIMATE_EASY_HW_TOUCH
 
+#include "esphome/core/hal.h"  // For millis()
 #include "esphome/core/log.h"
 #include "tx_ultimate_easy_touch.h"
 #include <cinttypes>
@@ -15,28 +16,91 @@ static const char *TAG = "tx_ultimate_easy.touch";
 
 void TxUltimateEasy::setup() { ESP_LOGI(TAG, "TX Ultimate Easy is initialized"); }
 
+/**
+ * @brief Reads the touch panel UART and dispatches each complete frame.
+ *
+ * A frame starts with the 0xAA 0x55 header. The frame being received is kept across loop() calls, so a frame
+ * split across them (the UART read caught it mid-transmission) is completed by the next call instead of lost.
+ *
+ * A frame is dispatched as soon as UART_FRAME_DECODE_SIZE bytes are received, as no later byte is decoded, and
+ * the rest of it is ignored. This also keeps a 0xAA in the payload (e.g. a swipe channel bitmap) from being taken
+ * as a new header. A shorter frame is dispatched when a new header arrives or after UART_FRAME_IDLE_TIMEOUT_MS
+ * without new bytes, if it has at least UART_FRAME_MIN_SIZE bytes; otherwise it is discarded.
+ */
 void TxUltimateEasy::loop() {
-  bool found = false;
-  std::array<int, UART_RECEIVED_BYTES_SIZE> uart_received_bytes{};
-  int byte = -1;
-  int i = 0;
-
+  bool received = false;
   while (this->available()) {
-    byte = this->read();
-    if (byte == HEADER_BYTE_1) {
-      this->handle_touch(uart_received_bytes);
-      i = 0;
+    const int byte = this->read();
+    if (byte < 0)
+      break;
+    received = true;
+    const int previous_byte = this->uart_last_byte_;
+    this->uart_last_byte_ = byte;
+    this->uart_last_byte_ms_ = millis();
+    const bool receiving = this->uart_frame_size_ > 0 && !this->uart_frame_dispatched_;
+
+    // A header (0xAA 0x55) other than the one of the frame being received always starts a new frame
+    if (byte == HEADER_BYTE_2 && previous_byte == HEADER_BYTE_1 && !(receiving && this->uart_frame_size_ == 1)) {
+      if (receiving) {
+        // The current frame ended before this header: drop the header's 0xAA from it and dispatch it
+        if (this->uart_frame_[this->uart_frame_size_ - 1] == HEADER_BYTE_1)
+          this->uart_frame_[--this->uart_frame_size_] = 0;
+        this->flush_frame_();
+      }  // if receiving
+      this->start_frame_(2);
+      continue;
     }
-    if (i < UART_RECEIVED_BYTES_SIZE) {
-      uart_received_bytes[i] = byte;
-      i++;
+
+    if (!receiving) {
+      // Waiting for a new frame: anything other than the first header byte is ignored
+      if (byte == HEADER_BYTE_1)
+        this->start_frame_(1);
+      continue;
     }
-    if (byte != 0x00) {
-      found = true;
+
+    if (this->uart_frame_size_ == 1 && byte != HEADER_BYTE_2) {
+      // Not a header: discard, or restart if this is the first byte of a new header
+      if (byte == HEADER_BYTE_1) {
+        this->start_frame_(1);
+      } else {
+        this->uart_frame_size_ = 0;
+      }
+      continue;
     }
+
+    if (this->uart_frame_size_ < UART_RECEIVED_BYTES_SIZE)
+      this->uart_frame_[this->uart_frame_size_++] = byte;
+    if (this->uart_frame_size_ >= UART_FRAME_DECODE_SIZE)
+      this->flush_frame_();  // No later byte is decoded: dispatch now and ignore the rest of the frame
+  }  // while available
+
+  // Incomplete frame: dispatch it once no more bytes arrive, if long enough to be decoded
+  if (this->uart_frame_size_ > 0 && !this->uart_frame_dispatched_) {
+    if (this->uart_frame_size_ >= UART_FRAME_MIN_SIZE &&
+        millis() - this->uart_last_byte_ms_ >= UART_FRAME_IDLE_TIMEOUT_MS) {
+      this->flush_frame_();
+    } else if (received) {
+      ESP_LOGV(TAG, "UART - Partial frame: %" PRIu8 " bytes, waiting for the rest", this->uart_frame_size_);
+    }
+  }  // if incomplete frame
+}
+
+void TxUltimateEasy::start_frame_(const uint8_t header_size) {
+  this->uart_frame_.fill(0);
+  this->uart_frame_[0] = HEADER_BYTE_1;
+  if (header_size > 1)
+    this->uart_frame_[1] = HEADER_BYTE_2;
+  this->uart_frame_size_ = header_size;
+  this->uart_frame_dispatched_ = false;
+}
+
+void TxUltimateEasy::flush_frame_() {
+  if (this->uart_frame_size_ >= UART_FRAME_MIN_SIZE) {
+    this->handle_touch(this->uart_frame_);
+  } else if (this->uart_frame_size_ > 0) {
+    ESP_LOGV(TAG, "UART - Discarded incomplete frame: %" PRIu8 " bytes", this->uart_frame_size_);
   }
-  if (found)
-    this->handle_touch(uart_received_bytes);
+  this->uart_frame_dispatched_ = true;
 }
 
 void TxUltimateEasy::handle_touch(const std::array<int, UART_RECEIVED_BYTES_SIZE> &uart_received_bytes) {
