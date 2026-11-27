@@ -148,7 +148,7 @@ script:
     mode: restart
     then:
       # Extended by:
-      #   - HW Buttons
+      #   - ESP-NOW Sender
       #   - HW Relays
       #   - HW Touch
       - script.execute: update_device_name

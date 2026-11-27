@@ -65,14 +65,6 @@ globals:
     type: bool
     restore_value: false
     initial_value: 'false'
-  - id: boot_initialization_relays_light_modes
-    type: bool
-    restore_value: false
-    initial_value: 'false'
-  - id: boot_initialization_relays_relay_modes
-    type: bool
-    restore_value: false
-    initial_value: 'false'
 
   - id: gb_lights_1
     type: std::vector<light::LightState*>
@@ -394,16 +386,10 @@ script:
     mode: single
     then:
       - script.execute: boot_initialize_relays_group_assignments
-      - script.execute: boot_initialize_relays_light_modes
-      - script.execute: boot_initialize_relays_relay_modes
       - script.wait: boot_initialize_relays_group_assignments
-      - script.wait: boot_initialize_relays_light_modes
-      - script.wait: boot_initialize_relays_relay_modes
       - wait_until:
           condition:
             - lambda: return id(boot_initialization_relays_group_assignments);
-            - lambda: return id(boot_initialization_relays_light_modes);
-            - lambda: return id(boot_initialization_relays_relay_modes);
           # Bounded so the single-threaded loop is never blocked indefinitely.
           timeout: 5s
       # Always release downstream waiters, even if the wait_until above timed out.
@@ -445,20 +431,6 @@ script:
                               light_rl_4_4_${LIGHT_MODE_TOP_OR_RIGHT_TEXT} };
           #endif
           id(boot_initialization_relays_group_assignments) = true;
-
-  - id: boot_initialize_relays_light_modes
-    mode: restart
-    then:
-      - lambda: |-
-          // Set this section of initialization as completed
-          id(boot_initialization_relays_light_modes) = true;
-
-  - id: boot_initialize_relays_relay_modes
-    mode: restart
-    then:
-      - lambda: |-
-          // Set this section of initialization as completed
-          id(boot_initialization_relays_relay_modes) = true;
 
   # Momentary button action: the relay follows the touch, on while the button is held and off on release.
   # It reacts to the touch itself, without the click/long press timing, so it can drive inputs that need a
@@ -671,8 +643,6 @@ script:
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Boot initialization flags:");
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Overall:     %s", YESNO(id(boot_initialization_relays)));
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Groups:      %s", YESNO(id(boot_initialization_relays_group_assignments)));
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Light modes: %s", YESNO(id(boot_initialization_relays_light_modes)));
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay modes: %s", YESNO(id(boot_initialization_relays_relay_modes)));
 
           // Relay's LEDs modes
           #if TX_ULTIMATE_EASY_GANG_COUNT > 1
@@ -680,31 +650,15 @@ script:
           #else
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "Relay LEDs mode:");
           #endif  // TX_ULTIMATE_EASY_GANG_COUNT > 1
-          #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 1: %s", sl_relay_1_light_mode->current_option().c_str());
-          #else
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 1: %s", sl_relay_1_light_mode->current_option());
-          #endif
           #if TX_ULTIMATE_EASY_GANG_COUNT >= 2
-          #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 2: %s", sl_relay_2_light_mode->current_option().c_str());
-          #else
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 2: %s", sl_relay_2_light_mode->current_option());
-          #endif
           #endif  // TX_ULTIMATE_EASY_GANG_COUNT >= 2
           #if TX_ULTIMATE_EASY_GANG_COUNT >= 3
-          #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 3: %s", sl_relay_3_light_mode->current_option().c_str());
-          #else
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 3: %s", sl_relay_3_light_mode->current_option());
-          #endif
           #endif  // TX_ULTIMATE_EASY_GANG_COUNT >= 3
           #if TX_ULTIMATE_EASY_GANG_COUNT >= 4
-          #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
           ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 4: %s", sl_relay_4_light_mode->current_option().c_str());
-          #else
-          ESP_LOGCONFIG("${TAG_HW_RELAYS}", "  Relay 4: %s", sl_relay_4_light_mode->current_option());
-          #endif
           #endif  // TX_ULTIMATE_EASY_GANG_COUNT >= 4
 
   - id: !extend dump_config_list_packages
