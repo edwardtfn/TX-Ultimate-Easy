@@ -379,25 +379,28 @@ substitutions:
 packages:
   remote_package:
     url: https://github.com/edwardtfn/TX-Ultimate-Easy
-    ref: main  # Or you can specify a version tag for controlled updates, like `ref: v2024.12.2`
+    ref: stable  # Or you can specify a version, like `ref: v2024.12.6` or `ref: latest` to the latest non-stable
     refresh: 5min
     files:
-      # Core (essential) packages
-      - ESPHome/TX-Ultimate-Easy-ESPHome_common.yaml      # Basic shared settings
-      - ESPHome/TX-Ultimate-Easy-ESPHome_hw_buttons.yaml  # Button logic
-      - ESPHome/TX-Ultimate-Easy-ESPHome_hw_leds.yaml     # LED configuration
-      - ESPHome/TX-Ultimate-Easy-ESPHome_hw_touch.yaml    # Touch panel support
+      # Core (essential) packages - Do not disable these unless you know what you're doing
+      - ESPHome/TX-Ultimate-Easy-ESPHome_common.yaml              # Basic shared settings
+      - ESPHome/TX-Ultimate-Easy-ESPHome_hw_buttons.yaml          # Button logic
+      - ESPHome/TX-Ultimate-Easy-ESPHome_hw_leds.yaml             # LED configuration
+      - ESPHome/TX-Ultimate-Easy-ESPHome_hw_leds_individual.yaml  # One light per LED
+      - ESPHome/TX-Ultimate-Easy-ESPHome_hw_touch.yaml            # Touch panel support
 
-      # Optional but recommended packages
-      - ESPHome/TX-Ultimate-Easy-ESPHome_hw_relays.yaml     # Relay control
-      - ESPHome/TX-Ultimate-Easy-ESPHome_hw_vibration.yaml  # Haptic feedback
+      # Optional functionality - Can be enabled/disabled as needed
+      - ESPHome/TX-Ultimate-Easy-ESPHome_hw_relays.yaml       # Relay control
+      - ESPHome/TX-Ultimate-Easy-ESPHome_hw_vibration.yaml    # Haptic feedback
+      - ESPHome/TX-Ultimate-Easy-ESPHome_night_mode.yaml      # Night Mode (requires relays)
+      # - ESPHome/TX-Ultimate-Easy-ESPHome_cover.yaml         # Cover (requires 2+ gangs, see docs/cover.md)
 
       # Audio options (use none or choose only one - using both will fail)
-      - ESPHome/TX-Ultimate-Easy-ESPHome_media_player.yaml  # Media player (Recommended for most users)
-      # - ESPHome/TX-Ultimate-Easy-ESPHome_hw_speaker.yaml  # Basic speaker
+      - ESPHome/TX-Ultimate-Easy-ESPHome_media_player.yaml    # Media player (Recommended for most users)
+      # - ESPHome/TX-Ultimate-Easy-ESPHome_hw_speaker.yaml    # Basic speaker
 
-      # Advanced/Optional/Add-ons
-      # - ESPHome/TX-Ultimate-Easy-ESPHome_espnow.yaml    # Add support to ESP-NOW
+      # Add-ons
+      # - ESPHome/TX-Ultimate-Easy-ESPHome_espnow.yaml        # ESP-NOW (see docs/espnow.md)
 ```
 
 > [!NOTE]
