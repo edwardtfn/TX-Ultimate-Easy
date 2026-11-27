@@ -44,6 +44,10 @@ esphome:
   build_flags:
     - -D TX_ULTIMATE_EASY_HW_LEDS
 
+.light_turn_off_repaint: &light_turn_off_repaint
+  then:
+    - script.execute: leds_repaint_after_user_light_off
+
 .light_partition_sides: &light_partition_sides
   platform: partition
   default_transition_length: ${default_transition_length}
@@ -51,6 +55,7 @@ esphome:
   disabled_by_default: true
   internal: false
   restore_mode: ${LIGHT_SIDES_RESTORE_MODE}
+  on_turn_off: *light_turn_off_repaint
   effects:
     - pulse:
         name: "Pulse"
@@ -155,15 +160,7 @@ light:
       - id: light_full
         from: 0
         to: ${LIGHT_MAX_ADDR}
-    on_turn_off:
-      then:
-        - lambda: |-
-            #ifdef TX_ULTIMATE_EASY_NIGHT_MODE
-            if (sw_night_mode->state) { night_mode_apply->execute(); }
-            #endif
-            #ifdef TX_ULTIMATE_EASY_HW_RELAYS
-            show_relay_status->execute();
-            #endif
+    on_turn_off: *light_turn_off_repaint
 
   - id: light_bottom
     name: Light - Bottom
@@ -203,6 +200,21 @@ light:
         reversed: false
 
 script:
+  # Turning off a user light leaves its LEDs dark, including any relay indicator or Night Mode color below it.
+  # Called by every user light (Lights (all), the side lights and the individual LEDs) when turned off.
+  - id: leds_repaint_after_user_light_off
+    mode: restart
+    then:
+      - lambda: |-
+          #ifdef TX_ULTIMATE_EASY_NIGHT_MODE
+          if (sw_night_mode->state) {
+            night_mode_apply->execute();
+          }
+          #endif  // TX_ULTIMATE_EASY_NIGHT_MODE
+          #ifdef TX_ULTIMATE_EASY_HW_RELAYS
+          show_relay_status->execute();
+          #endif  // TX_ULTIMATE_EASY_HW_RELAYS
+
   - id: !extend dump_config
     then:
       - lambda: |-

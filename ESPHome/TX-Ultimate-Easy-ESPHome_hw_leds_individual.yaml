@@ -28,6 +28,9 @@ light:
     default_transition_length: ${default_transition_length}
     gamma_correct: ${LIGHT_GAMMA_CORRECT}
     restore_mode: ${LIGHT_INDIVIDUAL_RESTORE_MODE}
+    on_turn_off:
+      then:
+        - script.execute: leds_repaint_after_user_light_off
     segments:
       - id: light_full
         from: 0
