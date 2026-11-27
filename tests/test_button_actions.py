@@ -256,3 +256,23 @@ def test_tc_ba11_momentary_touch_moves_to_other_button(switch):
     assert switch.wait_for_entity_state("Relay 1", False)
     switch.send_touch_frame(0x01, 5, 5, 0x00)  # Release
     assert switch.get_entity_state("Relay 2") is False
+
+
+def test_tc_ba12_momentary_released_when_release_is_lost(switch):
+    """TC-BA12: A momentary relay is released after the hold limit if its release frame never arrives (#100).
+
+    The touch panel ends every touch after about 5 s, so a hold longer than the limit (6 s) means a lost release.
+    """
+    _set_momentary(switch, 1)
+
+    switch.send_touch_frame(0x02, 0x00, 1, 0x00)  # Touch-down on gang 1, and no release
+    switch.assert_log("Momentary relay 1: on")
+    assert switch.wait_for_entity_state("Relay 1", True)
+
+    switch.assert_log("Momentary relay held for 6000 ms without a release: releasing", timeout=10.0)
+    switch.assert_log("Momentary relay 1: off")
+    assert switch.wait_for_entity_state("Relay 1", False)
+
+    # Clear the pending press, as if the release had arrived, so the next test starts from a clean state
+    switch.send_touch_frame(0x01, 1, 1, 0x00)
+    time.sleep(1.0)

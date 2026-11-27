@@ -1,6 +1,5 @@
 import time
 import random
-import pytest
 
 
 def test_tc_f01_truncated_frames(switch):
@@ -98,7 +97,6 @@ def test_tc_f04_rapid_burst_flood(switch):
     switch.assert_log("Button 1 action: 'click'")
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: loop discards partial UART frame between ticks")
 def test_tc_f05_touch_packet_split_across_ticks_registers_press(switch):
     """TC-F05: Touch packet split across loop ticks must be buffered and recognized.
 
@@ -109,20 +107,38 @@ def test_tc_f05_touch_packet_split_across_ticks_registers_press(switch):
 
     # Send first 5 bytes of a valid Gang 1 tap frame
     switch.send_raw_bytes(bytes([0xAA, 0x55, 0x01, 0x02, 0x02]))
-    # Wait until loop() has processed the partial buffer (it logs the received bytes) before sending the rest.
+    # Wait until loop() has processed the partial buffer (it logs the partial frame) before sending the rest.
     # A fixed delay was not enough under emulation: both halves could arrive before the next loop() pass,
     # so the frame was read whole and the test passed although the defect is present.
-    switch.assert_log("- UART-Log -", timeout=2.0, msg="Firmware did not process the partial frame")
+    switch.assert_log("UART - Partial frame: 5 bytes", timeout=2.0, msg="Firmware did not process the partial frame")
     # Send remaining 10 bytes
     switch.send_raw_bytes(bytes([0x00, 0x01, 0x00] + [0x00] * 7))
     time.sleep(0.1)
 
-    # Valid press must be recognized
-    # On stock firmware, this fails because loop() discarded state between ticks
+    # Valid press must be recognized: the partial frame is kept across loop() calls
     switch.assert_log("Pressed at position 1", timeout=1.0)
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: 0xAA in the payload restarts the frame, swipe range is lost")
+def test_tc_f07_release_split_across_ticks_releases_button(switch):
+    """TC-F07: A release frame split across loop ticks must still release the button (#100).
+
+    A lost release left the button pressed, and a momentary relay on, until the next touch.
+    """
+    switch.drain_logs()
+
+    switch.send_touch_frame(0x02, 0x00, 1, 0x00)  # Press, gang 1
+    switch.assert_log("Pressed at position 1", timeout=2.0)
+
+    # Release frame split after its first 6 bytes, with a loop() pass in between
+    release = bytes([0xAA, 0x55, 0x01, 0x02, 0x01, 0x01, 0x01, 0x00] + [0x00] * 7)
+    switch.send_raw_bytes(release[:6])
+    switch.assert_log("UART - Partial frame: 6 bytes", timeout=2.0, msg="Firmware did not process the partial frame")
+    switch.send_raw_bytes(release[6:])
+
+    switch.assert_log("Released", timeout=1.0)
+    switch.assert_log("Button 1 action: 'click'", timeout=2.0)
+
+
 def test_tc_f06_swipe_with_0xaa_channel_bitmap_parsed_safely(switch):
     """TC-F06: Swipe frame containing 0xAA in payload bytes must parse without false header reset.
 

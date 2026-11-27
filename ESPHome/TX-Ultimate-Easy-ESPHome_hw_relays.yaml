@@ -25,6 +25,10 @@ substitutions:
   relay_4_pulse_time: '0'  # 0 - pulse disabled, otherwise time in seconds to turn_off
   pulse_time_internal: true
 
+  # Safety limit for momentary button actions. The touch panel ends every touch after about 5 s, even while the
+  # finger is still down, so a momentary relay held longer than this has missed its release and is turned off.
+  MOMENTARY_MAX_HOLD_MS: '6000'
+
   RELAY_1_MODE_LOWER: ${ relay_1_mode | lower }
   RELAY_2_MODE_LOWER: ${ relay_2_mode | lower }
   RELAY_3_MODE_LOWER: ${ relay_3_mode | lower }
@@ -493,6 +497,7 @@ script:
           // Relays in 'disabled' mode (e.g. driven by the cover) are never energized by a button
           static constexpr bool RELAY_ENABLED[] = {${SL_RELAY_1_MODE} != 0, ${SL_RELAY_2_MODE} != 0,
                                                    ${SL_RELAY_3_MODE} != 0, ${SL_RELAY_4_MODE} != 0};
+          bool energized = false;
           for (uint8_t i = 0; i < TX_ULTIMATE_EASY_GANG_COUNT; i++) {
             const uint8_t relay = i + 1;
             const uint8_t mask = 1 << i;
@@ -503,6 +508,7 @@ script:
                 ESP_LOGI("${TAG_HW_RELAYS}", "Momentary relay %" PRIu8 ": on", button);
                 id(relays_momentary_held) |= mask;
                 relays[i]->turn_on();
+                energized = true;
               }
             } else if ((id(relays_momentary_held) & mask) != 0) {
               // The touch moved to another button: release the relay held by the previous one
@@ -511,6 +517,22 @@ script:
               id(relays_momentary_held) &= ~mask;
               relays[i]->turn_off();
             }
+          }  // for i
+          // Start the hold limit from the moment a relay is energized
+          if (energized)
+            relays_momentary_watchdog->execute();
+
+  # Releases the momentary relays if no release was received within the hold limit (e.g. a release frame lost
+  # by the touch panel), so a relay is never left on.
+  - id: relays_momentary_watchdog
+    mode: restart
+    then:
+      - delay: ${MOMENTARY_MAX_HOLD_MS}ms
+      - lambda: |-
+          if (id(relays_momentary_held) != 0) {
+            ESP_LOGW("${TAG_HW_RELAYS}", "Momentary relay held for ${MOMENTARY_MAX_HOLD_MS} ms without a release: "
+                                         "releasing");
+            relays_momentary_release->execute();
           }
 
   - id: relays_momentary_release

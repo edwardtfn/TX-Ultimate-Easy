@@ -32,6 +32,15 @@ constexpr int HEADER_BYTE_1 = 0xAA;
 constexpr int HEADER_BYTE_2 = 0x55;
 constexpr int VALID_DATA_BYTE_2 = 0x01;
 constexpr int VALID_DATA_BYTE_3 = 0x02;
+// Bytes needed to decode a press or release frame (position in byte 6)
+constexpr uint8_t UART_FRAME_MIN_SIZE = 7;
+// Bytes needed to decode any frame (swipe channel bitmap in bytes 6 and 7): the frame is dispatched once received
+constexpr uint8_t UART_FRAME_DECODE_SIZE = 8;
+// A frame with at least UART_FRAME_MIN_SIZE bytes, but no more bytes for this long, is dispatched as it is
+constexpr uint32_t UART_FRAME_IDLE_TIMEOUT_MS = 20;
+// After a gap this long between reads, a lone 0xAA is no longer paired with a following 0x55 as a header.
+// Longer than the idle timeout, as it is measured when the bytes are read, which a slow loop() can delay.
+constexpr uint32_t UART_HEADER_GAP_TIMEOUT_MS = 100;
 
 struct TouchPoint {
   uint8_t button = 0;
@@ -172,6 +181,25 @@ class TxUltimateEasy : public uart::UARTDevice, public Component {
    */
   void get_swipe_range(const std::array<int, UART_RECEIVED_BYTES_SIZE> &bytes, uint8_t &lowest_channel,
                        uint8_t &highest_channel);
+
+  /**
+   * Dispatch the frame being received, if it is long enough to be decoded, and start waiting for a new frame.
+   * Frames shorter than UART_FRAME_MIN_SIZE, and swipes shorter than UART_FRAME_DECODE_SIZE, are discarded.
+   */
+  void flush_frame_();
+
+  /**
+   * Start receiving a new frame, with its header already received.
+   * @param header_size Header bytes already received: 1 (0xAA) or 2 (0xAA 0x55).
+   */
+  void start_frame_(uint8_t header_size);
+
+  // Frame being received. It is kept across loop() calls, so a frame split across them is not lost.
+  std::array<int, UART_RECEIVED_BYTES_SIZE> uart_frame_{};
+  uint8_t uart_frame_size_{0};         // Bytes received for the current frame
+  bool uart_frame_dispatched_{false};  // The current frame was already dispatched (remaining bytes are ignored)
+  int uart_last_byte_{-1};             // Last received byte, to detect a header split as 0xAA / 0x55
+  uint32_t uart_last_byte_ms_{0};      // Time of the last received byte, for the idle timeout
 
   Trigger<TouchPoint> trigger_touch_event_;
   Trigger<TouchPoint> trigger_touch_;

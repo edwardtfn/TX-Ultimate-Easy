@@ -49,11 +49,11 @@ The test suite is fully self-contained within the repository and automatically m
 
 ---
 
-## Test Modules & Expected Behavioral Coverage (90 Collected Tests)
+## Test Modules & Expected Behavioral Coverage (92 Collected Tests)
 
 The test suite is partitioned into 12 focused test modules:
 
-1. **`tests/test_button_actions.py` (11 Tests)**:
+1. **`tests/test_button_actions.py` (12 Tests)**:
    - Button action modes: `Toggle`, `None`, and `Failsafe`.
    - Decoupled smart bulb mode: physical tap emits HA event without relay toggle,
      remote HA toggle commands relay with LED coherence.
@@ -62,6 +62,7 @@ The test suite is partitioned into 12 focused test modules:
    - Hardware long-touch release (`TC-BA05`): hardware release code `x >= 17` must trigger button long press action.
    - Momentary action (`TC-BA08` to `TC-BA11`): the relay is on while the button is held and off on any end of the
      touch (release, long-touch release, swipe, multi-touch, or the touch moving to another button).
+   - Momentary hold limit (`TC-BA12`): a momentary relay is released when its release frame never arrives.
 
 2. **`tests/test_gestures.py` (12 Tests)**:
    - Single clicks across all gangs.
@@ -132,11 +133,12 @@ The test suite is partitioned into 12 focused test modules:
     - Multi-gang concurrent independent debounce.
     - Swipes, palm touches, partial drags, and hardware long touches in instant click mode.
 
-11. **`tests/test_fuzzing.py` (6 Tests)**:
+11. **`tests/test_fuzzing.py` (7 Tests)**:
     - Truncated UART frames and corrupted sync headers.
     - Out-of-bounds position bytes and rapid FIFO flood handling without crashes.
     - Chunked touch packets across loop ticks (`TC-F05`): split packets must buffer and register a valid press.
     - Payload handling (`TC-F06`): payload bytes containing 0xAA must parse safely without false header reset.
+    - Chunked release packets (`TC-F07`): a split release must still release the button.
 
 12. **`tests/test_cover.py` (7 Tests)**:
     - Tests dedicated cover firmware build (`TX-Ultimate-Easy-ESPHome_cover.yaml`).
