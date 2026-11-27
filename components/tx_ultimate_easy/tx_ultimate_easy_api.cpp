@@ -2,6 +2,12 @@
 #include "tx_ultimate_easy_api.h"
 #include "esphome/core/application.h"
 #include <cctype>
+#include <cinttypes>
+
+#ifdef USE_ESP32
+#include <esp_partition.h>
+#include <nvs.h>
+#endif  // USE_ESP32
 
 // Macro stringification helpers
 #define STRINGIFY_IMPL(x) #x
@@ -63,6 +69,40 @@ void fire_ha_event(const std::string &domain, const std::string &type, std::map<
   ha_event.fire_homeassistant_event("esphome.tx_ultimate_easy", data);
 
   ESP_LOGV(TAG_COMPONENT_BASE, "HA event 'esphome.tx_ultimate_easy' sent successfully");
+}
+
+void log_nvs_stats(const char *tag) {
+#ifdef USE_ESP32
+  const esp_partition_t *partition =
+      esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_NVS, nullptr);
+  if (partition == nullptr) {
+    ESP_LOGW(tag, "NVS partition: not found");
+    return;
+  }  // partition == nullptr
+
+  nvs_stats_t stats{};
+  const esp_err_t err = nvs_get_stats(nullptr, &stats);
+  if (err != ESP_OK) {
+    ESP_LOGW(tag, "NVS partition: %" PRIu32 " bytes, stats unavailable (%s)", static_cast<uint32_t>(partition->size),
+             esp_err_to_name(err));
+    return;
+  }  // err != ESP_OK
+
+  ESP_LOGCONFIG(tag,
+                "NVS partition:\n"
+                "  Size:         %" PRIu32 " bytes\n"
+                "  Entries used: %zu\n"
+                "  Entries free: %zu\n"
+                "  Entries:      %zu\n"
+                "  Namespaces:   %zu",
+                static_cast<uint32_t>(partition->size), stats.used_entries, stats.free_entries, stats.total_entries,
+                stats.namespace_count);
+  if (stats.free_entries * 10 < stats.total_entries) {
+    ESP_LOGW(tag, "NVS partition almost full: settings may fail to save");
+  }  // less than 10% free
+#else   // USE_ESP32
+  ESP_LOGCONFIG(tag, "NVS partition: not available on this platform");
+#endif  // USE_ESP32
 }
 
 }  // namespace tx_ultimate_easy

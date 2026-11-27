@@ -90,5 +90,18 @@ inline void feed_wdt_delay(uint32_t ms = 5) {
  */
 void fire_ha_event(const std::string &domain, const std::string &type, std::map<std::string, std::string> data = {});
 
+/**
+ * @brief Log the size and usage of the NVS partition, where the settings are saved.
+ *
+ * The partition table, and so the NVS size, is only written by a serial flash: OTA updates keep the one the
+ * device was first flashed with. Settings that are no longer used (e.g. after an entity rename) are never
+ * removed, so a device updated over many releases can run out of NVS space. These figures show how close it is.
+ *
+ * @param tag Log tag to use.
+ *
+ * @note Logged at CONFIG level, from `dump_config`. Warns when less than 10% of the entries are free.
+ */
+void log_nvs_stats(const char *tag);
+
 }  // namespace tx_ultimate_easy
 }  // namespace esphome

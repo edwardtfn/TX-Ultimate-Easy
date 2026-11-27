@@ -185,6 +185,9 @@ script:
           // Device model configuration
           ESP_LOGCONFIG("${TAG_COMMON}", "Device model: ${device_format}-${gang_count}G");
 
+          // Settings storage
+          esphome::tx_ultimate_easy::log_nvs_stats("${TAG_COMMON}");
+
           // Boot completion status
           if (bs_boot_completed->state)
             ESP_LOGCONFIG("${TAG_COMMON}", "Boot completed: Yes");
