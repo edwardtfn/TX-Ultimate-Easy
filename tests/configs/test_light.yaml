@@ -15,6 +15,10 @@ esp32:
   watchdog_timeout: 30s
   framework:
     type: esp-idf
+    sdkconfig_options:
+      # Same cause, for the interrupt watchdog (300 ms default): a preferences sync that erases an NVS page can keep
+      # the emulated flash busy longer than that, and the reset (TG1WDT_SYS_RESET) reboots the firmware mid-test.
+      CONFIG_ESP_INT_WDT_TIMEOUT_MS: "5000"
 
 logger:
   level: VERBOSE
