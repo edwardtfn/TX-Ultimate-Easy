@@ -1,0 +1,8 @@
+# Test only: partition table with a small (20 KB) NVS partition, to emulate a device that runs out of NVS space.
+# Same 8 MB layout as the other test builds otherwise, with both OTA app slots.
+# Name,   Type, SubType, Offset,   Size
+nvs,      data, nvs,     0x9000,   0x5000
+otadata,  data, ota,     0xE000,   0x2000
+phy_init, data, phy,     0x10000,  0x1000
+app0,     app,  ota_0,   0x20000,  0x3F0000
+app1,     app,  ota_1,   0x410000, 0x3F0000

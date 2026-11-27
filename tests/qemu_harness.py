@@ -13,6 +13,7 @@ FLASH_BIN_DEFAULT = os.path.join(DEFAULT_BUILD_CACHE_DIR, "qemu_flash_test.bin")
 FLASH_INSTANT_BIN_DEFAULT = os.path.join(DEFAULT_BUILD_CACHE_DIR, "qemu_flash_instant.bin")
 FLASH_LIGHT_BIN_DEFAULT = os.path.join(DEFAULT_BUILD_CACHE_DIR, "qemu_flash_light.bin")
 FLASH_COVER_BIN_DEFAULT = os.path.join(DEFAULT_BUILD_CACHE_DIR, "qemu_flash_cover.bin")
+FLASH_NVS_SMALL_BIN_DEFAULT = os.path.join(DEFAULT_BUILD_CACHE_DIR, "qemu_flash_nvs_small.bin")
 EFUSE_BIN_DEFAULT = ensure_efuse_bin()
 
 # Mapping for 3-gang EU device:
@@ -94,6 +95,7 @@ class QemuHarness:
         self.api_client: Optional[APIClient] = None
         self._api_loop: Optional[asyncio.AbstractEventLoop] = None
         self._entities = {}
+        self._services = {}
         self._api_connected = False
 
         try:
@@ -219,8 +221,9 @@ class QemuHarness:
 
         self.api_client.subscribe_states(self._on_state)
         self.api_client.subscribe_service_calls(self._on_service_call)
-        entities, _ = await self.api_client.list_entities_services()
+        entities, services = await self.api_client.list_entities_services()
         self._entities = {e.name: e for e in entities}
+        self._services = {s.name: s for s in services}
 
     def disconnect_api(self):
         """Disconnect the Native API client to simulate Home Assistant connection loss."""
@@ -586,6 +589,18 @@ class QemuHarness:
     def set_vibration_duration(self, duration_ms: float):
         """Set touch vibration duration in ms."""
         self.set_number("Vibrate duration", duration_ms)
+
+    def execute_action(self, name: str, data: Optional[dict] = None, timeout: float = 30.0):
+        """Run a device API action (`api: actions:`) and wait until the device has received it."""
+        if not self.api_client or not self._api_loop:
+            raise RuntimeError("ESPHome Native API client is not connected")
+        service = self._services.get(name)
+        if not service:
+            raise ValueError(f"API action '{name}' not found")
+        future = asyncio.run_coroutine_threadsafe(
+            self.api_client.execute_service(service, data or {}), self._api_loop
+        )
+        future.result(timeout=timeout)
 
     def set_night_mode(self, state: bool, settle: float = 0.5):
         """Toggle Night Mode on/off."""

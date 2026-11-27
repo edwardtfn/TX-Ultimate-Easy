@@ -5,6 +5,7 @@ from tests.qemu_harness import (
     FLASH_INSTANT_BIN_DEFAULT,
     FLASH_LIGHT_BIN_DEFAULT,
     FLASH_COVER_BIN_DEFAULT,
+    FLASH_NVS_SMALL_BIN_DEFAULT,
 )
 
 
@@ -124,3 +125,33 @@ def cover_switch(qemu_cover_switch):
     qemu_cover_switch.reset_state()
     qemu_cover_switch.cover_command(stop=True)
     return qemu_cover_switch
+
+
+@pytest.fixture(scope="module")
+def qemu_nvs_small_switch():
+    """Module-scoped QEMU harness instance running the small NVS partition firmware."""
+    print("\n[*] Initializing QEMU small NVS switch harness (module scope)...")
+    try:
+        harness = QemuHarness(
+            log_port=4452,
+            touch_port=4453,
+            api_port=6060,
+            flash_bin=FLASH_NVS_SMALL_BIN_DEFAULT,
+        )
+    except Exception as exc:
+        pytest.exit(
+            f"\n[!] FATAL: Small NVS QEMU firmware failed to initialize/boot: {exc}\nAborting test session.",
+            returncode=1,
+        )
+    try:
+        yield harness
+    finally:
+        print("\n[*] Shutting down QEMU small NVS switch harness...")
+        harness.close()
+
+
+@pytest.fixture
+def nvs_small_switch(qemu_nvs_small_switch):
+    """Per-test fixture providing access to the live small NVS switch."""
+    qemu_nvs_small_switch.reset_state()
+    return qemu_nvs_small_switch
