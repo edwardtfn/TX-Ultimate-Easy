@@ -171,6 +171,8 @@ All device behaviors can be customized through Home Assistant automations withou
 
 Night Mode freezes the LEDs at a fixed color and brightness and, optionally,
 suppresses vibration and click-sound feedback. The state survives reboots.
+Like all settings, changes are written to flash within a minute (ESPHome's default),
+so a power cut right after a change may bring back the previous setting.
 
 **Entities exposed to Home Assistant:**
 

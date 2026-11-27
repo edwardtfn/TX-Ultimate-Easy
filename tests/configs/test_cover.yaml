@@ -24,8 +24,8 @@ logger:
   level: VERBOSE
   baud_rate: 115200
 
-# The cover build has no night mode package, which sets this for the other builds. Without it, preferences are
-# only flushed after the 60 s default, so the reboot persistence tests would read stale NVS data.
+# The tests restart QEMU abruptly, like a power cut, so preferences must be flushed quickly or the reboot
+# persistence tests read stale NVS data. Test only: the firmware keeps ESPHome's 60 s default.
 preferences:
   flash_write_interval: 1s
 
