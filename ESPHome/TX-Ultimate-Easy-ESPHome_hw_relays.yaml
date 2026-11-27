@@ -43,12 +43,24 @@ substitutions:
   RELAY_MODE_TEXT_LIGHT: "Light"
   RELAY_MODE_TEXT_NOT_USED: "Not in use"
 
-  # You shouldn't change the restore mode as there is a custom restoring engine based on globals.
-  # The reason of a custom engine is to address an issue where NVS space was exceeded causing saving/restoring issues
+  # Restore modes of the relay entities. Only the entity matching each relay's mode restores the relay state:
+  # the "Relay N" switch in switch mode, the "Light output N" light in light mode. The other one never writes to NVS.
   RELAYS_LIGHT_RESTORE_MODE: RESTORE_DEFAULT_OFF
-  RELAYS_LIGHT_PARTITION_RESTORE_MODE: RESTORE_DEFAULT_OFF
-  RELAYS_EXPOSE_LEDS_TO_HA_RESTORE_MODE: RESTORE_DEFAULT_OFF
   RELAYS_SWITCH_RESTORE_MODE: RESTORE_DEFAULT_OFF
+  # The relay indicator LEDs only mirror the relay states, so they are never saved to NVS.
+  RELAYS_LIGHT_PARTITION_RESTORE_MODE: ALWAYS_OFF
+
+  # Light outputs drive the relays in both modes. Setup order: lights (HARDWARE - 1) before template switches
+  # (HARDWARE - 2), so in switch mode the light starts off and the switch then restores the relay.
+  RELAY_1_LIGHT_RESTORE_MODE: ${ RELAYS_LIGHT_RESTORE_MODE if SL_RELAY_1_MODE == 2 and gang_count >= 1 else "ALWAYS_OFF" }
+  RELAY_2_LIGHT_RESTORE_MODE: ${ RELAYS_LIGHT_RESTORE_MODE if SL_RELAY_2_MODE == 2 and gang_count >= 2 else "ALWAYS_OFF" }
+  RELAY_3_LIGHT_RESTORE_MODE: ${ RELAYS_LIGHT_RESTORE_MODE if SL_RELAY_3_MODE == 2 and gang_count >= 3 else "ALWAYS_OFF" }
+  RELAY_4_LIGHT_RESTORE_MODE: ${ RELAYS_LIGHT_RESTORE_MODE if SL_RELAY_4_MODE == 2 and gang_count >= 4 else "ALWAYS_OFF" }
+  # DISABLED: the switch neither restores nor drives the relay at boot, leaving it to the light output.
+  RELAY_1_SWITCH_RESTORE_MODE: ${ RELAYS_SWITCH_RESTORE_MODE if SL_RELAY_1_MODE == 1 and gang_count >= 1 else "DISABLED" }
+  RELAY_2_SWITCH_RESTORE_MODE: ${ RELAYS_SWITCH_RESTORE_MODE if SL_RELAY_2_MODE == 1 and gang_count >= 2 else "DISABLED" }
+  RELAY_3_SWITCH_RESTORE_MODE: ${ RELAYS_SWITCH_RESTORE_MODE if SL_RELAY_3_MODE == 1 and gang_count >= 3 else "DISABLED" }
+  RELAY_4_SWITCH_RESTORE_MODE: ${ RELAYS_SWITCH_RESTORE_MODE if SL_RELAY_4_MODE == 1 and gang_count >= 4 else "DISABLED" }
 
   TAG_HW_RELAYS: tx_ultimate_easy.hw.relays
 
@@ -106,7 +118,7 @@ light:
     output: output_relay_1
     platform: binary
     internal: ${SL_RELAY_1_MODE != 2 or gang_count < 1}
-    restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
+    restore_mode: ${RELAY_1_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
         - lambda: |-
@@ -122,7 +134,7 @@ light:
     output: output_relay_2
     platform: binary
     internal: ${SL_RELAY_2_MODE != 2 or gang_count < 2}
-    restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
+    restore_mode: ${RELAY_2_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
         - lambda: |-
@@ -138,7 +150,7 @@ light:
     output: output_relay_3
     platform: binary
     internal: ${SL_RELAY_3_MODE != 2 or gang_count < 3}
-    restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
+    restore_mode: ${RELAY_3_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
         - lambda: |-
@@ -154,7 +166,7 @@ light:
     output: output_relay_4
     platform: binary
     internal: ${SL_RELAY_4_MODE != 2 or gang_count < 4}
-    restore_mode: ${RELAYS_LIGHT_RESTORE_MODE}
+    restore_mode: ${RELAY_4_LIGHT_RESTORE_MODE}
     on_turn_on:
       then:
         - lambda: |-
@@ -1150,7 +1162,7 @@ switch:
   - id: sw_relay_1
     name: Relay 1
     internal: ${SL_RELAY_1_MODE != 1 or gang_count < 1}
-    restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
+    restore_mode: ${RELAY_1_SWITCH_RESTORE_MODE}
     platform: template
     lambda: |-
       return id(relay_1_state);
@@ -1169,7 +1181,7 @@ switch:
   - id: sw_relay_2
     name: Relay 2
     internal: ${SL_RELAY_2_MODE != 1 or gang_count < 2}
-    restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
+    restore_mode: ${RELAY_2_SWITCH_RESTORE_MODE}
     platform: template
     lambda: |-
       return id(relay_2_state);
@@ -1188,7 +1200,7 @@ switch:
   - id: sw_relay_3
     name: Relay 3
     internal: ${SL_RELAY_3_MODE != 1 or gang_count < 3}
-    restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
+    restore_mode: ${RELAY_3_SWITCH_RESTORE_MODE}
     platform: template
     lambda: |-
       return id(relay_3_state);
@@ -1207,7 +1219,7 @@ switch:
   - id: sw_relay_4
     name: Relay 4
     internal: ${SL_RELAY_4_MODE != 1 or gang_count < 4}
-    restore_mode: ${RELAYS_SWITCH_RESTORE_MODE}
+    restore_mode: ${RELAY_4_SWITCH_RESTORE_MODE}
     platform: template
     lambda: |-
       return id(relay_4_state);

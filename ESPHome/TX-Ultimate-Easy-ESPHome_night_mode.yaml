@@ -69,7 +69,8 @@ light:
     platform: partition
     gamma_correct: ${LIGHT_GAMMA_CORRECT}
     internal: true
-    restore_mode: RESTORE_DEFAULT_OFF
+    # Only mirrors "Night Mode" and "Night Mode - Color", which are saved themselves: never saved to NVS.
+    restore_mode: ALWAYS_OFF
     segments:
       - id: light_full
         from: 0

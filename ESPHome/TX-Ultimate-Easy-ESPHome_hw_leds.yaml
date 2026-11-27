@@ -32,7 +32,8 @@ substitutions:
   # at the cost of a less linear perceived brightness curve. 0 disables it.
   LIGHT_GAMMA_CORRECT: 2.8
 
-  LIGHT_FULL_RESTORE_MODE: RESTORE_DEFAULT_OFF
+  # The whole strip is only drawn by the lights below, so its own state is never saved to NVS.
+  LIGHT_FULL_RESTORE_MODE: ALWAYS_OFF
   LIGHT_SIDES_RESTORE_MODE: RESTORE_DEFAULT_OFF
 
   LIGHT_LED_COUNT: ${28 if IS_EU_MODEL else 32}
