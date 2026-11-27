@@ -26,8 +26,9 @@ void TxUltimateEasy::setup() { ESP_LOGI(TAG, "TX Ultimate Easy is initialized");
  * the rest of it is ignored. This also keeps a 0xAA in the payload (e.g. a swipe channel bitmap) from being taken
  * as a new header. A 0xAA as the last decoded byte is only taken as a new header if a 0x55 follows it. A shorter frame
  * is dispatched when a new header arrives or after UART_FRAME_IDLE_TIMEOUT_MS without new bytes, if it has at least
- * UART_FRAME_MIN_SIZE bytes (all UART_FRAME_DECODE_SIZE bytes for a swipe); otherwise it is discarded. A lone 0xAA
- * followed by a gap of UART_HEADER_GAP_TIMEOUT_MS is not taken as the start of a header.
+ * UART_FRAME_MIN_SIZE bytes (all UART_FRAME_DECODE_SIZE bytes for a swipe); otherwise it is discarded. After a gap
+ * of UART_FRAME_GAP_TIMEOUT_MS, an incomplete frame is discarded (or dispatched, if long enough) instead of being
+ * completed by the next bytes, and a 0xAA before the gap is not taken as the start of a header.
  */
 void TxUltimateEasy::loop() {
   bool received = false;
@@ -38,12 +39,12 @@ void TxUltimateEasy::loop() {
     received = true;
     const uint32_t now = millis();
     // Bytes of a frame arrive back-to-back: after a gap, an earlier byte is not part of the same header or frame
-    const bool contiguous = (now - this->uart_last_byte_ms_) < UART_HEADER_GAP_TIMEOUT_MS;
+    const bool contiguous = (now - this->uart_last_byte_ms_) < UART_FRAME_GAP_TIMEOUT_MS;
     const int previous_byte = contiguous ? this->uart_last_byte_ : -1;
     this->uart_last_byte_ = byte;
     this->uart_last_byte_ms_ = now;
-    if (!contiguous && this->uart_frame_size_ == 1 && !this->uart_frame_dispatched_)
-      this->uart_frame_size_ = 0;  // Expire a lone 0xAA, so a later 0x55 does not complete it as a header
+    if (!contiguous && this->uart_frame_size_ > 0 && !this->uart_frame_dispatched_)
+      this->flush_frame_();  // Stale incomplete frame: never complete it with bytes received after the gap
     const bool receiving = this->uart_frame_size_ > 0 && !this->uart_frame_dispatched_;
 
     // A header (0xAA 0x55) other than the one of the frame being received always starts a new frame
@@ -96,6 +97,8 @@ void TxUltimateEasy::loop() {
     if (this->uart_frame_size_ >= UART_FRAME_MIN_SIZE &&
         millis() - this->uart_last_byte_ms_ >= UART_FRAME_IDLE_TIMEOUT_MS) {
       this->flush_frame_();
+      // The frame is complete: its last byte (e.g. a 0xAA in byte 7) is not the start of a following header
+      this->uart_last_byte_ = -1;
     } else if (received) {
       ESP_LOGV(TAG, "UART - Partial frame: %" PRIu8 " bytes, waiting for the rest", this->uart_frame_size_);
     }

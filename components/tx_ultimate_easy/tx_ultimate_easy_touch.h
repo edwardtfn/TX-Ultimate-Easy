@@ -38,9 +38,10 @@ constexpr uint8_t UART_FRAME_MIN_SIZE = 7;
 constexpr uint8_t UART_FRAME_DECODE_SIZE = 8;
 // A frame with at least UART_FRAME_MIN_SIZE bytes, but no more bytes for this long, is dispatched as it is
 constexpr uint32_t UART_FRAME_IDLE_TIMEOUT_MS = 20;
-// After a gap this long between reads, a lone 0xAA is no longer paired with a following 0x55 as a header.
-// Longer than the idle timeout, as it is measured when the bytes are read, which a slow loop() can delay.
-constexpr uint32_t UART_HEADER_GAP_TIMEOUT_MS = 100;
+// After a gap this long between reads, an incomplete frame is stale: it is discarded instead of being completed by
+// the next bytes, and a 0xAA is no longer paired with a following 0x55 as a header. Much longer than the idle
+// timeout, as it is measured when the bytes are read, which a slow loop() can delay.
+constexpr uint32_t UART_FRAME_GAP_TIMEOUT_MS = 250;
 
 struct TouchPoint {
   uint8_t button = 0;
