@@ -4,14 +4,15 @@ import time
 
 # Most NVS entries the standard test build may use once every saved setting has been written.
 # The build saves 25 entities: about 82 entries when all of them are written (a saved value takes 3 NVS entries,
-# a light 4). Before the relay indicators and other derived lights stopped being saved, it saved 52 entities:
-# about 189 entries. The limit sits between the two, so the derived lights cannot quietly start saving again.
+# a light 4); CI measured 79 when this test first ran. Before the relay indicators and other derived lights stopped
+# being saved, it saved 52 entities: about 189 entries. The limit sits between the two, so the derived lights
+# cannot quietly start saving again.
 NVS_ENTRY_BUDGET = 120
 
 # Size of the NVS partition in tests/configs/nvs_small_partitions.csv
 NVS_SMALL_PARTITION_SIZE = 0x5000
 
-# Dummy settings saved per API call: each emulated flash write takes ~0.2 s, so this stays well under the watchdog
+# Dummy settings saved per API call (~0.2 s each under QEMU); the action stops at the first failed write
 NVS_FILL_CHUNK = 20
 # Upper bound of dummy settings: a 20 KB NVS partition holds far fewer, so filling always ends with a failed write
 NVS_FILL_MAX = 400
@@ -105,29 +106,30 @@ def test_tc_n04_full_nvs_degrades_safely(nvs_small_switch):
     sw.drain_logs()
 
     # 1. Fill NVS with dummy settings until a write fails
-    filled = False
+    full_match = None
     for start in range(0, NVS_FILL_MAX, NVS_FILL_CHUNK):
         sw.execute_action("test_nvs_fill", {"start": start, "count": NVS_FILL_CHUNK})
-        sw.assert_log(f"Dummy settings {start} to {start + NVS_FILL_CHUNK - 1}:", timeout=20.0)
-        if "NOT saved" in sw.get_recent_logs():
-            filled = True
+        sw.assert_log(f"Dummy settings from {start}:", timeout=30.0)
+        full_match = re.search(rf"Dummy settings from {start}: (\d+) saved, then NVS full", sw.get_recent_logs())
+        if full_match:
             break
-    assert filled, f"NVS did not fill up with {NVS_FILL_MAX} dummy settings"
-    sw.assert_log("failed. Last error=")
-    print(f"\n  [*] NVS full after {start + NVS_FILL_CHUNK} dummy settings", flush=True)
+    assert full_match, f"NVS did not fill up with {NVS_FILL_MAX} dummy settings"
+    sw.assert_log("failed. Last error=ESP_ERR_NVS_NOT_ENOUGH_SPACE")
+    print(f"\n  [*] NVS full after {start + int(full_match.group(1))} dummy settings", flush=True)
 
-    # 2. The device keeps working: relays still switch, and their state is still reported
+    # 2. The device keeps working: relays still switch, and their state is still reported.
+    # The relay's own save now fails too, which takes ~4 s under QEMU, so allow more time than usual.
     sw.drain_logs()
     sw.set_relay(1, True)
-    assert sw.wait_for_entity_state("Relay 1", True), "Relay 1 did not turn on with a full NVS"
+    assert sw.wait_for_entity_state("Relay 1", True, timeout=15.0), "Relay 1 did not turn on with a full NVS"
     sw.set_relay(1, False)
-    assert sw.wait_for_entity_state("Relay 1", False), "Relay 1 did not turn off with a full NVS"
+    assert sw.wait_for_entity_state("Relay 1", False, timeout=15.0), "Relay 1 did not turn off with a full NVS"
 
     # 3. The device still boots with a full NVS, and relays still work afterwards
     print("\n  [*] Rebooting QEMU emulator with a full NVS...", flush=True)
     sw.restart()
     sw.assert_log("Boot completed: Yes", timeout=20.0)
     sw.set_relay(2, True)
-    assert sw.wait_for_entity_state("Relay 2", True), "Relay 2 did not turn on after booting with a full NVS"
+    assert sw.wait_for_entity_state("Relay 2", True, timeout=15.0), "Relay 2 did not turn on after booting with a full NVS"
     sw.set_relay(2, False)
-    assert sw.wait_for_entity_state("Relay 2", False)
+    assert sw.wait_for_entity_state("Relay 2", False, timeout=15.0)

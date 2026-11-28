@@ -57,8 +57,9 @@ ethernet:
 
 api:
   actions:
-    # Saves `count` dummy settings (32 bytes each) under keys that no entity uses, like settings left behind by
-    # entity renames. Run it a few settings at a time: each emulated flash write takes ~0.2 s.
+    # Saves up to `count` dummy settings (32 bytes each) under keys that no entity uses, like settings left behind
+    # by entity renames, and stops at the first one that fails. One at a time: an emulated flash write takes ~0.2 s,
+    # but a write that fails on a full NVS takes ~4 s, and several in one loop pass would trip the task watchdog.
     - action: test_nvs_fill
       variables:
         start: int
@@ -66,15 +67,19 @@ api:
       then:
         - lambda: |-
             uint32_t data[8]{};
+            int saved = 0;
             for (int i = start; i < start + count; i++) {
               data[0] = static_cast<uint32_t>(i);
               ESPPreferenceObject pref =
                   global_preferences->make_preference(sizeof(data), 0x7E570000u + static_cast<uint32_t>(i), true);
               pref.save(reinterpret_cast<const uint8_t *>(data), sizeof(data));
+              if (!global_preferences->sync()) {
+                ESP_LOGI("test.nvs", "Dummy settings from %d: %d saved, then NVS full", start, saved);
+                return;
+              }  // sync failed
+              saved++;
             }
-            const bool saved = global_preferences->sync();
-            ESP_LOGI("test.nvs", "Dummy settings %d to %d: %s", start, start + count - 1,
-                     saved ? "saved" : "NOT saved");
+            ESP_LOGI("test.nvs", "Dummy settings from %d: %d saved", start, saved);
 
 packages:
   core: !include ../../ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
