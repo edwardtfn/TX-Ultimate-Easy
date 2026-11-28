@@ -38,6 +38,7 @@ BUTTON_ACTION_MAP = {
     "toggle": "Relay {gang} (toggle)",
     "relay": "Relay {gang} (toggle)",
     "failsafe": "Relay {gang} (API failsafe only)",
+    "momentary": "Relay {gang} (momentary)",
 }
 
 LIGHT_MODE_MAP = {
@@ -508,7 +509,7 @@ class QemuHarness:
     # --- Mode & Configuration Controls (Native API) ---
 
     def set_button_action(self, gang: int, action: str):
-        """Set Button action at runtime: 'None', 'Relay X (toggle)', 'Relay X (API failsafe only)'."""
+        """Set Button action at runtime: 'None', 'Relay X (toggle)', 'Relay X (API failsafe only)', 'Relay X (momentary)'."""
         if not self.api_client or not self._api_loop:
             raise RuntimeError("ESPHome Native API client is not connected")
         template = BUTTON_ACTION_MAP.get(action.lower().strip(), action)

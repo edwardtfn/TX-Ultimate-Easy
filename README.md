@@ -152,6 +152,16 @@ For more details, please refer to our **[Events docs](docs/events.md)**.
   Example: Trigger scenes or complex automations through Home Assistant
 - **Relay Toggle**: Direct control of the associated relay
   Example: Toggle relay state with each press, independent of Home Assistant
+- **Relay (API failsafe only)**: Toggles the relay locally only while Home Assistant is not connected
+- **Relay (momentary)**: The relay is on only while the button is touched, and turns off on release
+  Example: Drive the push-button input of a dimmer (hold to dim), a door bell or a gate opener
+  - It reacts to the touch itself, so a swipe or multi-touch starting over the button briefly energizes the relay
+  - The touch panel ends a touch after about 5 seconds, even while the finger is still down, and reports nothing
+    when the finger is lifted afterwards, so the relay is held for at most about 5 seconds.
+    To dim further, release and touch again
+  - Click, double-click and long-press events are still sent to Home Assistant
+  - The relay is turned off after a restart, and the relay pulse time (if set) still limits how long it stays on
+  - If a release is ever missed, the relay is still turned off after 6 seconds, as a safety limit
 - **Cover open / Cover close**: Local control of a cover, available when the [cover package](docs/cover.md) is installed
 
 #### Automation

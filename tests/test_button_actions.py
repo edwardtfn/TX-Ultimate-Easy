@@ -178,3 +178,108 @@ def test_tc_ba07_decoupled_relay_remote_toggle_led_coherence(switch):
     switch.set_relay(1, False)
     switch.assert_log("Turn-off Bottom light for Relay 1")
     assert switch.wait_for_entity_state("Relay 1", False)
+
+
+def _set_momentary(sw, gang: int = 1):
+    """Set the button action of `gang` to momentary and wait until it is reported."""
+    sw.set_button_action(gang, "momentary")
+    assert sw.wait_for_entity_state(f"Button {gang} action", f"Relay {gang} (momentary)")
+    sw.drain_logs()
+
+
+def test_tc_ba08_momentary_on_while_held(switch):
+    """TC-BA08: Button action 'Relay X (momentary)' keeps the relay on while held and turns it off on release.
+
+    The relay follows the touch itself: it is never toggled by the click handling, so a long hold does not
+    turn it off and the release always does.
+    """
+    _set_momentary(switch, 1)
+    pos = 1  # Gang 1
+
+    # Touch-down: the relay turns on immediately, without waiting for the click handling
+    switch.send_touch_frame(0x02, 0x00, pos, 0x00)
+    switch.assert_log("Momentary relay 1: on")
+    assert switch.wait_for_entity_state("Relay 1", True)
+
+    # Still held past the multi-click delay: the relay stays on
+    time.sleep(1.0)
+    assert switch.get_entity_state("Relay 1") is True
+
+    # Release: the relay turns off, and the button event that follows never toggles it
+    switch.send_touch_frame(0x01, pos, pos, 0x00)
+    switch.assert_log("Momentary relay 1: off")
+    assert switch.wait_for_entity_state("Relay 1", False)
+    switch.assert_no_log("Toggle relay 1")
+
+
+def test_tc_ba09_momentary_long_touch_release(switch):
+    """TC-BA09: A hardware long-touch release (x >= 17) releases a momentary relay (e.g. hold to dim)."""
+    _set_momentary(switch, 1)
+
+    switch.hardware_long_touch(gang=1, hold_ms=LONG_PRESS_HOLD_MS)
+    switch.assert_log("Momentary relay 1: on")
+    switch.assert_log("Momentary relay 1: off")
+    assert switch.wait_for_entity_state("Relay 1", False)
+    switch.assert_log("Button 1 action: 'long_press'")
+    assert "Toggle relay 1" not in switch.get_recent_logs()
+
+
+def test_tc_ba10_momentary_released_by_gestures(switch):
+    """TC-BA10: A swipe or a multi-touch starting over a momentary button releases its relay.
+
+    The relay reacts to the touch-down, so it is briefly energized before the panel reports the gesture.
+    The gesture frame alone must release the relay: the ordinary release is only sent after the checks, and
+    the timeouts are well below the 6 s hold limit, which would also release it.
+    """
+    _set_momentary(switch, 1)
+    switch.send_touch_frame(0x02, 0x00, 1, 0x00)  # Touch-down on gang 1
+    switch.assert_log("Momentary relay 1: on")
+    switch.send_touch_frame(0x03, 0x0C, 0x00, 0xFF)  # Swipe right
+    switch.assert_log("Momentary relay 1: off", timeout=2.0)
+    assert switch.wait_for_entity_state("Relay 1", False, timeout=2.0)
+    switch.send_touch_frame(0x01, 7, 7, 0x00)  # Release at the end of the swipe
+    time.sleep(1.0)
+
+    _set_momentary(switch, 2)
+    switch.send_touch_frame(0x02, 0x00, 5, 0x00)  # Touch-down on gang 2
+    switch.assert_log("Momentary relay 2: on")
+    switch.send_touch_frame(0x01, 0x0B, 0x00, 0x00)  # Multi-touch
+    switch.assert_log("Momentary relay 2: off", timeout=2.0)
+    assert switch.wait_for_entity_state("Relay 2", False, timeout=2.0)
+    switch.send_touch_frame(0x01, 5, 5, 0x00)  # Release
+
+
+def test_tc_ba11_momentary_touch_moves_to_other_button(switch):
+    """TC-BA11: When the touch moves to another button, the relay held by the previous button is released."""
+    _set_momentary(switch, 1)
+    switch.set_button_action(2, "None")
+    time.sleep(0.5)
+    switch.drain_logs()
+
+    switch.send_touch_frame(0x02, 0x00, 1, 0x00)  # Touch-down on gang 1
+    switch.assert_log("Momentary relay 1: on")
+    switch.send_touch_frame(0x02, 0x00, 5, 0x00)  # The touch moves to gang 2
+    switch.assert_log("Momentary relay 1: off (moved to button 2)")
+    assert switch.wait_for_entity_state("Relay 1", False)
+    switch.send_touch_frame(0x01, 5, 5, 0x00)  # Release
+    assert switch.get_entity_state("Relay 2") is False
+
+
+def test_tc_ba12_momentary_released_when_release_is_lost(switch):
+    """TC-BA12: A momentary relay is released after the hold limit if its release frame never arrives (#100).
+
+    The touch panel ends every touch after about 5 s, so a hold longer than the limit (6 s) means a lost release.
+    """
+    _set_momentary(switch, 1)
+
+    switch.send_touch_frame(0x02, 0x00, 1, 0x00)  # Touch-down on gang 1, and no release
+    switch.assert_log("Momentary relay 1: on")
+    assert switch.wait_for_entity_state("Relay 1", True)
+
+    switch.assert_log("Momentary relay held for 6000 ms without a release: releasing", timeout=10.0)
+    switch.assert_log("Momentary relay 1: off")
+    assert switch.wait_for_entity_state("Relay 1", False)
+
+    # Clear the pending press, as if the release had arrived, so the next test starts from a clean state
+    switch.send_touch_frame(0x01, 1, 1, 0x00)
+    time.sleep(1.0)

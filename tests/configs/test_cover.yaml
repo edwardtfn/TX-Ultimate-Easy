@@ -15,10 +15,19 @@ esp32:
   watchdog_timeout: 30s
   framework:
     type: esp-idf
+    sdkconfig_options:
+      # Same cause, for the interrupt watchdog (300 ms default): a preferences sync that erases an NVS page can keep
+      # the emulated flash busy longer than that, and the reset (TG1WDT_SYS_RESET) reboots the firmware mid-test.
+      CONFIG_ESP_INT_WDT_TIMEOUT_MS: "5000"
 
 logger:
   level: VERBOSE
   baud_rate: 115200
+
+# The cover build has no night mode package, which sets this for the other builds. Without it, preferences are
+# only flushed after the 60 s default, so the reboot persistence tests would read stale NVS data.
+preferences:
+  flash_write_interval: 1s
 
 substitutions:
   name: tx-qemu-cover

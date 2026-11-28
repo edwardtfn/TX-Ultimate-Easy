@@ -49,17 +49,20 @@ The test suite is fully self-contained within the repository and automatically m
 
 ---
 
-## Test Modules & Expected Behavioral Coverage (84 Collected Tests)
+## Test Modules & Expected Behavioral Coverage (92 Collected Tests)
 
 The test suite is partitioned into 12 focused test modules:
 
-1. **`tests/test_button_actions.py` (7 Tests)**:
+1. **`tests/test_button_actions.py` (12 Tests)**:
    - Button action modes: `Toggle`, `None`, and `Failsafe`.
    - Decoupled smart bulb mode: physical tap emits HA event without relay toggle,
      remote HA toggle commands relay with LED coherence.
    - API disconnect failsafe: fallback to local relay toggle when Home Assistant connection drops.
    - Rapid cross-gang taps (`TC-BA04`): rapid taps on Gang 1 then Gang 2 must fire click actions for both gangs.
    - Hardware long-touch release (`TC-BA05`): hardware release code `x >= 17` must trigger button long press action.
+   - Momentary action (`TC-BA08` to `TC-BA11`): the relay is on while the button is held and off on any end of the
+     touch (release, long-touch release, swipe, multi-touch, or the touch moving to another button).
+   - Momentary hold limit (`TC-BA12`): a momentary relay is released when its release frame never arrives.
 
 2. **`tests/test_gestures.py` (12 Tests)**:
    - Single clicks across all gangs.
@@ -107,12 +110,13 @@ The test suite is partitioned into 12 focused test modules:
    - Relay LEDs shown over the Night Mode color (`TC-NM07`) when `Night Mode - Suppress Relay LEDs` is off,
      suppressed again when it is turned back on (`TC-NM08`), and never painted over `Lights (all)` (`TC-NM09`).
 
-8. **`tests/test_persistence.py` (5 Tests)**:
+8. **`tests/test_persistence.py` (6 Tests)**:
    - Button action configuration persistence across hard reboots.
    - Relay LED indicator mode persistence across hard reboots.
    - Relay default power-on safety (`RESTORE_DEFAULT_OFF`).
    - Boot deferred LED repaint sequence.
    - Relay state restoration across reboot per `RESTORE_DEFAULT_OFF` policy.
+   - Momentary button action persistence, with its relay turned off after the reboot (`TC-P06`).
 
 9. **`tests/test_haptics.py` (6 Tests)**:
    - Touch vibration feedback on press and release.
@@ -129,19 +133,21 @@ The test suite is partitioned into 12 focused test modules:
     - Multi-gang concurrent independent debounce.
     - Swipes, palm touches, partial drags, and hardware long touches in instant click mode.
 
-11. **`tests/test_fuzzing.py` (6 Tests)**:
+11. **`tests/test_fuzzing.py` (7 Tests)**:
     - Truncated UART frames and corrupted sync headers.
     - Out-of-bounds position bytes and rapid FIFO flood handling without crashes.
     - Chunked touch packets across loop ticks (`TC-F05`): split packets must buffer and register a valid press.
     - Payload handling (`TC-F06`): payload bytes containing 0xAA must parse safely without false header reset.
+    - Chunked release packets (`TC-F07`): a split release must still release the button.
 
-12. **`tests/test_cover.py` (6 Tests)**:
+12. **`tests/test_cover.py` (7 Tests)**:
     - Tests dedicated cover firmware build (`TX-Ultimate-Easy-ESPHome_cover.yaml`).
     - Entity exposure: the cover and its travel times are exposed, the cover relays are not.
     - Full open and close energizing only the relay of the requested direction.
     - Direction reversal (`TC-CV03`): the active relay must turn off before the opposite one turns on.
     - Stop from Home Assistant and from the buttons (`Cover open` / `Cover close` button actions).
     - A relay not used by the cover keeps working as a regular relay.
+    - Cover button actions persist across reboot (`TC-CV07`), as their NVS codes differ from their select indexes.
 
 ---
 
