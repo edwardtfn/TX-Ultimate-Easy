@@ -1,0 +1,89 @@
+---
+# Test only: the standard test build with a small NVS partition (see nvs_small_partitions.csv), and an action that
+# fills it with dummy settings, to check that the firmware keeps working when settings can no longer be saved.
+esphome:
+  name: tx-qemu-test-nvs
+  friendly_name: TX QEMU Test NVS
+  includes:
+    - qemu_stubs.h
+  build_flags:
+    - "-Wl,--wrap=rmt_tx_wait_all_done"
+    - "-Wl,--wrap=rmt_transmit"
+
+esp32:
+  board: esp32dev
+  # Each emulated flash write takes ~0.2 s, and the first boot from a clean flash saves many preferences in one
+  # loop pass: longer than the 5 s default task watchdog, whose reset then crash-loops under QEMU.
+  watchdog_timeout: 30s
+  partitions: nvs_small_partitions.csv
+  framework:
+    type: esp-idf
+    sdkconfig_options:
+      # Same cause, for the interrupt watchdog (300 ms default): a preferences sync that erases an NVS page can keep
+      # the emulated flash busy longer than that, and the reset (TG1WDT_SYS_RESET) reboots the firmware mid-test.
+      # Filling NVS (TC-N04) erases pages repeatedly.
+      CONFIG_ESP_INT_WDT_TIMEOUT_MS: "5000"
+
+logger:
+  level: VERBOSE
+  baud_rate: 115200
+
+# The tests restart QEMU abruptly, like a power cut, so preferences must be flushed quickly or the reboot
+# persistence tests read stale NVS data. Test only: the firmware keeps ESPHome's 60 s default.
+preferences:
+  flash_write_interval: 1s
+
+substitutions:
+  name: tx-qemu-test-nvs
+  friendly_name: TX QEMU Test NVS
+  device_format: EU
+  gang_count: 3
+  touch_uart_rx_pin: GPIO3
+  touch_uart_tx_pin: GPIO1
+  # Emulator timing jitter has stretched 50 ms taps to ~900 ms, past the 500 ms default.
+  BUTTON_LONG_PRESS_DELAY: "2000"
+
+external_components:
+  - source:
+      type: local
+      path: ../../components
+    components:
+      - tx_ultimate_easy
+
+wifi: !remove
+
+ethernet:
+  type: OPENETH
+
+api:
+  actions:
+    # Saves up to `count` dummy settings (32 bytes each) under keys that no entity uses, like settings left behind
+    # by entity renames, and stops at the first one that fails. One at a time: an emulated flash write takes ~0.2 s,
+    # but a write that fails on a full NVS takes ~4 s, and several in one loop pass would trip the task watchdog.
+    - action: test_nvs_fill
+      variables:
+        start: int
+        count: int
+      then:
+        - lambda: |-
+            uint32_t data[8]{};
+            int saved = 0;
+            for (int i = start; i < start + count; i++) {
+              data[0] = static_cast<uint32_t>(i);
+              ESPPreferenceObject pref =
+                  global_preferences->make_preference(sizeof(data), 0x7E570000u + static_cast<uint32_t>(i), true);
+              pref.save(reinterpret_cast<const uint8_t *>(data), sizeof(data));
+              if (!global_preferences->sync()) {
+                ESP_LOGI("test.nvs", "Dummy settings from %d: %d saved, then NVS full", start, saved);
+                return;
+              }  // sync failed
+              saved++;
+            }
+            ESP_LOGI("test.nvs", "Dummy settings from %d: %d saved", start, saved);
+
+packages:
+  core: !include ../../ESPHome/TX-Ultimate-Easy-ESPHome_core.yaml
+  relays: !include ../../ESPHome/TX-Ultimate-Easy-ESPHome_hw_relays.yaml
+  night_mode: !include ../../ESPHome/TX-Ultimate-Easy-ESPHome_night_mode.yaml
+  vibration: !include ../../ESPHome/TX-Ultimate-Easy-ESPHome_hw_vibration.yaml
+...

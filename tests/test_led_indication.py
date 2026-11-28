@@ -150,7 +150,6 @@ def test_tc_l07_first_light_mode_change_after_boot_applies_immediately(switch):
     switch.assert_log("Relay 1 light mode changed to Disabled - turning off lights", timeout=2.5)
 
 
-@pytest.mark.xfail(reason="Stock firmware upstream defect: side partition turn-off lacks relay indicator restoration hook")
 def test_tc_l08_side_partition_turn_off_restores_relay_indicator(switch):
     """TC-L08: Turning OFF an individual side partition must restore active relay status LEDs.
 
@@ -173,5 +172,4 @@ def test_tc_l08_side_partition_turn_off_restores_relay_indicator(switch):
     switch.set_light("Light - Bottom", False)
 
     # Relay 1 indicator must be repainted / restored ON
-    # On stock firmware: no on_turn_off hook exists for side partitions, so this assertion fails:
     switch.assert_log("Turn-on Bottom light for Relay 1", timeout=3.0)

@@ -10,6 +10,8 @@ from typing import Optional
 REPO_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TESTS_DIR = os.path.join(REPO_DIR, "tests")
 CONFIGS_DIR = os.path.join(TESTS_DIR, "configs")
+# Partition table with a small NVS partition, used by test_nvs_small.yaml
+NVS_SMALL_PARTITIONS = "nvs_small_partitions.csv"
 _REPO_HASH = hashlib.sha256(REPO_DIR.encode("utf-8")).hexdigest()[:8]
 DEFAULT_BUILD_CACHE_DIR = os.path.join(tempfile.gettempdir(), f"tx_ultimate_{os.path.basename(REPO_DIR)}_{_REPO_HASH}")
 
@@ -85,7 +87,7 @@ def get_compiler_identity(esphome_exe: str) -> str:
 
 def compute_build_fingerprint(esphome_exe: str, config_path: str) -> str:
     """Return a SHA-256 fingerprint of the compiler identity and of every file the firmware is built from."""
-    sources = [config_path, os.path.join(CONFIGS_DIR, "qemu_stubs.h")]
+    sources = [config_path, os.path.join(CONFIGS_DIR, "qemu_stubs.h"), os.path.join(CONFIGS_DIR, NVS_SMALL_PARTITIONS)]
     for source_dir in ("ESPHome", "components", "versioning"):
         for root, dirs, files in os.walk(os.path.join(REPO_DIR, source_dir)):
             dirs[:] = [d for d in dirs if d != "__pycache__"]
@@ -171,10 +173,12 @@ def build_and_pad_firmware(
         abs_components = os.path.join(REPO_DIR, "components").replace("\\", "/")
         abs_esphome = os.path.join(REPO_DIR, "ESPHome").replace("\\", "/")
         abs_stubs = os.path.join(CONFIGS_DIR, "qemu_stubs.h").replace("\\", "/")
+        abs_partitions = os.path.join(CONFIGS_DIR, NVS_SMALL_PARTITIONS).replace("\\", "/")
 
         content = content.replace("../../components", abs_components)
         content = content.replace("../../ESPHome", abs_esphome)
         content = content.replace("qemu_stubs.h", abs_stubs)
+        content = content.replace(f"partitions: {NVS_SMALL_PARTITIONS}", f"partitions: {abs_partitions}")
 
         # Inject build_path under esphome
         build_path_str = target_build_dir.replace("\\", "/")
@@ -243,4 +247,7 @@ def ensure_all_test_assets(force: bool = False, build_cache_dir: str = DEFAULT_B
     cover_flash = build_and_pad_firmware(
         "test_cover.yaml", "qemu_flash_cover.bin", force=force, build_cache_dir=build_cache_dir
     )
-    return std_flash, inst_flash, light_flash, cover_flash
+    nvs_small_flash = build_and_pad_firmware(
+        "test_nvs_small.yaml", "qemu_flash_nvs_small.bin", force=force, build_cache_dir=build_cache_dir
+    )
+    return std_flash, inst_flash, light_flash, cover_flash, nvs_small_flash

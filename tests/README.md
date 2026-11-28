@@ -26,15 +26,17 @@ The test suite is fully self-contained within the repository and automatically m
      missing on a clean clone.
 
 2. **Automated Multi-Target Builds & Flash Caching**:
-   - Compiles four isolated firmware targets to local temporary storage (preventing network locks):
+   - Compiles five isolated firmware targets to local temporary storage (preventing network locks):
      - `test_standard.yaml`: Core (Buttons + LEDs + Touchpad) + Relays + Vibration + Night Mode.
      - `test_instant.yaml`: Core (Buttons + LEDs + Touchpad) + Relays +
        **Instant Click Mode** (`instant_click_mode: true`).
      - `test_light.yaml`: Mixed Gang Presentation (`relay_1_mode: switch`, `relay_2_mode: light`).
      - `test_cover.yaml`: Core + Relays + Cover (relays 1 and 2 drive the cover, relay 3 is a regular relay).
+     - `test_nvs_small.yaml`: The standard build with a small (20 KB) NVS partition (`nvs_small_partitions.csv`)
+       and a `test_nvs_fill` API action that fills it with dummy settings.
    - Pads the factory binaries into 8MB raw flash images.
    - Recompiles only when the content of a source file (`ESPHome/`, `components/`, `versioning/`,
-     the test configuration or stubs) or the ESPHome compiler changes, or when `--compile` is passed. The flash images are recreated from the factory
+     the test configuration, stubs or partition table) or the ESPHome compiler changes, or when `--compile` is passed. The flash images are recreated from the factory
      binaries on every run, so each session starts with a clean flash.
 
 3. **Multi-QEMU Session Isolation**:
@@ -42,16 +44,17 @@ The test suite is fully self-contained within the repository and automatically m
    - Instant Click firmware runs on ports `4446` (UART0 logs), `4447` (UART1 touch), and `6054` (API).
    - Light Relay Mode runs on ports `4448` (UART0 logs), `4449` (UART1 touch), and `6056` (API).
    - Cover firmware runs on ports `4450` (UART0 logs), `4451` (UART1 touch), and `6058` (API).
-   - The standard emulator runs for the whole session. The Instant Click, Light Relay Mode and Cover emulators run
-     only during their own module (`test_instant_click.py`, `test_relay_modes.py`, `test_cover.py`), so at most two
-     run at once.
+   - Small NVS firmware runs on ports `4452` (UART0 logs), `4453` (UART1 touch), and `6060` (API).
+   - The standard emulator runs for the whole session. The Instant Click, Light Relay Mode, Cover and Small NVS
+     emulators run only during their own module (`test_instant_click.py`, `test_relay_modes.py`, `test_cover.py`,
+     `test_nvs.py`), so at most two run at once.
    - Instant session abort (`pytest.exit`) and automatic process termination cleanup if boot times out.
 
 ---
 
-## Test Modules & Expected Behavioral Coverage (92 Collected Tests)
+## Test Modules & Expected Behavioral Coverage (96 Collected Tests)
 
-The test suite is partitioned into 12 focused test modules:
+The test suite is partitioned into 13 focused test modules:
 
 1. **`tests/test_button_actions.py` (12 Tests)**:
    - Button action modes: `Toggle`, `None`, and `Failsafe`.
@@ -148,6 +151,12 @@ The test suite is partitioned into 12 focused test modules:
     - Stop from Home Assistant and from the buttons (`Cover open` / `Cover close` button actions).
     - A relay not used by the cover keeps working as a regular relay.
     - Cover button actions persist across reboot (`TC-CV07`), as their NVS codes differ from their select indexes.
+
+13. **`tests/test_nvs.py` (4 Tests)**:
+    - NVS partition size and entry usage reported in the config dump (`TC-N01`).
+    - NVS usage within budget once every setting is written (`TC-N02`): derived lights must not be saved.
+    - Small NVS build reports its 20 KB partition (`TC-N03`).
+    - Full NVS (`TC-N04`): the failed write is logged, relays keep working, and the device still boots.
 
 ---
 

@@ -24,6 +24,11 @@ logger:
   level: VERBOSE
   baud_rate: 115200
 
+# The tests restart QEMU abruptly, like a power cut, so preferences must be flushed quickly or the reboot
+# persistence tests read stale NVS data. Test only: the firmware keeps ESPHome's 60 s default.
+preferences:
+  flash_write_interval: 1s
+
 substitutions:
   name: tx-qemu-test
   friendly_name: TX QEMU Test

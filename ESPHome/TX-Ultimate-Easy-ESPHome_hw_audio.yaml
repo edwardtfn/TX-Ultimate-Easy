@@ -12,7 +12,8 @@
 ####################################################################################################
 ---
 substitutions:
-  SWITCH_AUDIO_AMPLIFIER_RESTORE_MODE: RESTORE_DEFAULT_ON
+  # The amplifier is never switched at runtime, so its state is not saved to NVS.
+  SWITCH_AUDIO_AMPLIFIER_RESTORE_MODE: ALWAYS_ON
 
   TAG_HW_AUDIO: tx_ultimate_easy.hw.audio
 

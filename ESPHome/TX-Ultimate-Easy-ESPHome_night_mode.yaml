@@ -31,9 +31,6 @@ esphome:
       then:
         - script.execute: night_mode_apply
 
-preferences:
-  flash_write_interval: 1s
-
 output:
   # No-op outputs backing the virtual color picker.
   # The rgb light platform requires float outputs; these intentionally do nothing
@@ -69,7 +66,8 @@ light:
     platform: partition
     gamma_correct: ${LIGHT_GAMMA_CORRECT}
     internal: true
-    restore_mode: RESTORE_DEFAULT_OFF
+    # Only mirrors "Night Mode" and "Night Mode - Color", which are saved themselves: never saved to NVS.
+    restore_mode: ALWAYS_OFF
     segments:
       - id: light_full
         from: 0

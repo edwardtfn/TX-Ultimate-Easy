@@ -94,16 +94,9 @@ script:
     mode: restart
     then:
       - lambda: |-
-          // Remove this after ESPHome v2026.1.0 is released
-          #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
           if (sl_touch_vibration_feedback->current_option() != "Disabled") {
             vibrate->execute();
           }
-          #else
-          if (strcmp(sl_touch_vibration_feedback->current_option(), "Disabled") != 0) {
-            vibrate->execute();
-          }
-          #endif
 
   - id: !extend touch_on_press
     then:
@@ -113,18 +106,10 @@ script:
     mode: restart
     then:
       - lambda: |-
-          // Remove this after ESPHome v2026.1.0 is released
-          #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
           if (sl_touch_vibration_feedback->current_option() == "On press" or
               sl_touch_vibration_feedback->current_option() == "Always") {
             vibrate->execute();
           }
-          #else
-          if (strcmp(sl_touch_vibration_feedback->current_option(), "On press") == 0 or
-              strcmp(sl_touch_vibration_feedback->current_option(), "Always") == 0) {
-            vibrate->execute();
-          }
-          #endif
 
   - id: !extend touch_on_release
     then:
@@ -134,18 +119,10 @@ script:
     mode: restart
     then:
       - lambda: |-
-          // Remove this after ESPHome v2026.1.0 is released
-          #if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 0, 0)  // Code for ESPHome newer than v2026.0.0
           if (sl_touch_vibration_feedback->current_option() == "On release" or
               sl_touch_vibration_feedback->current_option() == "Always") {
             vibrate->execute();
           }
-          #else
-          if (strcmp(sl_touch_vibration_feedback->current_option(), "On release") == 0 or
-              strcmp(sl_touch_vibration_feedback->current_option(), "Always") == 0) {
-            vibrate->execute();
-          }
-          #endif
 
   - id: vibrate
     mode: restart
