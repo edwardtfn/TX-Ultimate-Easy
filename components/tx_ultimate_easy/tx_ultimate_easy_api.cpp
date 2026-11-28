@@ -73,8 +73,9 @@ void fire_ha_event(const std::string &domain, const std::string &type, std::map<
 
 void log_nvs_stats(const char *tag) {
 #ifdef USE_ESP32
+  // The default NVS partition, the one ESPHome saves to and nvs_get_stats(nullptr, ...) reports on
   const esp_partition_t *partition =
-      esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_NVS, nullptr);
+      esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_NVS, NVS_DEFAULT_PART_NAME);
   if (partition == nullptr) {
     ESP_LOGW(tag, "NVS partition: not found");
     return;
