@@ -225,7 +225,7 @@ script:
                                           "  Turning on:  ${LIGHT_TRANSITION_TURN_ON ~ 'ms' if LIGHT_TRANSITION_TURN_ON > 0 else 'Disabled'}\n"
                                           "  Turning off: ${LIGHT_TRANSITION_TURN_OFF ~ 'ms' if LIGHT_TRANSITION_TURN_OFF > 0 else 'Disabled'}");
           ESP_LOGCONFIG("${TAG_HW_LEDS}", "LED restore modes:\n"
-                                          "  Light - All: ${LIGHT_FULL_RESTORE_MODE}\n"
+                                          "  Full strip:  ${LIGHT_FULL_RESTORE_MODE}\n"
                                           "  Sides:       ${LIGHT_SIDES_RESTORE_MODE}");
 
   - id: !extend dump_config_list_packages
