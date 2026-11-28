@@ -208,7 +208,8 @@ script:
     then:
       - lambda: |-
           #ifdef TX_ULTIMATE_EASY_NIGHT_MODE
-          if (sw_night_mode->state) {
+          // Night Mode covers the whole strip: not while "Lights (all)" is on, which takes precedence
+          if (sw_night_mode->state && !lights_all->remote_values.is_on()) {
             night_mode_apply->execute();
           }
           #endif  // TX_ULTIMATE_EASY_NIGHT_MODE
