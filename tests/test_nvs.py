@@ -44,11 +44,29 @@ def write_every_setting(sw):
         sw.set_light(light, False)
     sw.set_night_mode(True)
     sw.set_night_mode(False)
+    sw.set_light("Night Mode - Color", True)
+    sw.set_light("Night Mode - Color", False)
+    for name in ("Night Mode - Suppress Vibration", "Night Mode - Suppress Sound", "Night Mode - Suppress Relay LEDs"):
+        sw.set_switch(name, False)
+        sw.set_switch(name, True)
     sw.set_button_action(1, "None")
     sw.set_button_action(1, "Relay 1 (toggle)")
     for gang in (1, 2, 3):
         sw.set_relay(gang, False)
         sw.set_gang_light_mode(gang, "Bottom")
+    # Numbers and selects, changed then set back to their defaults (relays are off, so pulse times do nothing)
+    for name, changed, default in (
+        ("Touch event duration", 300, 250),
+        ("Button multi-click delay", 300, 250),
+        ("Relay 1 Pulse Time", 5, 0),
+        ("Relay 2 Pulse Time", 5, 0),
+        ("Relay 3 Pulse Time", 5, 0),
+        ("Vibrate duration", 20, 15),
+    ):
+        sw.set_number(name, changed)
+        sw.set_number(name, default)
+    sw.set_vibration_feedback("On press")
+    sw.set_vibration_feedback("Disabled")
     # Allow the preferences component to flush everything to NVS (flash_write_interval: 1s in the test builds)
     time.sleep(3.0)
 
